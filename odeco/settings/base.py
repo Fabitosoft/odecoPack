@@ -112,10 +112,13 @@ DJANGO_APPS = (
 # Apps specific for this project go here.
 MY_APPS = (
     'home',
+    'utils',
+    'productos',
+    'proveedores'
 )
 
 THIRD_PART_APPS = (
-
+    'import_export',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
