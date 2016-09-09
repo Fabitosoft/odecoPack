@@ -1,0 +1,84 @@
+"""Development settings and globals."""
+
+from __future__ import absolute_import
+from .base import *
+
+############### SECRET FILE
+import json
+
+# Normally you should not import ANYTHING from Django directly
+# into your settings, but ImproperlyConfigured is an exception. from django.core.exceptions import ImproperlyConfigured
+# JSON-based secrets module
+from django.core.exceptions import ImproperlyConfigured
+
+with open("secretsLocal.json") as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting,variable, secrets=secrets):
+    """ Get the environment setting or return exception """
+    try:
+        return secrets[setting][variable]
+    except KeyError:
+        error_msg = "Set the {0} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
+# print(get_secret("DATABASE","FILENAME"))
+############### END SECRET FILE
+
+########## MANAGER CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
+ADMINS = (
+    ('Admin', 'correo@correo.com'),
+)
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
+MANAGERS = ADMINS
+########## END MANAGER CONFIGURATION
+
+########## STATIC FILE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
+
+
+########## END STATIC FILE CONFIGURATION
+
+
+########## DEBUG CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
+DEBUG = True
+########## END DEBUG CONFIGURATION
+
+########## SECRET CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
+# Note: This key should only be used for development and testing.
+SECRET_KEY = r"{{ secret_key }}"
+########## END SECRET CONFIGURATION
+
+########## EMAIL CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+########## END EMAIL CONFIGURATION
+
+
+########## CACHE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+######### END CACHE CONFIGURATION
+
+
+########## DATABASE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': get_secret("DATABASE1","NAME"),
+        'USER': get_secret("DATABASE1","USER"),
+        'PASSWORD': get_secret("DATABASE1","PASSWORD"),
+        'HOST': get_secret("DATABASE1","HOST"),
+        'PORT': get_secret("DATABASE1","PORT"),
+    }
+}
+########## END DATABASE CONFIGURATION
