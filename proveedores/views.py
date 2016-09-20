@@ -1,4 +1,5 @@
 from django.db.models import Case, When, DecimalField
+from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import ListView
 from django.db.models import Max, Count
@@ -55,6 +56,13 @@ class ListaPreciosView(ListView):
                 output_field=DecimalField(max_digits=10, decimal_places=3),
             )
         )
+        query = self.request.GET.get("q")
+        if query:
+            qs = qs.filter(
+                Q(producto__referencia__icontains=query) |
+                Q(producto__descripcion_estandar__icontains=query) |
+                Q(producto__fabricante__icontains=query)
+            ).distinct()
         #qs =self.model.objects.select_related('producto','proveedor').all()
         #Members.objects.values('designation').annotate(dcount=Count('designation'))
         print(qs)

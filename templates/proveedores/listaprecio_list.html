@@ -1,55 +1,64 @@
+{% extends "base.html" %}
 {% load funciones_especiales %}
 {% load mathfilters %}
-<h1>Productos</h1>
-<table>
-    <thead>
-        <tr>
-            <td>Referencia</td>
-            <td>Descripción</td>
-            <td>Fabricante</td>
-            <td>Cant. Emp.</td>
-            <td>Uni. Med.</td>
-            <td>Costo</td>
-            <td>Moneda</td>
-            <td>Costo</td>
-            <td>Costo Euro</td>
-            <td>Costo Dolar</td>
-            <td>Costo Cop</td>
-            <td>Contado</td>
-            <td>30 Días</td>
-            <td>60 Días</td>
-            <td>OEM Contado</td>
-            <td>OEM 30 Días</td>
-            <td>OEM 60 Días</td>
-            <td>DIST Contado</td>
-            <td>DIST 30 Días</td>
-            <td>DIST 60 Días</td>
-        </tr>
-    </thead>
-    <tbody>
-    {% for pro in object_list %}
-        <tr>
-            <td>{{ pro.producto__referencia }} </td>
-            <td>{{ pro.producto__descripcion_estandar }} </td>
-            <td>{{ pro.producto__fabricante }} </td>
-            <td>{{ pro.producto__cantidad_empaque }} </td>
-            <td>{{ pro.producto__unidad_medida }} </td>
-            <td>{{ pro.costo_base }} </td>
-            <td>{{ pro.proveedor__moneda__nombre }} </td>
-            <td>{{ pro.costo_base }} </td>
-            <td>{{ pro.costo_euro }} </td>
-            <td>{{ pro.costo_dolar }} </td>
-            <td>{{ pro.costo_odeco }} </td>
-            <td>{% arreglar_centenas_lp pro.precio_contado_base %} </td>
-            <td>{% obtener_precio_lp pro.precio_contado_base CF_30 %} </td>
-            <td>{% obtener_precio_lp pro.precio_contado_base CF_60 %} </td>
-            <td>{% obtener_precio_lp pro.precio_contado_base OEM_CONT %} </td>
-            <td>{% obtener_precio_lp pro.precio_contado_base OEM_30 %} </td>
-            <td>{% obtener_precio_lp pro.precio_contado_base OEM_60 %} </td>
-            <td>{% obtener_precio_lp pro.precio_contado_base DIST_CONT %} </td>
-            <td>{% obtener_precio_lp pro.precio_contado_base DIST_30 %} </td>
-            <td>{% obtener_precio_lp pro.precio_contado_base DIST_60 %} </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{% block content %}
+    <h1>Lista de Precios</h1>
+    <form method='GET' action=''>
+        <input type='text' name='q' placeholder='Buscar' value='{{ request.GET.q }}'/>
+        <input type='submit' value='Buscar'/>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <td>Referencia</td>
+                <td>Descripción</td>
+                <td>Fabricante</td>
+                <td>Cant. Emp.</td>
+                <td>Uni. Med.</td>
+                <td>Costo</td>
+                <td>Moneda</td>
+                <td>Costo</td>
+                <td>Costo Euro</td>
+                <td>Costo Dolar</td>
+                <td>Costo Cop</td>
+                <td>Contado</td>
+                <td>30 Días</td>
+                <td>60 Días</td>
+                <td>OEM Contado</td>
+                <td>OEM 30 Días</td>
+                <td>OEM 60 Días</td>
+                <td>DIST Contado</td>
+                <td>DIST 30 Días</td>
+                <td>DIST 60 Días</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pro in object_list %}
+                <tr>
+                    <td>{{ pro.producto__referencia }} </td>
+                    <td>{{ pro.producto__descripcion_estandar }} </td>
+                    <td>{{ pro.producto__fabricante }} </td>
+                    <td>{{ pro.producto__cantidad_empaque }} </td>
+                    <td>{{ pro.producto__unidad_medida }} </td>
+                    <td>{{ pro.costo_base }} </td>
+                    <td>{{ pro.proveedor__moneda__nombre }} </td>
+                    <td>{{ pro.costo_base }} </td>
+                    <td>{{ pro.costo_euro }} </td>
+                    <td>{{ pro.costo_dolar }} </td>
+                    <td>{{ pro.costo_odeco }} </td>
+                    <td>{% arreglar_centenas_lp pro.precio_contado_base %} </td>
+                    <td>{% obtener_precio_lp pro.precio_contado_base CF_30 %} </td>
+                    <td>{% obtener_precio_lp pro.precio_contado_base CF_60 %} </td>
+                    <td>{% obtener_precio_lp pro.precio_contado_base OEM_CONT %} </td>
+                    <td>{% obtener_precio_lp pro.precio_contado_base OEM_30 %} </td>
+                    <td>{% obtener_precio_lp pro.precio_contado_base OEM_60 %} </td>
+                    <td>{% obtener_precio_lp pro.precio_contado_base DIST_CONT %} </td>
+                    <td>{% obtener_precio_lp pro.precio_contado_base DIST_30 %} </td>
+                    <td>{% obtener_precio_lp pro.precio_contado_base DIST_60 %} </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

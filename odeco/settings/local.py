@@ -1,6 +1,9 @@
 """Development settings and globals."""
 
 from __future__ import absolute_import
+
+import os
+
 from .base import *
 
 ############### SECRET FILE
@@ -91,6 +94,13 @@ else:
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+STATICFILES_DIRS = [
+    os.path.join(SITE_ROOT, "static")
+]
+
+STATIC_ROOT = '/static/'
+
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
