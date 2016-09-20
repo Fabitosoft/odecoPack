@@ -95,10 +95,6 @@ else:
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-STATICFILES_DIRS = [
-    os.path.join(SITE_ROOT, "static")
-]
-
 STATIC_ROOT = '/static/'
 
 STATICFILES_FINDERS = (
