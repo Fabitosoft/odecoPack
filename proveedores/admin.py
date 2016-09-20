@@ -2,12 +2,11 @@ from django.contrib import admin
 
 from import_export.admin import ImportExportModelAdmin
 
-from proveedores.models import Proveedor, Moneda, ListaPrecio
+from proveedores.models import Proveedor, Moneda, ListaPrecio, VariableListaPrecio
 # Register your models here.
 
 class ProveedorAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'moneda')
-    list_display_links = None
 
 class ListaPrecioAdmin(ImportExportModelAdmin):
     list_display = ('get_referencia','producto', 'proveedor',
@@ -31,3 +30,8 @@ class ListaPrecioAdmin(ImportExportModelAdmin):
 admin.site.register(Proveedor,ProveedorAdmin)
 admin.site.register(ListaPrecio,ListaPrecioAdmin)
 admin.site.register(Moneda)
+
+class VariableListaPrecioAdmin(admin.ModelAdmin):
+    list_display = ('referencia','nombre', 'value')
+
+admin.site.register(VariableListaPrecio,VariableListaPrecioAdmin)

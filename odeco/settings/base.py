@@ -23,16 +23,6 @@ SITE_NAME = basename(DJANGO_ROOT)
 path.append(DJANGO_ROOT)
 ########## END PATH CONFIGURATION
 
-########## STATIC FILE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-)
-########## END STATIC FILE CONFIGURATION
-
 ########## GENERAL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
 TIME_ZONE = 'America/Bogota'
@@ -114,11 +104,14 @@ MY_APPS = (
     'home',
     'utils',
     'productos',
-    'proveedores'
+    'proveedores',
+    'usuarios',
+    'empresas',
 )
 
 THIRD_PART_APPS = (
     'import_export',
+    'mathfilters',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

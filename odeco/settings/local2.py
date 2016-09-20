@@ -21,8 +21,6 @@ def get_secret(setting,variable, secrets=secrets):
     except KeyError:
         error_msg = "Set the {0} environment variable".format(setting)
         raise ImproperlyConfigured(error_msg)
-
-# print(get_secret("DATABASE","FILENAME"))
 ############### END SECRET FILE
 
 ########## MANAGER CONFIGURATION
@@ -34,12 +32,6 @@ ADMINS = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
 ########## END MANAGER CONFIGURATION
-
-########## STATIC FILE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-
-
-########## END STATIC FILE CONFIGURATION
 
 
 ########## DEBUG CONFIGURATION
@@ -71,14 +63,36 @@ CACHES = {
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': get_secret("DATABASE1","NAME"),
-        'USER': get_secret("DATABASE1","USER"),
-        'PASSWORD': get_secret("DATABASE1","PASSWORD"),
-        'HOST': get_secret("DATABASE1","HOST"),
-        'PORT': get_secret("DATABASE1","PORT"),
+import sys
+if 'test' in sys.argv:
+    #To run a test:
+    #coverage run --include='./*' manage.py test
+    #coverage report
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': normpath(join(SITE_ROOT, 'db.sqlite3'))
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': get_secret("DATABASE1","NAME"),
+            'USER': get_secret("DATABASE1","USER"),
+            'PASSWORD': get_secret("DATABASE1","PASSWORD"),
+            'HOST': get_secret("DATABASE1","HOST"),
+            'PORT': get_secret("DATABASE1","PORT"),
+        }
+    }
 ########## END DATABASE CONFIGURATION
+
+########## STATIC FILE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
+########## END STATIC FILE CONFIGURATION

@@ -3,7 +3,10 @@ from utils.models import TimeStampedModel
 
 # Create your models here.
 class UnidadMedida(models.Model):
-    nombre = models.CharField(max_length=120)
+    nombre = models.CharField(max_length=120, unique=True)
+
+    class Meta:
+        verbose_name_plural = "unidades de medida"
 
     def __str__(self):
         return self.nombre
@@ -19,3 +22,4 @@ class Producto(TimeStampedModel):
 
     def __str__(self):
         return self.descripcion_estandar
+

@@ -3,9 +3,11 @@ boto==2.42.0
 botocore==1.4.52
 cement==2.8.2
 colorama==0.3.7
+coverage==4.2
 diff-match-patch==20121119
 Django==1.10.1
 django-import-export==0.5.0
+django-mathfilters==0.4.0
 django-storages==1.5.0
 docker-py==1.7.2
 dockerpty==0.4.1
@@ -13,6 +15,7 @@ docopt==0.6.2
 docutils==0.12
 jmespath==0.9.0
 pathspec==0.3.4
+Pillow==3.3.1
 psycopg2==2.6.2
 python-dateutil==2.5.3
 PyYAML==3.12
