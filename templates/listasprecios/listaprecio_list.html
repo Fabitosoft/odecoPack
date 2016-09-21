@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load funciones_especiales %}
+{% load mathfilters %}
+{% block content %}
+    <h1>Lista de Precios</h1>
+    <form method='GET' action=''>
+        <input type='text' name='q' placeholder='Buscar' value='{{ request.GET.q }}'/>
+        <select name="forma_pago_id">
+        {% for forma_pago in formas_pago %}
+            <option value="{{ forma_pago.id }}" {% if forma_pago.id == formas_pago_id_selected %}selected="selected"{% endif %}>
+{#                {{ forma_pago.forma }}#}
+            {% if forma_pago.id != formas_pago_id_selected %} entro {% else %}{{ forma_pago.id }} {{ formas_pago_id_selected }} {% endif %}
+            </option>
+        {% endfor %}
+        </select>
+        <input type='submit' value='Buscar'/>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <td>Referencia</td>
+                <td>Descripción</td>
+                <td>Fabricante</td>
+                <td>Cant. Emp.</td>
+                <td>Uni. Med.</td>
+                <td>Moneda</td>
+                <td>Costo Moneda Extrajera</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pro in object_list %}
+                <tr>
+                    <td>{{ pro.producto__referencia }} </td>
+                    <td>{{ pro.producto__descripcion_estandar }} </td>
+                    <td>{{ pro.producto__fabricante }} </td>
+                    <td>{{ pro.producto__cantidad_empaque }} </td>
+                    <td>{{ pro.producto__unidad_medida }} </td>
+                    <td>{{ pro.proveedor__moneda__nombre }} </td>
+                    <td>{{ pro.costo_me }} </td>
+                    <td>{{ pro.costo_cop }} </td>
+                    <td>{% obtener_precio_lp pro.precio_base formas_pago_porcentaje %} </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ formas_pago_id_selected }}
+{% endblock %}

@@ -4,7 +4,7 @@ from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
 from productos.models import UnidadMedida,Producto
-from proveedores.models import ListaPrecio
+from listasprecios.models import ListaPrecio
 # Register your models here.
 
 class ListaPrecioInline(admin.TabularInline):

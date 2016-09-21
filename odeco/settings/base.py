@@ -107,6 +107,8 @@ MY_APPS = (
     'proveedores',
     'usuarios',
     'empresas',
+    'listasprecios',
+    'importaciones'
 )
 
 THIRD_PART_APPS = (
