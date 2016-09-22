@@ -15,7 +15,7 @@ class ListaPreciosView(ListView):
             'producto__descripcion_estandar',
             'producto__cantidad_empaque',
             'producto__fabricante',
-            'producto__unidad_medida',
+            'producto__unidad_medida__nombre',
             'proveedor__moneda__nombre',
             'proveedor__moneda__moneda_cambio__cambio',
             'proveedor__moneda__variablebasica__margen_deseado',

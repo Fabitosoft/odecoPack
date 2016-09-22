@@ -29,7 +29,7 @@
                     <td>{{ pro.producto__descripcion_estandar }} </td>
                     <td>{{ pro.producto__fabricante }} </td>
                     <td>{{ pro.producto__cantidad_empaque }} </td>
-                    <td>{{ pro.producto__unidad_medida }} </td>
+                    <td>{{ pro.producto__unidad_medida__nombre }} </td>
                     <td>{% obtener_precio_lp pro.precio_base formas_pago_porcentaje %} </td>
                 </tr>
             {% endfor %}
