@@ -57,7 +57,7 @@ if DEBUG==False:
             'USER': os.environ['POSTGRESQL_DB_USER'],
             'PASSWORD': os.environ['POSTGRESQL_DB_PASSWORD'],
             'HOST': os.environ['POSTGRESQL_DB_HOST'],
-            'PORT': "5432",
+            'PORT': "3306",
         }
     }
     ########## END DATABASE CONFIGURATION
