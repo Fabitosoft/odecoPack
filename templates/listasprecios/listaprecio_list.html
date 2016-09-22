@@ -4,16 +4,11 @@
 {% block content %}
     <h1>Lista de Precios</h1>
     <form method='GET' action=''>
-        <input type='text' name='q' placeholder='Buscar' value='{{ request.GET.q }}'/>
-        <select name="forma_pago_id">
-        {% for forma_pago in formas_pago %}
-            <option value="{{ forma_pago.id }}" {% if forma_pago.id == formas_pago_id_selected %}selected="selected"{% endif %}>
-{#                {{ forma_pago.forma }}#}
-            {% if forma_pago.id != formas_pago_id_selected %} entro {% else %}{{ forma_pago.id }} {{ formas_pago_id_selected }} {% endif %}
-            </option>
-        {% endfor %}
-        </select>
-        <input type='submit' value='Buscar'/>
+        <h5>
+            {{ formu.buscar.label }} {{ formu.buscar }}
+            {{ formu.tipo.label }} {{ formu.tipo }}
+            <input type='submit' value='Buscar'/>
+        </h5>
     </form>
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
@@ -24,8 +19,7 @@
                 <td>Fabricante</td>
                 <td>Cant. Emp.</td>
                 <td>Uni. Med.</td>
-                <td>Moneda</td>
-                <td>Costo Moneda Extrajera</td>
+                <td>Precio</td>
             </tr>
             </thead>
             <tbody>
@@ -36,9 +30,6 @@
                     <td>{{ pro.producto__fabricante }} </td>
                     <td>{{ pro.producto__cantidad_empaque }} </td>
                     <td>{{ pro.producto__unidad_medida }} </td>
-                    <td>{{ pro.proveedor__moneda__nombre }} </td>
-                    <td>{{ pro.costo_me }} </td>
-                    <td>{{ pro.costo_cop }} </td>
                     <td>{% obtener_precio_lp pro.precio_base formas_pago_porcentaje %} </td>
                 </tr>
             {% endfor %}
@@ -46,4 +37,5 @@
         </table>
     </div>
     {{ formas_pago_id_selected }}
+
 {% endblock %}

@@ -12,7 +12,7 @@ class UnidadMedida(models.Model):
         return self.nombre
 
 class Producto(TimeStampedModel):
-    id_cguno = models.PositiveIntegerField()
+    id_cguno = models.PositiveIntegerField(default=0)
     referencia = models.CharField(max_length=120, unique=True)
     descripcion_estandar = models.CharField(max_length=200)
     descripcion_comercial = models.CharField(max_length=200)
