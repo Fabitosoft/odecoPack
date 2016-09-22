@@ -28,8 +28,6 @@ class ListaPrecio(TimeStampedModel):
         unique_together = ("proveedor","producto", "cantidad_minima")
         verbose_name_plural = "listas de precios"
 
-    def __str__(self):
-        return "%s %s %s"%(self.proveedor,self.producto.referencia, self.cantidad_minima)
 
 class VariableListaPrecio(TimeStampedModel):
     forma_pago = models.OneToOneField(FormaPago, related_name='porcentaje_lp')

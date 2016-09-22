@@ -23,7 +23,9 @@ class ListaPrecioAdmin(ImportExportModelAdmin):
     def get_unidadMedida(self, obj):
         return obj.producto.unidad_medida
     get_unidadMedida.short_description = 'UM'
+
 admin.site.register(ListaPrecio,ListaPrecioAdmin)
+
 
 class VariableListaPrecioAdmin(admin.ModelAdmin):
     list_display = ('forma_pago', 'value')
