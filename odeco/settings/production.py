@@ -52,7 +52,7 @@ if DEBUG==False:
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.mysql',
             'NAME': os.environ['POSTGRESQL_DB_NAME'],
             'USER': os.environ['POSTGRESQL_DB_USER'],
             'PASSWORD': os.environ['POSTGRESQL_DB_PASSWORD'],
