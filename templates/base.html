@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>
         {% block title %}
-            Bootstrap 101 Template
+            Odecopack
         {% endblock %}
     </title>
 
@@ -24,9 +24,16 @@
 <body>
 
 {% block content %}
-Esta es una prueba
+    Esta es una prueba
 {% endblock %}
 
-{#{% include 'javascript.html' %}#}
+{% include 'javascript.html' %}
+<script>
+    $(document).ready(function () {
+        {% block script %}
+
+        {% endblock %}
+    });
+</script>
 </body>
 </html>

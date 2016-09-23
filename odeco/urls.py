@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('home.urls',namespace="home")),
     url(r'^lp/', include('listasprecios.urls',namespace="listasprecios")),
+    url(r'^lp2/', include('cotizaciones.urls',namespace="cotizaciones")),
 ]
 
 if settings.DEBUG:

@@ -2,40 +2,164 @@
 {% load funciones_especiales %}
 {% load mathfilters %}
 {% block content %}
-    <h1>Lista de Precios</h1>
-    <form method='GET' action=''>
-        <h5>
-            {{ formu.buscar.label }} {{ formu.buscar }}
-            {{ formu.tipo.label }} {{ formu.tipo }}
-            <input type='submit' value='Buscar'/>
-        </h5>
-    </form>
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <thead>
-            <tr>
-                <td>Referencia</td>
-                <td>Descripción</td>
-                <td>Fabricante</td>
-                <td>Cant. Emp.</td>
-                <td>Uni. Med.</td>
-                <td>Precio</td>
-            </tr>
-            </thead>
-            <tbody>
-            {% for pro in object_list %}
-                <tr>
-                    <td>{{ pro.producto__referencia }} </td>
-                    <td>{{ pro.producto__descripcion_estandar }} </td>
-                    <td>{{ pro.producto__fabricante }} </td>
-                    <td>{{ pro.producto__cantidad_empaque }} </td>
-                    <td>{{ pro.producto__unidad_medida__nombre }} </td>
-                    <td>{% obtener_precio_lp pro.precio_base formas_pago_porcentaje %} </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <h3>Cotización</h3>
+            <form method='GET' action=''>
+                <div class="row">
+                    <div class="col-md-5">Razón Social:</div>
+                    <div class="col-md-5">{{ cotizacion_form.razon_social }}</div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-5 col-lg-1">Nombres:</div>
+                    <div class="col-sm-12 col-md-5 col-lg-5">{{ cotizacion_form.nombres_contacto }}</div>
+                    <div class="col-sm-12 col-md-5 col-lg-1">Apellidos:</div>
+                    <div class="col-sm-12 col-md-5 col-lg-5">{{ cotizacion_form.apellidos_contacto }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-5 col-lg-2">Correo Electrónico:</div>
+                    <div class="col-sm-12 col-md-5 col-lg-4">{{ cotizacion_form.email }}</div>
+                    <div class="col-sm-12 col-md-5 col-lg-2">Número Contacto:</div>
+                    <div class="col-sm-12 col-md-5 col-lg-4">{{ cotizacion_form.nro_contacto }}</div>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <td>Referencia</td>
+                        <td>Nombre</td>
+                        <td>Cantidad</td>
+                        <td>Uni. Medida</td>
+                        <td>Precio</td>
+                        <td>Total</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items_cotizacion %}
+                        <tr id="item-{{ item.id }}">
+                            <td>{{ item.item }}</td>
+                            <td>{{ item.item.descripcion_comercial }}</td>
+                            <td>
+                                <input type='hidden' name='item' value='{{ item.id }}'/>
+                                <input class="item-qty" type="number"
+                                       value="{{ item.cantidad }}"/>
+                            </td>
+                            <td>{{ item.item.unidad_medida }}</td>
+                            <td>{{ item.precio }}</td>
+                            <td class="total">{{ item.total }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td>
+                            Total:
+                        </td>
+                        <td id="coti_val_total">
+                            {{ cotizacion_total }}
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+                <input type='submit' value='Enviar'/>
+            </form>
+        </div>
     </div>
-    {{ formas_pago_id_selected }}
+
+    <div class="row" xmlns="http://www.w3.org/1999/html">
+        <div class="col-md-10 col-md-offset-1">
+            <h3>Lista de Precios</h3>
+            <form method='GET' action=''>
+                <h5>
+                    {{ formu.buscar.label }} {{ formu.buscar }}
+                    {{ formu.tipo.label }} {{ formu.tipo }}
+                    <input type='submit' value='Buscar'/>
+                </h5>
+            </form>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <td>Referencia</td>
+                        <td>Descripción</td>
+                        <td>Fabricante</td>
+                        <td>Cant. Emp.</td>
+                        <td>Uni. Med.</td>
+                        <td>Precio</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for pro in object_list %}
+                        {% obtener_precio_lp pro.precio_base formas_pago_porcentaje as precio %}
+                        <tr>
+                            <td>{{ pro.producto__referencia }} </td>
+                            <td>{{ pro.producto__descripcion_estandar }} </td>
+                            <td>{{ pro.producto__fabricante }} </td>
+                            <td>{{ pro.producto__cantidad_empaque }} </td>
+                            <td>{{ pro.producto__unidad_medida__nombre }} </td>
+                            <td>{% obtener_precio_lp pro.precio_base formas_pago_porcentaje %} </td>
+                            <td>
+                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.producto_id precio=precio %}">
+                                    +
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
+<script>
+    {% block script %}
+        {#        $(".addicionar_boton").click(function () {#}
+        {#            var precio = $(this).prev("input[type='hidden']").val();#}
+        {#            var item = $(this).prev("input[type='hidden']").prev("input[type='hidden']").val();#}
+        {#            var data = {#}
+        {#                item_id: item,#}
+        {#                precio: precio#}
+        {#            }#}
+        {#            $.get("{% url 'cotizaciones:add_item_cotizacion' %}", data, function (data) {#}
+        {##}
+        {#            });#}
+        {##}
+        {#        });#}
+        $(".item-qty").change(function () {
+
+            var item = $(this).prev("input[type='hidden']").val();
+            var qty = $(this).val()
+            var data = {
+                item: item,
+                qty: qty
+            }
+            $.get("{% url 'cotizaciones:add_qty_item_cotizacion' %}", data, function (data) {
+                $("#coti_val_total").html(data.total_cotizacion)
+                if (data.deleted) {
+                    $("#item-" + item).fadeOut();
+                    {#                    $("#subtotal").text(data.subtotal);#}
+                    {#                    $("#taxtotal").text(data.tax_total);#}
+                    {#                    $("#carttotal").text(data.cart_total);#}
+                }
+                else {
+                    $("#item-" + item).find('.total').html(data.total_line)
+                }
+
+
+                {#  else {#}
+                {#                    $("#item-line-total-"+item).text(data.line_total);#}
+                {#                    $("#subtotal").text(data.subtotal);#}
+                {#                    $("#taxtotal").text(data.tax_total);#}
+                {#                    $("#carttotal").text(data.cart_total);#}
+                {#                }#}
+                {#                if (data.total_items == 0 ) {#}
+                {#                    $(".table").fadeOut()#}
+                {#                    var template = "{% include 'carts/empty_cart.html' %}";#}
+                {#                    $(".main-content").html(template);#}
+                {#                }#}
+
+            });
+        });
+    {% endblock %}
+</script>

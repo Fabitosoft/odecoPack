@@ -12,6 +12,8 @@ class ListaPrecioAdmin(ImportExportModelAdmin):
 
     search_fields = ['producto__referencia','producto__descripcion_estandar','producto__descripcion_comercial']
 
+    raw_id_fields = ("producto",)
+
     def get_referencia(self, obj):
         return obj.producto.referencia
     get_referencia.short_description = 'Referencia'

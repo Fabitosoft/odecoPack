@@ -21,5 +21,5 @@ class Producto(TimeStampedModel):
     unidad_medida = models.ForeignKey(UnidadMedida,on_delete=models.PROTECT, null=True)
 
     def __str__(self):
-        return self.descripcion_estandar
+        return self.referencia
 
