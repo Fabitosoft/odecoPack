@@ -12,7 +12,6 @@ from cotizaciones.forms import CotizacionForm
 
 class ListaPreciosView(ListView):
     model = ListaPrecio
-    paginate_by = 1  # and that's it !!
 
     def get_queryset(self):
         query = self.request.GET.get("buscar")
