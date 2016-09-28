@@ -1,5 +1,9 @@
 from .base import *
+import os
+
 try:
-    from .local import *
+    if os.environ['DJANGO_IS_PRODUCTION']:
+        from .production import *
 except:
-    from .production import *
+    from .local import *
+    print('entro local')
