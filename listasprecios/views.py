@@ -7,10 +7,12 @@ from cotizaciones.models import Cotizacion
 from .forms import ProductoBusqueda
 from cotizaciones.forms import CotizacionForm
 
+from usuarios.mixins import LoginRequiredMixin
+
 
 # Create your views here.
 
-class ListaPreciosView(ListView):
+class ListaPreciosView(LoginRequiredMixin,ListView):
     model = ListaPrecio
 
     def get_queryset(self):
@@ -56,9 +58,11 @@ class ListaPreciosView(ListView):
         else:
             context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje_lp.value
 
-        cotizacion = Cotizacion.objects.last()
+        cotizacion = Cotizacion.objects.filter(usuario=self.request.user).last()
+        print(cotizacion)
         if not cotizacion or cotizacion.estado == 'ENV':
             cotizacion = Cotizacion()
+            cotizacion.usuario=self.request.user
             cotizacion.save()
         context["cotizacion_form"] = CotizacionForm(self.request.GET or None)
         context["cotizacion_total"] = cotizacion.total

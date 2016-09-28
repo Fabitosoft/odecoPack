@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import RegexValidator
 from django.db.models.signals import post_save, post_delete
@@ -18,6 +19,7 @@ class Cotizacion(TimeStampedModel):
     apellidos_contacto = models.CharField(max_length=120, blank=True)
     razon_social = models.CharField(max_length=120, blank=True)
     total = models.DecimalField(max_digits=10, decimal_places=0, default=0)
+    usuario = models.ForeignKey(User, default=1)
 
     def update_total(self):
         "updating..."

@@ -10,7 +10,7 @@ class ListaPrecioInline(admin.TabularInline):
     can_delete = False
 
 class CotizacionAdmin(admin.ModelAdmin):
-    list_display = ('estado', 'razon_social','modified')
+    list_display = ('estado', 'razon_social','modified', 'usuario')
 
     inlines = [
         ListaPrecioInline,

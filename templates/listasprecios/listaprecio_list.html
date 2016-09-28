@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load funciones_especiales %}
-{% load mathfilters %}
 {% block content %}
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
@@ -97,7 +96,7 @@
                             <td>{{ pro.producto__fabricante }} </td>
                             <td>{{ pro.producto__cantidad_empaque }} </td>
                             <td>{{ pro.producto__unidad_medida__nombre }} </td>
-                            <td>{% obtener_precio_lp pro.precio_base formas_pago_porcentaje %} </td>
+                            <td>{{ precio }} </td>
                             <td>
                                 <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.producto_id precio=precio %}">
                                     +
@@ -135,7 +134,7 @@
                 qty: qty
             }
             $.get("{% url 'cotizaciones:add_qty_item_cotizacion' %}", data, function (data) {
-                $("#coti_val_total").html(data.total_cotizacion)
+                $("#coti_val_total").html(numberWithCommas(data.total_cotizacion))
                 if (data.deleted) {
                     $("#item-" + item).fadeOut();
                     {#                    $("#subtotal").text(data.subtotal);#}
@@ -143,7 +142,7 @@
                     {#                    $("#carttotal").text(data.cart_total);#}
                 }
                 else {
-                    $("#item-" + item).find('.total').html(data.total_line)
+                    $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
                 }
 
 
@@ -161,5 +160,11 @@
 
             });
         });
+
+        function numberWithCommas(x) {
+            var parts = x.toString().split(",");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return parts.join(",");
+        }
     {% endblock %}
 </script>

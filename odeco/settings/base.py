@@ -24,11 +24,18 @@ path.append(DJANGO_ROOT)
 ########## END PATH CONFIGURATION
 
 ########## GENERAL CONFIGURATION
+
+FORMAT_MODULE_PATH = [
+    'odeco.formats',
+]
+
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
 TIME_ZONE = 'America/Bogota'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = 'es-CO'
+LANGUAGE_CODE = 'es'
+
+USE_THOUSAND_SEPARATOR = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
@@ -89,6 +96,7 @@ ROOT_URLCONF = '%s.urls' % SITE_NAME
 DJANGO_APPS = (
     # Default Django apps:
     'django.contrib.admin',
+    'registration',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -114,7 +122,6 @@ MY_APPS = (
 
 THIRD_PART_APPS = (
     'import_export',
-    'mathfilters',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

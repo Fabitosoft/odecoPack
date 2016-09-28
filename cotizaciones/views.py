@@ -13,7 +13,7 @@ class AddItem(SingleObjectMixin, View):
     model = ItemCotizacion
 
     def get(self, request, *args, **kwargs):
-        cotizacion = Cotizacion.objects.last()
+        cotizacion = Cotizacion.objects.filter(usuario=self.request.user).last()
         item_id = kwargs["item_id"]
         precio = kwargs["precio"]
         item = cotizacion.items.filter(item__id=item_id).first()
