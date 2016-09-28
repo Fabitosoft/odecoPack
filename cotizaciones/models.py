@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 
 from utils.models import TimeStampedModel
 from productos.models import Producto
@@ -40,5 +40,5 @@ def cotizacion_item_post_save_receiver(sender, instance, *args, **kwargs):
 	instance.cotizacion.update_total()
 
 post_save.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
-
+post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 
