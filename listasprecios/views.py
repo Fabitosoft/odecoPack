@@ -1,4 +1,9 @@
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django.template import Context
+from django.template.loader import get_template, render_to_string
+from django.urls import reverse
 from django.views.generic import ListView
 from django.db.models import Max
 
@@ -17,7 +22,7 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("buscar")
-        print(query)
+        print("entro get queryset")
         if not query:
             query = "Ningun atributo de busqueda"
 
@@ -50,6 +55,7 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
         return qs
 
     def get_context_data(self, **kwargs):
+        print("entro get context data")
         context = super().get_context_data(**kwargs)
         context['formu'] = ProductoBusqueda(self.request.GET or None)
         if self.request.GET.get("tipo"):
@@ -68,3 +74,21 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
         context["cotizacion_total"] = cotizacion.total
         context["items_cotizacion"] = cotizacion.items.all()
         return context
+
+    def get(self, request, *args, **kwargs):
+        subject, from_email, to = 'prueba', 'fabio.garcia.sanchez@gmail.com', 'fabio.garcia.sanchez@gmail.com'
+
+        ctx={
+            'uno': 'valor uno',
+            'dos': 'valor dos'
+        }
+        text_content = render_to_string('listasprecios/emails/cotizacion.html',ctx)
+        html_content = get_template('listasprecios/emails/cotizacion.html').render(Context(ctx))
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+        if self.request.user.user_extendido.es_vendedor():
+            return super().get(request, *args, **kwargs)
+        return HttpResponseRedirect(reverse('home:home-index'))
+
+
