@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+    {{ object.as_p }}
+    <table>
+        <thead>
+
+        </thead>
+        <tbody>
+        {% for item in object.items.all %}
+            <tr>
+                <td>
+                    {{ item.item.referencia }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

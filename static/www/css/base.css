@@ -1,3 +1,10 @@
+header .logo {
+  margin: 20px;
+  height: 100px;
+  width: 190;
+  background-image: url("../img/logos/logo.png");
+  background-repeat: no-repeat;
+}
 #email_body {
   width: 1024px;
 }

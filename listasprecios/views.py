@@ -67,30 +67,31 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
             context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje_lp.value
 
         cotizacion = Cotizacion.objects.filter(usuario=self.request.user).last()
-        print(cotizacion)
         if not cotizacion or cotizacion.estado == 'ENV':
             cotizacion = Cotizacion()
             cotizacion.usuario=self.request.user
             cotizacion.save()
         context["cotizacion_form"] = CotizacionForm(self.request.GET or None)
+        context["cotizacion_id"] = cotizacion.id
         context["cotizacion_total"] = cotizacion.total
         context["items_cotizacion"] = cotizacion.items.all()
         return context
 
     def get(self, request, *args, **kwargs):
-        subject, from_email, to = 'prueba', settings.EMAIL_HOST_USER, 'fabio.garcia.sanchez@gmail.com'
-
-        ctx={
-            'uno': 'valor uno',
-            'dos': 'valor dos'
-        }
-        text_content = render_to_string('listasprecios/emails/cotizacion.html', ctx)
-        html_content = get_template('listasprecios/emails/cotizacion.html').render(Context(ctx))
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-        # if self.request.user.user_extendido.es_vendedor():
-        #     return super().get(request, *args, **kwargs)
-        return HttpResponseRedirect(reverse('home:home-index'))
+        # subject, from_email, to = 'prueba', settings.EMAIL_HOST_USER, 'fabio.garcia.sanchez@gmail.com'
+        #
+        # ctx={
+        #     'uno': 'valor uno',
+        #     'dos': 'valor dos'
+        # }
+        # text_content = render_to_string('listasprecios/emails/cotizacion.html', ctx)
+        # html_content = get_template('listasprecios/emails/cotizacion.html').render(Context(ctx))
+        # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        # msg.attach_alternative(html_content, "text/html")
+        # msg.send()
+        if self.request.user.user_extendido.es_vendedor():
+            return super().get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
+        #return HttpResponseRedirect(reverse('home:home-index'))
 
 

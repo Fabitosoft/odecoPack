@@ -14,6 +14,14 @@ import json
 # JSON-based secrets module
 from django.core.exceptions import ImproperlyConfigured
 
+def str_to_bool(s):
+    if s == 'True':
+        return True
+    elif s == 'False':
+        return False
+    else:
+        raise ValueError
+
 with open("secretsLocal.json") as f:
     secrets = json.loads(f.read())
 
@@ -53,6 +61,11 @@ SECRET_KEY = r"{{ secret_key }}"
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ########## END EMAIL CONFIGURATION
 
+THIRD_PART_APPS = (
+    'debug_toolbar',
+)
+
+INSTALLED_APPS = INSTALLED_APPS + THIRD_PART_APPS
 
 ########## CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
@@ -105,7 +118,10 @@ STATICFILES_FINDERS = (
 
 ########## EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+#'EMAIL_IS_LOCAL'
+if not str_to_bool(get_secret("EMAIL_SERVER","EMAIL_IS_LOCAL")):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host
 EMAIL_HOST = get_secret("EMAIL_SERVER","EMAIL_HOST")
@@ -128,3 +144,8 @@ EMAIL_USE_TLS = True
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = EMAIL_HOST_USER
 ########## END EMAIL CONFIGURATION
+
+
+########## DEBUG TOOLBAR CONFIGURATION CONFIGURATION
+INTERNAL_IPS=('127.0.0.1')
+########## END TOOLBAR CONFIGURATION CONFIGURATION

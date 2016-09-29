@@ -22,11 +22,17 @@
     <![endif]-->
 </head>
 <body>
+<header>
+<div class="logo">
 
+</div>
+</header>
+
+<div class="col-md-offset-1">
 {% block content %}
     Esta es una prueba
 {% endblock %}
-
+</div>
 {% include 'javascript.html' %}
 <script>
     $(document).ready(function () {

@@ -4,11 +4,23 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
 from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import DetailView
 
 from .models import ItemCotizacion, Cotizacion
 
 
 # Create your views here.
+class CotizacionDetailView(DetailView):
+    model = Cotizacion
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        obj = self.model.objects.filter(id=self.kwargs["pk"]).prefetch_related('items__item').first()
+        return obj
+
+
 class AddItem(SingleObjectMixin, View):
     model = ItemCotizacion
 
