@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.views.generic import ListView
 from django.db.models import Max
 
+from django.conf import settings
+
 from .models import ListaPrecio, FormaPago
 from cotizaciones.models import Cotizacion
 from .forms import ProductoBusqueda
@@ -76,19 +78,19 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
         return context
 
     def get(self, request, *args, **kwargs):
-        subject, from_email, to = 'prueba', 'fabio.garcia.sanchez@gmail.com', 'fabio.garcia.sanchez@gmail.com'
+        subject, from_email, to = 'prueba', settings.EMAIL_HOST_USER, 'fabio.garcia.sanchez@gmail.com'
 
         ctx={
             'uno': 'valor uno',
             'dos': 'valor dos'
         }
-        text_content = render_to_string('listasprecios/emails/cotizacion.html',ctx)
+        text_content = render_to_string('listasprecios/emails/cotizacion.html', ctx)
         html_content = get_template('listasprecios/emails/cotizacion.html').render(Context(ctx))
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
         msg.send()
-        if self.request.user.user_extendido.es_vendedor():
-            return super().get(request, *args, **kwargs)
+        # if self.request.user.user_extendido.es_vendedor():
+        #     return super().get(request, *args, **kwargs)
         return HttpResponseRedirect(reverse('home:home-index'))
 
 

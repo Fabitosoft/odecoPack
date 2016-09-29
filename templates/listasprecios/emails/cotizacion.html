@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,10 @@
     <title>Title</title>
 </head>
 <body>
+<HEADER>
+    <img src="{% static "www/img/emails/cotizaciones/encabezado_cotizacion.jpg" %}" alt="My image"/>
+</HEADER>
+<h1>Esta es la informacion a enviar</h1>
     {{ uno }}
     {{ dos }}
 </body>
