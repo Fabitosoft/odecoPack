@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block title %}{% trans "Log in" %}{% endblock %}
+{% block login %}
+    <div class="text-center">
+        <h2>Bienvenido a Odecopack</h2>
+        <img src="{% static "www/img/logos/logo.png" %}" alt="logo"/>
+    </div>
+    <div class="container form-signin">
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <input class="btn btn-lg btn-primary btn-block" type="submit" value="{% trans 'Log in' %}"/>
+            <input type="hidden" name="next" value="{{ next }}"/>
+        </form>
+        <p>{% trans "Forgot your password?" %} <a
+                href="{% url 'auth_password_reset' %}">{% trans "Reset it" %}</a>.
+        </p>
+        <p>{% trans "Not a member?" %} <a href="{% url 'registration_register' %}">{% trans "Register" %}</a>.
+        </p>
+    </div>
+{% endblock %}

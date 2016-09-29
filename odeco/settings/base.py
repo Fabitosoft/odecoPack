@@ -122,6 +122,7 @@ MY_APPS = (
 
 THIRD_PART_APPS = (
     'import_export',
+    'crispy_forms',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -159,3 +160,12 @@ STATICFILES_DIRS = [
     normpath(join(SITE_ROOT, "static"))
 ]
 ########## END STATIC FILE CONFIGURATION
+
+
+#Crispy FORM TAGs SETTINGS
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+#DJANGO REGISTRATION REDUX SETTINGS
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_AUTO_LOGIN = True
+LOGIN_REDIRECT_URL = '/'

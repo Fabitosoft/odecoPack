@@ -1,27 +1,14 @@
 {% extends "base.html" %}
 {% load funciones_especiales %}
+{% load crispy_forms_tags %}
 {% block content %}
     <div class="row">
-        <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-10">
             <h3>Cotización</h3>
             <form method='GET' action="{% url 'cotizaciones:detail_cotizacion' pk=cotizacion_id %}">
-                <div class="row">
-                    <div class="col-md-5">Razón Social:</div>
-                    <div class="col-md-5">{{ cotizacion_form.razon_social }}</div>
-
-                </div>
-                <div class="row">
-                    <div class="col-sm-12 col-md-5 col-lg-1">Nombres:</div>
-                    <div class="col-sm-12 col-md-5 col-lg-5">{{ cotizacion_form.nombres_contacto }}</div>
-                    <div class="col-sm-12 col-md-5 col-lg-1">Apellidos:</div>
-                    <div class="col-sm-12 col-md-5 col-lg-5">{{ cotizacion_form.apellidos_contacto }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12 col-md-5 col-lg-2">Correo Electrónico:</div>
-                    <div class="col-sm-12 col-md-5 col-lg-4">{{ cotizacion_form.email }}</div>
-                    <div class="col-sm-12 col-md-5 col-lg-2">Número Contacto:</div>
-                    <div class="col-sm-12 col-md-5 col-lg-4">{{ cotizacion_form.nro_contacto }}</div>
-                </div>
+                <h6>
+                    {{ cotizacion_form|crispy }}
+                </h6>
                 <table class="table table-bordered table-striped">
                     <thead>
                     <tr>
@@ -66,7 +53,7 @@
     </div>
 
     <div class="row" xmlns="http://www.w3.org/1999/html">
-        <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-10">
             <h3>Lista de Precios</h3>
             <form method='GET' action=''>
                 <h5>

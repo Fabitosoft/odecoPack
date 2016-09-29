@@ -1,9 +1,13 @@
-header .logo {
-  margin: 20px;
-  height: 100px;
-  width: 190;
-  background-image: url("../img/logos/logo.png");
-  background-repeat: no-repeat;
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+nav {
+  padding: 10px;
+}
+main {
+  margin: 70px;
 }
 #email_body {
   width: 1024px;

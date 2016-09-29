@@ -7,4 +7,4 @@ from cotizaciones.models import Cotizacion
 class CotizacionForm(ModelForm):
     class Meta:
         model = Cotizacion
-        exclude = ['estado','total']
+        exclude = ['estado','total','usuario']
