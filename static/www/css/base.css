@@ -1,0 +1,21 @@
+#email_body {
+  width: 1024px;
+}
+#email_body #email_header .logo {
+  margin: 20px;
+  height: 100px;
+  width: 190;
+  background-image: url("../img/logos/logo.png");
+  background-repeat: no-repeat;
+}
+#email_body #email_header .info_cotizacion {
+  margin: 10px;
+}
+#email_body #email_header .info_cotizacion h6,
+#email_body #email_header .info_cotizacion h4 {
+  margin: 5px;
+  padding: 0;
+}
+#email_body footer {
+  text-align: center;
+}

@@ -2,15 +2,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include 'css.html' %}
 </head>
-<body>
-<HEADER>
-    <img src="{% static "www/img/emails/cotizaciones/encabezado_cotizacion.jpg" %}" alt="My image"/>
-</HEADER>
-<h1>Esta es la informacion a enviar</h1>
+<body id="email_body">
+<header id="email_header">
+    <div class="row">
+        <div class="logo col-xs-12 col-sm-3 col-md-2">
+
+        </div>
+        <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
+            <div class="row">
+                <div class="col-xs-12 col-sm-5">
+                    <h4>Cotización Nro: <small>CTV-932</small></h4>
+                    <h4>Para:</h4>
+                    <h6>Nombre de la Empresa</h6>
+                    <h6>Nombre del Contacto</h6>
+                    <h6>Correo@contacto.com</h6>
+                    <h6>317 111111</h6>
+                    <h6>Cali Colombia</h6>
+                </div>
+                <div class="col-xs-12 col-sm-5">
+                    <h4>Fecha: <small>Fecha de hoy</small></h4>
+                    <h4>De:</h4>
+                    <h6>Nombre del Vendedor</h6>
+                    <h6>Correo@contacto.com</h6>
+                    <h6>317 111111</h6>
+                    <h6>Cali Colombia</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="col-lg-offset-1">
+    <h1>Esta es la informacion a enviar</h1>
     {{ uno }}
     {{ dos }}
+</div>
+
+<footer>
+    <span class="center">www.Odecopack.com</span>
+</footer>
 </body>
 </html>
