@@ -91,7 +91,7 @@ if DEBUG==False:
     ########## END EMAIL CONFIGURATION
 
 
-    ########## CACHE CONFIGURATION
-    # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
-    CACHES = {}
-    ########## END CACHE CONFIGURATION
+    # ########## CACHE CONFIGURATION
+    # # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
+    # CACHES = {}
+    # ########## END CACHE CONFIGURATION
