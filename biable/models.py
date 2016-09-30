@@ -27,3 +27,4 @@ class DataBiable(models.Model):
     costo = models.DecimalField(max_digits=10,decimal_places=4,default=0)
     rentabilidad = models.DecimalField(max_digits=10,decimal_places=4,default=0)
     fecha_generacion_biable = models.DateField(default=datetime.now)
+    numero_registros = models.PositiveIntegerField(default=0)
