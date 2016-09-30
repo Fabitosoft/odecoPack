@@ -123,6 +123,7 @@ MY_APPS = (
 THIRD_PART_APPS = (
     'import_export',
     'crispy_forms',
+    'biable',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

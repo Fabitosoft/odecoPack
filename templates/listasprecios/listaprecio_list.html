@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="row">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <h3>Cotización</h3>
             <form method='GET' action="{% url 'cotizaciones:detail_cotizacion' pk=cotizacion_id %}">
                 <h6>
@@ -52,8 +52,8 @@
         </div>
     </div>
 
-    <div class="row" xmlns="http://www.w3.org/1999/html">
-        <div class="col-md-10">
+    <div class="row">
+        <div class="col-md-12">
             <h3>Lista de Precios</h3>
             <form method='GET' action=''>
                 <h5>
