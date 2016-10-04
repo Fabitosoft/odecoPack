@@ -10,7 +10,7 @@ main {
   margin: 70px;
 }
 #email_body {
-  width: 1024px;
+  padding: 20px;
 }
 #email_body #email_header .logo {
   margin: 20px;
@@ -24,6 +24,15 @@ main {
 }
 #email_body #email_header .info_cotizacion h6,
 #email_body #email_header .info_cotizacion h4 {
+  margin: 5px;
+  padding: 0;
+}
+#email_body #email_coti_condiciones_comerciales {
+  background-color: #f0f8ff;
+  padding: 20px;
+}
+#email_body #email_coti_condiciones_comerciales h5,
+#email_body #email_coti_condiciones_comerciales h4 {
   margin: 5px;
   padding: 0;
 }

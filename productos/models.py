@@ -14,13 +14,13 @@ class UnidadMedida(models.Model):
 
 def productos_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
-    new_filename = "produ_%s_%s.%s" % (instance.id, basename, file_extention)
-    return "productos/%s/%s" % (instance.id, new_filename)
+    new_filename = "produ_perfil_%s.%s" % (basename, file_extention)
+    return "%s/%s/%s" % ("productos","foto_perfil", new_filename)
 
 class Producto(TimeStampedModel):
     def validate_image(fieldfile_obj):
         filesize = fieldfile_obj.file.size
-        megabyte_limit = 5.0
+        megabyte_limit = 1.0
         if filesize > megabyte_limit * 1024 * 1024:
             raise ValidationError("Max file size is %sMB" % str(megabyte_limit))
 
@@ -31,6 +31,8 @@ class Producto(TimeStampedModel):
     fabricante = models.CharField(max_length=60, null=True, blank=True)
     cantidad_empaque = models.DecimalField(max_digits=10,decimal_places=4, default=0)
     unidad_medida = models.ForeignKey(UnidadMedida,on_delete=models.PROTECT, null=True)
+    activo = models.BooleanField(default=True)
+    activo_catalogo = models.BooleanField(default=True)
     foto_perfil = models.ImageField(upload_to=productos_upload_to, validators=[validate_image], null=True, blank=True)
 
     def __str__(self):

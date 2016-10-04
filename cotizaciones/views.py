@@ -1,10 +1,15 @@
 from decimal import Decimal
+
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
+from django.template import Context
+from django.template.loader import get_template, render_to_string
 from django.views import View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import DetailView
+from django.conf import settings
 
 from .models import ItemCotizacion, Cotizacion
 from productos.models import Producto
@@ -27,6 +32,7 @@ class EnviarCotitacion(DetailView):
     template_name = "cotizaciones/emails/cotizacion.html"
 
     def get(self, request, *args, **kwargs):
+
         return super().get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -40,7 +46,19 @@ class EnviarCotitacion(DetailView):
         obj.pais = self.request.GET.get('pais')
         obj.nro_cotizacion= "%s - %s" %('CB',obj.id)
         obj.save()
-        print(obj)
+
+        subject, from_email, to = 'prueba', settings.EMAIL_HOST_USER, 'fabio.garcia.sanchez@gmail.com'
+
+        ctx={
+            'obj': obj,
+        }
+
+        text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
+        html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
         return obj
 
 

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -15,11 +16,22 @@ class UserExtended(models.Model):
     def es_colaborador(self):
         return Colaborador.objects.filter(usuario=self).exists()
 
+def colaborador_upload_to(instance, filename):
+    basename, file_extention = filename.split(".")
+    new_filename = "colaborador_perfil_%s.%s" % (basename, file_extention)
+    return "%s/%s/%s/%s/%s" % ("usuarios",instance.usuario.user.id,"foto_perfil","colaborador", new_filename)
 
 class Colaborador(models.Model):
+    def validate_image(fieldfile_obj):
+        filesize = fieldfile_obj.file.size
+        megabyte_limit = 1.0
+        if filesize > megabyte_limit * 1024 * 1024:
+            raise ValidationError("Max file size is %sMB" % str(megabyte_limit))
+
     usuario = models.OneToOneField(UserExtended, on_delete=models.PROTECT, related_name="colaborador")
     numero_contacto = models.CharField(max_length=12)
     extencion = models.CharField(max_length=10)
+    foto_perfil = models.ImageField(upload_to=colaborador_upload_to, validators=[validate_image], null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "colaboradores"

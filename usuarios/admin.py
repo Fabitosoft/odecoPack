@@ -15,10 +15,11 @@ class ColaboradorAdmin(admin.ModelAdmin):
             qs1 = UserExtended.objects.filter(
                 Q(tipo='I') &
                 (
-                    Q(colaborador__id=obj.usuario.pk) |
+                    Q(user_id=obj.usuario.pk) |
                     Q(colaborador__isnull=True)
                 )
             )
+            print(obj.usuario.pk)
             form.base_fields['usuario'].queryset = (qs1)
         else:
             qs1 = UserExtended.objects.filter(

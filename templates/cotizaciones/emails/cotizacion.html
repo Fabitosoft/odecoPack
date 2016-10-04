@@ -9,16 +9,22 @@
 </head>
 <body id="email_body">
 <header id="email_header">
-    <div class="row">
-        <div class="logo col-xs-12 col-sm-3 col-md-2">
+    <div class="row logo">
+        <div class="col-xs-12 col-sm-3 col-md-2">
 
         </div>
         <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
+            <div>
+                <h4>Cotización Nro:
+                    <small>{{ object.nro_cotizacion }}</small>
+                </h4>
+                <h4>Fecha:
+                    <small>{{ object.created }}</small>
+                </h4>
+            </div>
             <div class="row">
-                <div class="col-xs-12 col-sm-5">
-                    <h4>Cotización Nro:
-                        <small>{{ object.nro_cotizacion }}</small>
-                    </h4>
+                <div class="col-xs-12 col-sm-6">
+
                     <h4>Para:</h4>
                     <h6>{{ object.razon_social }}</h6>
                     <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
@@ -26,10 +32,7 @@
                     <h6>{{ object.nro_contacto }}</h6>
                     <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
                 </div>
-                <div class="col-xs-12 col-sm-5">
-                    <h4>Fecha:
-                        <small>{{ object.created }}</small>
-                    </h4>
+                <div class="col-xs-12 col-sm-6">
                     <h4>De:</h4>
                     <h6>{{ object.usuario.get_full_name }}</h6>
                     <h6>{{ object.usuario.email }}</h6>
@@ -40,7 +43,7 @@
         </div>
     </div>
 </header>
-<div class="col-lg-offset-1">
+<div>
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
@@ -83,16 +86,31 @@
         {% endfor %}
         </tbody>
         <tfoot>
-            <tr>
-                <td colspan="4"> Total: </td>
-                <td> {{ object.total }} </td>
-            </tr>
+        <tr>
+            <td colspan="4"> Total:</td>
+            <td> {{ object.total }} </td>
+        </tr>
         </tfoot>
     </table>
-</div>
+    <div id="email_coti_condiciones_comerciales">
+        <h4>NOTAS Y CONDICCIONES COMERCIALES </h4>
+        <ol>
+            <li> Agregar el IVA vigente a la fecha de facturación.</li>
+            <li>Para Compras inferiores a $800.000, el cliente asume el costo del envío.</li>
+            <li>Favor enviar orden de compra a nombre de ODECOPACK S.A.S. Nit. 800.176.169-3</li>
+            <li>Pagos con cheque favor girar a nombre de ODECOPACK S.A.S.</li>
+            <li>Transferencias bancarias a cuenta corriente Bancolombia 812063344-48 ODECOPACK S.A.S.</li>
+            <li>Medios de pago Cheque/T. Débito/T. Crédito/Transferencia Bancaria</li>
+        </ol>
 
+    </div>
+</div>
 <footer>
-    <span class="center">www.Odecopack.com</span>
+    <span class="center">
+        <p>www.Odecopack.com</p>
+        <p>Cll 39 #2-37 Manzanares</p>
+        <p>Cali,Colombia</p>
+    </span>
 </footer>
 </body>
 </html>
