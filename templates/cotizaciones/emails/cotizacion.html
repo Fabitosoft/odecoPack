@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include 'css.html' %}
+</head>
+<body id="email_body">
+<header id="email_header">
+    <div class="row">
+        <div class="logo col-xs-12 col-sm-3 col-md-2">
+
+        </div>
+        <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
+            <div class="row">
+                <div class="col-xs-12 col-sm-5">
+                    <h4>Cotización Nro:
+                        <small>{{ object.nro_cotizacion }}</small>
+                    </h4>
+                    <h4>Para:</h4>
+                    <h6>{{ object.razon_social }}</h6>
+                    <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
+                    <h6>{{ object.email }}</h6>
+                    <h6>{{ object.nro_contacto }}</h6>
+                    <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
+                </div>
+                <div class="col-xs-12 col-sm-5">
+                    <h4>Fecha:
+                        <small>{{ object.created }}</small>
+                    </h4>
+                    <h4>De:</h4>
+                    <h6>{{ object.usuario.get_full_name }}</h6>
+                    <h6>{{ object.usuario.email }}</h6>
+                    <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>
+                    <h6>Colombia - Cali</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="col-lg-offset-1">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Referencia
+            </th>
+            <th>
+                Nombre
+            </th>
+            <th>
+                Cant.
+            </th>
+            <th>
+                Uni. Emp
+            </th>
+            <th>
+                Total
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in object.items.all %}
+            <tr>
+                <td>
+                    {{ item.item.referencia }}
+                </td>
+                <td>
+                    {{ item.item.descripcion_comercial }}
+                </td>
+                <td>
+                    {{ item.cantidad }}
+                </td>
+                <td>
+                    {{ item.item.unidad_medida }}
+                </td>
+                <td>
+                    {{ item.total }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4"> Total: </td>
+                <td> {{ object.total }} </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<footer>
+    <span class="center">www.Odecopack.com</span>
+</footer>
+</body>
+</html>

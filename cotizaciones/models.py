@@ -5,6 +5,7 @@ from django.db.models.signals import post_save, post_delete
 
 from utils.models import TimeStampedModel
 from productos.models import Producto
+from listasprecios.models import FormaPago
 # Create your models here.
 class Cotizacion(TimeStampedModel):
     ESTADOS = (
@@ -16,8 +17,11 @@ class Cotizacion(TimeStampedModel):
     nro_contacto = models.CharField(validators=[phone_regex], blank=True, max_length=15)  # validators should be a list
     email = models.EmailField(max_length=150, blank=True)
     nombres_contacto = models.CharField(max_length=120, blank=True)
+    pais = models.CharField(max_length=120, blank=True)
+    ciudad = models.CharField(max_length=120, blank=True)
     apellidos_contacto = models.CharField(max_length=120, blank=True)
     razon_social = models.CharField(max_length=120, blank=True)
+    nro_cotizacion = models.CharField(max_length=120)
     total = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     usuario = models.ForeignKey(User, default=1)
 
@@ -34,8 +38,9 @@ class Cotizacion(TimeStampedModel):
 class ItemCotizacion(TimeStampedModel):
     cotizacion = models.ForeignKey(Cotizacion, related_name="items")
     item = models.ForeignKey(Producto, related_name="cotizaciones")
-    cantidad = models.DecimalField(max_digits=10, decimal_places=0)
+    cantidad = models.DecimalField(max_digits=10, decimal_places=3)
     precio = models.DecimalField(max_digits=10, decimal_places=0)
+    forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones")
     total = models.DecimalField(max_digits=10, decimal_places=0)
 
 def cotizacion_item_post_save_receiver(sender, instance, *args, **kwargs):

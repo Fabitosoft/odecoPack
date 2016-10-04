@@ -3,12 +3,8 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-7">
             <h3>Cotización</h3>
-            <form method='GET' action="{% url 'cotizaciones:detail_cotizacion' pk=cotizacion_id %}">
-                <h6>
-                    {{ cotizacion_form|crispy }}
-                </h6>
                 <table class="table table-bordered table-striped">
                     <thead>
                     <tr>
@@ -27,7 +23,7 @@
                             <td>{{ item.item.descripcion_comercial }}</td>
                             <td>
                                 <input type='hidden' name='item' value='{{ item.id }}'/>
-                                <input class="item-qty" type="number"
+                                <input class="item-qty" style="width: 60px" step=any
                                        value="{{ item.cantidad }}"/>
                             </td>
                             <td>{{ item.item.unidad_medida }}</td>
@@ -47,8 +43,9 @@
                     </tr>
                     </tfoot>
                 </table>
-                <input type='submit' value='Enviar'/>
-            </form>
+        </div>
+        <div class="col-md-5">
+            {% crispy cotizacion_form %}
         </div>
     </div>
 
@@ -85,7 +82,7 @@
                             <td>{{ pro.producto__unidad_medida__nombre }} </td>
                             <td>{{ precio }} </td>
                             <td>
-                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.producto_id precio=precio %}">
+                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.producto_id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id%}">
                                     +
                                 </a>
                             </td>

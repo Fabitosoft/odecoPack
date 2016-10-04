@@ -12,15 +12,17 @@ class UserExtended(models.Model):
     def __str__(self):
         return self.user.first_name
 
-    def es_vendedor(self):
-        return Vendedor.objects.filter(usuario=self).exists()
+    def es_colaborador(self):
+        return Colaborador.objects.filter(usuario=self).exists()
 
 
-class Vendedor(models.Model):
-    usuario = models.OneToOneField(UserExtended, on_delete=models.PROTECT, related_name="vendedor")
+class Colaborador(models.Model):
+    usuario = models.OneToOneField(UserExtended, on_delete=models.PROTECT, related_name="colaborador")
+    numero_contacto = models.CharField(max_length=12)
+    extencion = models.CharField(max_length=10)
 
     class Meta:
-        verbose_name_plural = "vendedores"
+        verbose_name_plural = "colaboradores"
 
     def __str__(self):
         return self.usuario.user.get_full_name()

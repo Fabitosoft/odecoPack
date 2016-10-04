@@ -24,7 +24,6 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("buscar")
-        print("entro get queryset")
         if not query:
             query = "Ningun atributo de busqueda"
 
@@ -57,9 +56,11 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
         return qs
 
     def get_context_data(self, **kwargs):
-        print("entro get context data")
+
         context = super().get_context_data(**kwargs)
         context['formu'] = ProductoBusqueda(self.request.GET or None)
+
+        #segun el tipo, obtiene el porcentaje que se aplicará a la lista de precios
         if self.request.GET.get("tipo"):
             context['formas_pago_porcentaje'] = FormaPago.objects.filter(
                 id=self.request.GET.get("tipo")).first().porcentaje_lp.value
@@ -71,10 +72,14 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
             cotizacion = Cotizacion()
             cotizacion.usuario=self.request.user
             cotizacion.save()
-        context["cotizacion_form"] = CotizacionForm(self.request.GET or None)
+        context["cotizacion_form"] = CotizacionForm(self.request.GET or None, instance=cotizacion)
+        context["cotizacion_form"].id = cotizacion.id
+
         context["cotizacion_id"] = cotizacion.id
         context["cotizacion_total"] = cotizacion.total
         context["items_cotizacion"] = cotizacion.items.all()
+        context["forma_de_pago"] = self.request.GET.get('tipo')
+
         return context
 
     def get(self, request, *args, **kwargs):
@@ -89,7 +94,7 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
         # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         # msg.attach_alternative(html_content, "text/html")
         # msg.send()
-        if self.request.user.user_extendido.es_vendedor():
+        if self.request.user.user_extendido.es_colaborador():
             return super().get(request, *args, **kwargs)
         return super().get(request, *args, **kwargs)
         #return HttpResponseRedirect(reverse('home:home-index'))
