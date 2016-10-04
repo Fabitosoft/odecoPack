@@ -2,49 +2,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% include 'css.html' %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style type="text/css">
+
+        #email_body {
+            padding: 20px;
+        }
+
+        #email_body #email_header .logo {
+            margin: 20px;
+            height: 100px;
+            width: 190px;
+            background-repeat: no-repeat;
+        }
+
+        #email_body #email_header .info_cotizacion {
+            margin: 10px;
+        }
+
+        #email_body #email_header .info_cotizacion h6,
+        #email_body #email_header .info_cotizacion h4 {
+            margin: 5px;
+            padding: 0;
+        }
+
+        #email_body #email_coti_condiciones_comerciales {
+            background-color: #f0f8ff;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        #email_body #email_coti_condiciones_comerciales h5,
+        #email_body #email_coti_condiciones_comerciales h4 {
+            margin: 5px;
+            padding: 0;
+        }
+
+        footer{
+            background-color: #df5e00;
+        }
+
+        footer p {
+            margin: 5px;
+            padding: 0;
+            color: white;
+        }
+
+        #email_body footer {
+            text-align: center;
+        }
+
+        #orden table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #orden th,
+        #orden td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #orden tr:nth-child(even) {
+            background-color: #f2f2f2
+        }
+
+        #orden table, #orden td, #orden th {
+            border: 1px solid black;
+        }
+
+        #encabezado_cotizacion {
+            font-size: 25px;
+        }
+
+        .texto_mensaje {
+            font-size: 20px;
+            padding: 10px;
+            text-align: justify;
+        }
+
+        .firma p {
+            font-size: 15px;
+            margin: 5px;
+            padding: 0;
+        }
+    </style>
 </head>
 <body id="email_body">
 <header id="email_header">
-    <div class="row logo">
-        <div class="col-xs-12 col-sm-3 col-md-2">
-
+    <div id="encabezado_cotizacion">
+        <div style="float: left">
+            <img src="{% static "www/img/logos/logo.png" %}" alt="My image"/>
         </div>
-        <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
-            <div>
-                <h4>Cotización Nro:
-                    <small>{{ object.nro_cotizacion }}</small>
-                </h4>
-                <h4>Fecha:
-                    <small>{{ object.created }}</small>
-                </h4>
-            </div>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6">
-
-                    <h4>Para:</h4>
-                    <h6>{{ object.razon_social }}</h6>
-                    <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
-                    <h6>{{ object.email }}</h6>
-                    <h6>{{ object.nro_contacto }}</h6>
-                    <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
-                </div>
-                <div class="col-xs-12 col-sm-6">
-                    <h4>De:</h4>
-                    <h6>{{ object.usuario.get_full_name }}</h6>
-                    <h6>{{ object.usuario.email }}</h6>
-                    <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>
-                    <h6>Colombia - Cali</h6>
-                </div>
-            </div>
+        <div>
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <strong>
+                            Cotización Nro:
+                            <small>{{ object.nro_cotizacion }}</small>
+                        </strong>
+                    </td>
+                </tr>
+                <tr colspan="2">
+                    <td>
+                        <small>Fecha: {{ object.modified }}</small>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
+
+
+    {#    <div class="row logo">#}
+    {#        <div class="col-xs-12 col-sm-3 col-md-2">#}
+    {##}
+    {#        </div>#}
+    {#        <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">#}
+    {#            <div>#}
+    {#                <h4>Cotización Nro:#}
+    {#                    <small>{{ object.nro_cotizacion }}</small>#}
+    {#                </h4>#}
+    {#                <h4>Fecha:#}
+    {#                    <small>{{ object.created }}</small>#}
+    {#                </h4>#}
+    {#            </div>#}
+    {#            <div class="row">#}
+    {#                <div class="col-xs-12 col-sm-6">#}
+    {##}
+    {#                    <h4>Para:</h4>#}
+    {#                    <h6>{{ object.razon_social }}</h6>#}
+    {#                    <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>#}
+    {#                    <h6>{{ object.email }}</h6>#}
+    {#                    <h6>{{ object.nro_contacto }}</h6>#}
+    {#                    <h6>{{ object.pais }} - {{ object.ciudad }}</h6>#}
+    {#                </div>#}
+    {#                <div class="col-xs-12 col-sm-6">#}
+    {#                    <h4>De:</h4>#}
+    {#                    <h6>{{ object.usuario.get_full_name }}</h6>#}
+    {#                    <h6>{{ object.usuario.email }}</h6>#}
+    {#                    <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>#}
+    {#                    <h6>Colombia - Cali</h6>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
+    {##}
+    {##}
 </header>
-<div>
-    <table class="table table-bordered table-striped">
+<div class="texto_mensaje">
+    <p>
+        Apreciado(a) {{ object.nombres_contacto }} mi nombre es
+        {{ object.usuario.get_full_name }}, de <strong>ODECOPACK S.A.S</strong>,
+        quien realizó la cotización para <strong>{{ object.razon_social }}</strong>.
+    </p>
+    <p>
+        Hago envío de la cotización llevada a cabo
+        el {{ object.modified }} hora local y referenciada con el <strong> número de
+        cotizacion {{ object.nro_cotizacion }}</strong>.
+    </p>
+    <p>
+        A continuación relaciono los items cotizados con sus respectivas cantidades y precios:
+    </p>
+</div>
+<div id="orden" style="overflow-x:auto;">
+    <table>
         <thead>
         <tr>
             <th>
@@ -92,6 +217,7 @@
         </tr>
         </tfoot>
     </table>
+
     <div id="email_coti_condiciones_comerciales">
         <h4>NOTAS Y CONDICCIONES COMERCIALES </h4>
         <ol>
@@ -102,12 +228,25 @@
             <li>Transferencias bancarias a cuenta corriente Bancolombia 812063344-48 ODECOPACK S.A.S.</li>
             <li>Medios de pago Cheque/T. Débito/T. Crédito/Transferencia Bancaria</li>
         </ol>
-
     </div>
+
+    <div class="texto_mensaje">
+        <p>ODECOPACK S.A.S agradece tenernos en cuenta para sus futuros proyectos y
+            por contar con nuestra compañia para suplir sus necesidades empresariales.</p>
+        Atentamente...
+
+        <div class="firma">
+            <p>{{ object.usuario.get_full_name }}</p>
+            <p>{{ object.usuario.email }}</p>
+            <p>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</p>
+            <p>Colombia - Cali</p>
+        </div>
+    </div>
+
 </div>
 <footer>
     <span class="center">
-        <p>www.Odecopack.com</p>
+        <a href="www.Odecopack.com">www.Odecopack.com</a>
         <p>Cll 39 #2-37 Manzanares</p>
         <p>Cali,Colombia</p>
     </span>

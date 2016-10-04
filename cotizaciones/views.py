@@ -46,13 +46,11 @@ class EnviarCotitacion(DetailView):
         obj.nro_cotizacion= "%s - %s" %('CB',obj.id)
         obj.save()
 
-        subject, from_email, to = "%s - %s"%('Cotizacion',obj.nro_cotizacion), settings.EMAIL_HOST_USER, 'fabio.garcia.sanchez@gmail.com'
+        subject, from_email, to = "%s - %s"%('Cotizacion',obj.nro_cotizacion), settings.EMAIL_HOST_USER, self.request.GET.get('email')
 
         ctx={
             'object': obj,
         }
-
-        print(ctx)
 
         text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
         html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
