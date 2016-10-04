@@ -47,7 +47,7 @@ class EnviarCotitacion(DetailView):
         obj.nro_cotizacion= "%s - %s" %('CB',obj.id)
         obj.save()
 
-        subject, from_email, to = 'prueba', settings.EMAIL_HOST_USER, 'fabio.garcia.sanchez@gmail.com'
+        subject, from_email, to = "%s - %s"%('Cotizacion',obj.nro_cotizacion), settings.EMAIL_HOST_USER, 'fabio.garcia.sanchez@gmail.com'
 
         ctx={
             'obj': obj,
