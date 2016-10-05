@@ -2,9 +2,11 @@
 {% load funciones_especiales %}
 {% load crispy_forms_tags %}
 {% block content %}
+    <h3>Cotización</h3>
+    <hr/>
     <div class="row">
-        <div class="col-md-7">
-            <h3>Cotización</h3>
+        {% if cotizacion_id %}
+            <div class="col-md-7">
                 <table class="table table-bordered table-striped">
                     <thead>
                     <tr>
@@ -43,22 +45,26 @@
                     </tr>
                     </tfoot>
                 </table>
-        </div>
-        <div class="col-md-5">
+            </div>
+            <div class="col-md-5">
+                {% crispy cotizacion_form %}
+                <hr/>
+                <form method="GET">
+                    <input name="descartar" class="btn btn-primary" type="submit" value="Descartar"/>
+                </form>
+            </div>
+        {% else %}
             {% crispy cotizacion_form %}
-        </div>
+        {% endif %}
     </div>
 
     <div class="row">
         <div class="col-md-12">
             <h3>Lista de Precios</h3>
-            <form method='GET' action=''>
-                <h5>
-                    {{ formu.buscar.label }} {{ formu.buscar }}
-                    {{ formu.tipo.label }} {{ formu.tipo }}
-                    <input type='submit' value='Buscar'/>
-                </h5>
-            </form>
+            <hr/>
+            <div class="row">
+                {% crispy formu %}
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead>
@@ -81,11 +87,13 @@
                             <td>{{ pro.producto__cantidad_empaque }} </td>
                             <td>{{ pro.producto__unidad_medida__nombre }} </td>
                             <td>{{ precio }} </td>
-                            <td>
-                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.producto_id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id%}">
-                                    +
-                                </a>
-                            </td>
+                            {% if cotizacion_id %}
+                                <td>
+                                    <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.producto_id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id %}">
+                                        +
+                                    </a>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>

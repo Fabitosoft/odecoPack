@@ -24,22 +24,7 @@
 </head>
 <body>
 {% if user.is_authenticated %}
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header" style="width: 100%">
-                <a class="navbar-brand" href="#">
-                    <img class="img-responsive" src="{% static "www/img/logos/logo.png" %}" alt="logo"/>
-                </a>
-                <p class="navbar-text navbar-right">
-                    {{ request.user.first_name }} {{ request.user.last_name }}
-                    <a href="{% url 'auth_logout' %}?next=/" class="navbar-link">
-                        (Salir)
-                    </a>
-                </p>
-
-            </div>
-        </div>
-    </nav>
+    {% include "nav.html" %}
     <main>
         {% block content %}
             Esta es una prueba

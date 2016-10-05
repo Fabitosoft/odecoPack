@@ -30,8 +30,6 @@ class CotizacionDetailView(DetailView):
             .prefetch_related('items__item', 'items__forma_pago') \
             .get(id=self.kwargs["pk"])
 
-        print(obj)
-
         if obj.estado == "INI":
             obj.razon_social = self.request.GET.get('razon_social')
             obj.nombres_contacto = self.request.GET.get('nombres_contacto')
@@ -104,9 +102,11 @@ class CotizacionesListView(ListView):
                 Q(nombres_contacto__icontains=query) |
                 Q(nro_cotizacion__icontains=query) |
                 Q(ciudad__icontains=query) |
-                Q(razon_social__icontains=query)
+                Q(razon_social__icontains=query) |
+                Q(items__item__descripcion_estandar__icontains=query) |
+                Q(items__item__referencia__icontains=query)
             )
-        ).order_by('-total')
+        ).order_by('-total').distinct()
         return qs
 
     def get_context_data(self, **kwargs):

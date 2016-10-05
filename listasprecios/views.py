@@ -1,19 +1,13 @@
-from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
-from django.http import HttpResponseRedirect
-from django.template import Context
-from django.template.loader import get_template, render_to_string
-from django.urls import reverse
 from django.views.generic import ListView
+from django.utils import timezone
 from django.db.models import Max
 
-from django.conf import settings
 
 from .models import ListaPrecio, FormaPago
 from cotizaciones.models import Cotizacion
 from .forms import ProductoBusqueda
 from cotizaciones.forms import CotizacionForm
-
 from usuarios.mixins import LoginRequiredMixin
 
 
@@ -62,41 +56,47 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
 
         #segun el tipo, obtiene el porcentaje que se aplicará a la lista de precios
         if self.request.GET.get("tipo"):
-            context['formas_pago_porcentaje'] = FormaPago.objects.filter(
+            context['formas_pago_porcentaje'] = FormaPago.objects.select_related('porcentaje_lp').filter(
                 id=self.request.GET.get("tipo")).first().porcentaje_lp.value
         else:
-            context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje_lp.value
+            context['formas_pago_porcentaje'] = FormaPago.objects.select_related('porcentaje_lp').first().porcentaje_lp.value
 
-        cotizacion = Cotizacion.objects.filter(usuario=self.request.user).last()
-        if not cotizacion or cotizacion.estado == 'ENV':
+        cotizacion = Cotizacion.objects.filter(
+            Q(usuario=self.request.user) &
+            Q(estado__exact="INI")
+        ).last()
+
+        if self.request.GET.get('crear') and not cotizacion:
             cotizacion = Cotizacion()
-            cotizacion.usuario=self.request.user
+            cotizacion.razon_social = self.request.GET.get('razon_social')
+            cotizacion.nombres_contacto = self.request.GET.get('nombres_contacto')
+            cotizacion.apellidos_contacto = self.request.GET.get('apellidos_contacto')
+            cotizacion.email = self.request.GET.get('email')
+            cotizacion.nro_contacto = self.request.GET.get('nro_contacto')
+            cotizacion.ciudad = self.request.GET.get('ciudad')
+            cotizacion.pais = self.request.GET.get('pais')
+            cotizacion.fecha_envio = timezone.now()
+            cotizacion.estado = "INI"
             cotizacion.save()
-        context["cotizacion_form"] = CotizacionForm(self.request.GET or None, instance=cotizacion)
-        context["cotizacion_form"].id = cotizacion.id
+            cotizacion.nro_cotizacion = "%s - %s" % ('CB', cotizacion.id)
+            cotizacion.save()
 
-        context["cotizacion_id"] = cotizacion.id
-        context["cotizacion_total"] = cotizacion.total
-        context["items_cotizacion"] = cotizacion.items.all()
+        if self.request.GET.get('descartar') and cotizacion:
+            cotizacion.delete()
+            cotizacion = None
+
+
+        if cotizacion:
+            context["cotizacion_form"] = CotizacionForm(instance=cotizacion)
+            context["cotizacion_form"].id = cotizacion.id
+            context["cotizacion_id"] = cotizacion.id
+            context["cotizacion_total"] = cotizacion.total
+            context["items_cotizacion"] = cotizacion.items.all()
+        else:
+            context["cotizacion_form"] = CotizacionForm()
+
         context["forma_de_pago"] = self.request.GET.get('tipo')
 
         return context
-
-    def get(self, request, *args, **kwargs):
-        # subject, from_email, to = 'prueba', settings.EMAIL_HOST_USER, 'fabio.garcia.sanchez@gmail.com'
-        #
-        # ctx={
-        #     'uno': 'valor uno',
-        #     'dos': 'valor dos'
-        # }
-        # text_content = render_to_string('listasprecios/emails/cotizacion.html', ctx)
-        # html_content = get_template('listasprecios/emails/cotizacion.html').render(Context(ctx))
-        # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        # msg.attach_alternative(html_content, "text/html")
-        # msg.send()
-        if self.request.user.user_extendido.es_colaborador():
-            return super().get(request, *args, **kwargs)
-        return super().get(request, *args, **kwargs)
-        #return HttpResponseRedirect(reverse('home:home-index'))
 
 
