@@ -1,18 +1,94 @@
 {% extends 'base.html' %}
 {% block content %}
-    {{ object.as_p }}
-    <table>
-        <thead>
+    <header id="email_header">
+        <div class="row logo">
+            <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
+                <div>
+                    <h4>Cotización Nro:
+                        <small>{{ object.nro_cotizacion }}</small>
+                    </h4>
+                    <h4>Fecha Envio:
+                        <small>{{ object.fecha_envio }}</small>
+                    </h4>
+                    <h4>Estado:
+                        <small>{{ object.get_estado_display }}</small>
+                    </h4>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
 
-        </thead>
-        <tbody>
-        {% for item in object.items.all %}
+                        <h4>Para:</h4>
+                        <h6>{{ object.razon_social }}</h6>
+                        <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
+                        <h6>{{ object.email }}</h6>
+                        <h6>{{ object.nro_contacto }}</h6>
+                        <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <h4>De:</h4>
+                        <h6>{{ object.usuario.get_full_name }}</h6>
+                        <h6>{{ object.usuario.email }}</h6>
+                        <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>
+                        <h6>Colombia - Cali</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div>
+        <table class="table table-bordered table-striped">
+            <thead>
             <tr>
-                <td>
-                    {{ item.item.referencia }}
-                </td>
+                <th>
+                    Referencia
+                </th>
+                <th>
+                    Nombre
+                </th>
+                <th>
+                    Cant.
+                </th>
+                <th>
+                    Uni. Emp
+                </th>
+                <th>
+                    Total
+                </th>
+                <th>
+                    Forma de Pago
+                </th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for item in object.items.all %}
+                <tr>
+                    <td>
+                        {{ item.item.referencia }}
+                    </td>
+                    <td>
+                        {{ item.item.descripcion_comercial }}
+                    </td>
+                    <td>
+                        {{ item.cantidad }}
+                    </td>
+                    <td>
+                        {{ item.item.unidad_medida }}
+                    </td>
+                    <td>
+                        {{ item.total }}
+                    </td>
+                    <td>
+                        {{ item.forma_pago }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="5"> Total:</td>
+                <td> {{ object.total }} </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
 {% endblock %}

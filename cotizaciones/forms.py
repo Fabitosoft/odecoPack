@@ -1,4 +1,4 @@
-from crispy_forms.bootstrap import StrictButton, PrependedText, FormActions
+from crispy_forms.bootstrap import StrictButton, PrependedText, FormActions, FieldWithButtons
 from crispy_forms.bootstrap import InlineField
 from crispy_forms.layout import Submit, Layout, Div, Field
 from django import forms
@@ -8,6 +8,22 @@ from crispy_forms.helper import FormHelper
 from django.urls import reverse
 
 from cotizaciones.models import Cotizacion
+
+
+class BusquedaCotiForm(forms.Form):
+    buscado = forms.CharField(max_length=70, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(BusquedaCotiForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-busqueda'
+        self.helper.form_method = "GET"
+        self.helper.form_action = reverse('cotizaciones:buscar_cotizacion')
+
+        self.helper.form_class = 'form-inline'
+        self.helper.layout = Layout(
+            FieldWithButtons('buscado', Submit('buscar','Buscar'))
+        )
 
 
 class CotizacionForm(ModelForm):
@@ -26,7 +42,7 @@ class CotizacionForm(ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = 'id-cotizacionForm'
         self.helper.form_method = "GET"
-        self.helper.form_action = reverse('cotizaciones:detail_cotizacion', kwargs={'pk': self.instance.pk})
+        self.helper.form_action = reverse('cotizaciones:detalle_cotizacion', kwargs={'pk': self.instance.pk})
 
         self.helper.form_class = 'form-inline'
         self.helper.layout = Layout(

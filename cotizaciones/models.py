@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import RegexValidator
 from django.db.models.signals import post_save, post_delete
+from django.urls import reverse
 
 from utils.models import TimeStampedModel
 from productos.models import Producto
@@ -22,8 +23,12 @@ class Cotizacion(TimeStampedModel):
     apellidos_contacto = models.CharField(max_length=120, blank=True)
     razon_social = models.CharField(max_length=120, blank=True)
     nro_cotizacion = models.CharField(max_length=120)
+    fecha_envio = models.DateField(null=True, blank=True)
     total = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     usuario = models.ForeignKey(User, default=1)
+
+    def get_absolute_url(self):
+        return reverse("cotizaciones:detalle_cotizacion", kwargs={"pk": self.pk})
 
     def update_total(self):
         "updating..."

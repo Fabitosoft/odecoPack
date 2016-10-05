@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% crispy form_busqueda %}
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Nro.
+            </th>
+            <th>
+                Razón S.
+            </th>
+            <th>
+                Ciudad
+            </th>
+            <th>
+                Estado
+            </th>
+            <th>
+                Fecha Env.
+            </th>
+            <th>
+                Contacto
+            </th>
+            <th>
+                Nro. Contacto
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Total
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cotizacion in object_list %}
+            <tr>
+                <td>
+                    <a href="{{ cotizacion.get_absolute_url }}">{{ cotizacion.nro_cotizacion }}</a>
+                </td>
+                <td>
+                    {{ cotizacion.razon_social }}
+                </td>
+                <td>
+                    {{ cotizacion.ciudad }}
+                </td>
+                <td>
+                    {{ cotizacion.get_estado_display }}
+                </td>
+                <td>
+                    {{ cotizacion.fecha_envio }}
+                </td>
+                <td>
+                    {{ cotizacion.nombres_contacto }} {{ cotizacion.apellidos_contacto }}
+                </td>
+                <td>
+                    {{ cotizacion.nro_contacto }}
+                </td>
+                <td>
+                    {{ cotizacion.email }}
+                </td>
+                <td>
+                    {{ cotizacion.total }}
+                </td>
+            </tr>
+        {% empty %}
+            <li>No articles yet.</li>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    </ul>
+{% endblock %}
