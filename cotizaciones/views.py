@@ -94,6 +94,8 @@ class CotizacionesListView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("buscado")
+        if not query:
+            query = ""
         print(query)
         qs = Cotizacion.objects.filter(
             (Q(usuario=self.request.user) &
