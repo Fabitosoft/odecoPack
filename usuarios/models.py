@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -23,10 +24,13 @@ def colaborador_upload_to(instance, filename):
 
 class Colaborador(models.Model):
     def validate_image(fieldfile_obj):
+        w, h = get_image_dimensions(fieldfile_obj)
         filesize = fieldfile_obj.file.size
-        megabyte_limit = 1.0
+        megabyte_limit = 1
         if filesize > megabyte_limit * 1024 * 1024:
-            raise ValidationError("Max file size is %sMB" % str(megabyte_limit))
+            raise ValidationError("Tamaño Máximo del Archivo es %sMB" % str(megabyte_limit))
+        if w > 300 or h > 300:
+            raise ValidationError("Tamaño Máximo de la imagen es 300x300")
 
     usuario = models.OneToOneField(UserExtended, on_delete=models.PROTECT, related_name="colaborador")
     numero_contacto = models.CharField(max_length=12)

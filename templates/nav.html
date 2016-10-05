@@ -46,7 +46,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <p class="text-center">
-                                            {% if request.user.user_extendido.colaborador.foto_perfil.url %}
+                                            {% if request.user.user_extendido.colaborador.foto_perfil %}
                                                 <img class="img-circle" height="100" width="100"
                                                      src="{{ request.user.user_extendido.colaborador.foto_perfil.url }}"/>
                                             {% else %}
