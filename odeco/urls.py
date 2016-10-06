@@ -22,9 +22,10 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('registration.backends.default.urls')),
-    url(r'^', include('home.urls',namespace="home")),
     url(r'^lp/', include('listasprecios.urls',namespace="listasprecios")),
     url(r'^cotizaciones/', include('cotizaciones.urls',namespace="cotizaciones")),
+    url(r'^indicadores/', include('indicadores.urls',namespace="indicadores")),
+    url(r'^$', include('home.urls',namespace="home")),
 ]
 
 if settings.DEBUG:

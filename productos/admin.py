@@ -17,5 +17,12 @@ class ProductoAdmin(ImportExportModelAdmin):
         ListaPrecioInline,
     ]
 
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.created_by = request.user
+        else:
+            obj.updated_by = request.user
+        obj.save()
+
 admin.site.register(UnidadMedida)
 admin.site.register(Producto,ProductoAdmin)
