@@ -46,4 +46,4 @@ class Producto(TimeStampedModel):
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="servicio_updated")
 
     def __str__(self):
-        return self.referencia
+        return "%s - %s"%(self.referencia,self.descripcion_estandar)
