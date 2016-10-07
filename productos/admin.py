@@ -10,9 +10,11 @@ class ListaPrecioInline(admin.TabularInline):
     model = ListaPrecio
     extra = 0
 
+
 class ProductoAdmin(ImportExportModelAdmin):
-    # list_display = ('referencia','descripcion_estandar','unidad_medida')
-    # search_fields = ['referencia','descripcion_estandar']
+    list_display = ('referencia','descripcion_estandar','unidad_medida','activo','activo_ensamble','activo_proyectos','activo_componentes','activo_catalogo')
+    search_fields = ['referencia','descripcion_estandar']
+    list_editable = ['activo','activo_ensamble','activo_proyectos','activo_componentes','activo_catalogo']
     inlines = [
         ListaPrecioInline,
     ]

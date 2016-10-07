@@ -1,40 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-    <header id="email_header">
-        <div class="row logo">
-            <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
-                <div>
-                    <h4>Cotización Nro:
-                        <small>{{ object.nro_cotizacion }}</small>
-                    </h4>
-                    <h4>Fecha Envio:
-                        <small>{{ object.fecha_envio }}</small>
-                    </h4>
-                    <h4>Estado:
-                        <small>{{ object.get_estado_display }}</small>
-                    </h4>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6">
+    <div class="row">
+        <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
+            <div>
+                <h4>Cotización Nro:
+                    <small>{{ object.nro_cotizacion }}</small>
+                </h4>
+                <h4>Fecha Envio:
+                    <small>{{ object.fecha_envio }}</small>
+                </h4>
+                <h4>Estado:
+                    <small>{{ object.get_estado_display }}</small>
+                </h4>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
 
-                        <h4>Para:</h4>
-                        <h6>{{ object.razon_social }}</h6>
-                        <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
-                        <h6>{{ object.email }}</h6>
-                        <h6>{{ object.nro_contacto }}</h6>
-                        <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <h4>De:</h4>
-                        <h6>{{ object.usuario.get_full_name }}</h6>
-                        <h6>{{ object.usuario.email }}</h6>
-                        <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>
-                        <h6>Colombia - Cali</h6>
-                    </div>
+                    <h4>Para:</h4>
+                    <h6>{{ object.razon_social }}</h6>
+                    <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
+                    <h6>{{ object.email }}</h6>
+                    <h6>{{ object.nro_contacto }}</h6>
+                    <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <h4>De:</h4>
+                    <h6>{{ object.usuario.get_full_name }}</h6>
+                    <h6>{{ object.usuario.email }}</h6>
+                    <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>
+                    <h6>Colombia - Cali</h6>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
     <div>
         <table class="table table-bordered table-striped">
             <thead>

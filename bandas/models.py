@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
 
 from utils.models import TimeStampedModel
 from productos.models import Producto
@@ -33,7 +34,7 @@ class Banda(TimeStampedModel):
     material_varilla = models.ForeignKey(ValorCaracteristica, related_name="bandas_con_material_varilla")
     total_filas = models.PositiveIntegerField()
 
-    empujador = models.ForeignKey(ValorCaracteristica, related_name="bandas_con_empujador")
+    con_empujador = models.BooleanField(default=False)
     empujador_tipo = models.ForeignKey(ValorCaracteristica, null=True, blank=True,
                                        related_name="bandas_con_tipo_empujador", verbose_name="Tipo")
     empujador_altura = models.DecimalField(max_digits=10, null=True, blank=True, decimal_places=2,
@@ -45,13 +46,15 @@ class Banda(TimeStampedModel):
                                                verbose_name="Identacion (mm)")
     empujador_filas_entre = models.PositiveIntegerField(null=True, blank=True, verbose_name="Filas entre Empujador")
     empujador_total_filas = models.PositiveIntegerField(null=True, blank=True, verbose_name="Total Filas Empujador")
+
+    con_aleta = models.BooleanField(default=False)
     aleta = models.DecimalField(max_digits=10, null=True, blank=True, decimal_places=2, verbose_name="Aleta (mm)")
     aleta_identacion = models.DecimalField(max_digits=10, null=True, blank=True, decimal_places=2,
                                            verbose_name="Identacion Aleta (mm)")
 
     descripcion_estandar = models.CharField(max_length=200)
     descripcion_comercial = models.CharField(max_length=200)
-    referencia = models.CharField(max_length=120, unique=True)
+    referencia = models.CharField(max_length=120, unique=True,null=True, blank=True)
     fabricante = models.CharField(max_length=60)
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="banda_created_by")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="banda_updated_by")
@@ -62,10 +65,13 @@ class Banda(TimeStampedModel):
         through_fields=('banda', 'producto'),
     )
 
+    def get_absolute_url(self):
+        return reverse("bandas:detalle_banda", kwargs={"pk": self.pk})
+
 
 class Ensamblado(TimeStampedModel):
     banda = models.ForeignKey(Banda, on_delete=models.CASCADE, related_name='ensamblado')
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='ensamblados')
+    producto = models.ForeignKey(Producto,on_delete=models.CASCADE, related_name='ensamblados')
     ancho = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ancho (mm)")
     cortado_a = models.CharField(max_length=10)
     cantidad = models.DecimalField(max_digits=10, decimal_places=2)

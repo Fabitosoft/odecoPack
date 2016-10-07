@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Referencia
+            </th>
+            <th>
+                Nombre
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for banda in object_list %}
+            <tr>
+                <td>
+                    <a href="{{ banda.get_absolute_url }}">
+                        {{ banda.referencia }}
+                    </a>
+                </td>
+                <td>
+                    {{ banda.descripcion_estandar }}
+                </td>
+            </tr>
+        {% empty %}
+            <li>No articles yet.</li>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

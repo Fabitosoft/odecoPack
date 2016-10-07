@@ -9,33 +9,22 @@ nav {
 main {
   margin: 70px;
 }
-#email_body {
-  padding: 20px;
+.detalles_cuadro_detalle {
+  padding: 0.333333333333333em;
 }
-#email_body #email_header .logo {
-  margin: 20px;
-  height: 100px;
-  width: 190;
-  background-image: url("../img/logos/logo.png");
-  background-repeat: no-repeat;
+.detalles_cuadro_detalle .label {
+  color: #df7755;
+  font-size: 1em;
 }
-#email_body #email_header .info_cotizacion {
-  margin: 10px;
+.detalles_cuadro_detalle thead {
+  background-color: #df7755;
+  color: #fff;
 }
-#email_body #email_header .info_cotizacion h6,
-#email_body #email_header .info_cotizacion h4 {
-  margin: 5px;
-  padding: 0;
+.odeco_titulo_principal {
+  font-size: 2em;
+  color: #df5e00;
 }
-#email_body #email_coti_condiciones_comerciales {
-  background-color: #f0f8ff;
-  padding: 20px;
-}
-#email_body #email_coti_condiciones_comerciales h5,
-#email_body #email_coti_condiciones_comerciales h4 {
-  margin: 5px;
-  padding: 0;
-}
-#email_body footer {
-  text-align: center;
+.odeco_titulo_2 {
+  font-size: 1.5em;
+  color: #df5e00;
 }

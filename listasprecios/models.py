@@ -20,7 +20,7 @@ class FormaPago(models.Model):
 
 class ListaPrecio(TimeStampedModel):
     proveedor = models.ForeignKey(Proveedor)
-    producto = models.ForeignKey(Producto)
+    producto = models.ForeignKey(Producto, related_name="en_lista_precios")
     cantidad_minima=models.DecimalField(max_digits=10, decimal_places=3)
     valor = models.DecimalField(max_digits=10, decimal_places=3)
 
