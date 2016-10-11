@@ -20,7 +20,7 @@ class ColaboradorAdmin(admin.ModelAdmin):
                 )
             )
             print(obj.usuario.pk)
-            form.base_fields['usuario'].queryset = (qs1)
+            form.base_fields['usuario'].queryset = qs1
         else:
             qs1 = UserExtended.objects.filter(
                 Q(tipo='I') &
@@ -28,7 +28,7 @@ class ColaboradorAdmin(admin.ModelAdmin):
                     Q(colaborador__isnull=True)
                 )
             )
-            form.base_fields['usuario'].queryset = (qs1)
+            form.base_fields['usuario'].queryset = qs1
 
         return form
 admin.site.register(Colaborador,ColaboradorAdmin)
@@ -45,7 +45,7 @@ class ClienteEmpresaAdmin(admin.ModelAdmin):
                     Q(cliente_empresa__isnull=True)
                 )
             )
-            form.base_fields['usuario'].queryset = (qs1)
+            form.base_fields['usuario'].queryset = qs1
         else:
             qs1 = UserExtended.objects.filter(
                 Q(tipo='E') &
@@ -53,7 +53,7 @@ class ClienteEmpresaAdmin(admin.ModelAdmin):
                     Q(cliente_empresa__isnull=True)
                 )
             )
-            form.base_fields['usuario'].queryset = (qs1)
+            form.base_fields['usuario'].queryset = qs1
 
         return form
 admin.site.register(ClienteEmpresa,ClienteEmpresaAdmin)

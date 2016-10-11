@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load l10n %}
 {% block content %}
     <span class="odeco_titulo_principal">{{ object.descripcion_estandar }}</span>
     <hr/>
@@ -73,7 +74,10 @@
                         Cant.
                     </th>
                     <th>
-                        Costo Unitario
+                        Categoria
+                    </th>
+                    <th>
+                        Precio Unitario
                     </th>
                     <th>
                         Total
@@ -99,20 +103,21 @@
                             {{ ensamblado.cantidad }}
                         </td>
                         <td>
-                            {% for cosa in ensamblado.producto.en_lista_precios.all %}
-                                {{ cosa.cantidad_minima }}
-                            {% endfor %}
+                            {{ ensamblado.producto.margen.categoria }}
                         </td>
                         <td>
-
+                            {{ ensamblado.producto.precio_base }}
+                        </td>
+                        <td>
+                            {{ ensamblado.precio_linea }}
                         </td>
                     </tr>
                 {% endfor %}
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="5"> Total:</td>
-                    <td> {{ object.total }} </td>
+                    <td colspan="7"> Total:</td>
+                    <td> {{ object.precio_total }} </td>
                 </tr>
                 </tfoot>
             </table>

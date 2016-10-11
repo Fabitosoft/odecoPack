@@ -24,7 +24,7 @@ class Cotizacion(TimeStampedModel):
     razon_social = models.CharField(max_length=120, blank=True)
     nro_cotizacion = models.CharField(max_length=120)
     fecha_envio = models.DateField(null=True, blank=True)
-    total = models.DecimalField(max_digits=10, decimal_places=0, default=0)
+    total = models.DecimalField(max_digits=18, decimal_places=0, default=0)
     usuario = models.ForeignKey(User, default=1)
 
     def get_absolute_url(self):
@@ -37,19 +37,19 @@ class Cotizacion(TimeStampedModel):
         for item in items:
             print(item.total)
             total += item.total
-        self.total = "%.2f" % (total)
+        self.total = "%.2f" % total
         self.save()
 
 class ItemCotizacion(TimeStampedModel):
     cotizacion = models.ForeignKey(Cotizacion, related_name="items")
     item = models.ForeignKey(Producto, related_name="cotizaciones")
-    cantidad = models.DecimalField(max_digits=10, decimal_places=3)
-    precio = models.DecimalField(max_digits=10, decimal_places=0)
+    cantidad = models.DecimalField(max_digits=18, decimal_places=3)
+    precio = models.DecimalField(max_digits=18, decimal_places=0)
     forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones")
-    total = models.DecimalField(max_digits=10, decimal_places=0)
+    total = models.DecimalField(max_digits=18, decimal_places=0)
 
 def cotizacion_item_post_save_receiver(sender, instance, *args, **kwargs):
-	instance.cotizacion.update_total()
+    instance.cotizacion.update_total()
 
 post_save.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)

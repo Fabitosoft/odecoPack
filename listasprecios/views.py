@@ -3,9 +3,9 @@ from django.views.generic import ListView
 from django.utils import timezone
 from django.db.models import Max
 
-
-from .models import ListaPrecio, FormaPago
+from .models import FormaPago
 from cotizaciones.models import Cotizacion
+from productos.models import Producto
 from .forms import ProductoBusqueda
 from cotizaciones.forms import CotizacionForm
 from usuarios.mixins import LoginRequiredMixin
@@ -13,8 +13,9 @@ from usuarios.mixins import LoginRequiredMixin
 
 # Create your views here.
 
-class ListaPreciosView(LoginRequiredMixin,ListView):
-    model = ListaPrecio
+class ListaPreciosView(LoginRequiredMixin, ListView):
+    model = Producto
+    template_name = "listasprecios/listaprecio_list.html"
 
     def get_queryset(self):
         query = self.request.GET.get("buscar")
@@ -22,31 +23,9 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
             query = "Ningun atributo de busqueda"
 
         qs = self.model.objects.filter(
-            Q(producto__referencia__icontains=query) |
-            Q(producto__descripcion_estandar__icontains=query) |
-            Q(producto__fabricante__icontains=query)
-        ).distinct().values(
-            'producto__referencia',
-            'producto__descripcion_estandar',
-            'producto__cantidad_empaque',
-            'producto__fabricante',
-            'producto__unidad_medida__nombre',
-            'proveedor__moneda__nombre',
-            'proveedor__moneda__moneda_cambio__cambio',
-            'proveedor__moneda__variablebasica__margen_deseado',
-            'proveedor__moneda__variablebasica__factor_importacion',
-            'producto_id'
-        ).annotate(
-            costo_me=Max('valor'),
-            factor_cambio=Max('proveedor__moneda__moneda_cambio__cambio'),
-            factor_importacion=Max('proveedor__moneda__variablebasica__factor_importacion'),
-            margen=Max('proveedor__moneda__variablebasica__margen_deseado'),
-            costo_cop=Max('proveedor__moneda__moneda_cambio__cambio') * Max('valor') * Max(
-                'proveedor__moneda__variablebasica__factor_importacion'),
-            precio_base=(Max('proveedor__moneda__moneda_cambio__cambio') * Max('valor') * Max(
-                'proveedor__moneda__variablebasica__factor_importacion') / (
-                             1 - Max('proveedor__moneda__variablebasica__margen_deseado')))
-        ).order_by('-modified')
+            Q(referencia__icontains=query) |
+            Q(descripcion_estandar__icontains=query)
+        ).distinct().order_by('-modified')
         return qs
 
     def get_context_data(self, **kwargs):
@@ -98,5 +77,3 @@ class ListaPreciosView(LoginRequiredMixin,ListView):
         context["forma_de_pago"] = self.request.GET.get('tipo')
 
         return context
-
-

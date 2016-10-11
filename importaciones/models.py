@@ -10,10 +10,20 @@ class Moneda(models.Model):
 
 class FactorCambioMoneda(models.Model):
     moneda_origen = models.OneToOneField(Moneda, related_name="moneda_cambio")
-    cambio = models.DecimalField(max_digits=10,decimal_places=4)
+    cambio = models.DecimalField(max_digits=18,decimal_places=4)
+
+    def save(self):
+        super().save()
+        qs = self.moneda_origen.provedores_con_moneda.all()
+        for provedor in qs:
+            qs2=provedor.mis_margenes_por_categoria.all()
+            for mxc in qs2:
+                productosqs= mxc.productos_con_margen.all()
+                for producto in productosqs:
+                    producto.save()
 
     class Meta:
         verbose_name_plural = "Factores de Cambio Monedas"
 
     def __str__(self):
-        return '%s vs COP'%(self.moneda_origen)
+        return '%s vs COP' % self.moneda_origen

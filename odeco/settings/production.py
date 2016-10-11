@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import os
 from .base import *
 
-if DEBUG==False:
+if not DEBUG:
     ########## MANAGER CONFIGURATION
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
     ADMINS = (

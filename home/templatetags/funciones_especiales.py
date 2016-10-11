@@ -10,5 +10,5 @@ def arreglar_centenas_lp(valor):
 
 @register.simple_tag
 def obtener_precio_lp(valor,porcentaje):
-    nuevo_valor = Decimal(valor)*Decimal((1+(porcentaje)))
+    nuevo_valor = Decimal(valor)*Decimal((1 + porcentaje))
     return math.ceil((nuevo_valor/100))*100

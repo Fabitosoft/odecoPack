@@ -2,61 +2,63 @@
 {% load funciones_especiales %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <h3>Cotización</h3>
-    <hr/>
-    <div class="row">
-        {% if cotizacion_id %}
-            <div class="col-md-7">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <td>Referencia</td>
-                        <td>Nombre</td>
-                        <td>Cantidad</td>
-                        <td>Uni. Medida</td>
-                        <td>Precio</td>
-                        <td>Total</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in items_cotizacion %}
-                        <tr id="item-{{ item.id }}">
-                            <td>{{ item.item }}</td>
-                            <td>{{ item.item.descripcion_comercial }}</td>
-                            <td>
-                                <input type='hidden' name='item' value='{{ item.id }}'/>
-                                <input class="item-qty" style="width: 60px" step=any
-                                       value="{{ item.cantidad }}"/>
-                            </td>
-                            <td>{{ item.item.unidad_medida }}</td>
-                            <td>{{ item.precio }}</td>
-                            <td class="total">{{ item.total }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <td>
-                            Total:
-                        </td>
-                        <td id="coti_val_total">
-                            {{ cotizacion_total }}
-                        </td>
-                    </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <div class="col-md-5">
-                {% crispy cotizacion_form %}
-                <hr/>
-                <form method="GET">
-                    <input name="descartar" class="btn btn-primary" type="submit" value="Descartar"/>
-                </form>
-            </div>
-        {% else %}
-            {% crispy cotizacion_form %}
-        {% endif %}
-    </div>
+{#    <!--#}
+{#    <h3>Cotización</h3>#}
+{#    <hr/>#}
+{#    <div class="row">#}
+{#        {% if cotizacion_id %}#}
+{#            <div class="col-md-7">#}
+{#                <table class="table table-bordered table-striped">#}
+{#                    <thead>#}
+{#                    <tr>#}
+{#                        <td>Referencia</td>#}
+{#                        <td>Nombre</td>#}
+{#                        <td>Cantidad</td>#}
+{#                        <td>Uni. Medida</td>#}
+{#                        <td>Precio</td>#}
+{#                        <td>Total</td>#}
+{#                    </tr>#}
+{#                    </thead>#}
+{#                    <tbody>#}
+{#                    {% for item in items_cotizacion %}#}
+{#                        <tr id="item-{{ item.id }}">#}
+{#                            <td>{{ item.item }}</td>#}
+{#                            <td>{{ item.item.descripcion_comercial }}</td>#}
+{#                            <td>#}
+{#                                <input type='hidden' name='item' value='{{ item.id }}'/>#}
+{#                                <input class="item-qty" style="width: 60px" step=any#}
+{#                                       value="{{ item.cantidad }}"/>#}
+{#                            </td>#}
+{#                            <td>{{ item.item.unidad_medida }}</td>#}
+{#                            <td>{{ item.precio }}</td>#}
+{#                            <td class="total">{{ item.total }}</td>#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+{#                    </tbody>#}
+{#                    <tfoot>#}
+{#                    <tr>#}
+{#                        <td>#}
+{#                            Total:#}
+{#                        </td>#}
+{#                        <td id="coti_val_total">#}
+{#                            {{ cotizacion_total }}#}
+{#                        </td>#}
+{#                    </tr>#}
+{#                    </tfoot>#}
+{#                </table>#}
+{#            </div>#}
+{#            <div class="col-md-5">#}
+{#                {% crispy cotizacion_form %}#}
+{#                <hr/>#}
+{#                <form method="GET">#}
+{#                    <input name="descartar" class="btn btn-primary" type="submit" value="Descartar"/>#}
+{#                </form>#}
+{#            </div>#}
+{#        {% else %}#}
+{#            {% crispy cotizacion_form %}#}
+{#        {% endif %}#}
+{#    </div>#}
+{#    -->#}
 
     <div class="row">
         <div class="col-md-12">
@@ -71,7 +73,6 @@
                     <tr>
                         <td>Referencia</td>
                         <td>Descripción</td>
-                        <td>Fabricante</td>
                         <td>Cant. Emp.</td>
                         <td>Uni. Med.</td>
                         <td>Precio</td>
@@ -79,17 +80,16 @@
                     </thead>
                     <tbody>
                     {% for pro in object_list %}
-                        {% obtener_precio_lp pro.precio_base formas_pago_porcentaje as precio %}
+                        {% obtener_precio_lp pro.costo_base formas_pago_porcentaje as precio %}
                         <tr>
-                            <td>{{ pro.producto__referencia }} </td>
-                            <td>{{ pro.producto__descripcion_estandar }} </td>
-                            <td>{{ pro.producto__fabricante }} </td>
-                            <td>{{ pro.producto__cantidad_empaque }} </td>
-                            <td>{{ pro.producto__unidad_medida__nombre }} </td>
-                            <td>{{ precio }} </td>
+                            <td>{{ pro.referencia }} </td>
+                            <td>{{ pro.descripcion_estandar }} </td>
+                            <td>{{ pro.cantidad_empaque }} </td>
+                            <td>{{ pro.unidad_medida__nombre }} </td>
+                            <td> {{ precio }} </td>
                             {% if cotizacion_id %}
                                 <td>
-                                    <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.producto_id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id %}">
+                                    <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id %}">
                                         +
                                     </a>
                                 </td>
@@ -120,13 +120,13 @@
         $(".item-qty").change(function () {
 
             var item = $(this).prev("input[type='hidden']").val();
-            var qty = $(this).val()
+            var qty = $(this).val();
             var data = {
                 item: item,
                 qty: qty
-            }
+            };
             $.get("{% url 'cotizaciones:add_qty_item_cotizacion' %}", data, function (data) {
-                $("#coti_val_total").html(numberWithCommas(data.total_cotizacion))
+                $("#coti_val_total").html(numberWithCommas(data.total_cotizacion));
                 if (data.deleted) {
                     $("#item-" + item).fadeOut();
                     {#                    $("#subtotal").text(data.subtotal);#}

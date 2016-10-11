@@ -1,14 +1,15 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
 
+from proveedores.models import MargenProvedor
 from utils.models import TimeStampedModel
+
 
 # Create your models here.
 
 ######################################################################################################################
-#UNIDADES DE MEDIDA
+# UNIDADES DE MEDIDA
 ######################################################################################################################
 class UnidadMedida(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
@@ -21,12 +22,13 @@ class UnidadMedida(models.Model):
 
 
 ######################################################################################################################
-#PRODUCTOS
+# PRODUCTOS
 ######################################################################################################################
 def productos_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
     new_filename = "produ_perfil_%s.%s" % (basename, file_extention)
-    return "%s/%s/%s" % ("productos","foto_perfil", new_filename)
+    return "%s/%s/%s" % ("productos", "foto_perfil", new_filename)
+
 
 class ProductoQuerySet(models.QuerySet):
     def para_ensamble(self):
@@ -40,9 +42,10 @@ class ProductoQuerySet(models.QuerySet):
 
     def para_proyectos(self):
         return self.filter(activo_proyectos=True)
-    #
-    # def editors(self):
-    #     return self.filter(role='E')
+        #
+        # def editors(self):
+        #     return self.filter(role='E')
+
 
 class ProductoActivosManager(models.Manager):
     def get_queryset(self):
@@ -60,6 +63,7 @@ class ProductoActivosManager(models.Manager):
     def proyectos(self):
         return self.get_queryset().para_proyectos()
 
+
 class Producto(TimeStampedModel):
     def validate_image(fieldfile_obj):
         filesize = fieldfile_obj.file.size
@@ -72,15 +76,23 @@ class Producto(TimeStampedModel):
     descripcion_estandar = models.CharField(max_length=200)
     descripcion_comercial = models.CharField(max_length=200)
     serie = models.CharField(max_length=10, default="")
-    fabricante = models.CharField(max_length=60, null=True, blank=True)
-    cantidad_empaque = models.DecimalField(max_digits=10,decimal_places=4, default=0)
-    unidad_medida = models.ForeignKey(UnidadMedida,on_delete=models.PROTECT, null=True)
-    cantidad_minima_venta = models.DecimalField(max_digits=10,decimal_places=4, default=0)
+    cantidad_empaque = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    unidad_medida = models.ForeignKey(UnidadMedida, on_delete=models.PROTECT, null=True)
+    cantidad_minima_venta = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+
+    margen = models.ForeignKey(MargenProvedor, null=True, blank=True, related_name="productos_con_margen",
+                               verbose_name="Id MxC")
+    costo = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    costo_cop = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+
+    precio_base = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+
     activo = models.BooleanField(default=True)
-    activo_componentes = models.BooleanField(default=True)
-    activo_proyectos = models.BooleanField(default=True)
-    activo_catalogo = models.BooleanField(default=True)
-    activo_ensamble = models.BooleanField(default=False)
+    activo_componentes = models.BooleanField(default=True, verbose_name="En Compo.")
+    activo_proyectos = models.BooleanField(default=True, verbose_name="En Proy.")
+    activo_catalogo = models.BooleanField(default=True, verbose_name="En Cata.")
+    activo_ensamble = models.BooleanField(default=False, verbose_name="Para Ensam.")
+
     foto_perfil = models.ImageField(upload_to=productos_upload_to, validators=[validate_image], null=True, blank=True)
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="servicio_created")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="servicio_updated")
@@ -88,5 +100,18 @@ class Producto(TimeStampedModel):
     objects = models.Manager()
     activos = ProductoActivosManager()
 
+    def save(self):
+        self.set_precio_base_y_costo()
+        super().save()
+        for ensamble in self.ensamblados.all():
+            ensamble.save()
+
     def __str__(self):
-        return "%s - %s"%(self.referencia,self.descripcion_estandar)
+        return "%s" % (self.descripcion_estandar)
+
+    def set_precio_base_y_costo(self):
+        self.costo_cop = self.costo * (
+            self.margen.proveedor.moneda.moneda_cambio.cambio) * (self.margen.proveedor.factor_importacion)
+
+        self.precio_base = self.costo * (1 + self.margen.margen_deseado / 100) * (
+            self.margen.proveedor.moneda.moneda_cambio.cambio) * (self.margen.proveedor.factor_importacion)

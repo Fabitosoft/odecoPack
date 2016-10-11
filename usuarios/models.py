@@ -8,7 +8,7 @@ from empresas.models import Empresa
 
 class UserExtended(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_extendido")
-    tipo = models.CharField(max_length=1, choices=((('I', 'Colaborador'),('E', 'Cliente'))))
+    tipo = models.CharField(max_length=1, choices=(('I', 'Colaborador'), ('E', 'Cliente')))
 
 
     def __str__(self):
