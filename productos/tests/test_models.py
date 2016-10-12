@@ -3,19 +3,20 @@ from django.test import TestCase
 from productos.models import Producto, UnidadMedida
 from django.utils.translation import ugettext_lazy as _
 
+
 class ProductoTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.unidad = UnidadMedida(nombre="metro")
         cls.unidad.save()
-        cls.producto=Producto(
+        cls.producto = Producto(
             id_cguno=1,
             referencia='referencia',
             descripcion_estandar='descripcion',
             descripcion_comercial='descripcion2',
             unidad_medida=cls.unidad
         )
-        cls.producto2=Producto(
+        cls.producto2 = Producto(
             id_cguno=1,
             referencia='referencia',
             descripcion_estandar='descripcion',

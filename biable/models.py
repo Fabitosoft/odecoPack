@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db import models
 
+
 # Create your models here.
 
 class DataBiable(models.Model):
@@ -20,11 +21,11 @@ class DataBiable(models.Model):
     nro_documento_relacionado = models.PositiveIntegerField(blank=True, null=True)
     tipo_rm_relacionado = models.CharField(max_length=10, blank=True, null=True)
     nro_rm_relacionado = models.PositiveIntegerField(blank=True, null=True)
-    valor_bruto = models.DecimalField(max_digits=14,decimal_places=4, default=0)
-    descuentos_netos = models.DecimalField(max_digits=14,decimal_places=4,default=0)
-    impuestos_netos = models.DecimalField(max_digits=14,decimal_places=4,default=0)
-    valor_neto = models.DecimalField(max_digits=14,decimal_places=4,default=0)
-    costo = models.DecimalField(max_digits=14,decimal_places=4,default=0)
-    rentabilidad = models.DecimalField(max_digits=14,decimal_places=4,default=0)
+    valor_bruto = models.DecimalField(max_digits=14, decimal_places=4, default=0)
+    descuentos_netos = models.DecimalField(max_digits=14, decimal_places=4, default=0)
+    impuestos_netos = models.DecimalField(max_digits=14, decimal_places=4, default=0)
+    valor_neto = models.DecimalField(max_digits=14, decimal_places=4, default=0)
+    costo = models.DecimalField(max_digits=14, decimal_places=4, default=0)
+    rentabilidad = models.DecimalField(max_digits=14, decimal_places=4, default=0)
     fecha_generacion_biable = models.DateField(default=datetime.now)
     numero_registros = models.PositiveIntegerField(default=0)

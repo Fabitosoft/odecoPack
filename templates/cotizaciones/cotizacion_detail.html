@@ -1,92 +1,155 @@
 {% extends 'base.html' %}
+{% load funciones_especiales %}
 {% block content %}
-    <div class="row">
-        <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
-            <div>
-                <h4>Cotización Nro:
-                    <small>{{ object.nro_cotizacion }}</small>
-                </h4>
-                <h4>Fecha Envio:
-                    <small>{{ object.fecha_envio }}</small>
-                </h4>
-                <h4>Estado:
-                    <small>{{ object.get_estado_display }}</small>
-                </h4>
-            </div>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6">
-
-                    <h4>Para:</h4>
-                    <h6>{{ object.razon_social }}</h6>
-                    <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
-                    <h6>{{ object.email }}</h6>
-                    <h6>{{ object.nro_contacto }}</h6>
-                    <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
+    <div class="detalles_cuadro_detalle">
+        <span class="odeco_titulo_principal">Cotizacion {{ object.nro_cotizacion }}</span>
+        <hr/>
+        <div class="row">
+            <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
+                <div>
+                    <h4>Cotización Nro:
+                        <small>{{ object.nro_cotizacion }}</small>
+                    </h4>
+                    <h4>Fecha Envio:
+                        <small>{{ object.fecha_envio }}</small>
+                    </h4>
+                    <h4>Estado:
+                        <small>{{ object.get_estado_display }}</small>
+                    </h4>
                 </div>
-                <div class="col-xs-12 col-sm-6">
-                    <h4>De:</h4>
-                    <h6>{{ object.usuario.get_full_name }}</h6>
-                    <h6>{{ object.usuario.email }}</h6>
-                    <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>
-                    <h6>Colombia - Cali</h6>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+
+                        <h4>Para:</h4>
+                        <h6>{{ object.razon_social }}</h6>
+                        <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
+                        <h6>{{ object.email }}</h6>
+                        <h6>{{ object.nro_contacto }}</h6>
+                        <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <h4>De:</h4>
+                        <h6>{{ object.usuario.get_full_name }}</h6>
+                        <h6>{{ object.usuario.email }}</h6>
+                        <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>
+                        <h6>Colombia - Cali</h6>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div>
-        <table class="table table-bordered table-striped">
-            <thead>
-            <tr>
-                <th>
-                    Referencia
-                </th>
-                <th>
-                    Nombre
-                </th>
-                <th>
-                    Cant.
-                </th>
-                <th>
-                    Uni. Emp
-                </th>
-                <th>
-                    Total
-                </th>
-                <th>
-                    Forma de Pago
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for item in object.items.all %}
+        <div>
+            <table class="table table-bordered table-striped">
+                <thead>
                 <tr>
-                    <td>
-                        {{ item.item.referencia }}
-                    </td>
-                    <td>
-                        {{ item.item.descripcion_comercial }}
-                    </td>
-                    <td>
-                        {{ item.cantidad }}
-                    </td>
-                    <td>
-                        {{ item.item.unidad_medida }}
-                    </td>
-                    <td>
-                        {{ item.total }}
-                    </td>
-                    <td>
-                        {{ item.forma_pago }}
-                    </td>
+                    <th>
+                        Referencia
+                    </th>
+                    <th>
+                        Nombre
+                    </th>
+                    <th>
+                        Cant.
+                    </th>
+                    <th>
+                        Uni. Emp
+                    </th>
+                    <th>
+                        Pre. Uni.
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                    <th>
+                        Forma de Pago
+                    </th>
+                    <th>
+                        Costo Base
+                    </th>
+                    <th>
+                        Costo Total
+                    </th>
+                    <th>
+                        Rent.
+                    </th>
+                    <th>
+                        Mrg Rent.
+                    </th>
                 </tr>
-            {% endfor %}
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="5"> Total:</td>
-                <td> {{ object.total }} </td>
-            </tr>
-            </tfoot>
-        </table>
+                </thead>
+                <tbody>
+                {% for item in object.items.all %}
+                    <tr>
+                        <td>
+                            {% if item.item %}
+                                {{ item.item.referencia }}
+                            {% else %}
+                                {{ item.banda.referencia }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.item %}
+                                {{ item.item.descripcion_comercial }}
+                            {% else %}
+                                {{ item.banda.descripcion_comercial }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ item.cantidad }}
+                        </td>
+                        <td>
+                            {% if item.item %}
+                                {{ item.item.unidad_medida }}
+                            {% else %}
+                                Metro
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ item.precio }}
+                        </td>
+                        <td>
+                            {{ item.total }}
+                        </td>
+                        <td>
+                            {{ item.forma_pago }}
+                        </td>
+                        <td>
+                            {% if item.item %}
+                                {{ item.item.costo_cop }}
+                            {% else %}
+                                {{ item.banda.costo_base_total }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.item %}
+                                {% multiplicar item.item.costo_cop item.cantidad %}
+                            {% else %}
+                                {% multiplicar item.banda.costo_base_total item.cantidad %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.item %}
+                                {% obtener_rentabilidad item.item.costo_cop item.precio cantidad=item.cantidad porcentaje=0 %}
+                            {% else %}
+                                {% obtener_rentabilidad item.banda.costo_base_total item.precio cantidad=item.cantidad porcentaje=0 %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.item %}
+                                {% obtener_rentabilidad item.item.costo_cop item.precio cantidad=item.cantidad porcentaje=1 %}
+                            {% else %}
+                                {% obtener_rentabilidad item.banda.costo_base_total item.precio cantidad=item.cantidad porcentaje=1 %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="5"> Total:</td>
+                    <td> {{ object.total }} </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
 {% endblock %}

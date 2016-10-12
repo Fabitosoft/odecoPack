@@ -1,6 +1,6 @@
 from crispy_forms.bootstrap import StrictButton, PrependedText, FormActions, FieldWithButtons
 from crispy_forms.bootstrap import InlineField
-from crispy_forms.layout import Submit, Layout, Div, Field, Button
+from crispy_forms.layout import Submit, Layout, Div, Field, Button, HTML
 from django import forms
 from django.forms import ModelForm
 
@@ -58,6 +58,7 @@ class CotizacionForm(ModelForm):
                 Field('apellidos_contacto')
             ),
             PrependedText('email', '@', placeholder="Correo Electrónico"),
+            HTML('<hr/>')
 
         )
         crear = Div(

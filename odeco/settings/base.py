@@ -103,7 +103,7 @@ DJANGO_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Admin panel and documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
 
 )
 

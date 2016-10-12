@@ -43,7 +43,7 @@ class MargenProvedor(models.Model):
             producto.save()
 
     class Meta:
-        verbose_name_plural = "Margenes x Proveedores"
+        verbose_name_plural = "Margenes x Categoría x Proveedores"
         unique_together = ("categoria", "proveedor")
 
     def __str__(self):

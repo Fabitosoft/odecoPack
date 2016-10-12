@@ -9,11 +9,23 @@ from productos.models import Producto
 from .forms import ProductoBusqueda
 from cotizaciones.forms import CotizacionForm
 from usuarios.mixins import LoginRequiredMixin
+from bandas.models import Banda
 
 
 # Create your views here.
-
 class ListaPreciosView(LoginRequiredMixin, ListView):
+    """
+    Display an individual :model:`myapp.MyModel`.
+
+    **Context**
+
+    ``mymodel``
+        An instance of :model:`myapp.MyModel`.
+
+    **Template:**
+
+    :template:`myapp/my_template.html`
+    """
     model = Producto
     template_name = "listasprecios/listaprecio_list.html"
 
@@ -22,7 +34,7 @@ class ListaPreciosView(LoginRequiredMixin, ListView):
         if not query:
             query = "Ningun atributo de busqueda"
 
-        qs = self.model.objects.filter(
+        qs = self.model.activos.componentes().select_related("unidad_medida").filter(
             Q(referencia__icontains=query) |
             Q(descripcion_estandar__icontains=query)
         ).distinct().order_by('-modified')
@@ -33,12 +45,20 @@ class ListaPreciosView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['formu'] = ProductoBusqueda(self.request.GET or None)
 
-        #segun el tipo, obtiene el porcentaje que se aplicará a la lista de precios
+        query = self.request.GET.get("buscar")
+        if not query:
+            query = "Ningun atributo de busqueda"
+        context['object_list_bandas'] = Banda.activos.componentes().filter(
+            Q(referencia__icontains=query) |
+            Q(descripcion_estandar__icontains=query)
+        ).distinct()
+
+        # segun el tipo, obtiene el porcentaje que se aplicará a la lista de precios
         if self.request.GET.get("tipo"):
-            context['formas_pago_porcentaje'] = FormaPago.objects.select_related('porcentaje_lp').filter(
-                id=self.request.GET.get("tipo")).first().porcentaje_lp.value
+            context['formas_pago_porcentaje'] = FormaPago.objects.filter(
+                id=self.request.GET.get("tipo")).first().porcentaje
         else:
-            context['formas_pago_porcentaje'] = FormaPago.objects.select_related('porcentaje_lp').first().porcentaje_lp.value
+            context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje
 
         cotizacion = Cotizacion.objects.filter(
             Q(usuario=self.request.user) &
@@ -63,7 +83,6 @@ class ListaPreciosView(LoginRequiredMixin, ListView):
         if self.request.GET.get('descartar') and cotizacion:
             cotizacion.delete()
             cotizacion = None
-
 
         if cotizacion:
             context["cotizacion_form"] = CotizacionForm(instance=cotizacion)

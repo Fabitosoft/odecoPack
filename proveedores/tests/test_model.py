@@ -4,6 +4,7 @@ from django.test import TestCase
 from productos.models import UnidadMedida, Producto
 from proveedores.models import Moneda, Proveedor, ListaPrecio
 
+
 class MonedaTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -20,6 +21,7 @@ class MonedaTestCase(TestCase):
         self.moneda.save()
         with self.assertRaises(IntegrityError):
             self.moneda2.save()
+
 
 class ProveedorTestCase(TestCase):
     @classmethod
@@ -39,6 +41,7 @@ class ProveedorTestCase(TestCase):
         self.proveedor.save()
         with self.assertRaises(IntegrityError):
             self.proveedor2.save()
+
 
 class ListaPreciosTestCase(TestCase):
     @classmethod
@@ -75,9 +78,9 @@ class ListaPreciosTestCase(TestCase):
 
     def test_string_representation(self):
         self.assertEqual(str(self.lista_precios),
-                         "%s %s %s"%(self.lista_precios.proveedor,
-                                     self.lista_precios.producto.referencia,
-                                     self.lista_precios.cantidad_minima))
+                         "%s %s %s" % (self.lista_precios.proveedor,
+                                       self.lista_precios.producto.referencia,
+                                       self.lista_precios.cantidad_minima))
 
     def test_verbose_name_plural(self):
         self.assertEqual(str(ListaPrecio._meta.verbose_name_plural), "listas de precios")

@@ -1,3 +1,4 @@
+import math
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -75,7 +76,7 @@ class Producto(TimeStampedModel):
     referencia = models.CharField(max_length=120, unique=True)
     descripcion_estandar = models.CharField(max_length=200)
     descripcion_comercial = models.CharField(max_length=200)
-    serie = models.CharField(max_length=10, default="")
+    fabricante = models.CharField(max_length=120, default="")
     cantidad_empaque = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     unidad_medida = models.ForeignKey(UnidadMedida, on_delete=models.PROTECT, null=True)
     cantidad_minima_venta = models.DecimalField(max_digits=18, decimal_places=4, default=0)
@@ -84,8 +85,8 @@ class Producto(TimeStampedModel):
                                verbose_name="Id MxC")
     costo = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     costo_cop = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-
     precio_base = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
 
     activo = models.BooleanField(default=True)
     activo_componentes = models.BooleanField(default=True, verbose_name="En Compo.")
@@ -100,6 +101,7 @@ class Producto(TimeStampedModel):
     objects = models.Manager()
     activos = ProductoActivosManager()
 
+
     def save(self):
         self.set_precio_base_y_costo()
         super().save()
@@ -110,8 +112,12 @@ class Producto(TimeStampedModel):
         return "%s" % (self.descripcion_estandar)
 
     def set_precio_base_y_costo(self):
-        self.costo_cop = self.costo * (
+        costo_base_cop = self.costo * (
             self.margen.proveedor.moneda.moneda_cambio.cambio) * (self.margen.proveedor.factor_importacion)
+        self.costo_cop = costo_base_cop
 
-        self.precio_base = self.costo * (1 + self.margen.margen_deseado / 100) * (
-            self.margen.proveedor.moneda.moneda_cambio.cambio) * (self.margen.proveedor.factor_importacion)
+        precio_base = costo_base_cop * (1 + self.margen.margen_deseado / 100)
+        #precio_base_sin_decimales = math.ceil((precio_base / 100)) * 100
+        self.precio_base = precio_base
+
+        self.rentabilidad = precio_base - costo_base_cop

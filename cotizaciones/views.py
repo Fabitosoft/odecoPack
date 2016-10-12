@@ -44,7 +44,7 @@ class CotizacionDetailView(DetailView):
             obj.save()
 
             subject, from_email, to = "%s - %s" % (
-            'Cotizacion', obj.nro_cotizacion), settings.EMAIL_HOST_USER, self.request.GET.get('email')
+                'Cotizacion', obj.nro_cotizacion), settings.EMAIL_HOST_USER, self.request.GET.get('email')
 
             ctx = {
                 'object': obj,
@@ -59,34 +59,6 @@ class CotizacionDetailView(DetailView):
         return obj
 
 
-class AddItem(SingleObjectMixin, View):
-    model = ItemCotizacion
-
-    def get(self, request, *args, **kwargs):
-        coti_id = kwargs["cot_id"]
-        item_id = kwargs["item_id"]
-        precio = kwargs["precio"]
-        forma_pago_id = kwargs["forma_pago"]
-
-        item = ItemCotizacion.objects.filter(
-            Q(item_id=item_id) &
-            Q(cotizacion_id=coti_id)
-        ).first()
-
-        if not item:
-            item = ItemCotizacion()
-            producto = Producto.objects.get(id=item_id)
-            item.cantidad = producto.cantidad_empaque
-        item.cotizacion_id = coti_id
-        item.item_id = item_id
-        item.precio = precio
-        item.forma_pago_id = forma_pago_id
-        item.total = int(precio) * item.cantidad
-        item.save()
-
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
 class CotizacionesListView(ListView):
     model = Cotizacion
 
@@ -97,7 +69,7 @@ class CotizacionesListView(ListView):
         print(query)
         qs = Cotizacion.objects.filter(
             (Q(usuario=self.request.user) &
-            ~Q(estado="INI")) &
+             ~Q(estado="INI")) &
             (
                 Q(nombres_contacto__icontains=query) |
                 Q(nro_cotizacion__icontains=query) |
@@ -138,3 +110,39 @@ class AddItemCantidad(SingleObjectMixin, View):
             "total_cotizacion": item.cotizacion.total
         }
         return JsonResponse(data)
+
+
+class AddItem(SingleObjectMixin, View):
+    model = ItemCotizacion
+
+    def get(self, request, *args, **kwargs):
+        coti_id = kwargs["cot_id"]
+        item_id = kwargs["item_id"]
+        precio = kwargs["precio"]
+        forma_pago_id = kwargs["forma_pago"]
+        tipo = kwargs["tipo"]
+
+        item = ItemCotizacion.objects.filter(
+            Q(item_id=item_id) &
+            Q(cotizacion_id=coti_id)
+        ).first()
+
+        if not item:
+            item = ItemCotizacion()
+            if tipo == 1:
+                producto = Producto.objects.get(id=item_id)
+                item.cantidad = producto.cantidad_empaque
+            else:
+                item.cantidad = 1
+
+        item.cotizacion_id = coti_id
+        if int(tipo) == 1:
+            item.item_id = item_id
+        else:
+            item.banda_id = item_id
+        item.precio = precio
+        item.forma_pago_id = forma_pago_id
+        item.total = int(precio) * item.cantidad
+        item.save()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

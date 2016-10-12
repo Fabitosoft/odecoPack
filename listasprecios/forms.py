@@ -8,7 +8,7 @@ from listasprecios.models import FormaPago
 
 class ProductoBusqueda(forms.Form):
     buscar = forms.CharField(max_length=100, required=False, label="Referencia")
-    tipo = forms.ModelChoiceField(queryset=FormaPago.objects.all(), label="Forma de Pago")
+    tipo = forms.ModelChoiceField(queryset=FormaPago.objects.all().order_by("forma"), label="Forma de Pago")
 
     def __init__(self, *args, **kwargs):
         super(ProductoBusqueda, self).__init__(*args, **kwargs)

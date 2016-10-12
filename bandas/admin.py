@@ -3,18 +3,20 @@ from django.contrib import admin
 # Register your models here.
 
 from productos.models import Producto
-from .models import Caracteristica, ValorCaracteristica, Banda, Ensamblado
+from .models import Caracteristica, ValorCaracteristica, Banda, Ensamblado, CostoEnsambladoBlanda
 
 
+# region BandasAdmin
 class EnsambladoInline(admin.TabularInline):
     model = Ensamblado
     raw_id_fields = ("producto",)
-    readonly_fields = ("es_para_ensamblado","precio_linea")
+    readonly_fields = ("es_para_ensamblado", "precio_linea", "costo_cop_linea", "rentabilidad")
     # can_delete = False
     extra = 0
 
     def es_para_ensamblado(self, obj):
         return obj.producto.activo_ensamble
+
     es_para_ensamblado.boolean = True
 
     # def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -23,9 +25,7 @@ class EnsambladoInline(admin.TabularInline):
     #         kwargs['queryset'] = Producto.activos.modulos()
     #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-
 class BandaAdmin(admin.ModelAdmin):
-
     list_display = (
         "referencia",
         "descripcion_estandar",
@@ -34,29 +34,53 @@ class BandaAdmin(admin.ModelAdmin):
         "con_aleta",
         "fabricante",
         "activo",
-        "precio_total"
+        'activo_proyectos',
+        'activo_componentes',
+        'activo_catalogo',
+        "costo_base_total",
+        "precio_total",
+        "rentabilidad"
     )
 
-    list_editable = ("activo",)
-    readonly_fields = ("precio_total",)
+    list_editable = (
+        "activo",
+        'activo_proyectos',
+        'activo_componentes',
+        'activo_catalogo',
+    )
+    readonly_fields = ("precio_total", "costo_base_total", "rentabilidad","referencia")
 
     fieldsets = (
+        ('Informacion General', {
+            'classes': ('form-control',),
+            'fields':
+                (
+                    ('id_cguno', 'referencia'),
+                    ('descripcion_estandar', 'descripcion_comercial'),
+                    'fabricante'
+                )
+        }),
         ('General', {
             'classes': ('form-control',),
             'fields':
                 (
-                    ('descripcion_estandar', 'descripcion_comercial'),
-                    'referencia',
-                    ('serie', 'material', 'color', 'fabricante', 'tipo'),
-                    ('ancho', 'longitud', 'total_filas'),
+                    ('serie', 'paso'),
+                    ('tipo', 'material', 'color'),
+                    ('ancho', 'longitud'),
                     'material_varilla',
-                    ('con_empujador', 'con_aleta'),
-                    'activo'
+                    'total_filas'
+                )
+        }),
+        ('Activar', {
+            'fields':
+                (
+                    ("activo", 'activo_proyectos', 'activo_componentes', 'activo_catalogo'),
                 )
         }),
         ('Empujador', {
             'classes': ('collapse',),
             'fields': (
+                'con_empujador',
                 'empujador_tipo',
                 ('empujador_altura', 'empujador_ancho'),
                 'empujador_distanciado',
@@ -67,12 +91,16 @@ class BandaAdmin(admin.ModelAdmin):
         ('Aleta', {
             'classes': ('collapse',),
             'fields': (
-                'aleta', 'aleta_identacion'
+                'con_aleta',
+                'aleta_altura',
+                'aleta_identacion'
             ),
         }),
-        ('Precio', {
+        ('Precio y Costo', {
             'fields': (
                 'precio_total',
+                'costo_base_total',
+                'rentabilidad'
             ),
         }),
     )
@@ -84,22 +112,59 @@ class BandaAdmin(admin.ModelAdmin):
     ]
 
     def save_model(self, request, obj, form, change):
-        obj.referencia = (
+
+        referencia = (
+                             "%s"
+                             "%s-"
                              "%s"
                              "%s"
                              "%s"
                              "%s"
-                             "%s"
-                             "%s"
+                             "V%s"
+                             "A%s"
                          ) % \
                          (
                              "B",
+                             obj.fabricante.nomenclatura,
                              obj.serie.nomenclatura,
                              obj.tipo.nomenclatura,
                              obj.material.nomenclatura,
                              obj.color.nomenclatura,
-                             obj.longitud
+                             obj.material_varilla.nomenclatura,
+                             obj.ancho,
                          )
+
+        if obj.con_empujador:
+            referencia += (
+                             "/%s"
+                             "%s"
+                             "H%s"
+                             "A%s"
+                             "D%s"
+                             "I%s"
+                         ) % \
+                         (
+                             "E",
+                             obj.empujador_tipo.nomenclatura,
+                             obj.empujador_altura,
+                             obj.empujador_ancho,
+                             obj.empujador_distanciado,
+                             obj.empujador_identacion,
+                         )
+        if obj.con_aleta:
+            referencia += (
+                             "/%s"
+                             "H%s"
+                             "I%s"
+                         ) % \
+                         (
+                             "A",
+                             obj.aleta_altura,
+                             obj.aleta_identacion,
+                         )
+
+        obj.referencia = referencia
+
         if not change:
             obj.created_by = request.user
         else:
@@ -114,6 +179,7 @@ class BandaAdmin(admin.ModelAdmin):
         qsMaterialVarilla = ValorCaracteristica.objects.filter(caracteristica__nombre__iexact="material varilla")
         qsEmpujadorTipo = ValorCaracteristica.objects.filter(caracteristica__nombre__iexact="empujador tipo")
         qsTipoBanda = ValorCaracteristica.objects.filter(caracteristica__nombre__iexact="banda tipo")
+        qsFabricante = ValorCaracteristica.objects.filter(caracteristica__nombre__iexact="fabricante")
 
         form.base_fields['serie'].queryset = qsSerie
         form.base_fields['material'].queryset = qsMaterial
@@ -121,10 +187,14 @@ class BandaAdmin(admin.ModelAdmin):
         form.base_fields['material_varilla'].queryset = qsMaterialVarilla
         form.base_fields['empujador_tipo'].queryset = qsEmpujadorTipo
         form.base_fields['tipo'].queryset = qsTipoBanda
+        form.base_fields['fabricante'].queryset = qsFabricante
 
         return form
 
 
+# endregion
+
+# region Caracteristicas
 class ValorCaracteristicaInline(admin.TabularInline):
     model = ValorCaracteristica
     extra = 0
@@ -136,22 +206,32 @@ class CaracteristicaAdmin(admin.ModelAdmin):
     ]
 
 
-class EnsambladoAdmin(admin.ModelAdmin):
-    list_display = ("get_banda_nombre","get_modulo","es_para_ensambado")
+# endregion
 
-    def get_banda_nombre(self,obj):
+class EnsambladoAdmin(admin.ModelAdmin):
+    list_display = ("get_banda_nombre", "get_modulo", "es_para_ensambado")
+
+    def get_banda_nombre(self, obj):
         return obj.banda.descripcion_estandar
+
     get_banda_nombre.short_description = "Banda"
 
-    def get_modulo(self,obj):
+    def get_modulo(self, obj):
         return obj.producto.descripcion_estandar
+
     get_modulo.short_description = "Modulo"
 
     def es_para_ensambado(self, obj):
         return obj.producto.activo_ensamble
+
     es_para_ensambado.boolean = True
     es_para_ensambado.short_description = "Es para ensamblaje?"
 
+class CostoEnsambladoBlandaAdmin(admin.ModelAdmin):
+    list_display = ('nombre','aleta','empujador','porcentaje')
+    list_editable = ('porcentaje',)
+
 admin.site.register(Caracteristica, CaracteristicaAdmin)
 admin.site.register(Banda, BandaAdmin)
-admin.site.register(Ensamblado,EnsambladoAdmin)
+admin.site.register(Ensamblado, EnsambladoAdmin)
+admin.site.register(CostoEnsambladoBlanda,CostoEnsambladoBlandaAdmin)

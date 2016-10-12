@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
-{% load l10n %}
 {% block content %}
-    <span class="odeco_titulo_principal">{{ object.descripcion_estandar }}</span>
-    <hr/>
     <div class="detalles_cuadro_detalle">
+        <span class="odeco_titulo_principal">{{ object.descripcion_estandar }}</span>
+        <hr/>
         <div>
             <span class="odeco_titulo_2">Información General</span>
         </div>
@@ -54,73 +53,73 @@
         <div>
             <span class="odeco_titulo_2">Componentes</span>
         </div>
-        <div class="detalles_cuadro_detalle">
-            <table class="table table-bordered table-striped table-responsive">
-                <thead>
+
+        <table class="table table-bordered table-striped table-responsive">
+            <thead>
+            <tr>
+                <th>
+                    Referencia
+                </th>
+                <th>
+                    Nombre
+                </th>
+                <th>
+                    Ancho (mm)
+                </th>
+                <th>
+                    Cortado a
+                </th>
+                <th>
+                    Cant.
+                </th>
+                <th>
+                    Categoria
+                </th>
+                <th>
+                    Precio Unitario
+                </th>
+                <th>
+                    Total
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ensamblado in object.ensamblado.all %}
                 <tr>
-                    <th>
-                        Referencia
-                    </th>
-                    <th>
-                        Nombre
-                    </th>
-                    <th>
-                        Ancho (mm)
-                    </th>
-                    <th>
-                        Cortado a
-                    </th>
-                    <th>
-                        Cant.
-                    </th>
-                    <th>
-                        Categoria
-                    </th>
-                    <th>
-                        Precio Unitario
-                    </th>
-                    <th>
-                        Total
-                    </th>
+                    <td>
+                        {{ ensamblado.producto.referencia }}
+                    </td>
+                    <td>
+                        {{ ensamblado.producto.descripcion_comercial }}
+                    </td>
+                    <td>
+                        {{ ensamblado.ancho }}
+                    </td>
+                    <td>
+                        {{ ensamblado.cortado_a }}
+                    </td>
+                    <td>
+                        {{ ensamblado.cantidad }}
+                    </td>
+                    <td>
+                        {{ ensamblado.producto.margen.categoria }}
+                    </td>
+                    <td>
+                        {{ ensamblado.producto.precio_base }}
+                    </td>
+                    <td>
+                        {{ ensamblado.precio_linea }}
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for ensamblado in object.ensamblado.all %}
-                    <tr>
-                        <td>
-                            {{ ensamblado.producto.referencia }}
-                        </td>
-                        <td>
-                            {{ ensamblado.producto.descripcion_comercial }}
-                        </td>
-                        <td>
-                            {{ ensamblado.ancho }}
-                        </td>
-                        <td>
-                            {{ ensamblado.cortado_a }}
-                        </td>
-                        <td>
-                            {{ ensamblado.cantidad }}
-                        </td>
-                        <td>
-                            {{ ensamblado.producto.margen.categoria }}
-                        </td>
-                        <td>
-                            {{ ensamblado.producto.precio_base }}
-                        </td>
-                        <td>
-                            {{ ensamblado.precio_linea }}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-                <tfoot>
-                <tr>
-                    <td colspan="7"> Total:</td>
-                    <td> {{ object.precio_total }} </td>
-                </tr>
-                </tfoot>
-            </table>
-        </div>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="7"> Total:</td>
+                <td> {{ object.precio_total }} </td>
+            </tr>
+            </tfoot>
+        </table>
     </div>
+
 {% endblock %}

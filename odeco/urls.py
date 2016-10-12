@@ -18,15 +18,17 @@ from django.conf.urls.static import static
 from django.conf.urls import url, include
 from django.contrib import admin
 
+from home.views import HomeView
 
 urlpatterns = [
+    url(r'^$', HomeView.as_view()),
     url(r'^admin/', admin.site.urls),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^accounts/', include('registration.backends.default.urls')),
-    url(r'^lp/', include('listasprecios.urls',namespace="listasprecios")),
-    url(r'^cotizaciones/', include('cotizaciones.urls',namespace="cotizaciones")),
-    url(r'^bandas/', include('bandas.urls',namespace="bandas")),
-    url(r'^indicadores/', include('indicadores.urls',namespace="indicadores")),
-    url(r'^$', include('home.urls',namespace="home")),
+    url(r'^lp/', include('listasprecios.urls', namespace="listasprecios")),
+    url(r'^cotizaciones/', include('cotizaciones.urls', namespace="cotizaciones")),
+    url(r'^bandas/', include('bandas.urls', namespace="bandas")),
+    url(r'^indicadores/', include('indicadores.urls', namespace="indicadores")),
 ]
 
 if settings.DEBUG:

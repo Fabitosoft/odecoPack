@@ -1,6 +1,8 @@
 from django.db import models
 
 from utils.models import TimeStampedModel
+
+
 # Create your models here.
 
 class Canal(TimeStampedModel):
@@ -12,6 +14,7 @@ class Canal(TimeStampedModel):
     def __str__(self):
         return self.canal
 
+
 class GrupoEmpresarial(TimeStampedModel):
     nombre = models.CharField(max_length=200, unique=True)
 
@@ -20,6 +23,7 @@ class GrupoEmpresarial(TimeStampedModel):
 
     def __str__(self):
         return self.nombre
+
 
 class Empresa(TimeStampedModel):
     nombre = models.CharField(max_length=200, unique=True)
@@ -32,4 +36,3 @@ class Empresa(TimeStampedModel):
 
     def __str__(self):
         return self.nombre
-

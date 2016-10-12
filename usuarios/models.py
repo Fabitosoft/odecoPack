@@ -4,12 +4,13 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from empresas.models import Empresa
+
+
 # Create your models here.
 
 class UserExtended(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_extendido")
     tipo = models.CharField(max_length=1, choices=(('I', 'Colaborador'), ('E', 'Cliente')))
-
 
     def __str__(self):
         return self.user.first_name
@@ -17,10 +18,12 @@ class UserExtended(models.Model):
     def es_colaborador(self):
         return Colaborador.objects.filter(usuario=self).exists()
 
+
 def colaborador_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
     new_filename = "colaborador_perfil_%s.%s" % (basename, file_extention)
-    return "%s/%s/%s/%s/%s" % ("usuarios",instance.usuario.user.id,"foto_perfil","colaborador", new_filename)
+    return "%s/%s/%s/%s/%s" % ("usuarios", instance.usuario.user.id, "foto_perfil", "colaborador", new_filename)
+
 
 class Colaborador(models.Model):
     def validate_image(fieldfile_obj):
@@ -53,4 +56,3 @@ class ClienteEmpresa(models.Model):
 
     def __str__(self):
         return self.empresa.nombre
-
