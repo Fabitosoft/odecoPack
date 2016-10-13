@@ -7,17 +7,17 @@
             <span class="odeco_titulo_2">Información General</span>
         </div>
         <div class="row detalles_cuadro_detalle">
-            <div class="col-sm-6"><span class="label">Descripción Comercial: </span>{{ object.descripcion_comercial }}
+            <div class="col-sm-12"><span class="label">Código CGUno: </span>{{ object.id_cguno }}</div>
+            <div class="col-xs-12"><span class="label">Descripción Comercial: </span>{{ object.descripcion_comercial }}
             </div>
-            <div class="col-sm-6"><span class="label">Referencia: </span>{{ object.referencia }}</div>
+            <div class="col-xs-12"><span class="label">Referencia: </span>{{ object.referencia }}</div>
             <div class="col-sm-6"><span class="label">Serie: </span>{{ object.serie }}</div>
             <div class="col-sm-6"><span class="label">Tipo: </span>{{ object.tipo }}</div>
             <div class="col-sm-6"><span class="label">Material: </span>{{ object.material }}</div>
             <div class="col-sm-6"><span class="label">Color: </span>{{ object.color }}</div>
-            <div class="col-sm-6"><span class="label">Ancho: </span>{{ object.ancho }} mm</div>
-            <div class="col-sm-6"><span class="label">Longitud: </span>{{ object.longitud }} mm</div>
+            <div class="col-sm-6"><span class="label">Ancho: </span>{{ object.ancho }} (mm)</div>
+            <div class="col-sm-6"><span class="label">Longitud: </span>{{ object.longitud }} (m)</div>
             <div class="col-sm-6"><span class="label">Varilla: </span>{{ object.material_varilla }}</div>
-            <div class="col-sm-6"><span class="label">Total Filas: </span>{{ object.total_filas }}</div>
 
         </div>
         {% if object.con_empujador %}
@@ -27,13 +27,11 @@
             </div>
             <div class="row detalles_cuadro_detalle">
                 <div class="col-sm-6"><span class="label">Tipo: </span>{{ object.empujador_tipo }}</div>
-                <div class="col-sm-6"><span class="label">Altura: </span>{{ object.empujador_altura }} mm</div>
-                <div class="col-sm-6"><span class="label">Ancho: </span>{{ object.empujador_ancho }} mm</div>
-                <div class="col-sm-6"><span class="label">Distanciamiento: </span>{{ object.empujador_distanciado }} mm
+                <div class="col-sm-6"><span class="label">Altura: </span>{{ object.empujador_altura }} (mm)</div>
+                <div class="col-sm-6"><span class="label">Ancho: </span>{{ object.empujador_ancho }} (mm)</div>
+                <div class="col-sm-6"><span class="label">Distanciamiento: </span>{{ object.empujador_distanciado }} (mm)
                 </div>
                 <div class="col-sm-6"><span class="label">Identacion: </span>{{ object.empujador_identacion }}</div>
-                <div class="col-sm-6"><span
-                        class="label">Filas entre Empujador: </span>{{ object.empujador_filas_entre }}</div>
 
             </div>
         {% endif %}
@@ -44,7 +42,7 @@
                 <span class="odeco_titulo_2">Aleta</span>
             </div>
             <div class="row detalles_cuadro_detalle">
-                <div class="col-sm-6"><span class="label">Aleta: </span>{{ object.aleta }}</div>
+                <div class="col-sm-6"><span class="label">Aleta: </span>{{ object.aleta_altura }} (mm)</div>
                 <div class="col-sm-6"><span class="label">Identacion: </span>{{ object.aleta_identacion }}</div>
             </div>
         {% endif %}

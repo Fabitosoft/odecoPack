@@ -25,7 +25,7 @@ class CategoriaMargen(TimeStampedModel):
     nombre = models.CharField(max_length=60, unique=True)
 
     class Meta:
-        verbose_name_plural = "2. Margenes x Categoría"
+        verbose_name_plural = "2. Categorias de Margen"
 
     def __str__(self):
         return self.nombre

@@ -42,6 +42,9 @@
                 <thead>
                 <tr>
                     <th>
+                        Rentable
+                    </th>
+                    <th>
                         Referencia
                     </th>
                     <th>
@@ -62,23 +65,32 @@
                     <th>
                         Forma de Pago
                     </th>
-                    <th>
-                        Costo Base
-                    </th>
-                    <th>
-                        Costo Total
-                    </th>
-                    <th>
-                        Rent.
-                    </th>
-                    <th>
-                        Mrg Rent.
-                    </th>
+                    {% if perms.cotizaciones.full_cotizacion %}
+                        <th>
+                            Costo Base
+                        </th>
+                        <th>
+                            Costo Total
+                        </th>
+                        <th>
+                            Rent.
+                        </th>
+                        <th>
+                            Mrg Rent.
+                        </th>
+                    {% endif %}
                 </tr>
                 </thead>
                 <tbody>
                 {% for item in object.items.all %}
                     <tr>
+                        <td>
+                            {% if item.get_margen_rentabilidad_actual < 0 %}
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if item.item %}
                                 {{ item.item.referencia }}
@@ -87,14 +99,10 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if item.item %}
-                                {{ item.item.descripcion_comercial }}
-                            {% else %}
-                                {{ item.banda.descripcion_comercial }}
-                            {% endif %}
+                            {{ item.get_nombre_item }}
                         </td>
                         <td>
-                            {{ item.cantidad }}
+                            {{ item.cantidad|floatformat:2 }}
                         </td>
                         <td>
                             {% if item.item %}
@@ -112,39 +120,26 @@
                         <td>
                             {{ item.forma_pago }}
                         </td>
-                        <td>
-                            {% if item.item %}
-                                {{ item.item.costo_cop }}
-                            {% else %}
-                                {{ item.banda.costo_base_total }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if item.item %}
-                                {% multiplicar item.item.costo_cop item.cantidad %}
-                            {% else %}
-                                {% multiplicar item.banda.costo_base_total item.cantidad %}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if item.item %}
-                                {% obtener_rentabilidad item.item.costo_cop item.precio cantidad=item.cantidad porcentaje=0 %}
-                            {% else %}
-                                {% obtener_rentabilidad item.banda.costo_base_total item.precio cantidad=item.cantidad porcentaje=0 %}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if item.item %}
-                                {% obtener_rentabilidad item.item.costo_cop item.precio cantidad=item.cantidad porcentaje=1 %}
-                            {% else %}
-                                {% obtener_rentabilidad item.banda.costo_base_total item.precio cantidad=item.cantidad porcentaje=1 %}
-                            {% endif %}
-                        </td>
+                        {% if perms.cotizaciones.full_cotizacion %}
+                            <td>
+                                {{ item.get_costo_cop_actual_unidad }}
+                            </td>
+                            <td>
+                                {{ item.get_costo_cop_actual_total }}
+                            </td>
+                            <td>
+                                {{ item.get_rentabilidad_actual_total }}
+                            </td>
+                            <td>
+                                {{ item.get_margen_rentabilidad_actual }} %
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
                 <tfoot>
                 <tr>
+                    <td class="clear"></td>
                     <td colspan="5"> Total:</td>
                     <td> {{ object.total }} </td>
                 </tr>

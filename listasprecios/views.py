@@ -67,6 +67,7 @@ class ListaPreciosView(LoginRequiredMixin, ListView):
 
         if self.request.GET.get('crear') and not cotizacion:
             cotizacion = Cotizacion()
+            cotizacion.usuario = self.request.user
             cotizacion.razon_social = self.request.GET.get('razon_social')
             cotizacion.nombres_contacto = self.request.GET.get('nombres_contacto')
             cotizacion.apellidos_contacto = self.request.GET.get('apellidos_contacto')

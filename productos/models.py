@@ -9,22 +9,20 @@ from utils.models import TimeStampedModel
 
 # Create your models here.
 
-######################################################################################################################
-# UNIDADES DE MEDIDA
-######################################################################################################################
+# region Unidades de Medida
 class UnidadMedida(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
 
     class Meta:
-        verbose_name_plural = "unidades de medida"
+        verbose_name_plural = "2. Unidades de Medida"
 
     def __str__(self):
         return self.nombre
 
 
-######################################################################################################################
-# PRODUCTOS
-######################################################################################################################
+# endregion
+
+# region Productos
 def productos_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
     new_filename = "produ_perfil_%s.%s" % (basename, file_extention)
@@ -101,18 +99,21 @@ class Producto(TimeStampedModel):
     objects = models.Manager()
     activos = ProductoActivosManager()
 
+    class Meta:
+        verbose_name_plural ="1. Productos"
+
     def __init__(self, *args, **kwargs):
         super(Producto, self).__init__(*args, **kwargs)
         self.precio_base_original = self.precio_base
         self.costo_original = self.costo
 
-    def save(self,**kwargs):
+    def save(self, **kwargs):
 
         margen = kwargs.get("margen_deseado")
         factor_importacion = kwargs.get("factor_importacion")
         tasa = kwargs.get("tasa")
 
-        if not tasa and not factor_importacion and not margen and self.costo!=self.costo_original:
+        if not tasa and not factor_importacion and not margen and self.costo != self.costo_original:
             print("en save Cambio Costo")
             self.set_precio_base_y_costo()
         if tasa or factor_importacion or margen:
@@ -121,8 +122,8 @@ class Producto(TimeStampedModel):
 
         super().save()
 
-        #Sólo entra a hacer el proceso de actualización de ensamblajes
-        #si el precio base a cambiado
+        # Sólo entra a hacer el proceso de actualización de ensamblajes
+        # si el precio base a cambiado
         if self.precio_base_original != self.precio_base:
             print("Entro a cambiar ensamblado")
             for ensamble in self.ensamblados.all():
@@ -144,12 +145,13 @@ class Producto(TimeStampedModel):
             margen = self.margen.margen_deseado
         margen = (margen) / 100  # Se transforma en porcentaje
 
-
-        #Calculamos los nuevos costos y precios basados en el cambio de los parametros
+        # Calculamos los nuevos costos y precios basados en el cambio de los parametros
         costo_base_cop = self.costo * tasa * factor_importacion
         self.costo_cop = costo_base_cop
 
         precio_base = costo_base_cop * (1 / (1 - margen))
-        self.precio_base = round(precio_base,4)
+        self.precio_base = round(precio_base, 4)
 
         self.rentabilidad = precio_base - costo_base_cop
+
+# endregion

@@ -109,6 +109,11 @@ class Banda(TimeStampedModel):
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="banda_created_by")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="banda_updated_by")
 
+    class Meta:
+        permissions = (
+            ('full_bandas', 'Full Bandas'),
+        )
+
     # region Atributos de activación
     activo = models.BooleanField(default=False, verbose_name="Activo")
     activo_componentes = models.BooleanField(default=False, verbose_name="En Compo.")

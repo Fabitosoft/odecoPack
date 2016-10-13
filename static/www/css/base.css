@@ -28,3 +28,9 @@ main {
   font-size: 1.5em;
   color: #df5e00;
 }
+.fa-exclamation-triangle {
+  color: #f00;
+}
+.fa-check-circle {
+  color: #008000;
+}

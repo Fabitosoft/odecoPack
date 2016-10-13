@@ -33,7 +33,7 @@ class Proveedor(TimeStampedModel):
                     producto.save(factor_importacion=self.factor_importacion, tasa = tasa)
 
     class Meta:
-        verbose_name_plural = "proveedores"
+        verbose_name_plural = "1. Proveedores"
 
     def __str__(self):
         return self.nombre
@@ -52,7 +52,7 @@ class MargenProvedor(TimeStampedModel):
             producto.save(margen_deseado=self.margen_deseado, tasa=tasa, factor_importacion=factor_importacion)
 
     class Meta:
-        verbose_name_plural = "Margenes x Categoría x Proveedores"
+        verbose_name_plural = "2. Margenes x Categoría x Proveedores"
         unique_together = ("categoria", "proveedor")
 
     def __str__(self):

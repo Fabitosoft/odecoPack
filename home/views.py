@@ -7,7 +7,7 @@ from usuarios.mixins import LoginRequiredMixin
 # Create your views here.
 
 class HomeView(LoginRequiredMixin, View):
-    template_name = "cotizaciones/emails/cotizacion.html"
+    template_name = "index.html"
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name)

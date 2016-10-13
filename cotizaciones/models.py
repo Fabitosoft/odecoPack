@@ -11,6 +11,19 @@ from listasprecios.models import FormaPago
 
 
 # Create your models here.
+
+class CotizacionesEstadosManager(models.Manager):
+    def iniciado(self):
+        return self.get_queryset().filter(estado='INI')
+
+    def enviado(self, **kwarg):
+        usuario = kwarg.get("usuario")
+        qs = self.get_queryset().filter(estado='ENV')
+        if usuario:
+            qs = qs.filter(usuario=usuario)
+        return qs
+
+
 class Cotizacion(TimeStampedModel):
     ESTADOS = (
         ('INI', 'Iniciado'),
@@ -31,6 +44,14 @@ class Cotizacion(TimeStampedModel):
     total = models.DecimalField(max_digits=18, decimal_places=0, default=0)
     usuario = models.ForeignKey(User, default=1)
 
+    estados = CotizacionesEstadosManager()
+    objects = models.Manager()
+
+    class Meta:
+        permissions = (
+            ('full_cotizacion', 'Full Cotizacion'),
+        )
+
     def get_absolute_url(self):
         return reverse("cotizaciones:detalle_cotizacion", kwargs={"pk": self.pk})
 
@@ -44,6 +65,12 @@ class Cotizacion(TimeStampedModel):
         self.total = "%.2f" % total
         self.save()
 
+    def get_rentabilidad_actual_total(self):
+        rentabilidad = 0
+        for item in self.items.all():
+            rentabilidad += item.get_rentabilidad_actual_total()
+        return rentabilidad
+
 
 class ItemCotizacion(TimeStampedModel):
     cotizacion = models.ForeignKey(Cotizacion, related_name="items")
@@ -53,6 +80,34 @@ class ItemCotizacion(TimeStampedModel):
     precio = models.DecimalField(max_digits=18, decimal_places=0)
     forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones")
     total = models.DecimalField(max_digits=18, decimal_places=0)
+
+    def get_nombre_item(self):
+        if self.item:
+            nombre = self.item.descripcion_estandar
+        else:
+            nombre = self.banda.descripcion_estandar
+        return nombre
+
+    def get_costo_cop_actual_unidad(self):
+        if self.item:
+            costo = self.item.costo_cop
+        else:
+            costo = self.banda.costo_base_total
+        return round(costo,0)
+
+    def get_costo_cop_actual_total(self):
+        if self.item:
+            costo = self.item.costo_cop
+        else:
+            costo = self.banda.costo_base_total
+        return round(costo * self.cantidad,0)
+
+    def get_rentabilidad_actual_total(self):
+        costo = self.get_costo_cop_actual_total()
+        return round(self.total - costo,0)
+
+    def  get_margen_rentabilidad_actual(self):
+        return round((self.get_rentabilidad_actual_total()*100)/self.total,2)
 
 
 def cotizacion_item_post_save_receiver(sender, instance, *args, **kwargs):
