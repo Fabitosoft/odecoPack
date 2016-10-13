@@ -24,6 +24,11 @@ class MargenProveedorAdmin(admin.ModelAdmin):
     list_display = ('proveedor', 'categoria', 'margen_deseado')
     list_editable = ('margen_deseado',)
 
+    def save_model(self, request, obj, form, change):
+        if form.has_changed():
+            obj.save()
+
+
 
 admin.site.register(Proveedor, ProveedorAdmin)
 admin.site.register(MargenProvedor, MargenProveedorAdmin)

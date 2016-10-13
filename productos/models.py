@@ -101,23 +101,55 @@ class Producto(TimeStampedModel):
     objects = models.Manager()
     activos = ProductoActivosManager()
 
+    def __init__(self, *args, **kwargs):
+        super(Producto, self).__init__(*args, **kwargs)
+        self.precio_base_original = self.precio_base
+        self.costo_original = self.costo
 
-    def save(self):
-        self.set_precio_base_y_costo()
+    def save(self,**kwargs):
+
+        margen = kwargs.get("margen_deseado")
+        factor_importacion = kwargs.get("factor_importacion")
+        tasa = kwargs.get("tasa")
+
+        if not tasa and not factor_importacion and not margen and self.costo!=self.costo_original:
+            print("en save Cambio Costo")
+            self.set_precio_base_y_costo()
+        if tasa or factor_importacion or margen:
+            print("en save cambio otros")
+            self.set_precio_base_y_costo(tasa=tasa, factor_importacion=factor_importacion, margen=margen)
+
         super().save()
-        for ensamble in self.ensamblados.all():
-            ensamble.save()
+
+        #Sólo entra a hacer el proceso de actualización de ensamblajes
+        #si el precio base a cambiado
+        if self.precio_base_original != self.precio_base:
+            print("Entro a cambiar ensamblado")
+            for ensamble in self.ensamblados.all():
+                ensamble.save()
 
     def __str__(self):
         return "%s" % (self.descripcion_estandar)
 
-    def set_precio_base_y_costo(self):
-        costo_base_cop = self.costo * (
-            self.margen.proveedor.moneda.moneda_cambio.cambio) * (self.margen.proveedor.factor_importacion)
+    def set_precio_base_y_costo(self, tasa=None, factor_importacion=None, margen=None):
+
+        if not tasa:
+            print("Entro a buscar la tasa")
+            tasa = self.margen.proveedor.moneda.moneda_cambio.cambio
+        if not factor_importacion:
+            print("Entro a buscar el factor")
+            factor_importacion = self.margen.proveedor.factor_importacion
+        if not margen:
+            print("Entro a buscar el margen")
+            margen = self.margen.margen_deseado
+        margen = (margen) / 100  # Se transforma en porcentaje
+
+
+        #Calculamos los nuevos costos y precios basados en el cambio de los parametros
+        costo_base_cop = self.costo * tasa * factor_importacion
         self.costo_cop = costo_base_cop
 
-        precio_base = costo_base_cop * (1 + self.margen.margen_deseado / 100)
-        #precio_base_sin_decimales = math.ceil((precio_base / 100)) * 100
-        self.precio_base = precio_base
+        precio_base = costo_base_cop * (1 / (1 - margen))
+        self.precio_base = round(precio_base,4)
 
         self.rentabilidad = precio_base - costo_base_cop

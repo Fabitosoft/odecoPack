@@ -170,10 +170,16 @@ class Ensamblado(TimeStampedModel):
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_created_by")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_updated_by")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.precio_linea_original = self.precio_linea
+
     def save(self):
         self.actualizar_precio_total_linea()
         super().save()
-        self.banda.save()
+        if self.precio_linea != self.precio_linea_original:
+            print("Entro a actualizar banda")
+            self.banda.save()
 
     def actualizar_precio_total_linea(self):
         self.precio_linea = Decimal(self.producto.precio_base) * Decimal(self.cantidad)
