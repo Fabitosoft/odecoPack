@@ -104,6 +104,7 @@ DJANGO_APPS = (
     'django.contrib.staticfiles',
     # Admin panel and documentation:
     'django.contrib.admindocs',
+    'django.contrib.humanize',
 
 )
 
@@ -125,6 +126,7 @@ THIRD_PART_APPS = (
     'import_export',
     'crispy_forms',
     'biable',
+    'tareas'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

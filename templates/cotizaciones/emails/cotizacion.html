@@ -150,37 +150,31 @@
             <th>
                 Total
             </th>
+            <th>
+                Tiem. Entre
+            </th>
         </tr>
         </thead>
         <tbody>
         {% for item in object.items.all %}
             <tr>
                 <td>
-                    {% if item.item %}
-                        {{ item.item.referencia }}
-                    {% else %}
-                        {{ item.banda.referencia }}
-                    {% endif %}
+                    {{ item.get_referencia_item }}
                 </td>
                 <td>
-                    {% if item.item %}
-                        {{ item.item.descripcion_comercial }}
-                    {% else %}
-                        {{ item.banda.descripcion_comercial }}
-                    {% endif %}
+                    {{ item.get_nombre_item }}
                 </td>
                 <td>
                     {{ item.cantidad }}
                 </td>
                 <td>
-                    {% if item.item %}
-                        {{ item.item.unidad_medida }}
-                    {% else %}
-                        Metro
-                    {% endif %}
+                    {{ item.get_unidad_item }}
                 </td>
                 <td>
                     {{ item.total }}
+                </td>
+                <td>
+                    {{ item.get_tiempo_entrega_prometido }}
                 </td>
             </tr>
         {% endfor %}

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load funciones_especiales %}
+{% load crispy_forms_tags %}
 {% block content %}
     <div class="detalles_cuadro_detalle">
         <span class="odeco_titulo_principal">Cotizacion {{ object.nro_cotizacion }}</span>
@@ -79,6 +80,9 @@
                             Mrg Rent.
                         </th>
                     {% endif %}
+                    <th>
+                        Tiem. Entrega
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -92,11 +96,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if item.item %}
-                                {{ item.item.referencia }}
-                            {% else %}
-                                {{ item.banda.referencia }}
-                            {% endif %}
+                            {{ item.get_referencia_item }}
                         </td>
                         <td>
                             {{ item.get_nombre_item }}
@@ -105,11 +105,7 @@
                             {{ item.cantidad|floatformat:2 }}
                         </td>
                         <td>
-                            {% if item.item %}
-                                {{ item.item.unidad_medida }}
-                            {% else %}
-                                Metro
-                            {% endif %}
+                            {{ item.get_unidad_item }}
                         </td>
                         <td>
                             {{ item.precio }}
@@ -134,6 +130,9 @@
                                 {{ item.get_margen_rentabilidad_actual }} %
                             </td>
                         {% endif %}
+                        <th>
+                            {{ item.get_tiempo_entrega_prometido }}
+                        </th>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -145,6 +144,12 @@
                 </tr>
                 </tfoot>
             </table>
+        </div>
+
+        <div>
+            <span class="odeco_titulo_principal">Remisiones</span>
+            <hr/>
+            {% crispy remisiones helper %}
         </div>
     </div>
 {% endblock %}

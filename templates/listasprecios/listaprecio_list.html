@@ -82,7 +82,7 @@
                 <hr/>
                 <div class="row">
                     {% if cotizacion_id %}
-                        <div class="col-md-7">
+                        <div class="col-md-9">
                             <table class="table table-bordered table-striped">
                                 <thead>
                                 <tr>
@@ -92,39 +92,33 @@
                                     <td>Uni. Medida</td>
                                     <td>Precio</td>
                                     <td>Total</td>
+                                    <td>Días Ent.</td>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for item in items_cotizacion %}
                                     <tr id="item-{{ item.id }}">
                                         <td>
-                                            {% if item.item %}
-                                                {{ item.item.referencia }}
-                                            {% else %}
-                                                {{ item.banda.referencia }}
-                                            {% endif %}
+                                            {{ item.get_referencia_item }}
                                         </td>
                                         <td>
-                                            {% if item.item %}
-                                                {{ item.item.descripcion_comercial }}
-                                            {% else %}
-                                                {{ item.banda.descripcion_comercial }}
-                                            {% endif %}
+                                            {{ item.get_nombre_item }}
                                         </td>
                                         <td>
                                             <input type='hidden' name='item' value='{{ item.id }}'/>
                                             <input class="item-qty" style="width: 60px" step=any
-                                                   value="{{ item.cantidad }}"/>
+                                                   value="{{ item.cantidad|floatformat:2 }}"/>
                                         </td>
                                         <td>
-                                            {% if item.item %}
-                                                {{ item.item.unidad_medida }}
-                                            {% else %}
-                                                Metro
-                                            {% endif %}
+                                            {{ item.get_unidad_item }}
                                         </td>
                                         <td>{{ item.precio }}</td>
                                         <td class="total">{{ item.total }}</td>
+                                        <td>
+                                            <input type='hidden' name='item' value='{{ item.id }}'/>
+                                            <input class="item-ent" style="width: 60px" step=any
+                                                   value="{{ item.dias_entrega }}"/>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -140,7 +134,7 @@
                                 </tfoot>
                             </table>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             {% crispy cotizacion_form %}
                             <hr/>
                             <form method="GET">
@@ -160,20 +154,7 @@
 {% endblock %}
 <script>
     {% block script %}
-        {#        $(".addicionar_boton").click(function () {#}
-        {#            var precio = $(this).prev("input[type='hidden']").val();#}
-        {#            var item = $(this).prev("input[type='hidden']").prev("input[type='hidden']").val();#}
-        {#            var data = {#}
-        {#                item_id: item,#}
-        {#                precio: precio#}
-        {#            }#}
-        {#            $.get("{% url 'cotizaciones:add_item_cotizacion' %}", data, function (data) {#}
-        {##}
-        {#            });#}
-        {##}
-        {#        });#}
         $(".item-qty").change(function () {
-
             var item = $(this).prev("input[type='hidden']").val();
             var qty = $(this).val();
             var data = {
@@ -184,27 +165,21 @@
                 $("#coti_val_total").html(numberWithCommas(data.total_cotizacion));
                 if (data.deleted) {
                     $("#item-" + item).fadeOut();
-                    {#                    $("#subtotal").text(data.subtotal);#}
-                    {#                    $("#taxtotal").text(data.tax_total);#}
-                    {#                    $("#carttotal").text(data.cart_total);#}
                 }
                 else {
                     $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
                 }
-
-
-                {#  else {#}
-                {#                    $("#item-line-total-"+item).text(data.line_total);#}
-                {#                    $("#subtotal").text(data.subtotal);#}
-                {#                    $("#taxtotal").text(data.tax_total);#}
-                {#                    $("#carttotal").text(data.cart_total);#}
-                {#                }#}
-                {#                if (data.total_items == 0 ) {#}
-                {#                    $(".table").fadeOut()#}
-                {#                    var template = "{% include 'carts/empty_cart.html' %}";#}
-                {#                    $(".main-content").html(template);#}
-                {#                }#}
-
+            });
+        });
+        $(".item-ent").change(function () {
+            var item = $(this).prev("input[type='hidden']").val();
+            var dias = $(this).val();
+            var data = {
+                item: item,
+                dias: dias
+            };
+            $.get("{% url 'cotizaciones:cambiar_dias_item_cotizacion' %}", data, function (data) {
+                console.log(data)
             });
         });
 

@@ -1,5 +1,4 @@
 from crispy_forms.bootstrap import StrictButton, PrependedText, FormActions, FieldWithButtons
-from crispy_forms.bootstrap import InlineField
 from crispy_forms.layout import Submit, Layout, Div, Field, Button, HTML
 from django import forms
 from django.forms import ModelForm
@@ -7,7 +6,7 @@ from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from django.urls import reverse
 
-from cotizaciones.models import Cotizacion
+from .models import Cotizacion, RemisionCotizacion
 
 
 class BusquedaCotiForm(forms.Form):
@@ -80,3 +79,33 @@ class CotizacionForm(ModelForm):
 
         self.helper.all().wrap(Field, css_class="form-control")
         # self.helper.filter_by_widget(forms.CharField).wrap(Field, css_class="form-control")
+
+
+class RemisionCotizacionForm(ModelForm):
+    fecha_prometida_entrega = forms.DateField(
+        widget=forms.TextInput(
+            attrs={'type': 'date'}
+        )
+    )
+    class Meta:
+        model = RemisionCotizacion
+        fields = ('__all__')
+
+
+class ExampleFormSetHelper(FormHelper):
+    def __init__(self, *args, **kwargs):
+        super(ExampleFormSetHelper, self).__init__(*args, **kwargs)
+        self.form_method = 'post'
+        self.form_class = 'form-inline'
+
+        self.render_required_fields = True
+        self.layout = Layout(
+            Field('DELETE'),
+            Div(
+                Field('nro_remision'),
+                Field('nro_factura'),
+                Field('fecha_prometida_entrega'),
+                Field('entregado'),
+            ),
+        )
+        self.add_input(Submit("submit", "Guardar"))

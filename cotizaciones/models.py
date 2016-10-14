@@ -11,7 +11,7 @@ from listasprecios.models import FormaPago
 
 
 # Create your models here.
-
+# region Cotizaciones
 class CotizacionesEstadosManager(models.Manager):
     def iniciado(self):
         return self.get_queryset().filter(estado='INI')
@@ -40,7 +40,7 @@ class Cotizacion(TimeStampedModel):
     apellidos_contacto = models.CharField(max_length=120, blank=True)
     razon_social = models.CharField(max_length=120, blank=True)
     nro_cotizacion = models.CharField(max_length=120)
-    fecha_envio = models.DateField(null=True, blank=True)
+    fecha_envio = models.DateTimeField(null=True, blank=True)
     total = models.DecimalField(max_digits=18, decimal_places=0, default=0)
     usuario = models.ForeignKey(User, default=1)
 
@@ -71,7 +71,13 @@ class Cotizacion(TimeStampedModel):
             rentabilidad += item.get_rentabilidad_actual_total()
         return rentabilidad
 
+    def __str__(self):
+        return "%s" %self.nro_cotizacion
 
+
+# endregion
+
+# region ItemCotizacion
 class ItemCotizacion(TimeStampedModel):
     cotizacion = models.ForeignKey(Cotizacion, related_name="items")
     item = models.ForeignKey(Producto, related_name="cotizaciones", null=True)
@@ -80,6 +86,7 @@ class ItemCotizacion(TimeStampedModel):
     precio = models.DecimalField(max_digits=18, decimal_places=0)
     forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones")
     total = models.DecimalField(max_digits=18, decimal_places=0)
+    dias_entrega = models.PositiveIntegerField(default=0)
 
     def get_nombre_item(self):
         if self.item:
@@ -88,26 +95,47 @@ class ItemCotizacion(TimeStampedModel):
             nombre = self.banda.descripcion_estandar
         return nombre
 
+    def get_referencia_item(self):
+        if self.item:
+            nombre = self.item.referencia
+        else:
+            nombre = self.banda.referencia
+        return nombre
+
+    def get_unidad_item(self):
+        if self.item:
+            nombre = self.item.unidad_medida
+        else:
+            nombre = "Metro"
+        return nombre
+
     def get_costo_cop_actual_unidad(self):
         if self.item:
             costo = self.item.costo_cop
         else:
             costo = self.banda.costo_base_total
-        return round(costo,0)
+        return round(costo, 0)
 
     def get_costo_cop_actual_total(self):
         if self.item:
             costo = self.item.costo_cop
         else:
             costo = self.banda.costo_base_total
-        return round(costo * self.cantidad,0)
+        return round(costo * self.cantidad, 0)
 
     def get_rentabilidad_actual_total(self):
         costo = self.get_costo_cop_actual_total()
-        return round(self.total - costo,0)
+        return round(self.total - costo, 0)
 
-    def  get_margen_rentabilidad_actual(self):
-        return round((self.get_rentabilidad_actual_total()*100)/self.total,2)
+    def get_margen_rentabilidad_actual(self):
+        return round((self.get_rentabilidad_actual_total() * 100) / self.total, 2)
+
+    def get_tiempo_entrega_prometido(self):
+        if self.dias_entrega == 0:
+            return "Inmediato"
+        if self.dias_entrega == 1:
+            return "%s dia" % self.dias_entrega
+        return "%s dias" % self.dias_entrega
 
 
 def cotizacion_item_post_save_receiver(sender, instance, *args, **kwargs):
@@ -116,3 +144,21 @@ def cotizacion_item_post_save_receiver(sender, instance, *args, **kwargs):
 
 post_save.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
+
+
+# endregion
+
+# region Remisiones
+class RemisionCotizacion(TimeStampedModel):
+    nro_remision = models.PositiveIntegerField()
+    nro_factura = models.PositiveIntegerField()
+    fecha_prometida_entrega = models.DateField()
+    entregado = models.BooleanField(default=False)
+    cotizacion = models.ForeignKey(Cotizacion, related_name="mis_remisiones")
+
+    class Meta:
+        verbose_name_plural = "Remisiones x Cotización"
+
+    def __str__(self):
+        return "%s" % self.nro_remision
+# endregion
