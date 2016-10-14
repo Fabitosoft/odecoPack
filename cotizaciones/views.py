@@ -34,14 +34,14 @@ class CotizacionDetailView(DetailView):
         RemisionFormSet = inlineformset_factory(
             parent_model=Cotizacion,
             model=RemisionCotizacion,
-            fields=('id',
-                    'nro_factura',
+            fields=('nro_factura',
                     'nro_remision',
                     'fecha_prometida_entrega',
                     'entregado',
                     ),
             form=RemisionCotizacionForm,
-            can_delete=True
+            can_delete=True,
+            can_order=True
         )
 
         remision_formset = RemisionFormSet(instance=self.get_object())
@@ -63,23 +63,23 @@ class CotizacionRemisionView(SingleObjectMixin, FormView):
         RemisionFormSet = inlineformset_factory(
             parent_model=Cotizacion,
             model=RemisionCotizacion,
-            fields=('id',
-                    'nro_factura',
+            fields=('nro_factura',
                     'nro_remision',
                     'fecha_prometida_entrega',
                     'entregado'
                     ),
             form=RemisionCotizacionForm,
-            can_delete=True
+            can_delete=True,
+            can_order=True
         )
 
-        remision_formset = RemisionFormSet(self.request.POST, instance=self.get_object())
 
         if self.request.method == "POST":
+            remision_formset = RemisionFormSet(self.request.POST, instance=self.get_object())
             print("Es el post")
             if remision_formset.is_valid():
                 print(remision_formset)
-                #remision_formset.save()
+                remision_formset.save()
 
         context["remisiones"] = remision_formset
         helper = ExampleFormSetHelper()

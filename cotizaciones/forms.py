@@ -87,6 +87,7 @@ class RemisionCotizacionForm(ModelForm):
             attrs={'type': 'date'}
         )
     )
+
     class Meta:
         model = RemisionCotizacion
         fields = ('__all__')
@@ -100,12 +101,17 @@ class ExampleFormSetHelper(FormHelper):
 
         self.render_required_fields = True
         self.layout = Layout(
-            Field('DELETE'),
             Div(
-                Field('nro_remision'),
-                Field('nro_factura'),
-                Field('fecha_prometida_entrega'),
-                Field('entregado'),
+                Div(
+                    Field('nro_remision'),
+                    Field('nro_factura'),
+                    Field('fecha_prometida_entrega'),
+                ),
+                Div(
+                    Field('entregado'),
+                    Field('DELETE'),
+                ),
             ),
+            HTML("<br/>")
         )
         self.add_input(Submit("submit", "Guardar"))
