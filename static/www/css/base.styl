@@ -1,35 +1,82 @@
 $Color_Odeco_1 = #df5e00
 $Color_Odeco_2 = #df7755
+$color_h1_intranet = #df5e00
+$color_h2_intranet = #df5e00
+$color_h3_intranet = #df5e00
+$color_h4_intranet = #df5e00
+$color_h5_intranet = #df5e00
+$color_h6_intranet = #000000
+$color_p_intranet = #000000
+$color_label_intranet = #df7755
 
 .form-signin
   max-width 330px;
   padding 15px;
   margin 0 auto
+
 nav
   padding 10px
+
 main
   margin 70px
 
-.detalles_cuadro_detalle
-  padding (1/3)em
+//Odeco Estilos
+.intranet
+  h1
+    color $color_h1_intranet
+    font-size 2.1em
+  h2
+    color $color_h2_intranet
+    font-size 1.8em
+  h3
+    color $color_h3_intranet
+    font-size 1.5em
+  h4
+    color $color_h4_intranet
+    font-size 1.3em
+  h5
+    color $color_h5_intranet
+    font-size 1.1em
+  h6
+    color $color_h6_intranet
+    font-size 0.9em
+  p
+    color $color_p_intranet
   .label
-    color $Color_Odeco_2
-    font-size 1em
+    color $color_label_intranet
+    font-size 1.2em
   thead
-    background-color $Color_Odeco_2
     color white
+    background-color $color_label_intranet
 
-.odeco_titulo_principal
-  font-size 2em
-  color $Color_Odeco_1
+  .borde_div
+    border-style solid
+    border-width thin
+    border-color gray
+    padding 1em
+  .div_detalle
+    padding-left 1em
 
-.odeco_titulo_2
-  font-size (3/2)em
-  color $Color_Odeco_1
-
+//
+//  padding (1/3)em
+//  .label
+//    color $Color_Odeco_2
+//    font-size 1em
+//  thead
+//    background-color $Color_Odeco_2
+//    color white
+//
+//.odeco_titulo_principal
+//  font-size 2em
+//  color $Color_Odeco_1
+//
+//.odeco_titulo_2
+//  font-size (3/2)em
+//  color $Color_Odeco_1
 
 .fa-exclamation-triangle
   color red
 
 .fa-check-circle
   color green
+

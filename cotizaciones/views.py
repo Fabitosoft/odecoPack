@@ -12,20 +12,32 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView
 from django.forms import inlineformset_factory
 
-from .models import ItemCotizacion, Cotizacion, RemisionCotizacion
+from .models import (
+    ItemCotizacion,
+    Cotizacion,
+    RemisionCotizacion,
+    TareaCotizacion
+)
 from productos.models import Producto
-from .forms import BusquedaCotiForm, RemisionCotizacionForm, ExampleFormSetHelper
+from .forms import (
+    BusquedaCotiForm,
+    RemisionCotizacionForm,
+    RemisionCotizacionFormHelper,
+    TareaCotizacionForm,
+    TareaCotizacionFormHelper
+)
 
 
 # Create your views here.
 
+# region Detalle Cotización
 class CotizacionDetailView(DetailView):
     model = Cotizacion
 
     def get_object(self, queryset=None):
         obj = self.model.objects \
             .select_related('usuario', 'usuario__user_extendido', 'usuario__user_extendido__colaborador') \
-            .prefetch_related('items__item', 'items__forma_pago') \
+            .prefetch_related('items__item', 'items__forma_pago', 'mis_tareas') \
             .get(id=self.kwargs["pk"])
         return obj
 
@@ -41,15 +53,35 @@ class CotizacionDetailView(DetailView):
                     ),
             form=RemisionCotizacionForm,
             can_delete=True,
-            can_order=True
+            can_order=True,
+            extra=2
+        )
+
+        TareaFormSet = inlineformset_factory(
+            parent_model=Cotizacion,
+            model=TareaCotizacion,
+            fields=('nombre',
+                    'descripcion',
+                    'fecha_inicial',
+                    'fecha_final',
+                    'esta_finalizada'
+                    ),
+            form=TareaCotizacionForm,
+            can_delete=True,
+            can_order=True,
+            extra=1
         )
 
         remision_formset = RemisionFormSet(instance=self.get_object())
+        tarea_formset = TareaFormSet(instance=self.get_object())
+
+        context["tareas"] = tarea_formset
+        helper_tarea = TareaCotizacionFormHelper()
+        context["helper_tarea"] = helper_tarea
 
         context["remisiones"] = remision_formset
-        helper = ExampleFormSetHelper()
-        context["helper"] = helper
-        print("lo saco de get")
+        helper_remision = RemisionCotizacionFormHelper()
+        context["helper_remision"] = helper_remision
         return context
 
 
@@ -57,6 +89,13 @@ class CotizacionRemisionView(SingleObjectMixin, FormView):
     template_name = "cotizaciones/cotizacion_detail.html"
     form_class = RemisionCotizacionForm
     model = Cotizacion
+
+    def get_object(self, queryset=None):
+        obj = self.model.objects \
+            .select_related('usuario', 'usuario__user_extendido', 'usuario__user_extendido__colaborador') \
+            .prefetch_related('items__item', 'items__forma_pago', 'mis_tareas') \
+            .get(id=self.kwargs["pk"])
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -66,32 +105,86 @@ class CotizacionRemisionView(SingleObjectMixin, FormView):
             fields=('nro_factura',
                     'nro_remision',
                     'fecha_prometida_entrega',
-                    'entregado'
+                    'entregado',
                     ),
             form=RemisionCotizacionForm,
             can_delete=True,
-            can_order=True
+            can_order=True,
+            extra=2
         )
 
+        TareaFormSet = inlineformset_factory(
+            parent_model=Cotizacion,
+            model=TareaCotizacion,
+            fields=('nombre',
+                    'descripcion',
+                    'fecha_inicial',
+                    'fecha_final',
+                    'esta_finalizada'
+                    ),
+            form=TareaCotizacionForm,
+            can_delete=True,
+            can_order=True,
+            extra=1
+        )
 
         if self.request.method == "POST":
-            remision_formset = RemisionFormSet(self.request.POST, instance=self.get_object())
-            print("Es el post")
-            if remision_formset.is_valid():
-                print(remision_formset)
-                remision_formset.save()
+            print(self.request.POST)
+            cotizacion = self.get_object()
+
+            es_cambiar_tareas = self.request.POST.get('cambiar_tareas')
+            es_cambiar_remision = self.request.POST.get('cambiar_remision')
+            es_rechazada = self.request.POST.get('rechazar')
+            es_aceptada = self.request.POST.get('aceptada')
+            es_completada = self.request.POST.get('completada')
+            es_recibida = self.request.POST.get('recibida')
+
+            if es_rechazada:
+                cotizacion.estado = 'ELI'
+                cotizacion.save()
+
+            if es_aceptada:
+                cotizacion.estado = 'PRO'
+                cotizacion.save()
+
+            if es_completada:
+                cotizacion.estado = 'FIN'
+                cotizacion.save()
+
+            if es_recibida:
+                cotizacion.estado = 'REC'
+                cotizacion.save()
+
+            remision_formset = RemisionFormSet(instance=cotizacion)
+            tarea_formset = TareaFormSet(instance=cotizacion)
+            if es_cambiar_tareas:
+                tarea_formset = TareaFormSet(self.request.POST, instance=cotizacion)
+                if tarea_formset.is_valid():
+                    tarea_formset.save()
+                    tarea_formset = TareaFormSet(instance=cotizacion)
+
+            if es_cambiar_remision:
+                remision_formset = RemisionFormSet(self.request.POST, instance=cotizacion)
+                if remision_formset.is_valid():
+                    if remision_formset.is_valid():
+                        remision_formset.save()
+                        remision_formset = RemisionFormSet(instance=cotizacion)
+
+        context["object"] = self.get_object()
+
+        context["tareas"] = tarea_formset
+        helper_tarea = TareaCotizacionFormHelper()
+        context["helper_tarea"] = helper_tarea
 
         context["remisiones"] = remision_formset
-        helper = ExampleFormSetHelper()
-        context["helper"] = helper
-        print("lo saco de post")
+        helper_remision = RemisionCotizacionFormHelper()
+        context["helper_remision"] = helper_remision
         return context
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponseForbidden()
         self.object = self.get_object()
-        print("Entro a post")
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -107,6 +200,8 @@ class CotizacionView(View):
         view = CotizacionRemisionView.as_view()
         return view(request, *args, **kwargs)
 
+
+# endregion
 
 # class CotizacionDetailView(DetailView):
 #     model = Cotizacion
@@ -182,6 +277,49 @@ class CotizacionView(View):
 #         return context
 
 
+class TareaListView(ListView):
+    model = TareaCotizacion
+    template_name = 'cotizaciones/tarea_list.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get("buscado")
+        user = self.request.user
+
+        full_permisos = user.has_perm('cotizaciones.full_cotizacion')
+        if full_permisos:
+            user = None
+
+        if not query:
+            query = ""
+
+        qs = self.model.objects.filter(
+            Q(esta_finalizada=False) &
+            Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
+        ).order_by('fecha_final')
+        return qs
+
+class RemisionListView(ListView):
+    model = RemisionCotizacion
+    template_name = 'cotizaciones/remision_list.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get("buscado")
+        user = self.request.user
+
+        full_permisos = user.has_perm('cotizaciones.full_cotizacion')
+        if full_permisos:
+            user = None
+
+        if not query:
+            query = ""
+
+        qs = self.model.objects.filter(
+            Q(entregado=False) &
+            Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
+        ).order_by('fecha_prometida_entrega')
+        return qs
+
+
 class CotizacionesListView(ListView):
     model = Cotizacion
 
@@ -196,7 +334,7 @@ class CotizacionesListView(ListView):
         if not query:
             query = ""
 
-        qs = Cotizacion.estados.enviado(usuario=user).filter(
+        qs = Cotizacion.estados.activo(usuario=user).filter(
             Q(nombres_contacto__icontains=query) |
             Q(nro_cotizacion__icontains=query) |
             Q(ciudad__icontains=query) |

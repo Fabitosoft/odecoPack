@@ -1,6 +1,9 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import RegexValidator
+from django.db.models import Q
 from django.db.models.signals import post_save, post_delete
 from django.urls import reverse
 
@@ -12,22 +15,49 @@ from listasprecios.models import FormaPago
 
 # Create your models here.
 # region Cotizaciones
-class CotizacionesEstadosManager(models.Manager):
-    def iniciado(self):
-        return self.get_queryset().filter(estado='INI')
+class CotizacionesEstadosQuerySet(models.QuerySet):
+    def activas(self):
+        return self.filter(
+            ~Q(estado='ELI') &
+            ~Q(estado='FIN')
+        )
 
-    def enviado(self, **kwarg):
+    def inactivas(self):
+        return self.filter(
+            Q(estado='ELI') &
+            Q(estado='FIN')
+        )
+
+    def enviadas(self):
+        return self.filter(estado='ENV')
+
+
+class CotizacionesEstadosManager(models.Manager):
+    def get_queryset(self, **kwarg):
         usuario = kwarg.get("usuario")
-        qs = self.get_queryset().filter(estado='ENV')
+        qs = CotizacionesEstadosQuerySet(self.model, using=self._db)
         if usuario:
             qs = qs.filter(usuario=usuario)
         return qs
+
+    def enviado(self, **kwarg):
+        return self.get_queryset(**kwarg).enviadas()
+
+    def activo(self, **kwarg):
+        return self.get_queryset(**kwarg).activas()
+
+    def inactivo(self, **kwarg):
+        return self.get_queryset(**kwarg).inactivas()
 
 
 class Cotizacion(TimeStampedModel):
     ESTADOS = (
         ('INI', 'Iniciado'),
         ('ENV', 'Enviada'),
+        ('ELI', 'Rechazada'),
+        ('REC', 'Recibida'),
+        ('PRO', 'En Proceso'),
+        ('FIN', 'Entragada Totalmente'),
     )
     estado = models.CharField(max_length=10, choices=ESTADOS, default='INI')
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
@@ -65,6 +95,10 @@ class Cotizacion(TimeStampedModel):
         self.total = "%.2f" % total
         self.save()
 
+    def set_estado(self, estado):
+        self.estado = estado
+        self.save()
+
     def get_rentabilidad_actual_total(self):
         rentabilidad = 0
         for item in self.items.all():
@@ -72,7 +106,7 @@ class Cotizacion(TimeStampedModel):
         return rentabilidad
 
     def __str__(self):
-        return "%s" %self.nro_cotizacion
+        return "%s" % self.nro_cotizacion
 
 
 # endregion
@@ -161,4 +195,30 @@ class RemisionCotizacion(TimeStampedModel):
 
     def __str__(self):
         return "%s" % self.nro_remision
+
+    def get_dias_a_fecha_fin(self):
+        return (self.fecha_prometida_entrega - datetime.date.today()).days
+
+
+# endregion
+
+# region Tareas
+class TareaCotizacion(TimeStampedModel):
+    nombre = models.CharField(max_length=120)
+    descripcion = models.TextField(max_length=300)
+    fecha_inicial = models.DateField()
+    fecha_final = models.DateField()
+    esta_finalizada = models.BooleanField(default=False)
+    cotizacion = models.ForeignKey(Cotizacion, null=True, blank=True, related_name="mis_tareas")
+
+    class Meta:
+        verbose_name_plural = "Tareas"
+
+    def __str__(self):
+        return "%s" % self.nombre
+
+    def get_dias_a_fecha_fin(self):
+
+        return (self.fecha_final - datetime.date.today()).days
+
 # endregion

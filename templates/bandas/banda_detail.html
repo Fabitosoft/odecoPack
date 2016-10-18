@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="detalles_cuadro_detalle">
-        <span class="odeco_titulo_principal">{{ object.descripcion_estandar }}</span>
+    <div class="intranet">
+        <h1>{{ object.descripcion_estandar }}</h1>
         <hr/>
-        <div>
-            <span class="odeco_titulo_2">Información General</span>
-        </div>
-        <div class="row detalles_cuadro_detalle">
+        <h2>Información General</h2>
+        <div class="row">
             <div class="col-sm-12"><span class="label">Código CGUno: </span>{{ object.id_cguno }}</div>
             <div class="col-xs-12"><span class="label">Descripción Comercial: </span>{{ object.descripcion_comercial }}
             </div>
@@ -18,39 +16,36 @@
             <div class="col-sm-6"><span class="label">Ancho: </span>{{ object.ancho }} (mm)</div>
             <div class="col-sm-6"><span class="label">Longitud: </span>{{ object.longitud }} (m)</div>
             <div class="col-sm-6"><span class="label">Varilla: </span>{{ object.material_varilla }}</div>
-
         </div>
+
+
         {% if object.con_empujador %}
             <hr/>
-            <div>
-                <span class="odeco_titulo_2">Empujador</span>
-            </div>
-            <div class="row detalles_cuadro_detalle">
+            <h2>Empujador</h2>
+            <div class="row">
+
                 <div class="col-sm-6"><span class="label">Tipo: </span>{{ object.empujador_tipo }}</div>
                 <div class="col-sm-6"><span class="label">Altura: </span>{{ object.empujador_altura }} (mm)</div>
                 <div class="col-sm-6"><span class="label">Ancho: </span>{{ object.empujador_ancho }} (mm)</div>
-                <div class="col-sm-6"><span class="label">Distanciamiento: </span>{{ object.empujador_distanciado }} (mm)
+                <div class="col-sm-6"><span class="label">Distanciamiento: </span>{{ object.empujador_distanciado }}
+                    (mm)
                 </div>
                 <div class="col-sm-6"><span class="label">Identacion: </span>{{ object.empujador_identacion }}</div>
-
             </div>
+
         {% endif %}
 
         {% if object.con_aleta %}
             <hr/>
-            <div>
-                <span class="odeco_titulo_2">Aleta</span>
-            </div>
-            <div class="row detalles_cuadro_detalle">
+            <h2>Aleta</h2>
+            <div class="row">
                 <div class="col-sm-6"><span class="label">Aleta: </span>{{ object.aleta_altura }} (mm)</div>
                 <div class="col-sm-6"><span class="label">Identacion: </span>{{ object.aleta_identacion }}</div>
             </div>
         {% endif %}
 
         <hr/>
-        <div>
-            <span class="odeco_titulo_2">Componentes</span>
-        </div>
+        <h2>Componentes</h2>
 
         <table class="table table-bordered table-striped table-responsive">
             <thead>

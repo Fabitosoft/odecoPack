@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Cotizacion, ItemCotizacion, RemisionCotizacion
+from .models import Cotizacion, ItemCotizacion, RemisionCotizacion, TareaCotizacion
 
 
 # Register your models here.
@@ -31,6 +31,7 @@ class ListaPrecioInline(admin.TabularInline):
         )
     can_delete = False
 
+
 class RemisionInline(admin.TabularInline):
     model = RemisionCotizacion
 
@@ -43,6 +44,21 @@ class RemisionInline(admin.TabularInline):
         )
 
     extra = 0
+
+
+class TareasInline(admin.TabularInline):
+    model = TareaCotizacion
+
+    fields = \
+        (
+            'nombre',
+            "descripcion",
+            "fecha_inicial",
+            "fecha_final",
+            "esta_finalizada",
+        )
+
+    extra = 0
     # readonly_fields = \
     #     (
     #         'nro_remision',
@@ -51,7 +67,7 @@ class RemisionInline(admin.TabularInline):
     #         "entregado"
     #     )
 
-    #can_delete = False
+    # can_delete = False
 
 
 class CotizacionAdmin(admin.ModelAdmin):
@@ -60,6 +76,7 @@ class CotizacionAdmin(admin.ModelAdmin):
     inlines = [
         ListaPrecioInline,
         RemisionInline,
+        TareasInline,
     ]
 
 

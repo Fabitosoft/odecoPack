@@ -2,14 +2,12 @@
 {% load funciones_especiales %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="detalles_cuadro_detalle">
-        <span class="odeco_titulo_principal">Cotizacion {{ object.nro_cotizacion }}</span>
+    <div class="intranet">
+        <h1>Cotizacion {{ object.nro_cotizacion }}</h1>
         <hr/>
         <div class="row">
-            <div class="info_cotizacion col-xs-12 col-sm-8 col-md-9">
-                <div>
-                    <h4>Cotización Nro:
-                        <small>{{ object.nro_cotizacion }}</small>
+            <div class="col-xs-12 col-sm-8 col-md-9">
+                <div class="div_detalle">
                     </h4>
                     <h4>Fecha Envio:
                         <small>{{ object.fecha_envio }}</small>
@@ -18,24 +16,45 @@
                         <small>{{ object.get_estado_display }}</small>
                     </h4>
                 </div>
-                <div class="row">
+                <h2>Información Cliente</h2>
+                <div class="row div_detalle">
                     <div class="col-xs-12 col-sm-6">
-
-                        <h4>Para:</h4>
-                        <h6>{{ object.razon_social }}</h6>
-                        <h6>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</h6>
-                        <h6>{{ object.email }}</h6>
-                        <h6>{{ object.nro_contacto }}</h6>
-                        <h6>{{ object.pais }} - {{ object.ciudad }}</h6>
+                        <h4>Razón Social:
+                            <small>{{ object.razon_social }}</small>
+                        </h4>
+                        <h4>Nombre:
+                            <small>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</small>
+                        </h4>
+                        <h4>Correo Electrónico:
+                            <small>{{ object.email }}</small>
+                        </h4>
                     </div>
                     <div class="col-xs-12 col-sm-6">
-                        <h4>De:</h4>
-                        <h6>{{ object.usuario.get_full_name }}</h6>
-                        <h6>{{ object.usuario.email }}</h6>
-                        <h6>{{ object.usuario.user_extendido.colaborador.numero_contacto }}</h6>
-                        <h6>Colombia - Cali</h6>
+                        <h4>Número de Contacto:
+                            <small>{{ object.nro_contacto }}</small>
+                        </h4>
+                        <h4>Ubicación
+                            <small>{{ object.pais }} - {{ object.ciudad }}</small>
+                        </h4>
                     </div>
                 </div>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-3">
+                <form method="post" action="{{ object.get_absolute_url }}">
+                    {% csrf_token %}
+                    {% if object.estado == 'ENV' or object.estado == 'REC' %}
+                        <input class="btn btn-primary" name="rechazar" value="Rechazar" type="submit"/>
+                    {% endif %}
+                    {% if object.estado == 'ENV' %}
+                        <input class="btn btn-primary" name="recibida" value="Recibida" type="submit"/>
+                    {% endif %}
+                    {% if object.estado == 'REC' %}
+                        <input class="btn btn-primary" name="aceptada" value="Aceptada" type="submit"/>
+                    {% endif %}
+                    {% if object.estado == 'PRO' %}
+                        <input class="btn btn-primary" name="completada" value="Completada" type="submit"/>
+                    {% endif %}
+                </form>
             </div>
         </div>
         <div>
@@ -146,10 +165,22 @@
             </table>
         </div>
 
-        <div>
-            <span class="odeco_titulo_principal">Remisiones</span>
-            <hr/>
-            {% crispy remisiones helper %}
+        <div class="row">
+            {% if object.estado == 'PRO' %}
+                <div class="col-md-6">
+                    <h2>Remisiones</h2>
+                    <hr/>
+                    {% crispy remisiones helper_remision %}
+                </div>
+            {% endif %}
+
+            {% if object.estado == 'PRO' or object.estado == 'ENV' or object.estado == 'REC' %}
+                <div class="col-md-6">
+                    <h2>Tareas</h2>
+                    <hr/>
+                    {% crispy tareas helper_tarea %}
+                </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

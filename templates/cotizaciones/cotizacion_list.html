@@ -2,8 +2,8 @@
 {% load humanize %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="detalles_cuadro_detalle">
-        <span class="odeco_titulo_principal">Cotizaciones</span>
+    <div class="intranet">
+        <h1>Cotizaciones</h1>
         <hr/>
         {% crispy form_busqueda %}
         <br>
@@ -80,7 +80,7 @@
                     </td>
                 </tr>
             {% empty %}
-                <li>No articles yet.</li>
+                <li>Ninguna Cotización</li>
             {% endfor %}
             </tbody>
         </table>

@@ -6,7 +6,7 @@ from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from django.urls import reverse
 
-from .models import Cotizacion, RemisionCotizacion
+from .models import Cotizacion, RemisionCotizacion, TareaCotizacion
 
 
 class BusquedaCotiForm(forms.Form):
@@ -93,9 +93,26 @@ class RemisionCotizacionForm(ModelForm):
         fields = ('__all__')
 
 
-class ExampleFormSetHelper(FormHelper):
+class TareaCotizacionForm(ModelForm):
+    fecha_inicial = forms.DateField(
+        widget=forms.TextInput(
+            attrs={'type': 'date'}
+        )
+    )
+    fecha_final = forms.DateField(
+        widget=forms.TextInput(
+            attrs={'type': 'date'}
+        )
+    )
+
+    class Meta:
+        model = TareaCotizacion
+        fields = ('__all__')
+
+
+class RemisionCotizacionFormHelper(FormHelper):
     def __init__(self, *args, **kwargs):
-        super(ExampleFormSetHelper, self).__init__(*args, **kwargs)
+        super(RemisionCotizacionFormHelper, self).__init__(*args, **kwargs)
         self.form_method = 'post'
         self.form_class = 'form-inline'
 
@@ -108,10 +125,43 @@ class ExampleFormSetHelper(FormHelper):
                     Field('fecha_prometida_entrega'),
                 ),
                 Div(
-                    Field('entregado'),
-                    Field('DELETE'),
+                    Field('entregado')
                 ),
+                Div(
+                    Field('DELETE')
+                ),
+                css_class='borde_div'
             ),
             HTML("<br/>")
         )
-        self.add_input(Submit("submit", "Guardar"))
+        self.add_input(Submit("cambiar_remision", "Guardar"))
+
+
+class TareaCotizacionFormHelper(FormHelper):
+    def __init__(self, *args, **kwargs):
+        super(TareaCotizacionFormHelper, self).__init__(*args, **kwargs)
+        self.form_method = 'post'
+        self.form_class = 'form-inline'
+
+        self.render_required_fields = True
+        self.layout = Layout(
+            Div(
+                Div(
+                    Field('nombre'),
+                    Field('fecha_inicial'),
+                    Field('fecha_final'),
+                ),
+                Div(
+                    Field('descripcion', rows="4")
+                ),
+                Div(
+                    Field('esta_finalizada')
+                ),
+                Div(
+                    Field('DELETE')
+                ),
+                css_class='borde_div'
+            ),
+            HTML("<br/>")
+        )
+        self.add_input(Submit("cambiar_tareas", "Guardar"))

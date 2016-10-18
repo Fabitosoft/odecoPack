@@ -9,24 +9,49 @@ nav {
 main {
   margin: 70px;
 }
-.detalles_cuadro_detalle {
-  padding: 0.333333333333333em;
-}
-.detalles_cuadro_detalle .label {
-  color: #df7755;
-  font-size: 1em;
-}
-.detalles_cuadro_detalle thead {
-  background-color: #df7755;
-  color: #fff;
-}
-.odeco_titulo_principal {
-  font-size: 2em;
+.intranet h1 {
   color: #df5e00;
+  font-size: 2.1em;
 }
-.odeco_titulo_2 {
+.intranet h2 {
+  color: #df5e00;
+  font-size: 1.8em;
+}
+.intranet h3 {
+  color: #df5e00;
   font-size: 1.5em;
+}
+.intranet h4 {
   color: #df5e00;
+  font-size: 1.3em;
+}
+.intranet h5 {
+  color: #df5e00;
+  font-size: 1.1em;
+}
+.intranet h6 {
+  color: #000;
+  font-size: 0.9em;
+}
+.intranet p {
+  color: #000;
+}
+.intranet .label {
+  color: #df7755;
+  font-size: 1.2em;
+}
+.intranet thead {
+  color: #fff;
+  background-color: #df7755;
+}
+.intranet .borde_div {
+  border-style: solid;
+  border-width: thin;
+  border-color: #808080;
+  padding: 1em;
+}
+.intranet .div_detalle {
+  padding-left: 1em;
 }
 .fa-exclamation-triangle {
   color: #f00;
