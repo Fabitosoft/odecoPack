@@ -2,11 +2,20 @@ from django.contrib import admin
 
 from import_export.admin import ImportExportModelAdmin
 
-from productos.models import UnidadMedida, Producto
+from productos.models import (
+    UnidadMedida,
+    Producto,
+    CategoriaProducto,
+    ColorProducto,
+    MaterialProducto,
+    SerieProducto,
+    FabricanteProducto,
+)
 
 
-# Register your models here.
+# region Productos
 
+# region Action Productos
 def activar_seleccionados(modeladmin, request, queryset):
     queryset.update(activo=True)
 
@@ -42,7 +51,43 @@ def activar_seleccionados_ensamble(modeladmin, request, queryset):
 activar_seleccionados_ensamble.short_description = "Activar en Ensamble Bandas"
 
 
+# endregion
+
 class ProductoAdmin(ImportExportModelAdmin):
+    fieldsets = (
+        ('Informacion General', {
+            'classes': ('form-control',),
+            'fields':
+                (
+                    ('id_cguno', 'referencia'),
+                    'fabricante', 'serie',
+                    ('descripcion_estandar', 'descripcion_comercial'),
+                    'foto_perfil'
+                )
+        }),
+        ('Caracteristicas Físicas', {
+            'classes': ('form-control',),
+            'fields':
+                (
+                    'categoria',
+                    ('categoria_dos', 'tipo'),
+                    ('material', 'color'),
+                    ('ancho', 'alto'),
+                    ('longitud', 'diametro'),
+                    ('cantidad_empaque', 'cantidad_minima_venta', 'unidad_medida'),
+
+                )
+        }),
+        ('Visualización', {
+            'classes': ('form-control',),
+            'fields':
+                (
+                    'activo',
+                    ('activo_componentes', 'activo_proyectos', 'activo_catalogo', 'activo_ensamble'),
+                )
+        })
+    )
+
     actions = [
         activar_seleccionados,
         activar_seleccionados_componentes,
@@ -126,5 +171,14 @@ class ProductoAdmin(ImportExportModelAdmin):
         obj.save()
 
 
+# endregion
+
+
+
 admin.site.register(UnidadMedida)
+admin.site.register(CategoriaProducto)
+admin.site.register(ColorProducto)
+admin.site.register(MaterialProducto)
+admin.site.register(SerieProducto)
+admin.site.register(FabricanteProducto)
 admin.site.register(Producto, ProductoAdmin)

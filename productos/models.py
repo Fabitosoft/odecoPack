@@ -11,6 +11,66 @@ from utils.models import TimeStampedModel
 
 # Create your models here.
 
+# region Categorias Producto
+class CategoriaProducto(models.Model):
+    nombre = models.CharField(max_length=120, unique=True)
+
+    class Meta:
+        verbose_name_plural = "Categorías Productos"
+        verbose_name = "Categoría Producto"
+
+    def __str__(self):
+        return self.nombre
+# endregion
+
+# region Colores Producto
+class ColorProducto(models.Model):
+    nombre = models.CharField(max_length=120, unique=True)
+
+    class Meta:
+        verbose_name_plural = "Colores Productos"
+        verbose_name = "Color Producto"
+
+    def __str__(self):
+        return self.nombre
+# endregion
+
+# region Materiales Producto
+class MaterialProducto(models.Model):
+    nombre = models.CharField(max_length=120, unique=True)
+
+    class Meta:
+        verbose_name_plural = "Materiales Productos"
+        verbose_name = "Material Producto"
+
+    def __str__(self):
+        return self.nombre
+# endregion
+
+# region Series Producto
+class SerieProducto(models.Model):
+    nombre = models.CharField(max_length=120, unique=True)
+
+    class Meta:
+        verbose_name_plural = "Series Productos"
+        verbose_name = "Serie Producto"
+
+    def __str__(self):
+        return self.nombre
+# endregion
+
+#  region Fabricante Producto
+class FabricanteProducto(models.Model):
+    nombre = models.CharField(max_length=120, unique=True)
+
+    class Meta:
+        verbose_name_plural = "Fabricantes Productos"
+        verbose_name = "Fabricante Producto"
+
+    def __str__(self):
+        return self.nombre
+# endregion
+
 # region Unidades de Medida
 class UnidadMedida(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
@@ -73,7 +133,21 @@ class Producto(TimeStampedModel):
     referencia = models.CharField(max_length=120, unique=True)
     descripcion_estandar = models.CharField(max_length=200)
     descripcion_comercial = models.CharField(max_length=200)
-    fabricante = models.CharField(max_length=120, default="")
+    fabricante = models.ForeignKey(FabricanteProducto, verbose_name='fabricante', related_name='mis_productos', on_delete=models.PROTECT)
+    serie = models.ForeignKey(SerieProducto, verbose_name='serie', related_name='mis_productos', on_delete=models.PROTECT)
+
+    # region Caracteristica Físicas Producto
+    categoria = models.ForeignKey(CategoriaProducto, verbose_name='categoría', related_name='mis_productos', on_delete=models.PROTECT)
+    categoria_dos = models.CharField(max_length=120, verbose_name='categoría dos')
+    tipo = models.CharField(max_length=120, verbose_name='tipo')
+    material = models.ForeignKey(MaterialProducto, verbose_name='material', related_name='mis_productos', on_delete=models.PROTECT)
+    color = models.ForeignKey(ColorProducto, verbose_name='color', related_name='mis_productos', on_delete=models.PROTECT)
+    ancho = models.CharField(max_length=120, verbose_name='ancho (mm)')
+    alto = models.CharField(max_length=120, verbose_name='alto (mm)')
+    longitud = models.CharField(max_length=120, verbose_name='longitud (mt)')
+    diametro = models.CharField(max_length=120, verbose_name='longitud (mm)')
+    # endregion
+
     cantidad_empaque = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     unidad_medida = models.ForeignKey(UnidadMedida, on_delete=models.PROTECT, null=True)
     cantidad_minima_venta = models.DecimalField(max_digits=18, decimal_places=4, default=0)
