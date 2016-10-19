@@ -14,6 +14,7 @@ from utils.models import TimeStampedModel
 # region Categorias Producto
 class CategoriaProducto(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
+    nomenclatura = models.CharField(max_length=3, unique=True)
 
     class Meta:
         verbose_name_plural = "Categorías Productos"
@@ -21,11 +22,14 @@ class CategoriaProducto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
 # endregion
 
 # region Colores Producto
 class ColorProducto(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
+    nomenclatura = models.CharField(max_length=2, unique=True)
 
     class Meta:
         verbose_name_plural = "Colores Productos"
@@ -33,11 +37,14 @@ class ColorProducto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
 # endregion
 
 # region Materiales Producto
 class MaterialProducto(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
+    nomenclatura = models.CharField(max_length=2, unique=True)
 
     class Meta:
         verbose_name_plural = "Materiales Productos"
@@ -45,11 +52,14 @@ class MaterialProducto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
 # endregion
 
 # region Series Producto
 class SerieProducto(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
+    nomenclatura = models.CharField(max_length=6, unique=True)
 
     class Meta:
         verbose_name_plural = "Series Productos"
@@ -57,11 +67,14 @@ class SerieProducto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
 # endregion
 
 #  region Fabricante Producto
 class FabricanteProducto(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
+    nomenclatura = models.CharField(max_length=2, unique=True)
 
     class Meta:
         verbose_name_plural = "Fabricantes Productos"
@@ -69,11 +82,14 @@ class FabricanteProducto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
 # endregion
 
 # region Unidades de Medida
 class UnidadMedida(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
+    nomenclatura = models.CharField(max_length=2, unique=True)
 
     class Meta:
         verbose_name_plural = "Unidades de Medida"
@@ -133,19 +149,25 @@ class Producto(TimeStampedModel):
     referencia = models.CharField(max_length=120, unique=True)
     descripcion_estandar = models.CharField(max_length=200)
     descripcion_comercial = models.CharField(max_length=200)
-    fabricante = models.ForeignKey(FabricanteProducto, verbose_name='fabricante', related_name='mis_productos', on_delete=models.PROTECT)
-    serie = models.ForeignKey(SerieProducto, verbose_name='serie', related_name='mis_productos', on_delete=models.PROTECT)
+    con_nombre_automatico = models.BooleanField(default=False, verbose_name='nombre automático')
+    fabricante = models.ForeignKey(FabricanteProducto, verbose_name='fabricante', related_name='mis_productos',
+                                   on_delete=models.PROTECT)
+    serie = models.ForeignKey(SerieProducto, verbose_name='serie', related_name='mis_productos',
+                              on_delete=models.PROTECT, default=1)
 
     # region Caracteristica Físicas Producto
-    categoria = models.ForeignKey(CategoriaProducto, verbose_name='categoría', related_name='mis_productos', on_delete=models.PROTECT)
+    categoria = models.ForeignKey(CategoriaProducto, verbose_name='categoría', related_name='mis_productos',
+                                  on_delete=models.PROTECT)
     categoria_dos = models.CharField(max_length=120, verbose_name='categoría dos')
-    tipo = models.CharField(max_length=120, verbose_name='tipo')
-    material = models.ForeignKey(MaterialProducto, verbose_name='material', related_name='mis_productos', on_delete=models.PROTECT)
-    color = models.ForeignKey(ColorProducto, verbose_name='color', related_name='mis_productos', on_delete=models.PROTECT)
-    ancho = models.CharField(max_length=120, verbose_name='ancho (mm)')
-    alto = models.CharField(max_length=120, verbose_name='alto (mm)')
-    longitud = models.CharField(max_length=120, verbose_name='longitud (mt)')
-    diametro = models.CharField(max_length=120, verbose_name='longitud (mm)')
+    tipo = models.CharField(max_length=120, verbose_name='tipo', default='N.A')
+    material = models.ForeignKey(MaterialProducto, verbose_name='material', related_name='mis_productos',
+                                 on_delete=models.PROTECT, default=1)
+    color = models.ForeignKey(ColorProducto, verbose_name='color', related_name='mis_productos',
+                              on_delete=models.PROTECT, default=1)
+    ancho = models.CharField(max_length=120, verbose_name='ancho (mm)', default='N.A')
+    alto = models.CharField(max_length=120, verbose_name='alto (mm)', default='N.A')
+    longitud = models.CharField(max_length=120, verbose_name='longitud (mt)', default='N.A')
+    diametro = models.CharField(max_length=120, verbose_name='longitud (mm)', default='N.A')
     # endregion
 
     cantidad_empaque = models.DecimalField(max_digits=18, decimal_places=4, default=0)
@@ -198,7 +220,6 @@ class Producto(TimeStampedModel):
 
         super().save()
 
-
     def set_precio_base_y_costo(self, tasa=None, factor_importacion=None, margen=None):
 
         if not tasa:
@@ -221,6 +242,51 @@ class Producto(TimeStampedModel):
 
         self.rentabilidad = precio_base - costo_base_cop
 
+    def get_nombre_automático(self, tipo):
+        if self.con_nombre_automatico:
+            nombre = ''
+            configuracion = self.categoria.mi_configuracion_producto_nombre_estandar
+
+            if configuracion.con_categoría_uno:
+                nombre += self.categoria.nombre
+
+            if configuracion.con_categoría_dos:
+                nombre += self.categoria_dos
+
+            if tipo == 'estandar':
+                if configuracion.con_fabricante:
+                    nombre += self.fabricante.nombre
+
+            if configuracion.con_tipo and self.tipo != 'N.A':
+                nombre += self.tipo
+
+            if configuracion.con_material and self.material.id != 1:
+                nombre += self.material.nombre
+
+            if configuracion.con_color and self.color.id != 1:
+                nombre += self.color.nombre
+
+            if configuracion.con_serie and self.serie.id != 1:
+                nombre += self.serie.nombre
+
+            if configuracion.con_ancho and self.ancho != 'N.A':
+                nombre += self.ancho
+
+            if configuracion.con_alto and self.alto != 'N.A':
+                nombre += self.alto
+
+            if configuracion.con_longitud and self.longitud != 'N.A':
+                nombre += self.longitud
+
+            if configuracion.con_diametro and self.diametro != 'N.A':
+                nombre += self.diametro
+
+            if tipo == 'comercial':
+                self.descripcion_comercial = nombre
+
+            if tipo == 'estandar':
+                self.descripcion_estandar = nombre
+
 
 @receiver(post_save, sender=Producto)
 def post_save_producto(sender, instance, *args, **kwargs):
@@ -238,5 +304,30 @@ def post_save_producto(sender, instance, *args, **kwargs):
 #         print("Entro a cambiar ensamblado")
 #         for ensamble in instance.ensamblados.all():
 #             ensamble.actualizar_precio_total_linea()
+
+# endregion
+
+# region Nombre Estandar
+class ProductoNombreConfiguracion(models.Model):
+    categoria = models.OneToOneField(CategoriaProducto, on_delete=models.CASCADE, verbose_name='categoría',
+                                     related_name='mi_configuracion_producto_nombre_estandar', unique=True)
+    con_categoría_uno = models.BooleanField(default=True)
+    con_categoría_dos = models.BooleanField(default=True)
+    con_serie = models.BooleanField(default=True)
+    con_fabricante = models.BooleanField(default=False)
+    con_tipo = models.BooleanField(default=True)
+    con_material = models.BooleanField(default=True)
+    con_color = models.BooleanField(default=True)
+    con_ancho = models.BooleanField(default=False)
+    con_alto = models.BooleanField(default=False)
+    con_longitud = models.BooleanField(default=False)
+    con_diametro = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.categoria.nombre
+
+    class Meta:
+        verbose_name_plural = 'Configuración Nombres Automáticos'
+        verbose_name_plural = 'Configuración Nombre Automático'
 
 # endregion

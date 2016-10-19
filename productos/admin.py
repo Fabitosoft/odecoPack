@@ -10,6 +10,7 @@ from productos.models import (
     MaterialProducto,
     SerieProducto,
     FabricanteProducto,
+    ProductoNombreConfiguracion
 )
 
 
@@ -62,6 +63,7 @@ class ProductoAdmin(ImportExportModelAdmin):
                     ('id_cguno', 'referencia'),
                     'fabricante', 'serie',
                     ('descripcion_estandar', 'descripcion_comercial'),
+                    ('con_nombre_automatico'),
                     'foto_perfil'
                 )
         }),
@@ -164,6 +166,8 @@ class ProductoAdmin(ImportExportModelAdmin):
     get_moneda.short_description = 'Moneda'
 
     def save_model(self, request, obj, form, change):
+        obj.get_nombre_automático('estandar')
+        obj.get_nombre_automático('comercial')
         if not change:
             obj.created_by = request.user
         else:
@@ -176,6 +180,7 @@ class ProductoAdmin(ImportExportModelAdmin):
 
 
 admin.site.register(UnidadMedida)
+
 admin.site.register(CategoriaProducto)
 admin.site.register(ColorProducto)
 admin.site.register(MaterialProducto)
