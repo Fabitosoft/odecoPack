@@ -2,6 +2,8 @@ import math
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 from proveedores.models import MargenProvedor
 from utils.models import TimeStampedModel
@@ -41,9 +43,6 @@ class ProductoQuerySet(models.QuerySet):
 
     def para_proyectos(self):
         return self.filter(activo_proyectos=True)
-        #
-        # def editors(self):
-        #     return self.filter(role='E')
 
 
 class ProductoActivosManager(models.Manager):
@@ -100,12 +99,15 @@ class Producto(TimeStampedModel):
     activos = ProductoActivosManager()
 
     class Meta:
-        verbose_name_plural ="1. Productos"
+        verbose_name_plural = "1. Productos"
 
     def __init__(self, *args, **kwargs):
         super(Producto, self).__init__(*args, **kwargs)
         self.precio_base_original = self.precio_base
         self.costo_original = self.costo
+
+    def __str__(self):
+        return "%s" % (self.descripcion_estandar)
 
     def save(self, **kwargs):
 
@@ -122,15 +124,6 @@ class Producto(TimeStampedModel):
 
         super().save()
 
-        # Sólo entra a hacer el proceso de actualización de ensamblajes
-        # si el precio base a cambiado
-        if self.precio_base_original != self.precio_base:
-            print("Entro a cambiar ensamblado")
-            for ensamble in self.ensamblados.all():
-                ensamble.save()
-
-    def __str__(self):
-        return "%s" % (self.descripcion_estandar)
 
     def set_precio_base_y_costo(self, tasa=None, factor_importacion=None, margen=None):
 
@@ -153,5 +146,23 @@ class Producto(TimeStampedModel):
         self.precio_base = round(precio_base, 4)
 
         self.rentabilidad = precio_base - costo_base_cop
+
+
+@receiver(post_save, sender=Producto)
+def post_save_producto(sender, instance, *args, **kwargs):
+    print('post_save')
+    if instance.precio_base_original != instance.precio_base:
+        print("Entro a cambiar ensamblado")
+        for ensamble in instance.ensamblados.all():
+            ensamble.actualizar_precio_total_linea()
+
+
+# @receiver(post_delete, sender=Producto)
+# def post_delete_producto(sender, instance, *args, **kwargs):
+#     print('post_delete')
+#     if instance.precio_base_original != instance.precio_base:
+#         print("Entro a cambiar ensamblado")
+#         for ensamble in instance.ensamblados.all():
+#             ensamble.actualizar_precio_total_linea()
 
 # endregion

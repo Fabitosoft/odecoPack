@@ -25,6 +25,7 @@ class EnsambladoInline(admin.TabularInline):
     #         kwargs['queryset'] = Producto.activos.modulos()
     #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+
 class BandaAdmin(admin.ModelAdmin):
     list_display = (
         "referencia",
@@ -38,8 +39,10 @@ class BandaAdmin(admin.ModelAdmin):
         'activo_componentes',
         'activo_catalogo',
         "costo_base_total",
+        "precio_banda",
+        "rentabilidad",
+        'costo_mano_obra',
         "precio_total",
-        "rentabilidad"
     )
 
     list_editable = (
@@ -48,7 +51,8 @@ class BandaAdmin(admin.ModelAdmin):
         'activo_componentes',
         'activo_catalogo',
     )
-    readonly_fields = ("precio_total", "costo_base_total", "rentabilidad","referencia")
+    readonly_fields = (
+    "precio_total", "costo_base_total", "rentabilidad", "referencia", "costo_mano_obra", "precio_banda")
 
     fieldsets = (
         ('Informacion General', {
@@ -98,9 +102,11 @@ class BandaAdmin(admin.ModelAdmin):
         }),
         ('Precio y Costo', {
             'fields': (
-                'precio_total',
                 'costo_base_total',
-                'rentabilidad'
+                'precio_banda',
+                'rentabilidad',
+                'costo_mano_obra',
+                'precio_total',
             ),
         }),
     )
@@ -114,54 +120,54 @@ class BandaAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
 
         referencia = (
-                             "%s"
-                             "%s-"
-                             "%s"
-                             "%s"
-                             "%s"
-                             "%s"
-                             "V%s"
-                             "A%s"
-                         ) % \
-                         (
-                             "B",
-                             obj.fabricante.nomenclatura,
-                             obj.serie.nomenclatura,
-                             obj.tipo.nomenclatura,
-                             obj.material.nomenclatura,
-                             obj.color.nomenclatura,
-                             obj.material_varilla.nomenclatura,
-                             obj.ancho,
-                         )
+                         "%s"
+                         "%s-"
+                         "%s"
+                         "%s"
+                         "%s"
+                         "%s"
+                         "V%s"
+                         "A%s"
+                     ) % \
+                     (
+                         "B",
+                         obj.fabricante.nomenclatura,
+                         obj.serie.nomenclatura,
+                         obj.tipo.nomenclatura,
+                         obj.material.nomenclatura,
+                         obj.color.nomenclatura,
+                         obj.material_varilla.nomenclatura,
+                         obj.ancho,
+                     )
 
         if obj.con_empujador:
             referencia += (
-                             "/%s"
-                             "%s"
-                             "H%s"
-                             "A%s"
-                             "D%s"
-                             "I%s"
-                         ) % \
-                         (
-                             "E",
-                             obj.empujador_tipo.nomenclatura,
-                             obj.empujador_altura,
-                             obj.empujador_ancho,
-                             obj.empujador_distanciado,
-                             obj.empujador_identacion,
-                         )
+                              "/%s"
+                              "%s"
+                              "H%s"
+                              "A%s"
+                              "D%s"
+                              "I%s"
+                          ) % \
+                          (
+                              "E",
+                              obj.empujador_tipo.nomenclatura,
+                              obj.empujador_altura,
+                              obj.empujador_ancho,
+                              obj.empujador_distanciado,
+                              obj.empujador_identacion,
+                          )
         if obj.con_aleta:
             referencia += (
-                             "/%s"
-                             "H%s"
-                             "I%s"
-                         ) % \
-                         (
-                             "A",
-                             obj.aleta_altura,
-                             obj.aleta_identacion,
-                         )
+                              "/%s"
+                              "H%s"
+                              "I%s"
+                          ) % \
+                          (
+                              "A",
+                              obj.aleta_altura,
+                              obj.aleta_identacion,
+                          )
 
         obj.referencia = referencia
 
@@ -227,11 +233,13 @@ class EnsambladoAdmin(admin.ModelAdmin):
     es_para_ensambado.boolean = True
     es_para_ensambado.short_description = "Es para ensamblaje?"
 
+
 class CostoEnsambladoBlandaAdmin(admin.ModelAdmin):
-    list_display = ('nombre','aleta','empujador','porcentaje')
+    list_display = ('nombre', 'aleta', 'empujador', 'porcentaje')
     list_editable = ('porcentaje',)
+
 
 admin.site.register(Caracteristica, CaracteristicaAdmin)
 admin.site.register(Banda, BandaAdmin)
 admin.site.register(Ensamblado, EnsambladoAdmin)
-admin.site.register(CostoEnsambladoBlanda,CostoEnsambladoBlandaAdmin)
+admin.site.register(CostoEnsambladoBlanda, CostoEnsambladoBlandaAdmin)

@@ -1,6 +1,9 @@
 from decimal import Decimal
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Sum
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from django.urls import reverse
 
 from utils.models import TimeStampedModel
@@ -23,7 +26,7 @@ class ValorCaracteristica(models.Model):
     activo = models.BooleanField(default=True)
 
     class Meta:
-        unique_together=(('caracteristica','nombre'),('caracteristica','nomenclatura'))
+        unique_together = (('caracteristica', 'nombre'), ('caracteristica', 'nomenclatura'))
 
     def __str__(self):
         return self.nombre
@@ -88,10 +91,12 @@ class Banda(TimeStampedModel):
 
     # region Empujadores
     con_empujador = models.BooleanField(default=False)
-    empujador_tipo = models.ForeignKey(ValorCaracteristica, null=True, blank=True, related_name="bandas_con_tipo_empujador", verbose_name="Tipo")
+    empujador_tipo = models.ForeignKey(ValorCaracteristica, null=True, blank=True,
+                                       related_name="bandas_con_tipo_empujador", verbose_name="Tipo")
     empujador_altura = models.PositiveIntegerField(default=0, verbose_name="Altura (mm)")
     empujador_ancho = models.PositiveIntegerField(default=0, verbose_name="Ancho (mm)")
-    empujador_distanciado = models.PositiveIntegerField(default=0, null=True, blank=True, verbose_name="Distanciado (mm)")
+    empujador_distanciado = models.PositiveIntegerField(default=0, null=True, blank=True,
+                                                        verbose_name="Distanciado (mm)")
     empujador_identacion = models.CharField(max_length=10, default="N.A", verbose_name="Identacion")
 
     empujador_filas_entre = models.PositiveIntegerField(null=True, blank=True, verbose_name="Filas entre Empujador")
@@ -122,9 +127,11 @@ class Banda(TimeStampedModel):
     # endregion
 
     # region Precios y Costos
+    precio_banda = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     precio_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     costo_base_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    costo_mano_obra = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     # endregion
 
     objects = models.Manager()
@@ -136,26 +143,35 @@ class Banda(TimeStampedModel):
         through_fields=('banda', 'producto'),
     )
 
+    def save(self):
+        modulos = self.ensamblado.all()
+        porcentaje_mano_obra = (CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
+                                                                     empujador=self.con_empujador).first().porcentaje) / 100
+
+        if modulos:
+            print('Entro a actualizar precio banda')
+            precio = modulos.aggregate(precio=Sum('precio_linea'))['precio']
+            self.precio_banda = precio
+            costo_base = modulos.aggregate(costo=Sum('costo_cop_linea'))['costo']
+            self.costo_base_total = costo_base
+        else:
+            self.costo_base_total = 0
+            self.precio_banda = 0
+            self.precio_total = 0
+
+        self.costo_mano_obra = self.precio_banda * porcentaje_mano_obra
+        self.precio_total = self.precio_banda + self.costo_mano_obra
+        self.rentabilidad = self.precio_banda - self.costo_base_total
+        super().save()
+
     def get_absolute_url(self):
         return reverse("bandas:detalle_banda", kwargs={"pk": self.pk})
 
-    def save(self):
-        self.actualizar_precio_total()
-        super().save()
-
     def actualizar_precio_total(self):
-        """
-        Actualiza el precio total, el costo total y calcular la rentabilidad
-        desde el precio de cada uno de los módulos.
-        """
-        precio = 0
-        costo_base = 0
-        for modulo in self.ensamblado.all():
-            precio += modulo.precio_linea
-            costo_base += modulo.costo_cop_linea
-        self.precio_total = precio
-        self.costo_base_total = costo_base
-        self.rentabilidad = precio - costo_base
+        self.save()
+
+    def __str__(self):
+        return self.referencia
 
 
 # endregion
@@ -178,18 +194,27 @@ class Ensamblado(TimeStampedModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.precio_linea_original = self.precio_linea
+        self.cantidad_original = self.cantidad
 
     def save(self):
-        self.actualizar_precio_total_linea()
-        super().save()
-        if self.precio_linea != self.precio_linea_original:
-            print("Entro a actualizar banda")
-            self.banda.save()
-
-    def actualizar_precio_total_linea(self):
         self.precio_linea = Decimal(self.producto.precio_base) * Decimal(self.cantidad)
         self.costo_cop_linea = Decimal(self.producto.costo_cop) * Decimal(self.cantidad)
         self.rentabilidad = self.precio_linea - self.costo_cop_linea
+        super().save()
+
+    def actualizar_precio_total_linea(self):
+        self.save()
+
+
+@receiver(post_save, sender=Ensamblado)
+def post_save_ensamblado(sender, instance, *args, **kwargs):
+    instance.banda.actualizar_precio_total()
+
+
+@receiver(post_delete, sender=Ensamblado)
+def post_delete_ensamblado(sender, instance, *args, **kwargs):
+    instance.banda.actualizar_precio_total()
+
 
 # endregion
 
@@ -198,10 +223,11 @@ class CostoEnsambladoBlanda(models.Model):
     nombre = models.CharField(max_length=30)
     aleta = models.BooleanField(default=False)
     empujador = models.BooleanField(default=False)
-    porcentaje = models.DecimalField(max_digits=5 ,decimal_places=2)
+    porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
 
     class Meta:
-        unique_together=('aleta','empujador')
+        unique_together = ('aleta', 'empujador')
+
 # endregion
 
 # endregion
