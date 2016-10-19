@@ -167,7 +167,7 @@ class Producto(TimeStampedModel):
     ancho = models.CharField(max_length=120, verbose_name='ancho (mm)', default='N.A')
     alto = models.CharField(max_length=120, verbose_name='alto (mm)', default='N.A')
     longitud = models.CharField(max_length=120, verbose_name='longitud (mt)', default='N.A')
-    diametro = models.CharField(max_length=120, verbose_name='longitud (mm)', default='N.A')
+    diametro = models.CharField(max_length=120, verbose_name='diametro (mm)', default='N.A')
     # endregion
 
     cantidad_empaque = models.DecimalField(max_digits=18, decimal_places=4, default=0)
@@ -182,9 +182,9 @@ class Producto(TimeStampedModel):
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
 
     activo = models.BooleanField(default=True)
-    activo_componentes = models.BooleanField(default=True, verbose_name="En Compo.")
-    activo_proyectos = models.BooleanField(default=True, verbose_name="En Proy.")
-    activo_catalogo = models.BooleanField(default=True, verbose_name="En Cata.")
+    activo_componentes = models.BooleanField(default=False, verbose_name="En Compo.")
+    activo_proyectos = models.BooleanField(default=False, verbose_name="En Proy.")
+    activo_catalogo = models.BooleanField(default=False, verbose_name="En Cata.")
     activo_ensamble = models.BooleanField(default=False, verbose_name="Para Ensam.")
 
     foto_perfil = models.ImageField(upload_to=productos_upload_to, validators=[validate_image], null=True, blank=True)
@@ -221,71 +221,73 @@ class Producto(TimeStampedModel):
         super().save()
 
     def set_precio_base_y_costo(self, tasa=None, factor_importacion=None, margen=None):
+        if self.margen:
+            if not tasa:
+                print("Entro a buscar la tasa")
+                tasa = self.margen.proveedor.moneda.moneda_cambio.cambio
+            if not factor_importacion:
+                print("Entro a buscar el factor")
+                factor_importacion = self.margen.proveedor.factor_importacion
+            if not margen:
+                print("Entro a buscar el margen")
+                margen = self.margen.margen_deseado
+            margen = (margen) / 100  # Se transforma en porcentaje
 
-        if not tasa:
-            print("Entro a buscar la tasa")
-            tasa = self.margen.proveedor.moneda.moneda_cambio.cambio
-        if not factor_importacion:
-            print("Entro a buscar el factor")
-            factor_importacion = self.margen.proveedor.factor_importacion
-        if not margen:
-            print("Entro a buscar el margen")
-            margen = self.margen.margen_deseado
-        margen = (margen) / 100  # Se transforma en porcentaje
+            # Calculamos los nuevos costos y precios basados en el cambio de los parametros
+            costo_base_cop = self.costo * tasa * factor_importacion
+            self.costo_cop = costo_base_cop
 
-        # Calculamos los nuevos costos y precios basados en el cambio de los parametros
-        costo_base_cop = self.costo * tasa * factor_importacion
-        self.costo_cop = costo_base_cop
+            precio_base = costo_base_cop * (1 / (1 - margen))
+            self.precio_base = round(precio_base, 4)
 
-        precio_base = costo_base_cop * (1 / (1 - margen))
-        self.precio_base = round(precio_base, 4)
-
-        self.rentabilidad = precio_base - costo_base_cop
+            self.rentabilidad = precio_base - costo_base_cop
 
     def get_nombre_automático(self, tipo):
         if self.con_nombre_automatico:
             nombre = ''
+            print('Entro')
             configuracion = self.categoria.mi_configuracion_producto_nombre_estandar
-
+            print(configuracion)
             if configuracion.con_categoría_uno:
-                nombre += self.categoria.nombre
+                nombre += ' %s' %self.categoria.nombre
 
             if configuracion.con_categoría_dos:
-                nombre += self.categoria_dos
+                nombre += ' %s' %self.categoria_dos
 
             if tipo == 'estandar':
                 if configuracion.con_fabricante:
-                    nombre += self.fabricante.nombre
+                    nombre += ' %s' %self.fabricante.nombre
 
             if configuracion.con_tipo and self.tipo != 'N.A':
-                nombre += self.tipo
+                nombre += ' %s' %self.tipo
 
             if configuracion.con_material and self.material.id != 1:
-                nombre += self.material.nombre
+                nombre += ' %s' %self.material.nombre
 
             if configuracion.con_color and self.color.id != 1:
-                nombre += self.color.nombre
+                nombre += ' %s' %self.color.nombre
 
             if configuracion.con_serie and self.serie.id != 1:
-                nombre += self.serie.nombre
+                nombre += ' %s' %self.serie.nombre
 
             if configuracion.con_ancho and self.ancho != 'N.A':
-                nombre += self.ancho
+                nombre += ' W%s' %self.ancho
 
             if configuracion.con_alto and self.alto != 'N.A':
-                nombre += self.alto
+                nombre += ' H%s' %self.alto
 
             if configuracion.con_longitud and self.longitud != 'N.A':
-                nombre += self.longitud
+                nombre += ' L%s' %self.longitud
 
             if configuracion.con_diametro and self.diametro != 'N.A':
-                nombre += self.diametro
+                nombre += ' D%s' %self.diametro
+
 
             if tipo == 'comercial':
-                self.descripcion_comercial = nombre
+                self.descripcion_comercial = nombre.title()
 
             if tipo == 'estandar':
-                self.descripcion_estandar = nombre
+                self.descripcion_estandar = nombre.title()
 
 
 @receiver(post_save, sender=Producto)
@@ -311,13 +313,13 @@ def post_save_producto(sender, instance, *args, **kwargs):
 class ProductoNombreConfiguracion(models.Model):
     categoria = models.OneToOneField(CategoriaProducto, on_delete=models.CASCADE, verbose_name='categoría',
                                      related_name='mi_configuracion_producto_nombre_estandar', unique=True)
-    con_categoría_uno = models.BooleanField(default=True)
-    con_categoría_dos = models.BooleanField(default=True)
-    con_serie = models.BooleanField(default=True)
+    con_categoría_uno = models.BooleanField(default=False)
+    con_categoría_dos = models.BooleanField(default=False)
+    con_serie = models.BooleanField(default=False)
     con_fabricante = models.BooleanField(default=False)
-    con_tipo = models.BooleanField(default=True)
-    con_material = models.BooleanField(default=True)
-    con_color = models.BooleanField(default=True)
+    con_tipo = models.BooleanField(default=False)
+    con_material = models.BooleanField(default=False)
+    con_color = models.BooleanField(default=False)
     con_ancho = models.BooleanField(default=False)
     con_alto = models.BooleanField(default=False)
     con_longitud = models.BooleanField(default=False)

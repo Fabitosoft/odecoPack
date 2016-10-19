@@ -62,7 +62,8 @@ class ProductoAdmin(ImportExportModelAdmin):
                 (
                     ('id_cguno', 'referencia'),
                     'fabricante', 'serie',
-                    ('descripcion_estandar', 'descripcion_comercial'),
+                    'descripcion_estandar',
+                    'descripcion_comercial',
                     ('con_nombre_automatico'),
                     'foto_perfil'
                 )
@@ -75,6 +76,7 @@ class ProductoAdmin(ImportExportModelAdmin):
                     ('categoria_dos', 'tipo'),
                     ('material', 'color'),
                     ('ancho', 'alto'),
+                    'costo',
                     ('longitud', 'diametro'),
                     ('cantidad_empaque', 'cantidad_minima_venta', 'unidad_medida'),
 
@@ -181,7 +183,16 @@ class ProductoAdmin(ImportExportModelAdmin):
 
 admin.site.register(UnidadMedida)
 
-admin.site.register(CategoriaProducto)
+
+class ProductoNombreConfiguracionInLine(admin.TabularInline):
+    model = ProductoNombreConfiguracion
+
+
+class CategoriaProductoAdmin(admin.ModelAdmin):
+    inlines = [ProductoNombreConfiguracionInLine, ]
+
+
+admin.site.register(CategoriaProducto, CategoriaProductoAdmin)
 admin.site.register(ColorProducto)
 admin.site.register(MaterialProducto)
 admin.site.register(SerieProducto)
