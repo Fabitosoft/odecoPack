@@ -76,7 +76,7 @@ class UnidadMedida(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
 
     class Meta:
-        verbose_name_plural = "2. Unidades de Medida"
+        verbose_name_plural = "Unidades de Medida"
 
     def __str__(self):
         return self.nombre
@@ -173,7 +173,7 @@ class Producto(TimeStampedModel):
     activos = ProductoActivosManager()
 
     class Meta:
-        verbose_name_plural = "1. Productos"
+        verbose_name_plural = "Productos"
 
     def __init__(self, *args, **kwargs):
         super(Producto, self).__init__(*args, **kwargs)
