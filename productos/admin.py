@@ -3,12 +3,7 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
 from productos.models import (
-    UnidadMedida,
-    Producto,
-    ColorProducto,
-    MaterialProducto,
-    SerieProducto,
-    FabricanteProducto
+    Producto
 )
 
 
@@ -70,11 +65,10 @@ class ProductoAdmin(ImportExportModelAdmin):
             'classes': ('form-control',),
             'fields':
                 (
-                    'categoria',
-                    ('categoria_dos', 'tipo'),
+                    ('categoria_dos_por_categoria', 'tipo_por_categoria'),
                     ('material', 'color'),
                     ('ancho', 'alto'),
-                    'costo',
+                    ('costo', 'margen'),
                     ('longitud', 'diametro'),
                     ('cantidad_empaque', 'cantidad_minima_venta', 'unidad_medida'),
 
@@ -124,10 +118,22 @@ class ProductoAdmin(ImportExportModelAdmin):
         'activo_componentes',
         'activo_catalogo',
     )
-    search_fields = ['referencia', 'descripcion_estandar']
+    search_fields = [
+        'referencia',
+        'descripcion_estandar',
+        'descripcion_comercial',
+        'color__nombre',
+        'material__nombre',
+        'serie__nombre',
+        'fabricante__nombre',
+        'categoria_dos_por_categoria__categoria_uno__nombre',
+        'categoria_dos_por_categoria__categoria_dos__nombre',
+        'tipo_por_categoria__tipo__nombre',
+    ]
     list_filter = (
         'margen__proveedor', 'margen__categoria', 'activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes',
         'activo_catalogo')
+
     list_editable = ['activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes', 'activo_catalogo', 'margen',
                      'costo']
     raw_id_fields = ('margen',)
@@ -176,12 +182,4 @@ class ProductoAdmin(ImportExportModelAdmin):
 
 
 # endregion
-
-
-
-admin.site.register(UnidadMedida)
-admin.site.register(ColorProducto)
-admin.site.register(MaterialProducto)
-admin.site.register(SerieProducto)
-admin.site.register(FabricanteProducto)
 admin.site.register(Producto, ProductoAdmin)

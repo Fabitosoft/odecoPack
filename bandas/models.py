@@ -9,30 +9,20 @@ from django.urls import reverse
 from utils.models import TimeStampedModel
 from productos.models import Producto
 
+from productos_caracteristicas.models import (
+    MaterialProducto,
+    ColorProducto,
+    FabricanteProducto,
+    SerieProducto
+)
+
+from productos_categorias.models import (
+    TipoProductoCategoría
+)
+
 
 # Create your models here.
-# region Caracteristicas
-class Caracteristica(models.Model):
-    nombre = models.CharField(max_length=60)
 
-    def __str__(self):
-        return self.nombre
-
-
-class ValorCaracteristica(models.Model):
-    caracteristica = models.ForeignKey(Caracteristica)
-    nombre = models.CharField(max_length=60)
-    nomenclatura = models.CharField(max_length=6, blank=True, null=True)
-    activo = models.BooleanField(default=True)
-
-    class Meta:
-        unique_together = (('caracteristica', 'nombre'), ('caracteristica', 'nomenclatura'))
-
-    def __str__(self):
-        return self.nombre
-
-
-# endregion
 
 # region Ensamblaje Bandas
 
@@ -74,25 +64,25 @@ class Banda(TimeStampedModel):
     descripcion_estandar = models.CharField(max_length=200)
     descripcion_comercial = models.CharField(max_length=200)
     referencia = models.CharField(max_length=120, unique=True, null=True, blank=True)
-    fabricante = models.ForeignKey(ValorCaracteristica, related_name="bandas_con_fabricante")
+    fabricante = models.ForeignKey(FabricanteProducto, related_name="bandas_con_fabricante")  # fabricante
     # endregion
 
     # region Caracteristicas Básicas de Banda
-    serie = models.ForeignKey(ValorCaracteristica, related_name="bandas_con_serie")
+    serie = models.ForeignKey(SerieProducto, related_name="bandas_con_serie")  # series
     paso = models.PositiveIntegerField(default=0)
-    tipo = models.ForeignKey(ValorCaracteristica, related_name="bandas_con_tipo")
-    material = models.ForeignKey(ValorCaracteristica, related_name="bandas_con_material")
-    color = models.ForeignKey(ValorCaracteristica, related_name="bandas_con_color")
+    tipo = models.ForeignKey(TipoProductoCategoría, related_name="bandas_con_tipo")  # tipo
+    material = models.ForeignKey(MaterialProducto, related_name="bandas_con_material")  # materiales
+    color = models.ForeignKey(ColorProducto, related_name="bandas_con_color")  # colores
     ancho = models.PositiveIntegerField(default=0, verbose_name="Ancho (mm)")
     longitud = models.DecimalField(decimal_places=2, max_digits=8, default=1, verbose_name="Longitud (m)")
-    material_varilla = models.ForeignKey(ValorCaracteristica, related_name="bandas_con_material_varilla")
+    material_varilla = models.ForeignKey(MaterialProducto, related_name="bandas_con_material_varilla")  # materiales
     total_filas = models.PositiveIntegerField(default=0)
     # endregion
 
     # region Empujadores
     con_empujador = models.BooleanField(default=False)
-    empujador_tipo = models.ForeignKey(ValorCaracteristica, null=True, blank=True,
-                                       related_name="bandas_con_tipo_empujador", verbose_name="Tipo")
+    empujador_tipo = models.ForeignKey(TipoProductoCategoría, null=True, blank=True,
+                                       related_name="bandas_con_tipo_empujador", verbose_name="Tipo")  # tipo
     empujador_altura = models.PositiveIntegerField(default=0, verbose_name="Altura (mm)")
     empujador_ancho = models.PositiveIntegerField(default=0, verbose_name="Ancho (mm)")
     empujador_distanciado = models.PositiveIntegerField(default=0, null=True, blank=True,
@@ -143,10 +133,17 @@ class Banda(TimeStampedModel):
         through_fields=('banda', 'producto'),
     )
 
+    class Meta:
+        verbose_name_plural = '3. Bandas'
+        verbose_name = '3. Banda'
+
     def save(self):
         modulos = self.ensamblado.all()
-        porcentaje_mano_obra = (CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
-                                                                     empujador=self.con_empujador).first().porcentaje) / 100
+        costo_ensamblado = CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
+                                                                empujador=self.con_empujador).first()
+        porcentaje_mano_obra = 0
+        if costo_ensamblado:
+            porcentaje_mano_obra = costo_ensamblado.porcentaje / 100
 
         if modulos:
             print('Entro a actualizar precio banda')
@@ -170,6 +167,109 @@ class Banda(TimeStampedModel):
     def actualizar_precio_total(self):
         self.save()
 
+    def generar_referencia(self):
+        referencia = (
+                         "%s"
+                         "%s-"
+                         "%s"
+                         "%s"
+                         "%s"
+                         "%s"
+                         "V%s"
+                         "W%s"
+                     ) % \
+                     (
+                         "B",
+                         self.fabricante.nomenclatura,
+                         self.serie.nomenclatura,
+                         self.tipo.tipo.nomenclatura,
+                         self.material.nomenclatura,
+                         self.color.nomenclatura,
+                         self.material_varilla.nomenclatura,
+                         self.ancho,
+                     )
+
+        nombre = (
+                     "%s"
+                     " %s"
+                     " %s"
+                     " %s"
+                     " %s"
+                     " %s"
+                     " V%s"
+                     " W%s"
+                 ) % \
+                 (
+                     "Banda",
+                     self.fabricante.nombre,
+                     self.serie.nombre,
+                     self.tipo.tipo.nombre,
+                     self.material.nombre,
+                     self.color.nombre,
+                     self.material_varilla.nombre,
+                     self.ancho,
+                 )
+
+        if self.con_empujador:
+            referencia += (
+                              "/%s"
+                              "%s"
+                              "H%s"
+                              "W%s"
+                              "D%s"
+                              "I%s"
+                          ) % \
+                          (
+                              "E",
+                              self.empujador_tipo.tipo.nomenclatura,
+                              self.empujador_altura,
+                              self.empujador_ancho,
+                              self.empujador_distanciado,
+                              self.empujador_identacion,
+                          )
+            nombre += (
+                              " %s"
+                              " %s"
+                              " H%s"
+                              " W%s"
+                              " D%s"
+                              " I%s"
+                          ) % \
+                          (
+                              "con Empujador",
+                              self.empujador_tipo.tipo.nombre,
+                              self.empujador_altura,
+                              self.empujador_ancho,
+                              self.empujador_distanciado,
+                              self.empujador_identacion,
+                          )
+        if self.con_aleta:
+            referencia += (
+                              "/%s"
+                              "H%s"
+                              "I%s"
+                          ) % \
+                          (
+                              "A",
+                              self.aleta_altura,
+                              self.aleta_identacion,
+                          )
+
+            nombre += (
+                              " %s"
+                              " H%s"
+                              " I%s"
+                          ) % \
+                          (
+                              "con Aleta",
+                              self.aleta_altura,
+                              self.aleta_identacion,
+                          )
+
+        self.referencia = referencia.upper()
+        self.descripcion_comercial = nombre.strip().title()
+        self.descripcion_estandar = self.referencia
+
     def __str__(self):
         return self.referencia
 
@@ -190,6 +290,10 @@ class Ensamblado(TimeStampedModel):
     cantidad = models.PositiveIntegerField(verbose_name="Cantidad")
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_created_by")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_updated_by")
+
+    class Meta:
+        verbose_name_plural = '2. Ensamblados'
+        verbose_name = '2. Ensamblado'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -226,6 +330,8 @@ class CostoEnsambladoBlanda(models.Model):
     porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
 
     class Meta:
+        verbose_name = '1. Costo Emsamblado'
+        verbose_name_plural = '1. Costos Emsamblados'
         unique_together = ('aleta', 'empujador')
 
 # endregion

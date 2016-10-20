@@ -122,6 +122,7 @@ MY_APPS = (
     'bandas',
     'biable',
     'productos_categorias',
+    'productos_caracteristicas',
 )
 
 THIRD_PART_APPS = (

@@ -58,7 +58,10 @@ class ListaPreciosView(LoginRequiredMixin, ListView):
             context['formas_pago_porcentaje'] = FormaPago.objects.filter(
                 id=self.request.GET.get("tipo")).first().porcentaje
         else:
-            context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje
+            if FormaPago.objects.all():
+                context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje
+            else:
+                context['formas_pago_porcentaje'] = 0
 
         cotizacion = Cotizacion.objects.filter(
             Q(usuario=self.request.user) &

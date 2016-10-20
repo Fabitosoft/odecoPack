@@ -7,81 +7,14 @@ from django.dispatch import receiver
 
 from proveedores.models import MargenProvedor
 from utils.models import TimeStampedModel
-from productos_categorias.models import CategoriaProducto
-
-# region Colores Producto
-class ColorProducto(models.Model):
-    nombre = models.CharField(max_length=120, unique=True)
-    nomenclatura = models.CharField(max_length=2, unique=True)
-
-    class Meta:
-        verbose_name_plural = "Colores Productos"
-        verbose_name = "Color Producto"
-
-    def __str__(self):
-        return self.nombre
-
-
-# endregion
-
-# region Materiales Producto
-class MaterialProducto(models.Model):
-    nombre = models.CharField(max_length=120, unique=True)
-    nomenclatura = models.CharField(max_length=2, unique=True)
-
-    class Meta:
-        verbose_name_plural = "Materiales Productos"
-        verbose_name = "Material Producto"
-
-    def __str__(self):
-        return self.nombre
-
-
-# endregion
-
-# region Series Producto
-class SerieProducto(models.Model):
-    nombre = models.CharField(max_length=120, unique=True)
-    nomenclatura = models.CharField(max_length=6, unique=True)
-
-    class Meta:
-        verbose_name_plural = "Series Productos"
-        verbose_name = "Serie Producto"
-
-    def __str__(self):
-        return self.nombre
-
-
-# endregion
-
-#  region Fabricante Producto
-class FabricanteProducto(models.Model):
-    nombre = models.CharField(max_length=120, unique=True)
-    nomenclatura = models.CharField(max_length=2, unique=True)
-
-    class Meta:
-        verbose_name_plural = "Fabricantes Productos"
-        verbose_name = "Fabricante Producto"
-
-    def __str__(self):
-        return self.nombre
-
-
-# endregion
-
-# region Unidades de Medida
-class UnidadMedida(models.Model):
-    nombre = models.CharField(max_length=120, unique=True)
-    nomenclatura = models.CharField(max_length=2, unique=True)
-
-    class Meta:
-        verbose_name_plural = "Unidades de Medida"
-
-    def __str__(self):
-        return self.nombre
-
-
-# endregion
+from productos_categorias.models import CategoriaProducto, CategoriaDosCategoria, TipoProductoCategoría
+from productos_caracteristicas.models import (
+    ColorProducto,
+    MaterialProducto,
+    SerieProducto,
+    FabricanteProducto,
+    UnidadMedida
+)
 
 # region Productos
 def productos_upload_to(instance, filename):
@@ -136,17 +69,20 @@ class Producto(TimeStampedModel):
     fabricante = models.ForeignKey(FabricanteProducto, verbose_name='fabricante', related_name='mis_productos',
                                    on_delete=models.PROTECT)
     serie = models.ForeignKey(SerieProducto, verbose_name='serie', related_name='mis_productos',
-                              on_delete=models.PROTECT, default=1)
+                              on_delete=models.PROTECT, null=True, blank=True)
 
     # region Caracteristica Físicas Producto
-    categoria = models.ForeignKey(CategoriaProducto, verbose_name='categoría', related_name='mis_productos',
-                                  on_delete=models.PROTECT)
-    categoria_dos = models.CharField(max_length=120, verbose_name='categoría dos')
-    tipo = models.CharField(max_length=120, verbose_name='tipo', default='N.A')
+    categoria_dos_por_categoria = models.ForeignKey(CategoriaDosCategoria, verbose_name='categoría dos',
+                                                    on_delete=models.PROTECT, related_name='mis_productos'
+                                                    )
+    tipo_por_categoria = models.ForeignKey(TipoProductoCategoría, verbose_name='tipo',
+                                           on_delete=models.PROTECT, related_name='mis_productos',
+                                           null=True, blank=True
+                                           )
     material = models.ForeignKey(MaterialProducto, verbose_name='material', related_name='mis_productos',
-                                 on_delete=models.PROTECT, default=1)
+                                 on_delete=models.PROTECT, null=True, blank=True)
     color = models.ForeignKey(ColorProducto, verbose_name='color', related_name='mis_productos',
-                              on_delete=models.PROTECT, default=1)
+                              on_delete=models.PROTECT, null=True, blank=True)
     ancho = models.CharField(max_length=120, verbose_name='ancho (mm)', default='N.A')
     alto = models.CharField(max_length=120, verbose_name='alto (mm)', default='N.A')
     longitud = models.CharField(max_length=120, verbose_name='longitud (mt)', default='N.A')
@@ -186,7 +122,7 @@ class Producto(TimeStampedModel):
         self.costo_original = self.costo
 
     def __str__(self):
-        return "%s" % (self.descripcion_estandar)
+        return "%s" % (self.descripcion_comercial)
 
     def save(self, **kwargs):
 
@@ -228,48 +164,67 @@ class Producto(TimeStampedModel):
     def get_nombre_automático(self, tipo):
         if self.con_nombre_automatico:
             nombre = ''
-            configuracion = self.categoria.mi_configuracion_producto_nombre_estandar
+            configuracion = self.categoria_dos_por_categoria.categoria_uno.mi_configuracion_producto_nombre_estandar
             if configuracion.con_categoría_uno:
-                nombre += ' %s' %self.categoria.nombre
+
+                if tipo == 'comercial':
+                    nombre += ' %s' % self.categoria_dos_por_categoria.categoria_uno.nombre
+                if tipo == 'estandar':
+                    nombre += ' %s' % self.categoria_dos_por_categoria.categoria_uno.nomenclatura
 
             if configuracion.con_categoría_dos:
-                nombre += ' %s' %self.categoria_dos
+                if tipo == 'comercial':
+                    nombre += ' %s' % self.categoria_dos_por_categoria.categoria_dos.nombre
+                if tipo == 'estandar':
+                    nombre += ' %s' % self.categoria_dos_por_categoria.categoria_dos.nomenclatura
 
             if tipo == 'estandar':
                 if configuracion.con_fabricante:
-                    nombre += ' %s' %self.fabricante.nombre
+                    nombre += ' %s' % self.fabricante.nomenclatura
 
-            if configuracion.con_tipo and self.tipo != 'N.A':
-                nombre += ' %s' %self.tipo
+            if configuracion.con_tipo and self.tipo_por_categoria:
+                if tipo == 'comercial':
+                    nombre += ' %s' % self.tipo_por_categoria.tipo.nombre
+                if tipo == 'estandar':
+                    nombre += ' %s' % self.tipo_por_categoria.tipo.nomenclatura
 
-            if configuracion.con_material and self.material.id != 1:
-                nombre += ' %s' %self.material.nombre
+            if configuracion.con_material and self.material:
 
-            if configuracion.con_color and self.color.id != 1:
-                nombre += ' %s' %self.color.nombre
+                if tipo == 'comercial':
+                    nombre += ' %s' % self.material.nombre
+                if tipo == 'estandar':
+                    nombre += ' %s' % self.material.nomenclatura
 
-            if configuracion.con_serie and self.serie.id != 1:
-                nombre += ' %s' %self.serie.nombre
+            if configuracion.con_color and self.color:
+                if tipo == 'comercial':
+                    nombre += ' %s' % self.color.nombre
+                if tipo == 'estandar':
+                    nombre += ' %s' % self.color.nomenclatura
+
+            if configuracion.con_serie and self.serie:
+                if tipo == 'comercial':
+                    nombre += ' %s' % self.serie.nombre
+                if tipo == 'estandar':
+                    nombre += ' %s' % self.serie.nomenclatura
+                nombre += ' '
 
             if configuracion.con_ancho and self.ancho != 'N.A':
-                nombre += ' W%s' %self.ancho
+                nombre += 'W%s' % self.ancho
 
             if configuracion.con_alto and self.alto != 'N.A':
-                nombre += ' H%s' %self.alto
+                nombre += 'H%s' % self.alto
 
             if configuracion.con_longitud and self.longitud != 'N.A':
-                nombre += ' L%s' %self.longitud
+                nombre += 'L%s' % self.longitud
 
             if configuracion.con_diametro and self.diametro != 'N.A':
-                nombre += ' D%s' %self.diametro
-
-
+                nombre += 'D%s' % self.diametro
 
             if tipo == 'comercial':
-                self.descripcion_comercial = nombre.title()
+                self.descripcion_comercial = nombre.strip().title()
 
             if tipo == 'estandar':
-                self.descripcion_estandar = nombre.title()
+                self.descripcion_estandar = nombre.strip().upper()
 
 
 @receiver(post_save, sender=Producto)
@@ -279,7 +234,6 @@ def post_save_producto(sender, instance, *args, **kwargs):
         print("Entro a cambiar ensamblado")
         for ensamble in instance.ensamblados.all():
             ensamble.actualizar_precio_total_linea()
-
 
 # @receiver(post_delete, sender=Producto)
 # def post_delete_producto(sender, instance, *args, **kwargs):
