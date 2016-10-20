@@ -161,7 +161,7 @@ class Producto(TimeStampedModel):
 
             self.rentabilidad = precio_base - costo_base_cop
 
-    def get_nombre_automático(self, tipo):
+    def get_nombre_automatico(self, tipo):
         if self.con_nombre_automatico:
             nombre = ''
             configuracion = self.categoria_dos_por_categoria.categoria_uno.mi_configuracion_producto_nombre_estandar

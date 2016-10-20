@@ -172,8 +172,8 @@ class ProductoAdmin(ImportExportModelAdmin):
     get_moneda.short_description = 'Moneda'
 
     def save_model(self, request, obj, form, change):
-        obj.get_nombre_automático('estandar')
-        obj.get_nombre_automático('comercial')
+        obj.get_nombre_automatico('estandar')
+        obj.get_nombre_automatico('comercial')
         if not change:
             obj.created_by = request.user
         else:
