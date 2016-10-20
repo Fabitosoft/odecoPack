@@ -5,12 +5,10 @@ from import_export.admin import ImportExportModelAdmin
 from productos.models import (
     UnidadMedida,
     Producto,
-    CategoriaProducto,
     ColorProducto,
     MaterialProducto,
     SerieProducto,
-    FabricanteProducto,
-    ProductoNombreConfiguracion
+    FabricanteProducto
 )
 
 
@@ -182,17 +180,6 @@ class ProductoAdmin(ImportExportModelAdmin):
 
 
 admin.site.register(UnidadMedida)
-
-
-class ProductoNombreConfiguracionInLine(admin.TabularInline):
-    model = ProductoNombreConfiguracion
-
-
-class CategoriaProductoAdmin(admin.ModelAdmin):
-    inlines = [ProductoNombreConfiguracionInLine, ]
-
-
-admin.site.register(CategoriaProducto, CategoriaProductoAdmin)
 admin.site.register(ColorProducto)
 admin.site.register(MaterialProducto)
 admin.site.register(SerieProducto)

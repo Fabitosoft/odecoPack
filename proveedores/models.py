@@ -4,7 +4,7 @@ from django.dispatch import receiver
 
 from importaciones.models import Moneda
 from utils.models import TimeStampedModel
-from listasprecios.models import CategoriaMargen
+from productos_categorias.models import CategoriaProducto
 
 
 # Create your models here.
@@ -15,7 +15,7 @@ class Proveedor(TimeStampedModel):
     moneda = models.ForeignKey(Moneda, on_delete=models.PROTECT, related_name="provedores_con_moneda")
     factor_importacion = models.DecimalField(max_digits=18, decimal_places=3, default=1)
     margenes = models.ManyToManyField(
-        CategoriaMargen,
+        CategoriaProducto,
         through='MargenProvedor',
         through_fields=('proveedor', 'categoria')
     )
@@ -46,7 +46,7 @@ def post_save_proveedor(sender, instance, *args, **kwargs):
 
 # region Margen por Proveedor
 class MargenProvedor(TimeStampedModel):
-    categoria = models.ForeignKey(CategoriaMargen, on_delete=models.CASCADE, related_name="mis_margenes_por_proveedor")
+    categoria = models.ForeignKey(CategoriaProducto, on_delete=models.CASCADE, related_name="mis_margenes_por_proveedor")
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE, related_name="mis_margenes_por_categoria")
     margen_deseado = models.DecimalField(max_digits=18, decimal_places=3, verbose_name="Margen (%)")
 
