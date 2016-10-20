@@ -100,7 +100,7 @@ class ProductoAdmin(ImportExportModelAdmin):
 
     def get_queryset(self, request):
         qs = Producto.objects.select_related(
-            "margen__proveedor__moneda__moneda_cambio",
+            "margen__proveedor__moneda",
             "unidad_medida",
             "margen__categoria",
         ).all()
@@ -151,7 +151,7 @@ class ProductoAdmin(ImportExportModelAdmin):
 
     def get_cambio_moneda(self, obj):
         if obj.margen:
-            return obj.margen.proveedor.moneda.moneda_cambio.cambio
+            return obj.margen.proveedor.moneda.cambio
         else:
             return ""
 
@@ -159,7 +159,7 @@ class ProductoAdmin(ImportExportModelAdmin):
 
     def get_moneda(self, obj):
         if obj.margen:
-            return obj.margen.proveedor.moneda.moneda_cambio
+            return obj.margen.proveedor.moneda
         else:
             return ""
 

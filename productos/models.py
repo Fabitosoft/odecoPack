@@ -150,7 +150,7 @@ class Producto(TimeStampedModel):
     ancho = models.CharField(max_length=120, verbose_name='ancho (mm)', default='N.A')
     alto = models.CharField(max_length=120, verbose_name='alto (mm)', default='N.A')
     longitud = models.CharField(max_length=120, verbose_name='longitud (mt)', default='N.A')
-    diametro = models.CharField(max_length=120, verbose_name='longitud (mm)', default='N.A')
+    diametro = models.CharField(max_length=120, verbose_name='diametro (mm)', default='N.A')
     # endregion
 
     cantidad_empaque = models.DecimalField(max_digits=18, decimal_places=4, default=0)
@@ -165,9 +165,9 @@ class Producto(TimeStampedModel):
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
 
     activo = models.BooleanField(default=True)
-    activo_componentes = models.BooleanField(default=True, verbose_name="En Compo.")
-    activo_proyectos = models.BooleanField(default=True, verbose_name="En Proy.")
-    activo_catalogo = models.BooleanField(default=True, verbose_name="En Cata.")
+    activo_componentes = models.BooleanField(default=False, verbose_name="En Compo.")
+    activo_proyectos = models.BooleanField(default=False, verbose_name="En Proy.")
+    activo_catalogo = models.BooleanField(default=False, verbose_name="En Cata.")
     activo_ensamble = models.BooleanField(default=False, verbose_name="Para Ensam.")
 
     foto_perfil = models.ImageField(upload_to=productos_upload_to, validators=[validate_image], null=True, blank=True)
@@ -204,33 +204,31 @@ class Producto(TimeStampedModel):
         super().save()
 
     def set_precio_base_y_costo(self, tasa=None, factor_importacion=None, margen=None):
+        if self.margen:
+            if not tasa:
+                print("Entro a buscar la tasa")
+                tasa = self.margen.proveedor.moneda.cambio
+            if not factor_importacion:
+                print("Entro a buscar el factor")
+                factor_importacion = self.margen.proveedor.factor_importacion
+            if not margen:
+                print("Entro a buscar el margen")
+                margen = self.margen.margen_deseado
+            margen = (margen) / 100  # Se transforma en porcentaje
 
-        if not tasa:
-            print("Entro a buscar la tasa")
-            tasa = self.margen.proveedor.moneda.moneda_cambio.cambio
-        if not factor_importacion:
-            print("Entro a buscar el factor")
-            factor_importacion = self.margen.proveedor.factor_importacion
-        if not margen:
-            print("Entro a buscar el margen")
-            margen = self.margen.margen_deseado
-        margen = (margen) / 100  # Se transforma en porcentaje
+            # Calculamos los nuevos costos y precios basados en el cambio de los parametros
+            costo_base_cop = self.costo * tasa * factor_importacion
+            self.costo_cop = costo_base_cop
 
-        # Calculamos los nuevos costos y precios basados en el cambio de los parametros
-        costo_base_cop = self.costo * tasa * factor_importacion
-        self.costo_cop = costo_base_cop
+            precio_base = costo_base_cop * (1 / (1 - margen))
+            self.precio_base = round(precio_base, 4)
 
-        precio_base = costo_base_cop * (1 / (1 - margen))
-        self.precio_base = round(precio_base, 4)
-
-        self.rentabilidad = precio_base - costo_base_cop
+            self.rentabilidad = precio_base - costo_base_cop
 
     def get_nombre_automático(self, tipo):
         if self.con_nombre_automatico:
             nombre = ''
-            print('Entro')
             configuracion = self.categoria.mi_configuracion_producto_nombre_estandar
-            print(configuracion)
             if configuracion.con_categoría_uno:
                 nombre += ' %s' %self.categoria.nombre
 
@@ -268,10 +266,10 @@ class Producto(TimeStampedModel):
 
 
             if tipo == 'comercial':
-                self.descripcion_comercial = nombre
+                self.descripcion_comercial = nombre.title()
 
             if tipo == 'estandar':
-                self.descripcion_estandar = nombre
+                self.descripcion_estandar = nombre.title()
 
 
 @receiver(post_save, sender=Producto)

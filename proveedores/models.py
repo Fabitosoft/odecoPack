@@ -33,7 +33,7 @@ class Proveedor(TimeStampedModel):
 
 @receiver(post_save, sender=Proveedor)
 def post_save_proveedor(sender, instance, *args, **kwargs):
-    tasa = instance.moneda.moneda_cambio.cambio
+    tasa = instance.moneda.cambio
     print("Entro a cambiar factor de importacion")
     qsMxC = instance.mis_margenes_por_categoria.all()
     for MxC in qsMxC:
@@ -60,7 +60,7 @@ class MargenProvedor(TimeStampedModel):
 
 @receiver(post_save, sender=MargenProvedor)
 def post_save_margen_proveedor(sender, instance, *args, **kwargs):
-    tasa = instance.proveedor.moneda.moneda_cambio.cambio
+    tasa = instance.proveedor.moneda.cambio
     factor_importacion = instance.proveedor.factor_importacion
     for producto in instance.productos_con_margen.all():
         producto.save(margen_deseado=instance.margen_deseado, tasa=tasa, factor_importacion=factor_importacion)
