@@ -63,9 +63,9 @@ class Producto(TimeStampedModel):
 
     id_cguno = models.PositiveIntegerField(default=0)
     referencia = models.CharField(max_length=120, unique=True)
-    descripcion_estandar = models.CharField(max_length=200)
-    descripcion_comercial = models.CharField(max_length=200)
-    con_nombre_automatico = models.BooleanField(default=False, verbose_name='nombre automático')
+    descripcion_estandar = models.CharField(max_length=200, default='AUTOMATICO')
+    descripcion_comercial = models.CharField(max_length=200, default='AUTOMATICO')
+    con_nombre_automatico = models.BooleanField(default=True, verbose_name='nombre automático')
     fabricante = models.ForeignKey(FabricanteProducto, verbose_name='fabricante', related_name='mis_productos',
                                    on_delete=models.PROTECT)
     serie = models.ForeignKey(SerieProducto, verbose_name='serie', related_name='mis_productos',
@@ -206,19 +206,18 @@ class Producto(TimeStampedModel):
                     nombre += ' %s' % self.serie.nombre
                 if tipo == 'estandar':
                     nombre += ' %s' % self.serie.nomenclatura
-                nombre += ' '
 
             if configuracion.con_ancho and self.ancho != 'N.A':
-                nombre += 'W%s' % self.ancho
+                nombre += ' W%s' % self.ancho
 
             if configuracion.con_alto and self.alto != 'N.A':
-                nombre += 'H%s' % self.alto
+                nombre += ' H%s' % self.alto
 
             if configuracion.con_longitud and self.longitud != 'N.A':
-                nombre += 'L%s' % self.longitud
+                nombre += ' L%s' % self.longitud
 
             if configuracion.con_diametro and self.diametro != 'N.A':
-                nombre += 'D%s' % self.diametro
+                nombre += ' D%s' % self.diametro
 
             if tipo == 'comercial':
                 self.descripcion_comercial = nombre.strip().title()
