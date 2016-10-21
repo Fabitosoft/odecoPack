@@ -84,7 +84,8 @@ class BandaAdmin(admin.ModelAdmin):
                     ('tipo', 'material', 'color'),
                     ('ancho', 'longitud'),
                     'material_varilla',
-                    'total_filas'
+                    'total_filas',
+                    ('con_torneado_varilla'),
                 )
         }),
         ('Activar', {
@@ -123,8 +124,6 @@ class BandaAdmin(admin.ModelAdmin):
         }),
     )
 
-    # list_display = ('referencia','descripcion_estandar','unidad_medida')
-    # search_fields = ['referencia','descripcion_estandar']
     inlines = [
         EnsambladoInline,
     ]
