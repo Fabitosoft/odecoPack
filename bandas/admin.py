@@ -160,7 +160,7 @@ class EnsambladoAdmin(admin.ModelAdmin):
 
 
 class CostoEnsambladoBlandaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'aleta', 'empujador', 'porcentaje')
+    list_display = ('nombre', 'aleta', 'empujador', 'torneado','porcentaje')
     list_editable = ('porcentaje',)
 
 
