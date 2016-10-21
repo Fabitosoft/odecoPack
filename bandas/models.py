@@ -77,6 +77,7 @@ class Banda(TimeStampedModel):
     longitud = models.DecimalField(decimal_places=2, max_digits=8, default=1, verbose_name="Longitud (m)")
     material_varilla = models.ForeignKey(MaterialProducto, related_name="bandas_con_material_varilla")  # materiales
     total_filas = models.PositiveIntegerField(default=0)
+    con_torneado_varilla = models.BooleanField(default=False)
     # endregion
 
     # region Empujadores
@@ -140,7 +141,7 @@ class Banda(TimeStampedModel):
     def save(self):
         modulos = self.ensamblado.all()
         costo_ensamblado = CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
-                                                                empujador=self.con_empujador).first()
+                                                                empujador=self.con_empujador, torneado=self.con_torneado_varilla).first()
         porcentaje_mano_obra = 0
         if costo_ensamblado:
             porcentaje_mano_obra = costo_ensamblado.porcentaje / 100
@@ -326,12 +327,13 @@ class CostoEnsambladoBlanda(models.Model):
     nombre = models.CharField(max_length=30)
     aleta = models.BooleanField(default=False)
     empujador = models.BooleanField(default=False)
+    torneado = models.BooleanField(default=False)
     porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
 
     class Meta:
         verbose_name = '1. Costo Emsamblado'
         verbose_name_plural = '1. Costos Emsamblados'
-        unique_together = ('aleta', 'empujador')
+        unique_together = ('aleta', 'empujador','torneado')
 
 # endregion
 
