@@ -32,6 +32,7 @@ class BandaAdmin(admin.ModelAdmin):
         "serie",
         "con_empujador",
         "con_aleta",
+        "con_torneado_varilla",
         "fabricante",
         "activo",
         'activo_proyectos',
