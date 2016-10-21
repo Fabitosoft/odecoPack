@@ -156,7 +156,7 @@ class Banda(TimeStampedModel):
             self.precio_banda = 0
             self.precio_total = 0
 
-        self.costo_mano_obra = self.precio_banda * porcentaje_mano_obra
+        self.costo_mano_obra = self.costo_base_total * porcentaje_mano_obra
         self.precio_total = self.precio_banda + self.costo_mano_obra
         self.rentabilidad = self.precio_banda - self.costo_base_total
         super().save()
@@ -286,7 +286,6 @@ class Ensamblado(TimeStampedModel):
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
 
     ancho = models.PositiveIntegerField(default=0, verbose_name="Ancho (mm)")
-    cortado_a = models.CharField(max_length=10, null=True, blank=True)
     cantidad = models.PositiveIntegerField(verbose_name="Cantidad")
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_created_by")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_updated_by")
