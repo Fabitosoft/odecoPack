@@ -124,7 +124,7 @@ class ItemCotizacion(TimeStampedModel):
 
     def get_nombre_item(self):
         if self.item:
-            nombre = self.item.descripcion_estandar
+            nombre = self.item.descripcion_comercial
         else:
             nombre = self.banda.descripcion_comercial
         return nombre

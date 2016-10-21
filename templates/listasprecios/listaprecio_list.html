@@ -20,7 +20,9 @@
             <div role="tabpanel" class="tab-pane active" id="lista_precios">
                 <div class="row">
                     <div class="col-md-12">
-                        <span class="odeco_titulo_principal"><small>Lista de Precios</small></span>
+                        <h2>
+                            <small>Lista de Precios</small>
+                        </h2>
                         <hr/>
                         <div class="row">
                             {% crispy formu %}
@@ -41,7 +43,7 @@
                                     {% obtener_precio_lp pro.precio_base formas_pago_porcentaje as precio %}
                                     <tr>
                                         <td>{{ pro.referencia }} </td>
-                                        <td>{{ pro.descripcion_estandar }} </td>
+                                        <td>{{ pro.descripcion_comercial }} </td>
                                         <td>{{ pro.cantidad_empaque }} </td>
                                         <td>{{ pro.unidad_medida.nombre }} </td>
                                         <td> {{ precio }} </td>
@@ -58,7 +60,7 @@
                                     {% obtener_precio_lp banda.precio_total formas_pago_porcentaje as precio %}
                                     <tr>
                                         <td>{{ banda.referencia }} </td>
-                                        <td>{{ banda.descripcion_estandar }} </td>
+                                        <td>{{ banda.descripcion_comercial }} </td>
                                         <td> {{ banda.longitud }} </td>
                                         <td>Metro</td>
                                         <td> {{ precio }} </td>
@@ -78,7 +80,7 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane" id="cotizacion">
-                <span class="odeco_titulo_principal">Cotización</span>
+                <h2>Cotización</h2>
                 <hr/>
                 <div class="row">
                     {% if cotizacion_id %}

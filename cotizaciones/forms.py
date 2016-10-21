@@ -75,7 +75,8 @@ class CotizacionForm(ModelForm):
             self.helper.layout.fields.append(crear)
         else:
             self.helper.layout.fields.append(enviar)
-            self.helper.form_action = reverse('cotizaciones:detalle_cotizacion', kwargs={'pk': self.instance.pk})
+            self.helper.form_method = "POST"
+            self.helper.form_action = reverse('cotizaciones:enviar', kwargs={'pk': self.instance.pk})
 
         self.helper.all().wrap(Field, css_class="form-control")
         # self.helper.filter_by_widget(forms.CharField).wrap(Field, css_class="form-control")

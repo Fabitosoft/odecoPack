@@ -1,8 +1,13 @@
 from decimal import Decimal
 
+from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden
+from django.shortcuts import redirect
+from django.template.loader import render_to_string, get_template
 from django.urls import reverse
 from django.db.models import Q
+from django.template import Context
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.views import View
@@ -11,6 +16,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
 from django.forms import inlineformset_factory
+from django.utils import timezone
 
 from .models import (
     ItemCotizacion,
@@ -28,9 +34,6 @@ from .forms import (
 )
 
 
-# Create your views here.
-
-# region Detalle Cotización
 class CotizacionDetailView(DetailView):
     model = Cotizacion
 
@@ -201,80 +204,36 @@ class CotizacionView(View):
         return view(request, *args, **kwargs)
 
 
-# endregion
+class CotizacionEmailView(View):
+    def post(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        obj= Cotizacion.objects.get(pk=pk)
+        if obj.estado == "INI":
+            obj.razon_social = self.request.POST.get('razon_social')
+            obj.nombres_contacto = self.request.POST.get('nombres_contacto')
+            obj.apellidos_contacto = self.request.POST.get('apellidos_contacto')
+            obj.email = self.request.POST.get('email')
+            obj.nro_contacto = self.request.POST.get('nro_contacto')
+            obj.ciudad = self.request.POST.get('ciudad')
+            obj.pais = self.request.POST.get('pais')
+            obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
+            obj.fecha_envio = timezone.now()
+            obj.estado = "ENV"
+            obj.save()
 
-# class CotizacionDetailView(DetailView):
-#     model = Cotizacion
-#     template_name = "cotizaciones/cotizacion_detail.html"
-#
-#     def get_object(self, queryset=None):
-#         obj = self.model.objects \
-#             .select_related('usuario', 'usuario__user_extendido', 'usuario__user_extendido__colaborador') \
-#             .prefetch_related('items__item', 'items__forma_pago') \
-#             .get(id=self.kwargs["pk"])
-#
-#         # region Envio Correo
-#         if obj.estado == "INI":
-#             obj.razon_social = self.request.GET.get('razon_social')
-#             obj.nombres_contacto = self.request.GET.get('nombres_contacto')
-#             obj.apellidos_contacto = self.request.GET.get('apellidos_contacto')
-#             obj.email = self.request.GET.get('email')
-#             obj.nro_contacto = self.request.GET.get('nro_contacto')
-#             obj.ciudad = self.request.GET.get('ciudad')
-#             obj.pais = self.request.GET.get('pais')
-#             obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
-#             obj.fecha_envio = timezone.now()
-#             obj.estado = "ENV"
-#             obj.save()
-#
-#             subject, from_email, to = "%s - %s" % (
-#                 'Cotizacion', obj.nro_cotizacion), settings.EMAIL_HOST_USER, self.request.GET.get('email')
-#
-#             ctx = {
-#                 'object': obj,
-#             }
-#
-#             text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
-#             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
-#             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-#             msg.attach_alternative(html_content, "text/html")
-#             msg.send()
-#         # endregion
-#
-#
-#         return obj
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         RemisionFormSet = inlineformset_factory(
-#             Cotizacion,
-#             RemisionCotizacion,
-#             fields=('nro_factura',
-#                     'nro_remision',
-#                     'fecha_prometida_entrega',
-#                     'entregado'
-#                     ),
-#             form=RemisionCotizacionForm,
-#             extra=1
-#         )
-#
-#         remision_formset = RemisionFormSet(instance=self.get_object())
-#
-#         context["remisiones"] = remision_formset
-#         helper = ExampleFormSetHelper()
-#         context["helper"] = helper
-#
-#         if self.request.method == "GET":
-#             print("Es el get")
-#             # formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
-#             # if formset.is_valid():
-#             #     formset.save()
-#             #     # Do something. Should generally end with a redirect. For example:
-#             #     return HttpResponseRedirect(author.get_absolute_url())
-#         else:
-#             print("No es el get")
-#
-#         return context
+            subject, from_email, to = "%s - %s" % (
+                'Cotizacion', obj.nro_cotizacion), settings.EMAIL_HOST_USER, obj.email
+
+            ctx = {
+                'object': obj,
+            }
+
+            text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
+            html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        return redirect(obj)
 
 
 class TareaListView(ListView):

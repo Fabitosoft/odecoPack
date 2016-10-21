@@ -36,7 +36,8 @@ class ListaPreciosView(LoginRequiredMixin, ListView):
 
         qs = self.model.activos.componentes().select_related("unidad_medida").filter(
             Q(referencia__icontains=query) |
-            Q(descripcion_estandar__icontains=query)
+            Q(descripcion_estandar__icontains=query) |
+            Q(descripcion_comercial__icontains=query)
         ).distinct().order_by('-modified')
         return qs
 
