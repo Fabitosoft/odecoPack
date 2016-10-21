@@ -104,6 +104,7 @@ class Banda(TimeStampedModel):
 
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="banda_created_by")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="banda_updated_by")
+    costo_ensamblado = models.ForeignKey('CostoEnsambladoBlanda', null=True, editable=False, related_name='mis_bandas')
 
     class Meta:
         permissions = (
@@ -140,11 +141,12 @@ class Banda(TimeStampedModel):
 
     def save(self):
         modulos = self.ensamblado.all()
-        costo_ensamblado = CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
-                                                                empujador=self.con_empujador, torneado=self.con_torneado_varilla).first()
+        self.costo_ensamblado = CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
+                                                                     empujador=self.con_empujador,
+                                                                     torneado=self.con_torneado_varilla).first()
         porcentaje_mano_obra = 0
-        if costo_ensamblado:
-            porcentaje_mano_obra = costo_ensamblado.porcentaje / 100
+        if self.costo_ensamblado:
+            porcentaje_mano_obra = self.costo_ensamblado.porcentaje / 100
 
         if modulos:
             print('Entro a actualizar precio banda')
@@ -229,21 +231,21 @@ class Banda(TimeStampedModel):
                               self.empujador_identacion,
                           )
             nombre += (
-                              " %s"
-                              " %s"
-                              " H%s"
-                              " W%s"
-                              " D%s"
-                              " I%s"
-                          ) % \
-                          (
-                              "con Empujador",
-                              self.empujador_tipo.tipo.nombre,
-                              self.empujador_altura,
-                              self.empujador_ancho,
-                              self.empujador_distanciado,
-                              self.empujador_identacion,
-                          )
+                          " %s"
+                          " %s"
+                          " H%s"
+                          " W%s"
+                          " D%s"
+                          " I%s"
+                      ) % \
+                      (
+                          "con Empujador",
+                          self.empujador_tipo.tipo.nombre,
+                          self.empujador_altura,
+                          self.empujador_ancho,
+                          self.empujador_distanciado,
+                          self.empujador_identacion,
+                      )
         if self.con_aleta:
             referencia += (
                               "/%s"
@@ -257,15 +259,15 @@ class Banda(TimeStampedModel):
                           )
 
             nombre += (
-                              " %s"
-                              " H%s"
-                              " I%s"
-                          ) % \
-                          (
-                              "con Aleta",
-                              self.aleta_altura,
-                              self.aleta_identacion,
-                          )
+                          " %s"
+                          " H%s"
+                          " I%s"
+                      ) % \
+                      (
+                          "con Aleta",
+                          self.aleta_altura,
+                          self.aleta_identacion,
+                      )
 
         self.referencia = referencia.upper()
         self.descripcion_comercial = nombre.strip().title()
@@ -333,7 +335,7 @@ class CostoEnsambladoBlanda(models.Model):
     class Meta:
         verbose_name = '1. Costo Emsamblado'
         verbose_name_plural = '1. Costos Emsamblados'
-        unique_together = ('aleta', 'empujador','torneado')
+        unique_together = ('aleta', 'empujador', 'torneado')
 
 # endregion
 
