@@ -61,8 +61,8 @@ class Banda(TimeStampedModel):
     """
     # region Caracteristicas Comunes
     id_cguno = models.PositiveIntegerField(default=0)
-    descripcion_estandar = models.CharField(max_length=200)
-    descripcion_comercial = models.CharField(max_length=200)
+    descripcion_estandar = models.CharField(max_length=200, default='AUTOMÁTICO')
+    descripcion_comercial = models.CharField(max_length=200, default='AUTOMÁTICO')
     referencia = models.CharField(max_length=120, unique=True, null=True, blank=True)
     fabricante = models.ForeignKey(FabricanteProducto, related_name="bandas_con_fabricante")  # fabricante
     # endregion
@@ -105,6 +105,7 @@ class Banda(TimeStampedModel):
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="banda_created_by")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="banda_updated_by")
     costo_ensamblado = models.ForeignKey('CostoEnsambladoBlanda', null=True, editable=False, related_name='mis_bandas')
+    con_nombre_automatico = models.BooleanField(default=True, verbose_name='nombre automático')
 
     class Meta:
         permissions = (
@@ -270,8 +271,10 @@ class Banda(TimeStampedModel):
                       )
 
         self.referencia = referencia.upper()
-        self.descripcion_comercial = nombre.strip().title()
-        self.descripcion_estandar = self.referencia
+
+        if self.con_nombre_automatico:
+            self.descripcion_estandar = self.referencia
+            self.descripcion_comercial = nombre.strip().title()
 
     def __str__(self):
         return self.referencia

@@ -63,7 +63,7 @@ class BandaAdmin(admin.ModelAdmin):
 
     list_filter = (
         'activo', 'activo_proyectos', 'activo_componentes',
-        'activo_catalogo')
+        'activo_catalogo', 'serie__nombre')
 
     list_editable = (
         "activo",

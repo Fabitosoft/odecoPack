@@ -50,7 +50,8 @@ class ListaPreciosView(LoginRequiredMixin, ListView):
             query = "Ningun atributo de busqueda"
         context['object_list_bandas'] = Banda.activos.componentes().filter(
             Q(referencia__icontains=query) |
-            Q(descripcion_estandar__icontains=query)
+            Q(descripcion_estandar__icontains=query) |
+            Q(descripcion_comercial__icontains=query)
         ).distinct()
 
         # segun el tipo, obtiene el porcentaje que se aplicará a la lista de precios
