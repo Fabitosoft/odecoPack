@@ -1,5 +1,5 @@
 from django.contrib import admin
-
+from odeco.admin import ViewAdmin
 from proveedores.models import Proveedor, MargenProvedor
 
 
@@ -20,6 +20,15 @@ class ProveedorAdmin(admin.ModelAdmin):
 
 
 class MargenProveedorAdmin(admin.ModelAdmin):
+    list_filter = ("categoria", "proveedor")
+    list_display = ('proveedor', 'categoria', 'margen_deseado')
+    list_editable = ('margen_deseado',)
+
+    def save_model(self, request, obj, form, change):
+        if form.has_changed():
+            obj.save()
+
+class MargenProveedorAdmin2(ViewAdmin):
     list_filter = ("categoria", "proveedor")
     list_display = ('proveedor', 'categoria', 'margen_deseado')
     list_editable = ('margen_deseado',)

@@ -288,7 +288,7 @@ class Ensamblado(TimeStampedModel):
     costo_cop_linea = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
 
-    cortado_a = models.CharField(max_length=10, verbose_name="Cortado a")
+    cortado_a = models.CharField(max_length=10, verbose_name="Cortado a", default="COMPLETA")
     cantidad = models.PositiveIntegerField(verbose_name="Cantidad")
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_created_by")
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_updated_by")

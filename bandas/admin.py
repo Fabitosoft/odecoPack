@@ -7,9 +7,13 @@ from .models import Banda, Ensamblado, CostoEnsambladoBlanda
 
 # region BandasAdmin
 class EnsambladoInline(admin.TabularInline):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request).prefetch_related('producto')
+        return qs
+
     model = Ensamblado
     raw_id_fields = ("producto",)
-    readonly_fields = ("es_para_ensamblado", "precio_linea", "costo_cop_linea", "rentabilidad")
+    readonly_fields = ("es_para_ensamblado", "get_costo_producto", "precio_linea", "costo_cop_linea", "rentabilidad")
     # can_delete = False
     extra = 0
 
@@ -18,11 +22,15 @@ class EnsambladoInline(admin.TabularInline):
 
     es_para_ensamblado.boolean = True
 
-    # def formfield_for_foreignkey(self, db_field, request, **kwargs):
-    #     print(db_field)
-    #     if db_field.name=='producto':
-    #         kwargs['queryset'] = Producto.activos.modulos()
-    #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    def get_costo_producto(self, obj):
+        return obj.producto.costo
+
+
+        # def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        #     print(db_field)
+        #     if db_field.name=='producto':
+        #         kwargs['queryset'] = Producto.activos.modulos()
+        #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class BandaAdmin(admin.ModelAdmin):
@@ -160,7 +168,7 @@ class EnsambladoAdmin(admin.ModelAdmin):
 
 
 class CostoEnsambladoBlandaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'aleta', 'empujador', 'torneado','porcentaje')
+    list_display = ('nombre', 'aleta', 'empujador', 'torneado', 'porcentaje')
     list_editable = ('porcentaje',)
 
 
