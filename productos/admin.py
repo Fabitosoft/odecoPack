@@ -117,6 +117,7 @@ class ProductoAdmin(ImportExportModelAdmin):
         'activo_proyectos',
         'activo_componentes',
         'activo_catalogo',
+        'id_cguno'
     )
     search_fields = [
         'referencia',
@@ -132,10 +133,10 @@ class ProductoAdmin(ImportExportModelAdmin):
     ]
     list_filter = (
         'margen__proveedor', 'margen__categoria', 'activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes',
-        'activo_catalogo','serie')
+        'activo_catalogo', 'serie')
 
     list_editable = ['activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes', 'activo_catalogo', 'margen',
-                     'costo']
+                     'costo', 'id_cguno']
     raw_id_fields = ('margen',)
     readonly_fields = ("precio_base", "costo_cop", "rentabilidad")
 
