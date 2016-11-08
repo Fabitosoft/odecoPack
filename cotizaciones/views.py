@@ -207,7 +207,7 @@ class CotizacionView(View):
 class CotizacionEmailView(View):
     def post(self, request, *args, **kwargs):
         pk = kwargs['pk']
-        obj= Cotizacion.objects.get(pk=pk)
+        obj = Cotizacion.objects.get(pk=pk)
         if obj.estado == "INI":
             obj.razon_social = self.request.POST.get('razon_social')
             obj.nombres_contacto = self.request.POST.get('nombres_contacto')
@@ -256,6 +256,7 @@ class TareaListView(ListView):
             Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
         ).order_by('fecha_final')
         return qs
+
 
 class RemisionListView(ListView):
     model = RemisionCotizacion

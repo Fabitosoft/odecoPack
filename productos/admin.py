@@ -132,7 +132,7 @@ class ProductoAdmin(ImportExportModelAdmin):
     ]
     list_filter = (
         'margen__proveedor', 'margen__categoria', 'activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes',
-        'activo_catalogo')
+        'activo_catalogo','serie')
 
     list_editable = ['activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes', 'activo_catalogo', 'margen',
                      'costo']
