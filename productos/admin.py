@@ -101,6 +101,7 @@ class ProductoAdmin(ImportExportModelAdmin):
         return qs
 
     list_display = (
+        'id_cguno',
         'referencia',
         'descripcion_estandar',
         'unidad_medida',
@@ -116,8 +117,7 @@ class ProductoAdmin(ImportExportModelAdmin):
         'activo_ensamble',
         'activo_proyectos',
         'activo_componentes',
-        'activo_catalogo',
-        'id_cguno'
+        'activo_catalogo'
     )
     search_fields = [
         'referencia',
