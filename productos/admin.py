@@ -101,8 +101,8 @@ class ProductoAdmin(ImportExportModelAdmin):
         return qs
 
     list_display = (
-        'id_cguno',
         'referencia',
+        'id_cguno',
         'descripcion_estandar',
         'unidad_medida',
         'margen',
