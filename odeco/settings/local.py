@@ -93,7 +93,7 @@ if 'test' in sys.argv:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.mysql',
             'NAME': get_secret("DATABASE1","NAME"),
             'USER': get_secret("DATABASE1","USER"),
             'PASSWORD': get_secret("DATABASE1","PASSWORD"),
