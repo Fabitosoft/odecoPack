@@ -93,7 +93,7 @@ if 'test' in sys.argv:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.mysql',
+            'ENGINE': get_secret("DATABASE1","ENGINE"),
             'NAME': get_secret("DATABASE1","NAME"),
             'USER': get_secret("DATABASE1","USER"),
             'PASSWORD': get_secret("DATABASE1","PASSWORD"),
@@ -101,6 +101,20 @@ else:
             'PORT': get_secret("DATABASE1","PORT"),
         }
     }
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': get_secret("DATABASE3","ENGINE"),
+    #         'NAME': get_secret("DATABASE3","NAME"),
+    #         'USER': get_secret("DATABASE3","USER"),
+    #         'PASSWORD': get_secret("DATABASE3","PASSWORD"),
+    #         'HOST': get_secret("DATABASE3","HOST"),
+    #         'OPTIONS': {
+    #             'driver': 'ODBC Driver 13 for SQL Server',
+    #             'MARS_Connection': 'True',
+    #         }
+    #     }
+    # }
+
 ########## END DATABASE CONFIGURATION
 
 ########## STATIC FILE CONFIGURATION
