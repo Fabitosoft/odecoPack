@@ -12,9 +12,9 @@ class VendedorBiable(models.Model):
         (3, 'Proyectos'),
         (4, 'Sin Definir'),
     )
-    id = models.PositiveIntegerField(primary_key=True)
+    id = models.PositiveIntegerField(primary_key=True, editable=False)
     nombre = models.CharField(max_length=200)
-    linea = models.PositiveIntegerField(choices=LINEAS)
+    linea = models.PositiveIntegerField(choices=LINEAS, default=4)
 
     def __str__(self):
         return self.nombre
