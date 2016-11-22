@@ -5,5 +5,6 @@ from biable.models import VendedorBiable
 
 class VendedorBiableAdmin(admin.ModelAdmin):
     list_display = ('nombre','id','linea')
+    list_editable = ('linea',)
 
 admin.site.register(VendedorBiable,VendedorBiableAdmin)
