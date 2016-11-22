@@ -16,6 +16,10 @@ class VendedorBiable(models.Model):
     nombre = models.CharField(max_length=200)
     linea = models.PositiveIntegerField(choices=LINEAS)
 
+    def __str__(self):
+        return self.nombre
+
+
 class DataBiable(models.Model):
     vende_nombre = models.CharField(max_length=120, blank=True, null=True)
     vende_id = models.PositiveIntegerField(blank=True, null=True)
