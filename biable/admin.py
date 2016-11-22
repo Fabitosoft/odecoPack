@@ -4,6 +4,6 @@ from biable.models import VendedorBiable
 # Register your models here.
 
 class VendedorBiableAdmin(admin.ModelAdmin):
-    list_display = ('id','nombre','linea')
+    list_display = ('nombre','id','linea')
 
 admin.site.register(VendedorBiable,VendedorBiableAdmin)
