@@ -9,7 +9,7 @@ class VendedorBiable(models.Model):
     LINEAS = (
         (1, 'Proyectos'),
         (2, 'Bandas y Componentes'),
-        (3, 'Proyectos'),
+        (3, 'Posventa'),
         (4, 'Sin Definir'),
     )
     id = models.PositiveIntegerField(primary_key=True, editable=False)
