@@ -5,6 +5,17 @@ from django.db import models
 
 # Create your models here.
 
+class VendedorBiable(models.Model):
+    LINEAS = (
+        (1, 'Proyectos'),
+        (2, 'Bandas y Componentes'),
+        (3, 'Proyectos'),
+        (4, 'Sin Definir'),
+    )
+    id = models.PositiveIntegerField(primary_key=True)
+    nombre = models.CharField(max_length=200)
+    linea = models.PositiveIntegerField(choices=LINEAS)
+
 class DataBiable(models.Model):
     vende_nombre = models.CharField(max_length=120, blank=True, null=True)
     vende_id = models.PositiveIntegerField(blank=True, null=True)

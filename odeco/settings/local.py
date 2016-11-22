@@ -99,6 +99,17 @@ else:
             'PASSWORD': get_secret("DATABASE1","PASSWORD"),
             'HOST': get_secret("DATABASE1","HOST"),
             'PORT': get_secret("DATABASE1","PORT"),
+        },
+        'biable': {
+            'ENGINE': get_secret("DATABASE3","ENGINE"),
+            'NAME': get_secret("DATABASE3","NAME"),
+            'USER': get_secret("DATABASE3","USER"),
+            'PASSWORD': get_secret("DATABASE3","PASSWORD"),
+            'HOST': get_secret("DATABASE3","HOST"),
+            'OPTIONS': {
+                'driver': 'ODBC Driver 13 for SQL Server',
+                'MARS_Connection': 'True',
+            }
         }
     }
     # DATABASES = {
