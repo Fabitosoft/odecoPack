@@ -5,7 +5,7 @@ from django.db.models import F
 from django.utils import timezone
 from django.db.models.functions import TruncMonth, TruncYear
 from django.views.generic import TemplateView
-import pandas as pd
+#import pandas as pd
 # from pandas import pivot_table
 
 from biable.models import MovimientoVentaBiable
