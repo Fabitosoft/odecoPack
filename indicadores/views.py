@@ -5,7 +5,7 @@ from django.db.models import F
 from django.utils import timezone
 from django.db.models.functions import TruncMonth, TruncYear
 from django.views.generic import TemplateView
-#import pandas as pd
+import pandas as pd
 #from pandas import pivot_table
 
 from biable.models import MovimientoVentaBiable
@@ -27,9 +27,6 @@ class VentasVendedor(TemplateView):
         if self.request.GET.get('mes'):
             mes = self.request.GET.getlist('mes')
             print(mes)
-
-        a = np.array([1, 2, 3])  # Create a rank 1 array
-        print(type(a))
 
         context = super().get_context_data(**kwargs)
         ano_fin = MovimientoVentaBiable.objects.latest('fecha').fecha.year + 1
