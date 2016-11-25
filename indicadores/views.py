@@ -28,6 +28,9 @@ class VentasVendedor(TemplateView):
             mes = self.request.GET.getlist('mes')
             print(mes)
 
+        a = np.array([1, 2, 3])  # Create a rank 1 array
+        print(type(a))
+
         context = super().get_context_data(**kwargs)
         ano_fin = MovimientoVentaBiable.objects.latest('fecha').fecha.year + 1
         ano_ini = MovimientoVentaBiable.objects.earliest('fecha').fecha.year
