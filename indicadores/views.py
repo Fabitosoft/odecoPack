@@ -5,8 +5,8 @@ from django.db.models import F
 from django.utils import timezone
 from django.db.models.functions import TruncMonth, TruncYear
 from django.views.generic import TemplateView
-import pandas as pd
-from pandas import pivot_table
+# import pandas as pd
+# from pandas import pivot_table
 
 from biable.models import MovimientoVentaBiable
 
@@ -43,41 +43,41 @@ class VentasVendedor(TemplateView):
             renta=Sum('rentabilidad')
         ).filter(fecha__year=ano, fecha__month__in=mes)
 
-        if qs.exists():
-            df = pd.DataFrame.from_records(qs)
-            print(qs)
-            print(df)
-            print(df.dtypes)
-            #df[['v_neto', 'v_bruta']].apply(pd.to_numeric)
-            df[['v_neto', 'v_bruta']].apply(lambda x: pd.to_numeric(x, errors='ignore'))
-
-            df.rename(
-                columns={
-                    'vendedor_nombre': 'Vendedor',
-                    'ano': 'Año',
-                    'renta': 'Rent.',
-                    'v_neto': 'Vr. Neto.',
-                    'v_bruta': 'Vr. Bruto.',
-                },
-                inplace=True)
-
-            table = pivot_table(df,
-                                index=['Vendedor'],
-                                values=['Vr. Bruto.', 'Descuentos', 'Vr. Neto.', 'Costo', 'Rent.'],
-                                aggfunc=np.sum,
-                                fill_value=0,
-                                dropna=True
-                                )
-
-            table['margen'] = (table['Rent.'] / table['Vr. Neto.']) * 100
-
-            table.sort_values('Vr. Bruto.', ascending=False, inplace=True)
-
-            tableF = table.reindex_axis(['Vr. Bruto.', 'Descuentos', 'Vr. Neto.', 'Costo', 'Rent.', 'margen'], axis=1)
-
-            context['tabla_consulta'] = tableF.to_html(classes="table table-striped")
-            context['meses_filtro'] = mes
-            context['ano_filtro'] = ano
+        # if qs.exists():
+        #     df = pd.DataFrame.from_records(qs)
+        #     print(qs)
+        #     print(df)
+        #     print(df.dtypes)
+        #     #df[['v_neto', 'v_bruta']].apply(pd.to_numeric)
+        #     df[['v_neto', 'v_bruta']].apply(lambda x: pd.to_numeric(x, errors='ignore'))
+        #
+        #     df.rename(
+        #         columns={
+        #             'vendedor_nombre': 'Vendedor',
+        #             'ano': 'Año',
+        #             'renta': 'Rent.',
+        #             'v_neto': 'Vr. Neto.',
+        #             'v_bruta': 'Vr. Bruto.',
+        #         },
+        #         inplace=True)
+        #
+        #     table = pivot_table(df,
+        #                         index=['Vendedor'],
+        #                         values=['Vr. Bruto.', 'Descuentos', 'Vr. Neto.', 'Costo', 'Rent.'],
+        #                         aggfunc=np.sum,
+        #                         fill_value=0,
+        #                         dropna=True
+        #                         )
+        #
+        #     table['margen'] = (table['Rent.'] / table['Vr. Neto.']) * 100
+        #
+        #     table.sort_values('Vr. Bruto.', ascending=False, inplace=True)
+        #
+        #     tableF = table.reindex_axis(['Vr. Bruto.', 'Descuentos', 'Vr. Neto.', 'Costo', 'Rent.', 'margen'], axis=1)
+        #
+        #     context['tabla_consulta'] = tableF.to_html(classes="table table-striped")
+        #     context['meses_filtro'] = mes
+        #     context['ano_filtro'] = ano
 
         return context
 
