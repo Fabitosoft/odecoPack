@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
-from .views import Prueba
+from .views import VentasVendedor
 
 urlpatterns = [
-    url(r'^', Prueba.as_view(), name='lp'),
+    url(r'^ventxvend/', VentasVendedor.as_view(), name='ventasxvendedor'),
 ]

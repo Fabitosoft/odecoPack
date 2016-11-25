@@ -1,0 +1,68 @@
+{% extends 'indicadores/base_indicadores.html' %}
+{% load l10n %}
+
+{% block title %}
+    Vent x Vend
+{% endblock %}
+
+{% block titulo_indicador %}
+    Ventas por Vendedor
+{% endblock %}
+{% block indicador_contenido %}
+    <form method="get">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sx-12 col-sm-4 col-md-3">
+                    <label>Mes</label>
+                    <select name="mes" class="form-control" multiple="multiple">
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+                <div class="col-sx-12 col-sm-4 col-md-3">
+                    <label>Año</label>
+                    <select name="ano" class="form-control">
+                        {% localize off %}
+                            {% for ano in anos_list %}
+                                <option value="{{ ano }}">{{ ano }}</option>
+                            {% endfor %}
+                        {% endlocalize %}
+                    </select>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Consultar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="table-responsive">
+        <div class="row">
+            <div class="col-xs-12 col-sm-1">
+                <h3>Año:
+                    <small>{{ ano_filtro }}</small>
+                </h3>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <h3>Meses:
+                    <small>{{ meses_filtro }}</small>
+                </h3>
+            </div>
+        </div>
+        <div class="text-right">
+            {% if tabla_consulta %}
+                {{ tabla_consulta | safe }}
+            {% else %}
+                No hay registros para este filtro
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
