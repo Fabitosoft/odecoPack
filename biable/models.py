@@ -21,13 +21,15 @@ class VendedorBiable(models.Model):
 
 
 class MovimientoVentaBiable(models.Model):
+    year = models.PositiveIntegerField()
+    month = models.PositiveIntegerField()
+    day = models.PositiveIntegerField()
     vendedor = models.ForeignKey(VendedorBiable,null=True)
     id_terc_fa = models.CharField(max_length=20)
     cliente = models.CharField(max_length=200)
     proyecto = models.CharField(max_length=10)
     item_id = models.PositiveIntegerField()
     precio_uni = models.DecimalField(max_digits=18, decimal_places=4)
-    fecha = models.DateTimeField()
     cantidad = models.DecimalField(max_digits=18, decimal_places=4)
     venta_bruta = models.DecimalField(max_digits=18, decimal_places=4)
     dscto_netos = models.DecimalField(max_digits=18, decimal_places=4)
