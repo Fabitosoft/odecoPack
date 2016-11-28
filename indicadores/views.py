@@ -1,4 +1,4 @@
-import numpy as np
+# import numpy as np
 
 from django.db.models import Sum, Max, Min, Count
 from django.db.models import F
