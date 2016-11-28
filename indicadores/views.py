@@ -4,7 +4,7 @@ from django.db.models import Sum, Max, Min, Count
 from django.db.models import F
 from django.utils import timezone
 from django.views.generic import TemplateView
-# import pandas as pd
+import pandas as pd
 # from pandas import pivot_table
 
 from biable.models import MovimientoVentaBiable, VendedorBiable
