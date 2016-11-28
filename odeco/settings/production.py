@@ -6,6 +6,9 @@ import os
 from .base import *
 
 if not DEBUG:
+
+    DEBUG = False
+
     ########## MANAGER CONFIGURATION
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
     ADMINS = (
