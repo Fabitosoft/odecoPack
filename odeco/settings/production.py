@@ -7,7 +7,7 @@ from .base import *
 
 if not DEBUG:
 
-    DEBUG = False
+    DEBUG = True
 
     ########## MANAGER CONFIGURATION
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
