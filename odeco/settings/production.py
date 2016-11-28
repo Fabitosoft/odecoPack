@@ -53,10 +53,10 @@ if not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['POSTGRESQL_DB_NAME'],
-            'USER': os.environ['POSTGRESQL_DB_USER'],
-            'PASSWORD': os.environ['POSTGRESQL_DB_PASSWORD'],
-            'HOST': os.environ['POSTGRESQL_DB_HOST'],
+            'NAME': os.environ['DB_NAME'],
+            'USER': os.environ['DB_USER'],
+            'PASSWORD': os.environ['DB_PASSWORD'],
+            'HOST': os.environ['DB_HOST'],
             'PORT': "3306",
         }
     }

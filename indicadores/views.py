@@ -42,6 +42,8 @@ class VentasVendedor(TemplateView):
             renta=Sum('rentabilidad')
         ).filter(year=ano, month__in=mes)
 
+
+
         # if qs.exists():
         #     df = pd.DataFrame.from_records(qs)
         #     print(qs)
