@@ -5,13 +5,13 @@ from django.db.models import F
 from django.utils import timezone
 from django.views.generic import TemplateView
 #import pandas as pd
-try:
-    print("Entro a importar pandas")
-    from pandas import pivot_table
-    print("Salio de importar pandas")
-except ImportError:
-    print("Entro a except de import pandas")
-    raise ImportError('Aqui es donde falla la cosa')
+# try:
+#     print("Entro a importar pandas")
+#     from pandas import pivot_table
+#     print("Salio de importar pandas")
+# except ImportError:
+#     print("Entro a except de import pandas")
+#     raise ImportError('Aqui es donde falla la cosa')
 
 from biable.models import MovimientoVentaBiable, VendedorBiable
 
