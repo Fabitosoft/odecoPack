@@ -14,3 +14,8 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "odeco.settings")
 
 application = get_wsgi_application()
+
+
+# <IfModule reqtimeout_module>
+#   RequestReadTimeout header=62,MinRate=500 body=62,MinRate=500
+# </IfModule>
