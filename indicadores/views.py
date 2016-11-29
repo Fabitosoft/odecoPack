@@ -10,7 +10,6 @@ try:
 except ImportError:
     raise ImportError('Aqui es donde falla la cosa')
 
-
 from biable.models import MovimientoVentaBiable, VendedorBiable
 
 
