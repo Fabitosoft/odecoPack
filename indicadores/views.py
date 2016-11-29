@@ -5,10 +5,10 @@ from django.db.models import F
 from django.utils import timezone
 from django.views.generic import TemplateView
 #import pandas as pd
-try:
-    from pandas import pivot_table
-except ImportError:
-    raise ImportError('Aqui es donde falla la cosa')
+# try:
+#     from pandas import pivot_table
+# except ImportError:
+#     raise ImportError('Aqui es donde falla la cosa')
 
 from biable.models import MovimientoVentaBiable, VendedorBiable
 
