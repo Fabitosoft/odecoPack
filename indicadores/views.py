@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 
 from braces.views import JSONResponseMixin, AjaxResponseMixin
 
-from biable.models import MovimientoVentaBiable, VendedorBiable
+from biable.models import MovimientoVentaBiable
 
 
 # Create your views here.
@@ -31,29 +31,34 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin,TemplateView):
 
         context['anos_list'] = list(range(ano_ini, ano_fin))
 
-        qs = self.consulta(ano, mes)
-
         context['meses_filtro'] = mes
         context['ano_filtro'] = ano
         return context
 
     def post_ajax(self, request, *args, **kwargs):
-        print('entro get ajax')
-
-        qs = self.consulta(2016, [11])
-        print(list(qs))
-        return self.render_json_response(list(qs))
+        ano = self.request.POST.get('ano')
+        mes = self.request.POST.getlist('meses[]')
+        qs = self.consulta(ano, mes)
+        lista = list(qs)
+        for i in lista:
+            i["v_bruta"] = int(i["v_bruta"])
+            i["Costo"] = int(i["Costo"])
+            i["v_neto"] = int(i["v_neto"])
+            i["renta"] = int(i["renta"])
+            i["Descuentos"] = int(i["Descuentos"])
+        return self.render_json_response(lista)
 
 
     def consulta(self, ano, mes):
-        qs = MovimientoVentaBiable.objects.all().values('vendedor').annotate(
+        qs = MovimientoVentaBiable.objects.all().values('vendedor__nombre').annotate(
             vendedor_nombre=F('vendedor__nombre'),
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad')
-        ).filter(year=ano, month__in=mes)
+        ).filter(year=ano, month__in=list(map(lambda x: int(x), mes)))
+        print(qs.all().count())
         return qs
 
 

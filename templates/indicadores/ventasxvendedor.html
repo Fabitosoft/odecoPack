@@ -9,8 +9,7 @@
     Ventas por Vendedor
 {% endblock %}
 {% block indicador_contenido %}
-    {{ anos_list }}
-    <form method="get">
+    <form method="get" id="boton2">
         <div class="form-group">
             <div class="row">
                 <div class="col-sx-12 col-sm-4 col-md-3">
@@ -40,12 +39,12 @@
                         {% endlocalize %}
                     </select>
                     <br>
-                    <button type="submit" id="boton2" class="btn btn-primary">Consultar</button>
+                    <button type="submit" class="btn btn-primary">Consultar</button>
                 </div>
             </div>
         </div>
     </form>
-    <div class="table-responsive">
+    <div>
         <div class="row">
             <div class="col-xs-12 col-sm-1">
                 <h3>Año:
@@ -58,94 +57,118 @@
                 </h3>
             </div>
         </div>
-        <div class="text-right">
-            {% if tabla_consulta %}
-                {{ tabla_consulta | safe }}
-            {% else %}
-                No hay registros para este filtro
-            {% endif %}
-        </div>
     </div>
-    <div id="output"></div>
+    <div id="tabla_pv"></div>
 {% endblock %}
 
 <script>
     {% block script %}
 
-        $('#boton2').click(function (e) {
+        $('#boton2').submit(function (e) {
             e.preventDefault()
-            evento(1, 1)
+            var target = e.target;
+            var parent = target.parentElement;//parent of "target"
+            var opciones = target['mes'].selectedOptions
+            var meses = $.map(opciones, function (val, i) {
+                return parseInt(val.value)
+            });
+            evento(target['ano'].value, meses)
         })
 
-        function evento(item_id, mode) {
+        function evento(ano, meses) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
-                'item_id': item_id,
-                {#                'sell_id': {{ object.id }},#}
-                'mode': mode
+                'ano': ano,
+                'meses': meses
             };
             $.post(".", data, function (data) {
-                var utils = $.pivotUtilities;
-                var heatmap = utils.renderers["Heatmap"];
-                var sumOverSum = utils.aggregators["Sum over Sum"];
+                // pivot grid options
+                $('#tabla_pv').empty()
+                $('#tabla_pv').append('<div id =\'pgrid\'></div>')
+                var config = {
+                    dataSource: data,
+                    dataHeadersLocation: 'columns',
+                    canMoveFields: true,
+                    theme: 'blue',
+                    toolbar: {
+                        visible: true
+                    },
+                    grandTotal: {
+                        rowsvisible: true,
+                        columnsvisible: true
+                    },
+                    subTotal: {
+                        visible: true,
+                        collapsed: true
+                    },
+                    fields: [
+                        {name: 'vendedor_nombre', caption: 'Vendedor'},
+                        {
+                            name: 'v_bruta', caption: 'Valor Bruto',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'Costo', caption: 'Costo',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'v_neto', caption: 'Valor Neto',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'renta', caption: 'Rentabilidad',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'Descuentos', caption: 'Descuentos',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        }
+                    ],
+                    rows: ['vendedor_nombre'],
+                    columns: [],
+                    data: ['v_bruta','Descuentos','v_neto','Costo','renta']
+                };
 
-
-                $("#output").pivotUI(
-                        data, {
-                            rows: ["vendedor_nombre"],
-                            aggregator: sumOverSum(["v_neto"]),
-                            renderer: heatmap,
-                            aggregatorName: "Integer Sum",
-                            vals: ["v_neto",]
-                        });
-
-
+                // instantiate and show the pivot grid
+                new orb.pgridwidget(config).render(document.getElementById('pgrid'));
             });
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     {% endblock %}
 </script>
 
 {% block javascrip_external_sources %}
-    <script src="http://www.jbPivot.org/js/vendor/jbpivot.min.js"></script>
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/pivot.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/gchart_renderers.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/export_renderers.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/tips_data.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/d3_renderers.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/c3_renderers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/orb/1.0.9/orb.min.js"></script>
 {% endblock %}
 
 {% block css %}
-    <link rel="stylesheet" href="http://www.jbPivot.org/css/jbpivot.min.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/pivot.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orb/1.0.9/orb.min.css">
 {% endblock %}
