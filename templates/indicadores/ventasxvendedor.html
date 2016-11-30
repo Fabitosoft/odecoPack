@@ -9,6 +9,7 @@
     Ventas por Vendedor
 {% endblock %}
 {% block indicador_contenido %}
+    {{ anos_list }}
     <form method="get">
         <div class="form-group">
             <div class="row">
@@ -39,7 +40,7 @@
                         {% endlocalize %}
                     </select>
                     <br>
-                    <button type="submit" class="btn btn-primary">Consultar</button>
+                    <button type="submit" id="boton2" class="btn btn-primary">Consultar</button>
                 </div>
             </div>
         </div>
@@ -65,4 +66,86 @@
             {% endif %}
         </div>
     </div>
+    <div id="output"></div>
+{% endblock %}
+
+<script>
+    {% block script %}
+
+        $('#boton2').click(function (e) {
+            e.preventDefault()
+            evento(1, 1)
+        })
+
+        function evento(item_id, mode) {
+            $.ajaxSetup({
+                headers: {"X-CSRFToken": getCookie("csrftoken")}
+            });
+            var data = {
+                'item_id': item_id,
+                {#                'sell_id': {{ object.id }},#}
+                'mode': mode
+            };
+            $.post(".", data, function (data) {
+                var utils = $.pivotUtilities;
+                var heatmap = utils.renderers["Heatmap"];
+                var sumOverSum = utils.aggregators["Sum over Sum"];
+
+
+                $("#output").pivotUI(
+                        data, {
+                            rows: ["vendedor_nombre"],
+                            aggregator: sumOverSum(["v_neto"]),
+                            renderer: heatmap,
+                            aggregatorName: "Integer Sum",
+                            vals: ["v_neto",]
+                        });
+
+
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {% endblock %}
+</script>
+
+{% block javascrip_external_sources %}
+    <script src="http://www.jbPivot.org/js/vendor/jbpivot.min.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/pivot.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/gchart_renderers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/export_renderers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/tips_data.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/d3_renderers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/c3_renderers.min.js"></script>
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="http://www.jbPivot.org/css/jbpivot.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.3.0/pivot.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
 {% endblock %}
