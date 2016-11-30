@@ -1,20 +1,9 @@
-import numpy as np
-from braces.views import AjaxResponseMixin
 from django.db.models import Sum, Max, Min, Count
 from django.db.models import F
 from django.utils import timezone
 from django.views.generic import TemplateView
 
 from braces.views import JSONResponseMixin, AjaxResponseMixin
-
-import pandas as pd
-try:
-    print("Entro a importar pandas")
-    from pandas import pivot_table
-    print("Salio de importar pandas")
-except ImportError:
-    print("Entro a except de import pandas")
-    raise ImportError('Aqui es donde falla la cosa')
 
 from biable.models import MovimientoVentaBiable, VendedorBiable
 
@@ -42,40 +31,10 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin,TemplateView):
 
         context['anos_list'] = list(range(ano_ini, ano_fin))
 
-
         qs = self.consulta(ano, mes)
 
-        if qs.exists():
-            df = pd.DataFrame.from_records(qs)
-            df[['v_neto', 'v_bruta']].apply(lambda x: pd.to_numeric(x, errors='ignore'))
-
-            df.rename(
-                columns={
-                    'vendedor_nombre': 'Vendedor',
-                    'renta': 'Rent.',
-                    'v_neto': 'Vr. Neto.',
-                    'v_bruta': 'Vr. Bruto.',
-                },
-                inplace=True)
-
-            table = pivot_table(df,
-                                index=['Vendedor'],
-                                values=['Vr. Bruto.', 'Descuentos', 'Vr. Neto.', 'Costo', 'Rent.'],
-                                aggfunc=np.sum,
-                                fill_value=0,
-                                dropna=True
-                                )
-
-
-            table['margen'] = (table['Rent.'] / table['Vr. Neto.']) * 100
-
-            table.sort_values('Vr. Bruto.', ascending=False, inplace=True)
-
-            tableF = table.reindex_axis(['Vr. Bruto.', 'Descuentos', 'Vr. Neto.', 'Costo', 'Rent.', 'margen'], axis=1)
-
-            context['tabla_consulta'] = tableF.to_html(classes="table table-striped")
-            context['meses_filtro'] = mes
-            context['ano_filtro'] = ano
+        context['meses_filtro'] = mes
+        context['ano_filtro'] = ano
         return context
 
     def post_ajax(self, request, *args, **kwargs):
