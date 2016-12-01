@@ -1,0 +1,157 @@
+{% extends 'indicadores/base_indicadores.html' %}
+{% load l10n %}
+
+{% block title %}
+    Vent x Año
+{% endblock %}
+
+{% block titulo_indicador %}
+    Ventas por Mes
+{% endblock %}
+{% block indicador_contenido %}
+    <form method="get" id="form_consulta">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sx-12 col-sm-4 col-md-3">
+                    <label>Línea</label>
+                    <select name="linea" class="form-control">
+                        <option value="0">Todas</option>
+                        <option value="1">Proyectos</option>
+                        <option value="2">Bandas y Componentes</option>
+                        <option value="3">Posventa</option>
+                    </select>
+                </div>
+                <div class="col-sx-12 col-sm-4 col-md-3">
+                    <label>Año</label>
+                    <select name="ano" class="form-control">
+                        {% localize off %}
+                            {% for ano in anos_list %}
+                                <option value="{{ ano }}">{{ ano }}</option>
+                            {% endfor %}
+                        {% endlocalize %}
+                    </select>
+                </div>
+                <div class="col-sx-12 col-sm-4 col-md-3">
+                    <button type="submit" class="btn btn-primary">Consultar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div id="tabla_pv"></div>
+{% endblock %}
+
+<script>
+    {% block script %}
+        $('#form_consulta').submit(function (e) {
+            e.preventDefault()
+            var target = e.target;
+            var opciones_ano = target['ano'].value
+            var opciones_linea = target['linea'].value
+            evento(opciones_ano,opciones_linea)
+        })
+
+        function evento(ano,linea) {
+            $.ajaxSetup({
+                headers: {"X-CSRFToken": getCookie("csrftoken")}
+            });
+            var data = {
+                'ano': ano,
+                'linea': linea
+            };
+            $.post(".", data, function (data) {
+                // pivot grid options
+                $('#tabla_pv').empty()
+                $('#tabla_pv').append('<div id =\'pgrid\'></div>')
+                var config = {
+                    dataSource: data,
+                    dataHeadersLocation: 'rows',
+                    canMoveFields: true,
+                    theme: 'blue',
+                    toolbar: {
+                        visible: true
+                    },
+                    grandTotal: {
+                        rowsvisible: false,
+                        columnsvisible: true
+                    },
+                    subTotal: {
+                        visible: true,
+                        collapsed: true
+                    },
+                    fields: [
+                        {name: 'month', caption: 'Mes'},
+                        {
+                            name: 'v_bruta', caption: 'Valor Bruto',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'Costo', caption: 'Costo',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'v_neto', caption: 'Valor Neto',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'renta', caption: 'Rentabilidad',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'Descuentos', caption: 'Descuentos',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'Impuestos', caption: 'Impuestos',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'Margen', caption: 'Margen',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? Number(value).formatMoney(2, ',', '.') + '%' : '';
+                                }
+                            }
+                        }
+                    ],
+                    rows: [],
+                    columns: ['month'],
+                    data: ['v_bruta', 'Descuentos', 'Impuestos','v_neto', 'Costo', 'renta', 'Margen']
+                };
+
+                // instantiate and show the pivot grid
+                new orb.pgridwidget(config).render(document.getElementById('pgrid'));
+            });
+        }
+    {% endblock %}
+</script>

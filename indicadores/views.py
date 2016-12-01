@@ -152,12 +152,6 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_bruta') * 100),
-            linea=Case(
-                When(vendedor__linea=1, then=Value('Proyectos')),
-                When(vendedor__linea=2, then=Value('Bandas y Componentes')),
-                default=Value('Posventa'),
-                output_field=CharField(),
-            ),
         ).filter(
             year__in=list(map(lambda x: int(x), ano)),
             month__in=list(map(lambda x: int(x), mes))
@@ -167,8 +161,8 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return qs
 
 
-class FacturacionAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
-    template_name = 'indicadores/facturacionxano.html'
+class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+    template_name = 'indicadores/ventasxmes.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -214,16 +208,10 @@ class FacturacionAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return qs
 
 
-class FacturacionAnoLinea(TemplateView):
-    template_name = 'indicadores/facturacionxanoxlinea.html'
+class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+    template_name = 'indicadores/ventasxlineaxano.html'
 
     def get_context_data(self, **kwargs):
-        hoy = timezone.now()
-        ano = hoy.year
-
-        if self.request.GET.get('ano'):
-            ano = self.request.GET.get('ano')
-
         context = super().get_context_data(**kwargs)
 
         ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
@@ -232,13 +220,40 @@ class FacturacionAnoLinea(TemplateView):
 
         context['anos_list'] = list(range(ano_ini, ano_fin))
 
-        qs = MovimientoVentaBiable.objects.values('month').annotate(
+        return context
+
+    def post_ajax(self, request, *args, **kwargs):
+        ano = self.request.POST.getlist('anos[]')
+        mes = self.request.POST.getlist('meses[]')
+        linea = self.request.POST.get('linea')
+
+        qs = self.consulta(ano, mes)
+
+        if not linea == "0":
+            qs = qs.filter(vendedor__linea=linea)
+
+        lista = list(qs)
+        for i in lista:
+            i["v_bruta"] = int(i["v_bruta"])
+            i["Costo"] = int(i["Costo"])
+            i["v_neto"] = int(i["v_neto"])
+            i["renta"] = int(i["renta"])
+            i["Descuentos"] = int(i["Descuentos"])
+        return self.render_json_response(lista)
+
+    def consulta(self, ano, mes):
+        qs = MovimientoVentaBiable.objects.all().values('year').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
-            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100)
-        ).filter(year=ano)
-
-        return context
+            Impuestos=Sum('imp_netos'),
+            Margen=(Sum('rentabilidad') / Sum('venta_bruta') * 100),
+        ).filter(
+            year__in=list(map(lambda x: int(x), ano)),
+            month__in=list(map(lambda x: int(x), mes))
+        ).order_by('-v_bruta')
+        print(qs.all().count())
+        print(qs)
+        return qs
