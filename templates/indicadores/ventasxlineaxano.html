@@ -155,15 +155,6 @@
                             }
                         },
                         {
-                            name: 'Impuestos', caption: 'Impuestos',
-                            dataSettings: {
-                                aggregateFunc: 'sum',
-                                formatFunc: function (value) {
-                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
-                                }
-                            }
-                        },
-                        {
                             name: 'Margen', caption: 'Margen',
                             dataSettings: {
                                 aggregateFunc: 'sum',
@@ -175,7 +166,7 @@
                     ],
                     rows: [],
                     columns: ['year'],
-                    data: ['v_bruta', 'Descuentos', 'Impuestos', 'v_neto', 'Costo', 'renta', 'Margen']
+                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
                 };
 
                 // instantiate and show the pivot grid

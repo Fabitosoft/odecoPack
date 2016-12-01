@@ -19,6 +19,7 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
         ano_fin = ano_fin + 1
 
+
         context['anos_list'] = list(range(ano_ini, ano_fin))
 
         return context
@@ -45,7 +46,7 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
-            Margen=(Sum('rentabilidad') / Sum('venta_bruta') * 100),
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
             linea=Case(
                 When(vendedor__linea=1, then=Value('Proyectos')),
                 When(vendedor__linea=2, then=Value('Bandas y Componentes')),
@@ -96,13 +97,7 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
-            Margen=(Sum('rentabilidad') / Sum('venta_bruta') * 100),
-            linea=Case(
-                When(vendedor__linea=1, then=Value('Proyectos')),
-                When(vendedor__linea=2, then=Value('Bandas y Componentes')),
-                default=Value('Posventa'),
-                output_field=CharField(),
-            ),
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100)
         ).filter(
             year__in=list(map(lambda x: int(x), ano)),
             month__in=list(map(lambda x: int(x), mes))
@@ -151,7 +146,7 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
-            Margen=(Sum('rentabilidad') / Sum('venta_bruta') * 100),
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
             year__in=list(map(lambda x: int(x), ano)),
             month__in=list(map(lambda x: int(x), mes))
@@ -192,7 +187,6 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-            i["Impuestos"] = int(i["Impuestos"])
         return self.render_json_response(lista)
 
     def consulta(self, ano):
@@ -202,8 +196,7 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
-            Impuestos=Sum('imp_netos'),
-            Margen=(Sum('rentabilidad') / Sum('venta_bruta') * 100)
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100)
         ).filter(year=ano).order_by('month')
         return qs
 
@@ -248,8 +241,7 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
-            Impuestos=Sum('imp_netos'),
-            Margen=(Sum('rentabilidad') / Sum('venta_bruta') * 100),
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
             year__in=list(map(lambda x: int(x), ano)),
             month__in=list(map(lambda x: int(x), mes))
