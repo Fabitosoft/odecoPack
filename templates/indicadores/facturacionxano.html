@@ -13,8 +13,17 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sx-12 col-sm-4 col-md-3">
+                    <label>Línea</label>
+                    <select name="linea" class="form-control">
+                        <option value="0">Todas</option>
+                        <option value="1">Proyectos</option>
+                        <option value="2">Bandas y Componentes</option>
+                        <option value="3">Posventa</option>
+                    </select>
+                </div>
+                <div class="col-sx-12 col-sm-4 col-md-3">
                     <label>Año</label>
-                    <select name="ano" class="form-control" multiple="multiple">
+                    <select name="ano" class="form-control">
                         {% localize off %}
                             {% for ano in anos_list %}
                                 <option value="{{ ano }}">{{ ano }}</option>
@@ -36,25 +45,18 @@
         $('#form_consulta').submit(function (e) {
             e.preventDefault()
             var target = e.target;
-            var opciones_mes = target['mes'].selectedOptions
-            var opciones_ano = target['ano'].selectedOptions
-
-            var meses = $.map(opciones_mes, function (val, i) {
-                return parseInt(val.value)
-            });
-            var anos = $.map(opciones_ano, function (val, i) {
-                return parseInt(val.value)
-            });
-            evento(anos, meses)
+            var opciones_ano = target['ano'].value
+            var opciones_linea = target['linea'].value
+            evento(opciones_ano,opciones_linea)
         })
 
-        function evento(anos, meses) {
+        function evento(ano,linea) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
-                'anos': anos,
-                'meses': meses
+                'ano': ano,
+                'linea': linea
             };
             $.post(".", data, function (data) {
                 // pivot grid options
@@ -77,7 +79,7 @@
                         collapsed: true
                     },
                     fields: [
-                        {name: 'vendedor_nombre', caption: 'Vendedor'},
+                        {name: 'month', caption: 'Mes'},
                         {
                             name: 'v_bruta', caption: 'Valor Bruto',
                             dataSettings: {
@@ -122,11 +124,20 @@
                                     return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
                                 }
                             }
+                        },
+                        {
+                            name: 'Margen', caption: 'Margen',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? Number(value).formatMoney(2, ',', '.') + '%' : '';
+                                }
+                            }
                         }
                     ],
-                    rows: ['vendedor_nombre'],
+                    rows: ['month'],
                     columns: [],
-                    data: ['v_bruta','Descuentos','v_neto','Costo','renta']
+                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
                 };
 
                 // instantiate and show the pivot grid
