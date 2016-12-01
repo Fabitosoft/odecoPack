@@ -2,11 +2,11 @@
 {% load l10n %}
 
 {% block title %}
-    Fact x Año
+    Vent x Cli
 {% endblock %}
 
 {% block titulo_indicador %}
-    Facturación Año por Mes
+    Ventas por Cliente
 {% endblock %}
 {% block indicador_contenido %}
     <form method="get" id="form_consulta">
@@ -22,8 +22,25 @@
                     </select>
                 </div>
                 <div class="col-sx-12 col-sm-4 col-md-3">
+                    <label>Mes</label>
+                    <select name="mes" class="form-control" multiple="multiple">
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+                <div class="col-sx-12 col-sm-4 col-md-3">
                     <label>Año</label>
-                    <select name="ano" class="form-control">
+                    <select name="ano" class="form-control" multiple="multiple">
                         {% localize off %}
                             {% for ano in anos_list %}
                                 <option value="{{ ano }}">{{ ano }}</option>
@@ -45,17 +62,26 @@
         $('#form_consulta').submit(function (e) {
             e.preventDefault()
             var target = e.target;
-            var opciones_ano = target['ano'].value
+            var opciones_mes = target['mes'].selectedOptions
+            var opciones_ano = target['ano'].selectedOptions
             var opciones_linea = target['linea'].value
-            evento(opciones_ano,opciones_linea)
+
+            var meses = $.map(opciones_mes, function (val, i) {
+                return parseInt(val.value)
+            });
+            var anos = $.map(opciones_ano, function (val, i) {
+                return parseInt(val.value)
+            });
+            evento(anos, meses, opciones_linea)
         })
 
-        function evento(ano,linea) {
+        function evento(anos, meses, linea) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
-                'ano': ano,
+                'anos': anos,
+                'meses': meses,
                 'linea': linea
             };
             $.post(".", data, function (data) {
@@ -64,14 +90,14 @@
                 $('#tabla_pv').append('<div id =\'pgrid\'></div>')
                 var config = {
                     dataSource: data,
-                    dataHeadersLocation: 'rows',
+                    dataHeadersLocation: 'columns',
                     canMoveFields: true,
                     theme: 'blue',
                     toolbar: {
                         visible: true
                     },
                     grandTotal: {
-                        rowsvisible: false,
+                        rowsvisible: true,
                         columnsvisible: true
                     },
                     subTotal: {
@@ -79,7 +105,7 @@
                         collapsed: true
                     },
                     fields: [
-                        {name: 'month', caption: 'Mes'},
+                        {name: 'cliente', caption: 'Cliente'},
                         {
                             name: 'v_bruta', caption: 'Valor Bruto',
                             dataSettings: {
@@ -126,15 +152,6 @@
                             }
                         },
                         {
-                            name: 'Impuestos', caption: 'Impuestos',
-                            dataSettings: {
-                                aggregateFunc: 'sum',
-                                formatFunc: function (value) {
-                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
-                                }
-                            }
-                        },
-                        {
                             name: 'Margen', caption: 'Margen',
                             dataSettings: {
                                 aggregateFunc: 'sum',
@@ -144,9 +161,9 @@
                             }
                         }
                     ],
-                    rows: [],
-                    columns: ['month'],
-                    data: ['v_bruta', 'Descuentos', 'Impuestos','v_neto', 'Costo', 'renta', 'Margen']
+                    rows: ['cliente'],
+                    columns: [],
+                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
                 };
 
                 // instantiate and show the pivot grid
