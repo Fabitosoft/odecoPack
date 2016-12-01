@@ -1,5 +1,5 @@
-from django.db.models import Sum, Max, Min, Count
-from django.db.models import F
+from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F
+from django.db.models import Value
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -9,19 +9,13 @@ from biable.models import MovimientoVentaBiable
 
 
 # Create your views here.
-class VentasVendedor(JSONResponseMixin, AjaxResponseMixin,TemplateView):
+class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, TemplateView):
     template_name = 'indicadores/ventasxvendedor.html'
 
     def get_context_data(self, **kwargs):
         hoy = timezone.now()
         mes = [hoy.month]
         ano = hoy.year
-
-        if self.request.GET.get('ano'):
-            ano = self.request.GET.get('ano')
-
-        if self.request.GET.get('mes'):
-            mes = self.request.GET.getlist('mes')
 
         context = super().get_context_data(**kwargs)
 
@@ -31,13 +25,12 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin,TemplateView):
 
         context['anos_list'] = list(range(ano_ini, ano_fin))
 
-        context['meses_filtro'] = mes
-        context['ano_filtro'] = ano
         return context
 
     def post_ajax(self, request, *args, **kwargs):
-        ano = self.request.POST.get('ano')
+        ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
+
         qs = self.consulta(ano, mes)
         lista = list(qs)
         for i in lista:
@@ -48,7 +41,6 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin,TemplateView):
             i["Descuentos"] = int(i["Descuentos"])
         return self.render_json_response(lista)
 
-
     def consulta(self, ano, mes):
         qs = MovimientoVentaBiable.objects.all().values('vendedor__nombre').annotate(
             vendedor_nombre=F('vendedor__nombre'),
@@ -56,13 +48,20 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin,TemplateView):
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
-            renta=Sum('rentabilidad')
-        ).filter(year=ano, month__in=list(map(lambda x: int(x), mes)))
+            renta=Sum('rentabilidad'),
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
+            linea=Case(
+                When(vendedor__linea=1, then=Value('Proyectos')),
+                When(vendedor__linea=2, then=Value('Bandas y Componentes')),
+                default=Value('Posventa'),
+                output_field=CharField(),
+            ),
+        ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes)))
         print(qs.all().count())
         return qs
 
 
-class FacturacionAno(TemplateView):
+class FacturacionAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
     template_name = 'indicadores/facturacionxano.html'
 
     def get_context_data(self, **kwargs):
@@ -86,41 +85,35 @@ class FacturacionAno(TemplateView):
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
-            Margen = (Sum('rentabilidad') / Sum('venta_neto') * 100)
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100)
         ).filter(year=ano)
 
-
-        # if qs.exists():
-        #     print(qs.all().count())
-        #     df = pd.DataFrame.from_records(qs)
-        #     #df[['v_neto', 'v_bruta']].apply(pd.to_numeric)
-        #     df[['v_neto', 'v_bruta']].apply(lambda x: pd.to_numeric(x, errors='ignore'))
-        #
-        #     print(df)
-        #
-        #     df.rename(
-        #         columns={
-        #             'month': 'Mes',
-        #             'renta': 'Rent.',
-        #             'v_neto': 'Vr. Neto.',
-        #             'v_bruta': 'Vr. Bruto.',
-        #         },
-        #         inplace=True)
-        #
-        #     table = pivot_table(df,
-        #                         values=['Vr. Bruto.', 'Descuentos', 'Vr. Neto.', 'Costo', 'Rent.','Margen'],
-        #                         columns=['Mes'],
-        #                         aggfunc=np.sum,
-        #                         fill_value=0,
-        #                         dropna=True
-        #                         )
-        #
-        #     tableF = table.reindex_axis(['Vr. Bruto.', 'Descuentos', 'Vr. Neto.', 'Costo', 'Rent.', 'Margen'], axis=0)
-        #
-        #     context['tabla_consulta'] = tableF.to_html(classes="table table-striped")
-        #     context['ano_filtro'] = ano
-
         return context
+
+    def post_ajax(self, request, *args, **kwargs):
+        ano = self.request.POST.getlist('anos[]')
+        mes = self.request.POST.getlist('meses[]')
+
+        qs = self.consulta(ano, mes)
+        lista = list(qs)
+        for i in lista:
+            i["v_bruta"] = int(i["v_bruta"])
+            i["Costo"] = int(i["Costo"])
+            i["v_neto"] = int(i["v_neto"])
+            i["renta"] = int(i["renta"])
+            i["Descuentos"] = int(i["Descuentos"])
+        return self.render_json_response(lista)
+
+    def consulta(self, ano, mes):
+        qs = MovimientoVentaBiable.objects.all().values('vendedor__nombre').annotate(
+            vendedor_nombre=F('vendedor__nombre'),
+            v_bruta=Sum('venta_bruta'),
+            v_neto=Sum('venta_neto'),
+            Descuentos=Sum('dscto_netos'),
+            Costo=Sum('costo_total'),
+            renta=Sum('rentabilidad')
+        ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes)))
+        return qs
 
 
 class FacturacionAnoLinea(TemplateView):
@@ -141,16 +134,14 @@ class FacturacionAnoLinea(TemplateView):
 
         context['anos_list'] = list(range(ano_ini, ano_fin))
 
-
         qs = MovimientoVentaBiable.objects.values('month').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
-            Margen = (Sum('rentabilidad') / Sum('venta_neto') * 100)
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100)
         ).filter(year=ano)
-
 
         # if qs.exists():
         #     print(qs.all().count())
