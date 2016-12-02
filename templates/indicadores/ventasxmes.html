@@ -9,35 +9,39 @@
     Ventas por Mes
 {% endblock %}
 {% block indicador_contenido %}
-    <form method="get" id="form_consulta">
-        <div class="form-group">
-            <div class="row">
-                <div class="col-sx-12 col-sm-4 col-md-3">
-                    <label>Línea</label>
-                    <select name="linea" class="form-control">
-                        <option value="0">Todas</option>
-                        <option value="1">Proyectos</option>
-                        <option value="2">Bandas y Componentes</option>
-                        <option value="3">Posventa</option>
-                    </select>
-                </div>
-                <div class="col-sx-12 col-sm-4 col-md-3">
-                    <label>Año</label>
-                    <select name="ano" class="form-control">
-                        {% localize off %}
-                            {% for ano in anos_list %}
-                                <option value="{{ ano }}">{{ ano }}</option>
-                            {% endfor %}
-                        {% endlocalize %}
-                    </select>
-                </div>
-                <div class="col-sx-12 col-sm-4 col-md-3">
-                    <button type="submit" class="btn btn-primary">Consultar</button>
+    {% if perms.biable.ver_indicadores_ventas and perms.biable.ver_ventaxmes %}
+        <form method="get" id="form_consulta">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sx-12 col-sm-4 col-md-3">
+                        <label>Línea</label>
+                        <select name="linea" class="form-control">
+                            <option value="0">Todas</option>
+                            <option value="1">Proyectos</option>
+                            <option value="2">Bandas y Componentes</option>
+                            <option value="3">Posventa</option>
+                        </select>
+                    </div>
+                    <div class="col-sx-12 col-sm-4 col-md-3">
+                        <label>Año</label>
+                        <select name="ano" class="form-control">
+                            {% localize off %}
+                                {% for ano in anos_list %}
+                                    <option value="{{ ano }}">{{ ano }}</option>
+                                {% endfor %}
+                            {% endlocalize %}
+                        </select>
+                    </div>
+                    <div class="col-sx-12 col-sm-4 col-md-3">
+                        <button type="submit" class="btn btn-primary">Consultar</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
-    <div id="tabla_pv"></div>
+        </form>
+        <div id="tabla_pv"></div>
+    {% else %}
+        No tiene permisos suficientes para ver este informe
+    {% endif %}
 {% endblock %}
 
 <script>
@@ -47,10 +51,10 @@
             var target = e.target;
             var opciones_ano = target['ano'].value
             var opciones_linea = target['linea'].value
-            evento(opciones_ano,opciones_linea)
+            evento(opciones_ano, opciones_linea)
         })
 
-        function evento(ano,linea) {
+        function evento(ano, linea) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
@@ -137,7 +141,7 @@
                     ],
                     rows: [],
                     columns: ['month'],
-                    data: ['v_bruta', 'Descuentos','v_neto', 'Costo', 'renta', 'Margen']
+                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
                 };
 
                 // instantiate and show the pivot grid

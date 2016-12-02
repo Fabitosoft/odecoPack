@@ -9,44 +9,49 @@
     Ventas por Vendedor
 {% endblock %}
 {% block indicador_contenido %}
-    <form method="get" id="form_consulta">
-        <div class="form-group">
-            <div class="row">
-                <div class="col-sx-12 col-sm-4 col-md-3">
-                    <label>Mes</label>
-                    <select name="mes" class="form-control" multiple="multiple">
-                        <option value="1">Enero</option>
-                        <option value="2">Febrero</option>
-                        <option value="3">Marzo</option>
-                        <option value="4">Abril</option>
-                        <option value="5">Mayo</option>
-                        <option value="6">Junio</option>
-                        <option value="7">Julio</option>
-                        <option value="8">Agosto</option>
-                        <option value="9">Septiembre</option>
-                        <option value="10">Octubre</option>
-                        <option value="11">Noviembre</option>
-                        <option value="12">Diciembre</option>
-                    </select>
-                </div>
-                <div class="col-sx-12 col-sm-4 col-md-3">
-                    <label>Año</label>
-                    <select name="ano" class="form-control" multiple="multiple">
-                        {% localize off %}
-                            {% for ano in anos_list %}
-                                <option value="{{ ano }}">{{ ano }}</option>
-                            {% endfor %}
-                        {% endlocalize %}
-                    </select>
-                </div>
-                <div class="col-sx-12 col-sm-4 col-md-3">
-                    <button type="submit" class="btn btn-primary">Consultar</button>
+    {% if perms.biable.ver_indicadores_ventas and perms.biable.ver_ventaxvendedor %}
+        <form method="get" id="form_consulta">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sx-12 col-sm-4 col-md-3">
+                        <label>Mes</label>
+                        <select name="mes" class="form-control" multiple="multiple">
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="col-sx-12 col-sm-4 col-md-3">
+                        <label>Año</label>
+                        <select name="ano" class="form-control" multiple="multiple">
+                            {% localize off %}
+                                {% for ano in anos_list %}
+                                    <option value="{{ ano }}">{{ ano }}</option>
+                                {% endfor %}
+                            {% endlocalize %}
+                        </select>
+                    </div>
+                    <div class="col-sx-12 col-sm-4 col-md-3">
+                        <button type="submit" class="btn btn-primary">Consultar</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
-    <div id="tabla_pv"></div>
+        </form>
+        <div id="tabla_pv"></div>
+    {% else %}
+        No tiene permisos suficientes para ver este informe
+    {% endif %}
 {% endblock %}
+
 
 <script>
     {% block script %}
@@ -151,9 +156,9 @@
                             }
                         }
                     ],
-                    rows: ['linea','vendedor_nombre'],
+                    rows: ['linea', 'vendedor_nombre'],
                     columns: [],
-                    data: ['v_bruta','Descuentos','v_neto','Costo','renta','Margen']
+                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
                 };
 
                 // instantiate and show the pivot grid

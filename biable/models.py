@@ -37,3 +37,13 @@ class MovimientoVentaBiable(models.Model):
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4)
     imp_netos = models.DecimalField(max_digits=18, decimal_places=4)
     venta_neto = models.DecimalField(max_digits=18, decimal_places=4)
+
+    class Meta:
+        permissions = (
+            ('ver_ventaxvendedor', 'Ver Ventas x Vendedor'),
+            ('ver_ventaxcliente', 'Ver Ventas x Cliente'),
+            ('ver_ventaxclientexano', 'Ver Ventas x Cliente x Año'),
+            ('ver_ventaxmes', 'Ver Ventas x Mes'),
+            ('ver_ventaxlineaxano', 'Ver Ventas x Linea x Año'),
+            ('ver_indicadores_ventas', 'Ver Indicadores de Ventas'),
+        )

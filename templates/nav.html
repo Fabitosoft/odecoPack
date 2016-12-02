@@ -36,17 +36,29 @@
                         <li><a href="{% url 'bandas:listar_bandas' %}">Listar</a></li>
                     </ul>
                 </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">Indicadores<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{% url 'indicadores:ventasxvendedor' %}">Ventas x Vendedor</a></li>
-                        <li><a href="{% url 'indicadores:ventasxcliente' %}">Ventas x Cliente</a></li>
-                        <li><a href="{% url 'indicadores:ventasxclientexano' %}">Ventas x Cliente x Año</a></li>
-                        <li><a href="{% url 'indicadores:ventasxmes' %}">Ventas x Mes</a></li>
-                        <li><a href="{% url 'indicadores:ventasxlineaxano' %}">Ventas x Linea x Año</a></li>
-                    </ul>
-                </li>
+                {% if perms.biable.ver_indicadores_ventas %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">Indicadores<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            {% if perms.biable.ver_ventaxvendedor %}
+                                <li><a href="{% url 'indicadores:ventasxvendedor' %}">Ventas x Vendedor</a></li>
+                            {% endif %}
+                            {% if perms.biable.ver_ventaxcliente %}
+                                <li><a href="{% url 'indicadores:ventasxcliente' %}">Ventas x Cliente</a></li>
+                            {% endif %}
+                            {% if perms.biable.ver_ventaxclientexano %}
+                                <li><a href="{% url 'indicadores:ventasxclientexano' %}">Ventas x Cliente x Año</a></li>
+                            {% endif %}
+                            {% if perms.biable.ver_ventaxmes %}
+                                <li><a href="{% url 'indicadores:ventasxmes' %}">Ventas x Mes</a></li>
+                            {% endif %}
+                            {% if perms.biable.ver_ventaxlineaxano %}
+                                <li><a href="{% url 'indicadores:ventasxlineaxano' %}">Ventas x Linea x Año</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                {% endif %}
                 {#                <li><a href="#" class="fa fa-sign-in fa-2x" aria-hidden="true" role="button">Opcion Uno</a></li>#}
                 {% if not user.is_authenticated %}
                     <li><a href="/accounts/login/" class="fa fa-sign-in fa-2x" aria-hidden="true" role="button">
