@@ -2,32 +2,24 @@
 {% load l10n %}
 
 {% block title %}
-    Vent x Vend
+    Vent x Lin x Año x Mes
 {% endblock %}
 
 {% block titulo_indicador %}
-    Ventas por Vendedor
+    Ventas por Linea por Año por Mes
 {% endblock %}
 {% block indicador_contenido %}
-    {% if perms.biable.ver_indicadores_ventas and perms.biable.ver_ventaxvendedor %}
+    {% if perms.biable.ver_indicadores_ventas and perms.biable.ver_ventaxlineaxanoxmes %}
         <form method="get" id="form_consulta">
             <div class="form-group">
                 <div class="row">
                     <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Mes</label>
-                        <select name="mes" class="form-control" multiple="multiple">
-                            <option value="1">Enero</option>
-                            <option value="2">Febrero</option>
-                            <option value="3">Marzo</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Mayo</option>
-                            <option value="6">Junio</option>
-                            <option value="7">Julio</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Septiembre</option>
-                            <option value="10">Octubre</option>
-                            <option value="11">Noviembre</option>
-                            <option value="12">Diciembre</option>
+                        <label>Línea</label>
+                        <select name="linea" class="form-control">
+                            <option value="0">Todas</option>
+                            <option value="1">Proyectos</option>
+                            <option value="2">Bandas y Componentes</option>
+                            <option value="3">Posventa</option>
                         </select>
                     </div>
                     <div class="col-sx-12 col-sm-4 col-md-3">
@@ -46,63 +38,60 @@
                 </div>
             </div>
         </form>
-        <div id="calendar_basic"></div>
         <div id="tabla_pv"></div>
     {% else %}
         No tiene permisos suficientes para ver este informe
     {% endif %}
 {% endblock %}
 
-
 <script>
     {% block script %}
         $('#form_consulta').submit(function (e) {
             e.preventDefault()
             var target = e.target;
-            var opciones_mes = target['mes'].selectedOptions
             var opciones_ano = target['ano'].selectedOptions
+            var opciones_linea = target['linea'].value
 
-            var meses = $.map(opciones_mes, function (val, i) {
-                return parseInt(val.value)
-            });
             var anos = $.map(opciones_ano, function (val, i) {
                 return parseInt(val.value)
             });
-            evento(anos, meses)
+            evento(anos, opciones_linea)
         })
 
-        function evento(anos, meses) {
+        function evento(anos, linea) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
                 'anos': anos,
-                'meses': meses
+                'linea': linea
             };
             $.post(".", data, function (data) {
-
                 // pivot grid options
                 $('#tabla_pv').empty()
                 $('#tabla_pv').append('<div id =\'pgrid\'></div>')
                 var config = {
                     dataSource: data,
-                    dataHeadersLocation: 'columns',
+                    dataHeadersLocation: 'rows',
                     canMoveFields: true,
                     theme: 'orange',
                     toolbar: {
                         visible: true
                     },
                     grandTotal: {
-                        rowsvisible: true,
+                        rowsvisible: false,
                         columnsvisible: true
                     },
                     subTotal: {
                         visible: true,
                         collapsed: true
                     },
+                    rowSettings: {
+                        sort: {order: 'desc'}
+                    },
                     fields: [
-                        {name: 'vendedor_nombre', caption: 'Vendedor'},
-                        {name: 'linea', caption: 'Línea'},
+                        {name: 'year', caption: 'Año'},
+                        {name: 'month', caption: 'Mes'},
                         {
                             name: 'v_bruta', caption: 'Valor Bruto',
                             dataSettings: {
@@ -158,51 +147,14 @@
                             }
                         }
                     ],
-                    rows: ['linea', 'vendedor_nombre'],
-                    columns: [],
-                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
+                    rows: ['year'],
+                    columns: ['month'],
+                    data: ['v_neto']
                 };
 
                 // instantiate and show the pivot grid
                 new orb.pgridwidget(config).render(document.getElementById('pgrid'));
-{#                google.charts.load("current", {packages: ["calendar"]});#}
-{#                google.charts.setOnLoadCallback(drawChart);#}
-
             });
         }
-
-{#        function drawChart() {#}
-{#            var dataTable = new google.visualization.DataTable();#}
-{#            dataTable.addColumn({type: 'date', id: 'Date'});#}
-{#            dataTable.addColumn({type: 'number', id: 'Won/Loss'});#}
-{#            dataTable.addRows([#}
-{#                [new Date(2012, 3, 13), 37032],#}
-{#                [new Date(2012, 3, 14), 38024],#}
-{#                [new Date(2012, 3, 15), 38024],#}
-{#                [new Date(2012, 3, 16), 38108],#}
-{#                [new Date(2012, 3, 17), 38229],#}
-{#                // Many rows omitted for brevity.#}
-{#                [new Date(2013, 9, 4), 38177],#}
-{#                [new Date(2013, 9, 5), 38705],#}
-{#                [new Date(2013, 9, 12), 38210],#}
-{#                [new Date(2013, 9, 13), 38029],#}
-{#                [new Date(2013, 9, 19), 38823],#}
-{#                [new Date(2013, 9, 23), 38345],#}
-{#                [new Date(2013, 9, 24), 38436],#}
-{#                [new Date(2013, 9, 30), 38447]#}
-{#            ]);#}
-{##}
-{#            var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));#}
-{##}
-{#            var options = {#}
-{#                title: "Red Sox Attendance",#}
-{#                height: 350,#}
-{#            };#}
-{##}
-{#            chart.draw(dataTable, options);#}
-{#        }#}
-
-
-
     {% endblock %}
 </script>

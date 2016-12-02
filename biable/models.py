@@ -45,5 +45,6 @@ class MovimientoVentaBiable(models.Model):
             ('ver_ventaxclientexano', 'Ver Ventas x Cliente x Año'),
             ('ver_ventaxmes', 'Ver Ventas x Mes'),
             ('ver_ventaxlineaxano', 'Ver Ventas x Linea x Año'),
+            ('ver_ventaxlineaxanoxmes', 'Ver Ven. x Lin x Año x Mes'),
             ('ver_indicadores_ventas', 'Ver Indicadores de Ventas'),
         )

@@ -56,6 +56,9 @@
                             {% if perms.biable.ver_ventaxlineaxano %}
                                 <li><a href="{% url 'indicadores:ventasxlineaxano' %}">Ventas x Linea x Año</a></li>
                             {% endif %}
+                            {% if perms.biable.ver_ventaxlineaxanoxmes %}
+                                <li><a href="{% url 'indicadores:ventasxlineaxanoxmes' %}">Ventas x Linea x Año x Mes</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                 {% endif %}

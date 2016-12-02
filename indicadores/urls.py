@@ -5,7 +5,8 @@ from .views import (
     VentasMes,
     VentasLineaAno,
     VentasClientes,
-    VentasClientesAno
+    VentasClientesAno,
+    VentasLineaAnoMes
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     url(r'^ventxcliexano/', VentasClientesAno.as_view(), name='ventasxclientexano'),
     url(r'^ventxmes/', VentasMes.as_view(), name='ventasxmes'),
     url(r'^ventxlineaxano/', VentasLineaAno.as_view(), name='ventasxlineaxano'),
+    url(r'^ventxlineaxanoxmes/', VentasLineaAnoMes.as_view(), name='ventasxlineaxanoxmes'),
 ]
