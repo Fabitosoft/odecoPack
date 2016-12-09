@@ -99,6 +99,14 @@ else:
             'PASSWORD': get_secret("DATABASE2","PASSWORD"),
             'HOST': get_secret("DATABASE2","HOST"),
             'PORT': get_secret("DATABASE2","PORT"),
+        },
+        'biable': {
+            'ENGINE': get_secret("DATABASE4", "ENGINE"),
+            'NAME': get_secret("DATABASE4", "NAME"),
+            'USER': get_secret("DATABASE4", "USER"),
+            'PASSWORD': get_secret("DATABASE4", "PASSWORD"),
+            'HOST': get_secret("DATABASE4", "HOST"),
+            'PORT': get_secret("DATABASE4", "PORT"),
         }
     }
     # DATABASES = {

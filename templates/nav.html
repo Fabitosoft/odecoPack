@@ -59,6 +59,10 @@
                             {% if perms.biable.ver_ventaxlineaxanoxmes %}
                                 <li><a href="{% url 'indicadores:ventasxlineaxanoxmes' %}">Ventas x Linea x Año x Mes</a></li>
                             {% endif %}
+
+                            <li><a href="{% url 'indicadores:ventasxvendedorxmes' %}">Ventas x Vendedor x Mes</a></li>
+                            <li><a href="{% url 'indicadores:consolaventas' %}">Consola de Ventas</a></li>
+
                         </ul>
                     </li>
                 {% endif %}
