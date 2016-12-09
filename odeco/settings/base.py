@@ -123,7 +123,7 @@ MY_APPS = (
     'biable',
     'productos_categorias',
     'productos_caracteristicas',
-    'crm',
+    #'crm',
 )
 
 THIRD_PART_APPS = (
