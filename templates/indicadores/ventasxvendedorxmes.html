@@ -9,7 +9,7 @@
     Ventas por Vendedor por Mes
 {% endblock %}
 {% block indicador_contenido %}
-{#    {% if perms.biable.ver_indicadores_ventas and perms.biable.ver_ventaxlineaxano %}#}
+    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_9 %}
         <form method="get" id="form_consulta">
             <div class="form-group">
                 <div class="row">
@@ -39,9 +39,9 @@
             </div>
         </form>
         <div id="tabla_pv"></div>
-{#    {% else %}#}
-{#        No tiene permisos suficientes para ver este informe#}
-{#    {% endif %}#}
+    {% else %}
+        No tiene permisos suficientes para ver este informe
+    {% endif %}
 {% endblock %}
 
 <script>

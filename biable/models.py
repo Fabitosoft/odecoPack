@@ -52,11 +52,14 @@ class MovimientoVentaBiable(models.Model):
 
     class Meta:
         permissions = (
-            ('ver_ventaxvendedor', 'Ver Ventas x Vendedor'),
-            ('ver_ventaxcliente', 'Ver Ventas x Cliente'),
-            ('ver_ventaxclientexano', 'Ver Ventas x Cliente x Año'),
-            ('ver_ventaxmes', 'Ver Ventas x Mes'),
-            ('ver_ventaxlineaxano', 'Ver Ventas x Linea x Año'),
-            ('ver_ventaxlineaxanoxmes', 'Ver Ven. x Lin x Año x Mes'),
-            ('ver_indicadores_ventas', 'Ver Indicadores de Ventas'),
+            ('reportes_ventas', 'Reportes Ventas'),
+            ('reporte_ventas_1', 'R Vent Vend'),
+            ('reporte_ventas_2', 'R Conso Ventas'),
+            ('reporte_ventas_3', 'R Vent Cli'),
+            ('reporte_ventas_4', 'R Vent Cli Año'),
+            ('reporte_ventas_5', 'R Vent Cli Mes'),
+            ('reporte_ventas_6', 'R Vent Lin Año'),
+            ('reporte_ventas_7', 'R Vent Lin Año Mes'),
+            ('reporte_ventas_8', 'R Vent Mes'),
+            ('reporte_ventas_9', 'R Vent Vend Mes'),
         )

@@ -2,14 +2,14 @@
 {% load l10n %}
 
 {% block title %}
-    Vent x Cli x Año
+    Vent x Cli x Mes
 {% endblock %}
 
 {% block titulo_indicador %}
-    Ventas por Cliente por Año
+    Ventas por Cliente por Mes
 {% endblock %}
 {% block indicador_contenido %}
-    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_4 %}
+{% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_5 %}
         <form method="get" id="form_consulta">
             <div class="form-group">
                 <div class="row">
@@ -23,25 +23,8 @@
                         </select>
                     </div>
                     <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Mes</label>
-                        <select name="mes" class="form-control" multiple="multiple">
-                            <option value="1">Enero</option>
-                            <option value="2">Febrero</option>
-                            <option value="3">Marzo</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Mayo</option>
-                            <option value="6">Junio</option>
-                            <option value="7">Julio</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Septiembre</option>
-                            <option value="10">Octubre</option>
-                            <option value="11">Noviembre</option>
-                            <option value="12">Diciembre</option>
-                        </select>
-                    </div>
-                    <div class="col-sx-12 col-sm-4 col-md-3">
                         <label>Año</label>
-                        <select name="ano" class="form-control" multiple="multiple">
+                        <select name="ano" class="form-control">
                             {% localize off %}
                                 {% for ano in anos_list %}
                                     <option value="{{ ano }}">{{ ano }}</option>
@@ -66,26 +49,18 @@
         $('#form_consulta').submit(function (e) {
             e.preventDefault()
             var target = e.target;
-            var opciones_mes = target['mes'].selectedOptions
-            var opciones_ano = target['ano'].selectedOptions
+            var opciones_ano = target['ano'].value
             var opciones_linea = target['linea'].value
 
-            var meses = $.map(opciones_mes, function (val, i) {
-                return parseInt(val.value)
-            });
-            var anos = $.map(opciones_ano, function (val, i) {
-                return parseInt(val.value)
-            });
-            evento(anos, meses, opciones_linea)
+            evento(opciones_ano, opciones_linea)
         })
 
-        function evento(anos, meses, linea) {
+        function evento(ano, linea) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
-                'anos': anos,
-                'meses': meses,
+                'ano': ano,
                 'linea': linea
             };
             $.post(".", data, function (data) {
@@ -94,26 +69,24 @@
                 $('#tabla_pv').append('<div id =\'pgrid\'></div>')
                 var config = {
                     dataSource: data,
-                    dataHeadersLocation: 'columns',
+                    dataHeadersLocation: 'rows',
                     canMoveFields: true,
                     theme: 'orange',
                     toolbar: {
                         visible: true
                     },
                     grandTotal: {
-                        rowsvisible: true,
+                        rowsvisible: false,
                         columnsvisible: true
                     },
                     subTotal: {
                         visible: true,
                         collapsed: true
                     },
-                    columnSettings: {
-                        sort: {order: 'asc'}
-                    },
                     fields: [
-                        {name: 'cliente', caption: 'Cliente'},
                         {name: 'year', caption: 'Año'},
+                        {name: 'month', caption: 'Mes'},
+                        {name: 'cliente', caption: 'Vendedor'},
                         {
                             name: 'v_bruta', caption: 'Valor Bruto',
                             dataSettings: {
@@ -170,7 +143,7 @@
                         }
                     ],
                     rows: ['cliente'],
-                    columns: ['year'],
+                    columns: ['month'],
                     data: ['v_neto']
                 };
 

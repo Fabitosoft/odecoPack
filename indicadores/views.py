@@ -156,7 +156,7 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ).filter(
             year__in=list(map(lambda x: int(x), ano)),
             month__in=list(map(lambda x: int(x), mes))
-        ).order_by('-v_bruta')
+        ).order_by('-v_neto')
         print(qs.all().count())
         return qs
 
@@ -398,6 +398,54 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ).filter(
             year__in=list(map(lambda x: int(x), ano))
         ).order_by('month')
+        print(qs.all().count())
+        print(qs)
+        return qs
+
+
+class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+    template_name = 'indicadores/ventasxclientexmes.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
+        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
+        ano_fin = ano_fin + 1
+
+        context['anos_list'] = list(range(ano_ini, ano_fin))
+
+        return context
+
+    def post_ajax(self, request, *args, **kwargs):
+        ano = self.request.POST.getlist('ano')
+        linea = self.request.POST.get('linea')
+
+        qs = self.consulta(ano)
+
+        if not linea == "0":
+            qs = qs.filter(vendedor__linea=linea)
+
+        lista = list(qs)
+        for i in lista:
+            i["v_bruta"] = int(i["v_bruta"])
+            i["Costo"] = int(i["Costo"])
+            i["v_neto"] = int(i["v_neto"])
+            i["renta"] = int(i["renta"])
+            i["Descuentos"] = int(i["Descuentos"])
+        return self.render_json_response(lista)
+
+    def consulta(self, ano):
+        qs = MovimientoVentaBiable.objects.all().values('month','cliente').annotate(
+            v_bruta=Sum('venta_bruta'),
+            v_neto=Sum('venta_neto'),
+            Descuentos=Sum('dscto_netos'),
+            Costo=Sum('costo_total'),
+            renta=Sum('rentabilidad'),
+            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
+        ).filter(
+            year__in=list(map(lambda x: int(x), ano))
+        ).order_by('-v_neto','month')
         print(qs.all().count())
         print(qs)
         return qs

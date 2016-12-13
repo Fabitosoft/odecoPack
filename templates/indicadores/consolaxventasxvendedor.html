@@ -9,7 +9,7 @@
     Consola de Ventas
 {% endblock %}
 {% block indicador_contenido %}
-    {% if perms.biable.ver_indicadores_ventas and perms.biable.ver_ventaxvendedor %}
+    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_2 %}
         <form method="get" id="form_consulta">
             <div class="form-group">
                 <div class="row">
@@ -114,7 +114,7 @@
                             }
                         },
                     ],
-                    rows: [],
+                    rows: ['day'],
                     columns: ['vendedor_nombre'],
                     data: ['v_neto']
                 };

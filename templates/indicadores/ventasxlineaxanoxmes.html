@@ -9,7 +9,7 @@
     Ventas por Linea por Año por Mes
 {% endblock %}
 {% block indicador_contenido %}
-    {% if perms.biable.ver_indicadores_ventas and perms.biable.ver_ventaxlineaxanoxmes %}
+    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_7 %}
         <form method="get" id="form_consulta">
             <div class="form-group">
                 <div class="row">
