@@ -243,3 +243,22 @@ def post_save_producto(sender, instance, *args, **kwargs):
 #             ensamble.actualizar_precio_total_linea()
 
 # endregion
+
+
+class ArticuloCatalogo(models.Model):
+    refencia = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=200)
+    unidad_medida = models.CharField(max_length=100)
+    categoria = models.CharField(max_length=100, null=True, blank=True)
+    costo = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    costo_cop = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    precio_base = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    fabricante = models.ForeignKey(FabricanteProducto, verbose_name='fabricante', related_name='mis_articulos_catalogo',
+                                   on_delete=models.PROTECT)
+    margen = models.ForeignKey(MargenProvedor, null=True, blank=True, related_name="articulos_catalogo_con_margen",
+                               verbose_name="Id MxC")
+    activo = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nombre

@@ -3,9 +3,14 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
 from productos.models import (
-    Producto
+    Producto,
+    ArticuloCatalogo
 )
 
+class ArticuloCatalogoAdmin(ImportExportModelAdmin):
+    pass
+
+admin.site.register(ArticuloCatalogo,ArticuloCatalogoAdmin)
 
 # region Productos
 

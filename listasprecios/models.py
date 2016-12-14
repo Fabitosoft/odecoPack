@@ -5,7 +5,6 @@ from empresas.models import Canal
 from importaciones.models import Moneda
 from utils.models import TimeStampedModel
 
-
 class FormaPago(models.Model):
     canal = models.ForeignKey(Canal)
     forma = models.CharField(max_length=100)
@@ -17,4 +16,3 @@ class FormaPago(models.Model):
 
     def __str__(self):
         return "%s %s" % (self.canal, self.forma)
-
