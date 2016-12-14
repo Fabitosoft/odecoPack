@@ -8,6 +8,16 @@ from usuarios.models import UserExtended
 
 # Create your models here.
 
+class Actualizacion(models.Model):
+    tipo = models.CharField(max_length=100)
+    dia = models.PositiveIntegerField()
+    mes = models.PositiveIntegerField()
+    ano = models.PositiveIntegerField()
+    fecha = models.DateTimeField()
+
+    def __str__(self):
+        return '%s - %s' (self.tipo,self.fecha)
+
 class VendedorBiable(models.Model):
     LINEAS = (
         (1, 'Proyectos'),
