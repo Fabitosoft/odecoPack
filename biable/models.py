@@ -16,7 +16,15 @@ class Actualizacion(models.Model):
     fecha = models.DateTimeField()
 
     def __str__(self):
-        return '%s - %s' (self.tipo,self.fecha)
+        return '%s - %s' %(self.tipo,self.fecha)
+
+    def fecha_formateada(self):
+        fecha = '%s'%(self.fecha)
+        fecha_splited = fecha.split(sep=".",maxsplit=1)
+        fecha_splited = fecha_splited[0].split(" ")
+        formateada = 'Actualizado el %s a las %s'%(fecha_splited[0],fecha_splited[1])
+        return formateada
+
 
 class VendedorBiable(models.Model):
     LINEAS = (

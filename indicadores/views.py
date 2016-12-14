@@ -5,7 +5,11 @@ from django.views.generic import TemplateView
 
 from braces.views import JSONResponseMixin, AjaxResponseMixin
 
-from biable.models import MovimientoVentaBiable, VendedorBiableUser
+from biable.models import (
+    MovimientoVentaBiable,
+    VendedorBiableUser,
+    Actualizacion
+)
 
 
 # from crm.models import VtigerCrmentity, VtigerAccountscf
@@ -85,14 +89,16 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
-
         qs = self.consulta(ano, mes)
         lista = list(qs)
+        context = {"fecha_actualizacion":ultima_actualizacion}
         for i in lista:
             i["v_neto"] = int(i["v_neto"])
-        return self.render_json_response(lista)
+        context["lista"]=lista
+        return self.render_json_response(context)
 
     def consulta(self, ano, mes):
         qs = MovimientoVentaBiable.objects.all().values('day').annotate(
@@ -107,8 +113,6 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             ),
         ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes))
         ).exclude(vendedor__id=1).order_by('day')
-
-        print(qs.all().count())
         return qs
 
 
@@ -449,3 +453,4 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         print(qs.all().count())
         print(qs)
         return qs
+
