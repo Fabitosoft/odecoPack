@@ -89,11 +89,13 @@
                 'linea': linea
             };
             $.post(".", data, function (data) {
+                $('#hora_actualizacion').text("("+data.fecha_actualizacion+")");
+
                 // pivot grid options
                 $('#tabla_pv').empty()
                 $('#tabla_pv').append('<div id =\'pgrid\'></div>')
                 var config = {
-                    dataSource: data,
+                    dataSource: data.lista,
                     dataHeadersLocation: 'columns',
                     canMoveFields: true,
                     theme: 'orange',

@@ -80,7 +80,7 @@
                 'meses': meses
             };
             $.post(".", data, function (data) {
-                $('#hora_actualizacion').text(data.fecha_actualizacion);
+                $('#hora_actualizacion').text("("+data.fecha_actualizacion+")");
 
                 // pivot grid options
                 $('#tabla_pv').empty()

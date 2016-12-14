@@ -40,6 +40,9 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
+
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
 
@@ -51,7 +54,8 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-        return self.render_json_response(lista)
+        context["lista"] = lista
+        return self.render_json_response(context)
 
     def consulta(self, ano, mes):
         vendedores = VendedorBiableUser.objects.get(usuario__user=self.request.user).vendedores.all()
@@ -90,14 +94,16 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
+
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
         qs = self.consulta(ano, mes)
         lista = list(qs)
-        context = {"fecha_actualizacion":ultima_actualizacion}
+
         for i in lista:
             i["v_neto"] = int(i["v_neto"])
-        context["lista"]=lista
+        context["lista"] = lista
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
@@ -112,7 +118,7 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
                 output_field=CharField(),
             ),
         ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes))
-        ).exclude(vendedor__id=1).order_by('day')
+                 ).exclude(vendedor__id=1).order_by('day')
         return qs
 
 
@@ -131,6 +137,8 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
         linea = self.request.POST.get('linea')
@@ -147,7 +155,8 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-        return self.render_json_response(lista)
+        context["lista"] = lista
+        return self.render_json_response(context)
 
     def consulta(self, ano, mes):
         qs = MovimientoVentaBiable.objects.all().values('cliente').annotate(
@@ -180,6 +189,8 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
         linea = self.request.POST.get('linea')
@@ -196,7 +207,8 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-        return self.render_json_response(lista)
+        context["lista"] = lista
+        return self.render_json_response(context)
 
     def consulta(self, ano, mes):
         qs = MovimientoVentaBiable.objects.all().values('cliente', 'year').annotate(
@@ -229,6 +241,8 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
         ano = self.request.POST.get('ano')
         linea = self.request.POST.get('linea')
         qs = self.consulta(ano)
@@ -246,7 +260,8 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-        return self.render_json_response(lista)
+        context["lista"] = lista
+        return self.render_json_response(context)
 
     def consulta(self, ano):
         qs = MovimientoVentaBiable.objects.values('month').annotate(
@@ -275,6 +290,8 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
         linea = self.request.POST.get('linea')
@@ -291,7 +308,8 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-        return self.render_json_response(lista)
+        context["lista"] = lista
+        return self.render_json_response(context)
 
     def consulta(self, ano, mes):
         qs = MovimientoVentaBiable.objects.all().values('year').annotate(
@@ -325,6 +343,8 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
         ano = self.request.POST.getlist('ano')
         linea = self.request.POST.get('linea')
 
@@ -340,7 +360,8 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-        return self.render_json_response(lista)
+        context["lista"] = lista
+        return self.render_json_response(context)
 
     def consulta(self, ano):
         qs = MovimientoVentaBiable.objects.all().values('month').annotate(
@@ -374,6 +395,8 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
         ano = self.request.POST.getlist('anos[]')
         linea = self.request.POST.get('linea')
 
@@ -389,7 +412,8 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-        return self.render_json_response(lista)
+        context["lista"] = lista
+        return self.render_json_response(context)
 
     def consulta(self, ano):
         qs = MovimientoVentaBiable.objects.all().values('year', 'month').annotate(
@@ -422,6 +446,8 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return context
 
     def post_ajax(self, request, *args, **kwargs):
+        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
+        context = {"fecha_actualizacion": ultima_actualizacion}
         ano = self.request.POST.getlist('ano')
         linea = self.request.POST.get('linea')
 
@@ -437,10 +463,11 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             i["v_neto"] = int(i["v_neto"])
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
-        return self.render_json_response(lista)
+        context["lista"] = lista
+        return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = MovimientoVentaBiable.objects.all().values('month','cliente').annotate(
+        qs = MovimientoVentaBiable.objects.all().values('month', 'cliente').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -449,8 +476,7 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
             year__in=list(map(lambda x: int(x), ano))
-        ).order_by('-v_neto','month')
+        ).order_by('-v_neto', 'month')
         print(qs.all().count())
         print(qs)
         return qs
-
