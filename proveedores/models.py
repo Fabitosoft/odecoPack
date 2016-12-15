@@ -41,6 +41,10 @@ def post_save_proveedor(sender, instance, *args, **kwargs):
         for producto in qsPro:
             producto.save(factor_importacion=instance.factor_importacion, tasa=tasa)
 
+        qsArt = MxC.articulos_catalogo_con_margen.all()
+        for articulo_catalogo in qsArt:
+            articulo_catalogo.save(factor_importacion=instance.factor_importacion, tasa=tasa)
+
 
 # endregion
 
@@ -64,5 +68,8 @@ def post_save_margen_proveedor(sender, instance, *args, **kwargs):
     factor_importacion = instance.proveedor.factor_importacion
     for producto in instance.productos_con_margen.all():
         producto.save(margen_deseado=instance.margen_deseado, tasa=tasa, factor_importacion=factor_importacion)
+    for articulo_catalogo in instance.articulos_catalogo_con_margen.all():
+        articulo_catalogo.save(margen_deseado=instance.margen_deseado, tasa=tasa, factor_importacion=factor_importacion)
+
 
 # endregion

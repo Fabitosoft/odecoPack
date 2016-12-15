@@ -26,3 +26,6 @@ def post_save_margen_proveedor(sender, instance, *args, **kwargs):
             productosqs = mxc.productos_con_margen.all()
             for producto in productosqs:
                 producto.save(tasa=instance.cambio)
+            qsArt = mxc.articulos_catalogo_con_margen.all()
+            for articulo_catalogo in qsArt:
+                articulo_catalogo.save(tasa=instance.cambio)

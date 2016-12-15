@@ -120,6 +120,7 @@ class Producto(TimeStampedModel):
         super(Producto, self).__init__(*args, **kwargs)
         self.precio_base_original = self.precio_base
         self.costo_original = self.costo
+        self.margen_original = self.margen
 
     def __str__(self):
         return "%s" % (self.descripcion_comercial)
@@ -132,6 +133,9 @@ class Producto(TimeStampedModel):
 
         if not tasa and not factor_importacion and not margen and self.costo != self.costo_original:
             print("en save Cambio Costo")
+            self.set_precio_base_y_costo()
+        if self.margen != self.margen_original:
+            print("en save Cambio Margen en Producto")
             self.set_precio_base_y_costo()
         if tasa or factor_importacion or margen:
             print("en save cambio otros")
