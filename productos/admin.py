@@ -20,6 +20,7 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
     list_display = (
         'referencia',
         'nombre',
+        'get_fabricante',
         'margen',
         'costo',
         'get_moneda',
@@ -66,6 +67,14 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
             return ""
 
     get_moneda.short_description = 'Moneda'
+
+    def get_fabricante(self, obj):
+        if obj.fabricante:
+            return obj.fabricante.nombre
+        else:
+            return ""
+
+    get_fabricante.short_description = 'Fabricante'
 
 admin.site.register(ArticuloCatalogo,ArticuloCatalogoAdmin)
 
