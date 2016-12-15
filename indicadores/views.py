@@ -469,7 +469,7 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
             year__in=list(map(lambda x: int(x), ano))
-        ).order_by('-v_neto', 'month')
+        ).order_by('month')
         print(qs.all().count())
         print(qs)
         return qs
