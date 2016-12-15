@@ -208,11 +208,12 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         if not linea == "0":
             qs = qs.filter(vendedor__linea=linea)
 
-        total_fact = qs.aggregate(Sum('venta_neto'))["venta_neto__sum"]
+        max_year=qs.aggregate(Max('year'))['year__max']
+        total_fact = qs.filter(year=max_year).aggregate(Sum('venta_neto'))["venta_neto__sum"]
 
         pareto = []
         sum = 0
-        for cli in qs.values('id_terc_fa').annotate(fac=Sum('venta_neto')).order_by('-fac').all():
+        for cli in qs.values('id_terc_fa').annotate(fac=Sum('venta_neto')).filter(year=max_year).order_by('-fac').all():
             sum += (int(cli['fac']) / total_fact) * 100
             if sum <= 80:
                 pareto.append(cli['id_terc_fa'])
