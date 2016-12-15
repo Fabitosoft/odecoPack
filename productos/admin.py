@@ -8,7 +8,64 @@ from productos.models import (
 )
 
 class ArticuloCatalogoAdmin(ImportExportModelAdmin):
-    pass
+    list_filter = (
+        'margen__proveedor', 'activo', 'fabricante__nombre')
+
+    search_fields = [
+        'referencia',
+        'nombre',
+        'fabricante__nombre'
+    ]
+
+    list_display = (
+        'referencia',
+        'nombre',
+        'margen',
+        'costo',
+        'get_moneda',
+        'get_cambio_moneda',
+        'get_factor_importacion',
+        'costo_cop',
+        'get_margen',
+        'precio_base',
+        'activo'
+    )
+
+    list_editable = ['activo','margen','costo',]
+    raw_id_fields = ('margen',)
+    readonly_fields = ("precio_base", "costo_cop", "rentabilidad")
+
+    def get_margen(self, obj):
+        if obj.margen:
+            return obj.margen.margen_deseado
+        else:
+            return ""
+
+    get_margen.short_description = 'Mgn.'
+
+    def get_factor_importacion(self, obj):
+        if obj.margen:
+            return obj.margen.proveedor.factor_importacion
+        else:
+            return ""
+
+    get_factor_importacion.short_description = 'Fac. Imp'
+
+    def get_cambio_moneda(self, obj):
+        if obj.margen:
+            return obj.margen.proveedor.moneda.cambio
+        else:
+            return ""
+
+    get_cambio_moneda.short_description = 'Tasa'
+
+    def get_moneda(self, obj):
+        if obj.margen:
+            return obj.margen.proveedor.moneda
+        else:
+            return ""
+
+    get_moneda.short_description = 'Moneda'
 
 admin.site.register(ArticuloCatalogo,ArticuloCatalogoAdmin)
 

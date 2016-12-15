@@ -246,7 +246,7 @@ def post_save_producto(sender, instance, *args, **kwargs):
 
 
 class ArticuloCatalogo(models.Model):
-    refencia = models.CharField(max_length=100)
+    referencia = models.CharField(max_length=100)
     nombre = models.CharField(max_length=200)
     unidad_medida = models.CharField(max_length=100)
     categoria = models.CharField(max_length=100, null=True, blank=True)
