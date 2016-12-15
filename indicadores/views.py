@@ -109,14 +109,7 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
     def consulta(self, ano, mes):
         qs = MovimientoVentaBiable.objects.all().values('day').annotate(
             vendedor_nombre=F('vendedor__nombre'),
-            v_neto=Sum('venta_neto'),
-            Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
-            linea=Case(
-                When(vendedor__linea=1, then=Value('Proyectos')),
-                When(vendedor__linea=2, then=Value('Bandas y Componentes')),
-                default=Value('Posventa'),
-                output_field=CharField(),
-            ),
+            v_neto=Sum('venta_neto')
         ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes))
                  ).exclude(vendedor__id=1).order_by('day')
         return qs
