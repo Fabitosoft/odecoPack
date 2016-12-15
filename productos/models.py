@@ -264,18 +264,21 @@ class ArticuloCatalogo(models.Model):
         super(ArticuloCatalogo, self).__init__(*args, **kwargs)
         self.precio_base_original = self.precio_base
         self.costo_original = self.costo
+        self.margen_original = self.margen
 
     def __str__(self):
         return self.nombre
 
     def save(self, **kwargs):
-
         margen = kwargs.get("margen_deseado")
         factor_importacion = kwargs.get("factor_importacion")
         tasa = kwargs.get("tasa")
 
         if not tasa and not factor_importacion and not margen and self.costo != self.costo_original:
             print("en save Cambio Costo")
+            self.set_precio_base_y_costo()
+        if self.margen != self.margen_original:
+            print("en save Cambio Margen en Producto")
             self.set_precio_base_y_costo()
         if tasa or factor_importacion or margen:
             print("en save cambio otros")
