@@ -141,6 +141,22 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         if not linea == "0":
             qs = qs.filter(vendedor__linea=linea)
 
+        total_fact = qs.aggregate(Sum('venta_neto'))["venta_neto__sum"]
+
+        pareto = []
+        sum = 0
+        for cli in qs.values('id_terc_fa').annotate(fac=Sum('venta_neto')).order_by('-fac').all():
+            sum += (int(cli['fac']) / total_fact) * 100
+            if sum <= 80:
+                pareto.append(cli['id_terc_fa'])
+
+        qs = qs.annotate(tipo=Case(
+            When(id_terc_fa__in=pareto,
+                 then=Value('Pareto')),
+            default=Value('Otros'),
+            output_field=CharField(),
+        )).order_by('-v_neto')
+
         lista = list(qs)
         for i in lista:
             i["v_bruta"] = int(i["v_bruta"])
@@ -162,8 +178,7 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ).filter(
             year__in=list(map(lambda x: int(x), ano)),
             month__in=list(map(lambda x: int(x), mes))
-        ).order_by('-v_neto')
-        print(qs.all().count())
+        )
         return qs
 
 
@@ -193,6 +208,22 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         if not linea == "0":
             qs = qs.filter(vendedor__linea=linea)
 
+        total_fact = qs.aggregate(Sum('venta_neto'))["venta_neto__sum"]
+
+        pareto = []
+        sum = 0
+        for cli in qs.values('id_terc_fa').annotate(fac=Sum('venta_neto')).order_by('-fac').all():
+            sum += (int(cli['fac']) / total_fact) * 100
+            if sum <= 80:
+                pareto.append(cli['id_terc_fa'])
+
+        qs = qs.annotate(tipo=Case(
+            When(id_terc_fa__in=pareto,
+                 then=Value('Pareto')),
+            default=Value('Otros'),
+            output_field=CharField(),
+        )).order_by('-v_neto')
+
         lista = list(qs)
         for i in lista:
             i["v_bruta"] = int(i["v_bruta"])
@@ -214,9 +245,7 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ).filter(
             year__in=list(map(lambda x: int(x), ano)),
             month__in=list(map(lambda x: int(x), mes))
-        ).order_by('-v_bruta')
-        print(qs.all().count())
-        print(qs)
+        )
         return qs
 
 
@@ -449,6 +478,22 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         if not linea == "0":
             qs = qs.filter(vendedor__linea=linea)
 
+        total_fact = qs.aggregate(Sum('venta_neto'))["venta_neto__sum"]
+
+        pareto = []
+        sum = 0
+        for cli in qs.values('id_terc_fa').annotate(fac=Sum('venta_neto')).order_by('-fac').all():
+            sum += (int(cli['fac']) / total_fact) * 100
+            if sum <= 80:
+                pareto.append(cli['id_terc_fa'])
+
+        qs = qs.annotate(tipo=Case(
+            When(id_terc_fa__in=pareto,
+                 then=Value('Pareto')),
+            default=Value('Otros'),
+            output_field=CharField(),
+        )).order_by('month','cliente')
+
         lista = list(qs)
         for i in lista:
             i["v_bruta"] = int(i["v_bruta"])
@@ -460,7 +505,8 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = MovimientoVentaBiable.objects.all().values('month', 'cliente').annotate(
+        qs = MovimientoVentaBiable.objects.all().values('month', 'id_terc_fa').annotate(
+            cliente=F('cliente'),
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -469,7 +515,5 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
             year__in=list(map(lambda x: int(x), ano))
-        ).order_by('month')
-        print(qs.all().count())
-        print(qs)
+        )
         return qs
