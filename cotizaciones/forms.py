@@ -40,7 +40,7 @@ class CotizacionForm(ModelForm):
         super(CotizacionForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_id = 'id-cotizacionForm'
-        self.helper.form_method = "GET"
+        self.helper.form_method = "post"
 
         self.helper.form_class = 'form-inline'
         self.helper.layout = Layout(
@@ -75,7 +75,7 @@ class CotizacionForm(ModelForm):
             self.helper.layout.fields.append(crear)
         else:
             self.helper.layout.fields.append(enviar)
-            self.helper.form_method = "POST"
+            self.helper.form_method = "post"
             self.helper.form_action = reverse('cotizaciones:enviar', kwargs={'pk': self.instance.pk})
 
         self.helper.all().wrap(Field, css_class="form-control")

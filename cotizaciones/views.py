@@ -11,20 +11,27 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.views import View
-from django.views.generic import FormView
+from django.views.generic import TemplateView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import ListView
-from django.views.generic import DetailView
+from django.views.generic import DetailView, FormView
 from django.forms import inlineformset_factory
 from django.utils import timezone
 
+from listasprecios.forms import ProductoBusqueda
 from .models import (
     ItemCotizacion,
     Cotizacion,
     RemisionCotizacion,
     TareaCotizacion
 )
-from productos.models import Producto
+from productos.models import (
+    Producto,
+    ArticuloCatalogo
+)
+from bandas.models import Banda
+from .models import FormaPago
+from cotizaciones.forms import CotizacionForm
 from .forms import (
     BusquedaCotiForm,
     RemisionCotizacionForm,
@@ -383,13 +390,117 @@ class AddItem(SingleObjectMixin, View):
                 item.cantidad = 1
 
         item.cotizacion_id = coti_id
+
         if int(tipo) == 1:
             item.item_id = item_id
+        elif int(tipo) == 2:
+            item.articulo_catalogo_id = item_id
         else:
             item.banda_id = item_id
+
         item.precio = precio
         item.forma_pago_id = forma_pago_id
         item.total = int(precio) * item.cantidad
         item.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+# region Cotizador
+class CotizacionFormView(FormView):
+    def post(self, request, *args, **kwargs):
+        cotizacion = Cotizacion.objects.filter(
+            Q(usuario=self.request.user) &
+            Q(estado__exact="INI")
+        ).last()
+        if self.request.POST.get('crear') and not cotizacion:
+            cotizacion = Cotizacion()
+            cotizacion.usuario = self.request.user
+            cotizacion.razon_social = self.request.POST.get('razon_social')
+            cotizacion.nombres_contacto = self.request.POST.get('nombres_contacto')
+            cotizacion.apellidos_contacto = self.request.POST.get('apellidos_contacto')
+            cotizacion.email = self.request.POST.get('email')
+            cotizacion.nro_contacto = self.request.POST.get('nro_contacto')
+            cotizacion.ciudad = self.request.POST.get('ciudad')
+            cotizacion.pais = self.request.POST.get('pais')
+            cotizacion.fecha_envio = timezone.now()
+            cotizacion.estado = "INI"
+            cotizacion.save()
+            cotizacion.nro_cotizacion = "%s - %s" % ('CB', cotizacion.id)
+            cotizacion.save()
+
+        if self.request.POST.get('descartar') and cotizacion:
+            cotizacion.delete()
+        return HttpResponseRedirect(reverse('cotizaciones:cotizador'))
+
+
+class CotizadorTemplateView(TemplateView):
+    template_name = 'cotizaciones/cotizador.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['formu'] = ProductoBusqueda(self.request.GET or None)
+        query = self.request.GET.get("buscar")
+        if query:
+            qs_bandas = Banda.activos.componentes().filter(
+                Q(referencia__icontains=query) |
+                Q(descripcion_estandar__icontains=query) |
+                Q(descripcion_comercial__icontains=query)
+            ).distinct()
+            qs_componentes = Producto.activos.componentes().select_related("unidad_medida").filter(
+                Q(referencia__icontains=query) |
+                Q(descripcion_estandar__icontains=query) |
+                Q(descripcion_comercial__icontains=query)
+            ).distinct().order_by('-modified')
+
+            qs_articulos_catalogo = ArticuloCatalogo.objects.filter(
+                Q(activo=True) &
+                (
+                    Q(referencia__icontains=query) |
+                    Q(nombre__icontains=query) |
+                    Q(categoria__icontains=query)
+                )
+            ).distinct()
+
+            context['object_list_componentes'] = qs_componentes
+            context['object_list_articulos_catalogo'] = qs_articulos_catalogo
+            context['object_list_bandas'] = qs_bandas
+
+        # segun el tipo, obtiene el porcentaje que se aplicará a la lista de precios
+        if self.request.GET.get("tipo"):
+            context['formas_pago_porcentaje'] = FormaPago.objects.filter(
+                id=self.request.GET.get("tipo")).first().porcentaje
+        else:
+            if FormaPago.objects.all():
+                context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje
+            else:
+                context['formas_pago_porcentaje'] = 0
+
+        cotizacion = Cotizacion.objects.filter(
+            Q(usuario=self.request.user) &
+            Q(estado__exact="INI")
+        ).last()
+
+        if cotizacion:
+            context["cotizacion_form"] = CotizacionForm(instance=cotizacion)
+            context["cotizacion_form"].id = cotizacion.id
+            context["cotizacion_id"] = cotizacion.id
+            context["cotizacion_total"] = cotizacion.total
+            context["items_cotizacion"] = cotizacion.items.all()
+        else:
+            context["cotizacion_form"] = CotizacionForm()
+
+        context["forma_de_pago"] = self.request.GET.get('tipo')
+        return context
+
+
+class CotizadorView(View):
+    def get(self, request, *args, **kwargs):
+        view = CotizadorTemplateView.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        view = CotizacionFormView.as_view()
+        return view(request, *args, **kwargs)
+
+# endregion

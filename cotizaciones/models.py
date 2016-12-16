@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from bandas.models import Banda
 from utils.models import TimeStampedModel
-from productos.models import Producto
+from productos.models import Producto, ArticuloCatalogo
 from listasprecios.models import FormaPago
 
 
@@ -116,6 +116,7 @@ class ItemCotizacion(TimeStampedModel):
     cotizacion = models.ForeignKey(Cotizacion, related_name="items")
     item = models.ForeignKey(Producto, related_name="cotizaciones", null=True)
     banda = models.ForeignKey(Banda, related_name="cotizaciones", null=True)
+    articulo_catalogo = models.ForeignKey(ArticuloCatalogo, related_name="cotizaciones", null=True)
     cantidad = models.DecimalField(max_digits=18, decimal_places=3)
     precio = models.DecimalField(max_digits=18, decimal_places=0)
     forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones")
@@ -125,6 +126,8 @@ class ItemCotizacion(TimeStampedModel):
     def get_nombre_item(self):
         if self.item:
             nombre = self.item.descripcion_comercial
+        elif self.articulo_catalogo:
+            nombre = self.articulo_catalogo.nombre
         else:
             nombre = self.banda.descripcion_comercial
         return nombre
@@ -132,6 +135,8 @@ class ItemCotizacion(TimeStampedModel):
     def get_referencia_item(self):
         if self.item:
             nombre = self.item.referencia
+        elif self.articulo_catalogo:
+            nombre = self.articulo_catalogo.referencia
         else:
             nombre = self.banda.referencia
         return nombre
@@ -139,6 +144,8 @@ class ItemCotizacion(TimeStampedModel):
     def get_unidad_item(self):
         if self.item:
             nombre = self.item.unidad_medida
+        elif self.articulo_catalogo:
+            nombre = self.articulo_catalogo.unidad_medida
         else:
             nombre = "Metro"
         return nombre
@@ -146,6 +153,8 @@ class ItemCotizacion(TimeStampedModel):
     def get_costo_cop_actual_unidad(self):
         if self.item:
             costo = self.item.costo_cop
+        elif self.articulo_catalogo:
+            costo = self.articulo_catalogo.costo_cop
         else:
             costo = self.banda.costo_base_total
         return round(costo, 0)
@@ -153,6 +162,8 @@ class ItemCotizacion(TimeStampedModel):
     def get_costo_cop_actual_total(self):
         if self.item:
             costo = self.item.costo_cop
+        elif self.articulo_catalogo:
+            costo = self.articulo_catalogo.costo_cop
         else:
             costo = self.banda.costo_base_total
         return round(costo * self.cantidad, 0)

@@ -7,7 +7,10 @@ from .views import (
     CotizacionesListView,
     CambiarDiaEntregaView,
     TareaListView,
-    RemisionListView, CotizacionEmailView)
+    RemisionListView,
+    CotizacionEmailView,
+    CotizadorView
+)
 
 urlpatterns = [
     url(r'^add/(?P<item_id>[0-9]+)/(?P<precio>[0-9]+)/(?P<forma_pago>[0-9]+)/(?P<cot_id>[0-9]+)/(?P<tipo>[0-9]+)$',
@@ -20,5 +23,6 @@ urlpatterns = [
     url(r'^tareas/list/$', TareaListView.as_view(), name='listar_tareas'),
     url(r'^remisiones/list/$', RemisionListView.as_view(), name='listar_remisiones'),
     url(r'^buscar/$', CotizacionesListView.as_view(), name='buscar_cotizacion'),
+    url(r'^cotizador/', CotizadorView.as_view(), name='cotizador'),
 
 ]

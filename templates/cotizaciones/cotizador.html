@@ -3,8 +3,6 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="intranet">
-
-
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation"><a href="#cotizacion" aria-controls="cotizacion" role="tab"
@@ -14,7 +12,6 @@
                                                       data-toggle="tab">Lista de Precios</a></li>
 
         </ul>
-
         <!-- Tab panes -->
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="lista_precios">
@@ -39,7 +36,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for pro in object_list %}
+                                {% for pro in object_list_componentes %}
                                     {% obtener_precio_lp pro.precio_base formas_pago_porcentaje as precio %}
                                     <tr>
                                         <td>{{ pro.referencia }} </td>
@@ -56,6 +53,23 @@
                                         {% endif %}
                                     </tr>
                                 {% endfor %}
+                                {% for pro in object_list_articulos_catalogo %}
+                                    {% obtener_precio_lp pro.precio_base formas_pago_porcentaje as precio %}
+                                    <tr>
+                                        <td>{{ pro.referencia }} </td>
+                                        <td>{{ pro.nombre }} </td>
+                                        <td>  </td>
+                                        <td>{{ pro.unidad_medida }} </td>
+                                        <td> {{ precio }} </td>
+                                        {% if cotizacion_id %}
+                                            <td>
+                                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=2 %}">
+                                                    +
+                                                </a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
                                 {% for banda in object_list_bandas %}
                                     {% obtener_precio_lp banda.precio_total formas_pago_porcentaje as precio %}
                                     <tr>
@@ -66,7 +80,7 @@
                                         <td> {{ precio }} </td>
                                         {% if cotizacion_id %}
                                             <td>
-                                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=2 %}">
+                                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=3 %}">
                                                     +
                                                 </a>
                                             </td>
@@ -139,7 +153,8 @@
                         <div class="col-md-3">
                             {% crispy cotizacion_form %}
                             <hr/>
-                            <form method="GET">
+                            <form method="POST">
+                                {% csrf_token %}
                                 <input name="descartar" class="btn btn-primary" type="submit" value="Descartar"/>
                             </form>
                         </div>
@@ -154,6 +169,7 @@
 
     </div>
 {% endblock %}
+
 <script>
     {% block script %}
         $(".item-qty").change(function () {
@@ -186,6 +202,7 @@
         });
 
         function numberWithCommas(x) {
+            x.replace(".00", "Cop")
             var parts = x.toString().split(",");
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             return parts.join(",");
