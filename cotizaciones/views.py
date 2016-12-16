@@ -230,11 +230,18 @@ class CotizacionEmailView(View):
 
             subject, from_email, to = "%s - %s" % (
                 'Cotizacion', obj.nro_cotizacion), settings.EMAIL_HOST_USER, obj.email
-
             ctx = {
-                'avatar': request.user.user_extendido.colaborador.foto_perfil.url,
                 'object': obj,
             }
+
+            if request.user.user_extendido.colaborador:
+                if request.user.user_extendido.colaborador.foto_perfil:
+                    url_avatar = request.user.user_extendido.colaborador.foto_perfil.url
+                    ctx = {
+                        'object': obj,
+                        'avatar': url_avatar
+                    }
+
 
             text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
