@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <style type="text/css">
 
+        .img-circle {
+            border-radius: 50%;
+        }
+
         #email_body {
             padding: 20px;
         }
@@ -98,21 +102,13 @@
             <img src="{% static "www/img/logos/logo.png" %}" alt="logo"/>
         </div>
         <div>
-            <table>
-                <tr>
-                    <td colspan="2">
-                        <strong>
-                            Cotización Nro:
-                            <small>{{ object.nro_cotizacion }}</small>
-                        </strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <small>Fecha: {{ object.fecha_envio }}</small>
-                    </td>
-                </tr>
-            </table>
+            <strong>
+                Cotización Nro:
+                <small>{{ object.nro_cotizacion }}</small>
+            </strong>
+            <td colspan="2">
+                <small>Fecha: {{ object.fecha_envio }}</small>
+            </td>
         </div>
     </div>
 </header>
@@ -203,7 +199,10 @@
         <p>ODECOPACK S.A.S agradece tenernos en cuenta para sus futuros proyectos y
             por contar con nuestra compañia para suplir sus necesidades empresariales.</p>
         Atentamente...
-
+        <div>
+            <img class="img-circle" height="100" width="100"
+                 src="{{ request.user.user_extendido.colaborador.foto_perfil.url }}"/>
+        </div>
         <div class="firma">
             <p>{{ object.usuario.get_full_name }}</p>
             <p>{{ object.usuario.email }}</p>
