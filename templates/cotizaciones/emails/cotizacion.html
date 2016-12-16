@@ -97,14 +97,12 @@
 </head>
 <body id="email_body">
 <header id="email_header">
-    <div id="encabezado_cotizacion">
-        <div>
-            <img src="{% static "www/img/logos/logo.png" %}" alt="logo"/>
-        </div>
-        <div>
-            <strong>Cotización Nro:<small>{{ object.nro_cotizacion }}</small></strong>
-            <small>Fecha: {{ object.fecha_envio }}</small>
-        </div>
+    <div>
+        <img src="{% static "www/img/logos/logo.png" %}" alt="logo"/>
+    </div>
+    <div>
+        <h1><strong>Cotización Nro:<small>{{ object.nro_cotizacion }}</small></strong></h1>
+        <h3><small>Fecha: {{ object.fecha_envio }}</small></h3>
     </div>
 </header>
 <div class="texto_mensaje">
