@@ -199,11 +199,12 @@
         <p>ODECOPACK S.A.S agradece tenernos en cuenta para sus futuros proyectos y
             por contar con nuestra compañia para suplir sus necesidades empresariales.</p>
         Atentamente...
-        {{ avatar }}
-        <div>
-            <img class="img-circle" height="100" width="100"
-                 src="{{ avatar }}"/>
-        </div>
+        {% if avatar %}
+            <div>
+                <img class="img-circle" height="100" width="100"
+                     src="{{ avatar }}"/>
+            </div>
+        {% endif %}
         <div class="firma">
             <p>{{ object.usuario.get_full_name }}</p>
             <p>{{ object.usuario.email }}</p>
