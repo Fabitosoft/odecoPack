@@ -98,7 +98,7 @@
 <body id="email_body">
 <header id="email_header">
     <div id="encabezado_cotizacion">
-        <div style="float: left">
+        <div>
             <img src="{% static "www/img/logos/logo.png" %}" alt="logo"/>
         </div>
         <div>
@@ -201,7 +201,7 @@
         Atentamente...
         <div>
             <img class="img-circle" height="100" width="100"
-                 src="{{ request.user.user_extendido.colaborador.foto_perfil.url }}"/>
+                 src="{{ avatar }}"/>
         </div>
         <div class="firma">
             <p>{{ object.usuario.get_full_name }}</p>

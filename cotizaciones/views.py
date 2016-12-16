@@ -232,6 +232,7 @@ class CotizacionEmailView(View):
                 'Cotizacion', obj.nro_cotizacion), settings.EMAIL_HOST_USER, obj.email
 
             ctx = {
+                'avatar': request.user.user_extendido.colaborador.foto_perfil.url,
                 'object': obj,
             }
 
