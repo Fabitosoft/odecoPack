@@ -102,13 +102,8 @@
             <img src="{% static "www/img/logos/logo.png" %}" alt="logo"/>
         </div>
         <div>
-            <strong>
-                Cotización Nro:
-                <small>{{ object.nro_cotizacion }}</small>
-            </strong>
-            <td colspan="2">
-                <small>Fecha: {{ object.fecha_envio }}</small>
-            </td>
+            <strong>Cotización Nro:<small>{{ object.nro_cotizacion }}</small></strong>
+            <small>Fecha: {{ object.fecha_envio }}</small>
         </div>
     </div>
 </header>
