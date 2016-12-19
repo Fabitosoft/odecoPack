@@ -94,8 +94,14 @@ class BandaAdmin(admin.ModelAdmin):
         'activo_componentes',
         'activo_catalogo',
     )
-    # readonly_fields = (
-    #     "precio_total", "costo_base_total", "rentabilidad", "referencia", "costo_mano_obra", "precio_banda")
+    readonly_fields = (
+        "get_costo_cop",
+        "get_precio_base",
+        'get_costo_mano_obra',
+        "get_precio_total",
+        "rentabilidad",
+        "referencia"
+    )
 
     fieldsets = (
         ('Informacion General', {
@@ -144,15 +150,14 @@ class BandaAdmin(admin.ModelAdmin):
                 'aleta_identacion'
             ),
         }),
-        # ('Precio y Costo', {
-        #     'fields': (
-        #         'costo_base_total',
-        #         'precio_banda',
-        #         'rentabilidad',
-        #         'costo_mano_obra',
-        #         'precio_total',
-        #     ),
-        # }),
+        ('Precio y Costo', {
+            'fields': (
+                "get_costo_cop",
+                "get_precio_base",
+                'get_costo_mano_obra',
+                "get_precio_total",
+            ),
+        }),
     )
 
     inlines = [

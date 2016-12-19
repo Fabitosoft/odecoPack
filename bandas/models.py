@@ -341,16 +341,6 @@ class Ensamblado(TimeStampedModel):
         return round(self.get_precio_base_linea() - self.get_costo_cop_linea(), 0)
 
 
-# @receiver(post_save, sender=Ensamblado)
-# def post_save_ensamblado(sender, instance, *args, **kwargs):
-#     instance.banda.actualizar_precio_total()
-#
-#
-# @receiver(post_delete, sender=Ensamblado)
-# def post_delete_ensamblado(sender, instance, *args, **kwargs):
-#     instance.banda.actualizar_precio_total()
-
-
 # endregion
 
 # region CostoEnsamblado
