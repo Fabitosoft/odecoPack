@@ -59,7 +59,7 @@ class MargenProvedor(TimeStampedModel):
         unique_together = ("categoria", "proveedor")
 
     def __str__(self):
-        return "%s - %s" % (self.proveedor, self.categoria)
+        return "%s - %s" % (self.proveedor.nombre, self.categoria.nombre)
 
 
 @receiver(post_save, sender=MargenProvedor)

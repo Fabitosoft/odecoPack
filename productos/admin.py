@@ -8,13 +8,21 @@ from productos.models import (
 )
 
 class ArticuloCatalogoAdmin(ImportExportModelAdmin):
+    list_select_related = (
+        'margen',
+        'margen__proveedor',
+        'margen__categoria',
+        'margen__proveedor__moneda',
+        'fabricante'
+    )
+
     list_filter = (
         'margen__proveedor', 'activo', 'fabricante__nombre')
 
     search_fields = [
         'referencia',
         'nombre',
-        'fabricante__nombre'
+        'fabricante__nombre',
     ]
 
     list_display = (
@@ -26,15 +34,16 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
         'get_moneda',
         'get_cambio_moneda',
         'get_factor_importacion',
-        'costo_cop',
+        'get_costo_cop',
         'get_margen',
-        'precio_base',
-        'activo'
+        'get_precio_base',
+        'get_rentabilidad',
+        'activo',
     )
 
     list_editable = ['activo','margen','costo',]
     raw_id_fields = ('margen',)
-    readonly_fields = ("precio_base", "costo_cop", "rentabilidad")
+    readonly_fields = ("get_precio_base", "get_costo_cop", "get_rentabilidad")
 
     def get_margen(self, obj):
         if obj.margen:
@@ -75,6 +84,18 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
             return ""
 
     get_fabricante.short_description = 'Fabricante'
+
+    def get_costo_cop(self, obj):
+        return obj.get_costo_cop()
+    get_costo_cop.short_description = 'Costo Cop'
+
+    def get_precio_base(self, obj):
+        return obj.get_precio_base()
+    get_precio_base.short_description = 'Precio Base'
+
+    def get_rentabilidad(self, obj):
+        return obj.get_rentabilidad()
+    get_rentabilidad.short_description = 'Rentabilidad'
 
 admin.site.register(ArticuloCatalogo,ArticuloCatalogoAdmin)
 

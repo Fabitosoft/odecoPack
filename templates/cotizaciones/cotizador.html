@@ -54,7 +54,7 @@
                                     </tr>
                                 {% endfor %}
                                 {% for pro in object_list_articulos_catalogo %}
-                                    {% obtener_precio_lp pro.precio_base formas_pago_porcentaje as precio %}
+                                    {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
                                     <tr>
                                         <td>{{ pro.referencia }} </td>
                                         <td>{{ pro.nombre }} </td>
