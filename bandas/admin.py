@@ -83,6 +83,10 @@ class BandaAdmin(admin.ModelAdmin):
         return self.precio_base+self.costo_mano_obra
     get_precio_total.short_description = 'Precio Total'
 
+    def get_rentabilidad(self, obj):
+        return self.precio_base-self.costo_base
+    get_rentabilidad.short_description = 'Rentabilidad'
+
     search_fields = [
         'referencia',
         'descripcion_estandar',
@@ -110,6 +114,7 @@ class BandaAdmin(admin.ModelAdmin):
         "get_precio_base",
         'get_costo_mano_obra',
         "get_precio_total",
+        "get_rentabilidad",
         "referencia"
     )
 
@@ -164,6 +169,7 @@ class BandaAdmin(admin.ModelAdmin):
             'fields': (
                 "get_costo_cop",
                 "get_precio_base",
+                "get_rentabilidad",
                 'get_costo_mano_obra',
                 "get_precio_total",
             ),
