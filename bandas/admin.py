@@ -9,7 +9,7 @@ from .models import Banda, Ensamblado, CostoEnsambladoBlanda
 class EnsambladoInline(admin.TabularInline):
     model = Ensamblado
     raw_id_fields = ("producto",)
-    readonly_fields = ("es_para_ensamblado", "get_costo_producto", "get_precio_base_linea", "get_costo_cop_linea", "get_rentabilidad_linea")
+    readonly_fields = ("es_para_ensamblado", "get_costo_producto", "get_costo_cop_linea", "get_precio_base_linea", "get_rentabilidad_linea")
     can_delete = False
     extra = 0
 
@@ -22,6 +22,10 @@ class EnsambladoInline(admin.TabularInline):
         return obj.producto.costo
     get_costo_producto.short_description = 'Costo'
 
+    def get_costo_cop(self, obj):
+        return obj.producto.get_costo_cop()
+    get_costo_cop.short_description = 'Costo Cop'
+
     def get_costo_cop_linea(self, obj):
         return obj.get_costo_cop_linea()
     get_costo_cop_linea.short_description = 'Costo Cop Linea'
@@ -33,13 +37,6 @@ class EnsambladoInline(admin.TabularInline):
     def get_rentabilidad_linea(self, obj):
         return obj.get_rentabilidad_linea()
     get_rentabilidad_linea.short_description = 'Rentabilidad'
-
-
-        # def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        #     print(db_field)
-        #     if db_field.name=='producto':
-        #         kwargs['queryset'] = Producto.activos.modulos()
-        #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class BandaAdmin(admin.ModelAdmin):
