@@ -99,7 +99,6 @@ class BandaAdmin(admin.ModelAdmin):
         "get_precio_base",
         'get_costo_mano_obra',
         "get_precio_total",
-        "rentabilidad",
         "referencia"
     )
 
