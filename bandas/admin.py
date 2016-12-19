@@ -9,7 +9,7 @@ from .models import Banda, Ensamblado, CostoEnsambladoBlanda
 class EnsambladoInline(admin.TabularInline):
     model = Ensamblado
     raw_id_fields = ("producto",)
-    readonly_fields = ("es_para_ensamblado", "get_costo_producto", "get_costo_cop_linea", "get_precio_base_linea", "get_rentabilidad_linea")
+    readonly_fields = ("es_para_ensamblado","get_costo_cop", "get_costo_producto", "get_costo_cop_linea", "get_precio_base_linea", "get_rentabilidad_linea")
     can_delete = False
     extra = 0
 
