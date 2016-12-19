@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from importaciones.models import Moneda
 from utils.models import TimeStampedModel
@@ -20,30 +18,11 @@ class Proveedor(TimeStampedModel):
         through_fields=('proveedor', 'categoria')
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.factor_importacion_original = self.factor_importacion
-
     class Meta:
         verbose_name_plural = "1. Proveedores"
 
     def __str__(self):
         return self.nombre
-
-
-@receiver(post_save, sender=Proveedor)
-def post_save_proveedor(sender, instance, *args, **kwargs):
-    tasa = instance.moneda.cambio
-    print("Entro a cambiar factor de importacion")
-    qsMxC = instance.mis_margenes_por_categoria.all()
-    for MxC in qsMxC:
-        qsPro = MxC.productos_con_margen.all()
-        for producto in qsPro:
-            producto.save(factor_importacion=instance.factor_importacion, tasa=tasa)
-
-        qsArt = MxC.articulos_catalogo_con_margen.all()
-        for articulo_catalogo in qsArt:
-            articulo_catalogo.save(factor_importacion=instance.factor_importacion, tasa=tasa)
 
 
 # endregion
@@ -60,16 +39,5 @@ class MargenProvedor(TimeStampedModel):
 
     def __str__(self):
         return "%s - %s" % (self.proveedor.nombre, self.categoria.nombre)
-
-
-@receiver(post_save, sender=MargenProvedor)
-def post_save_margen_proveedor(sender, instance, *args, **kwargs):
-    tasa = instance.proveedor.moneda.cambio
-    factor_importacion = instance.proveedor.factor_importacion
-    for producto in instance.productos_con_margen.all():
-        producto.save(margen_deseado=instance.margen_deseado, tasa=tasa, factor_importacion=factor_importacion)
-    for articulo_catalogo in instance.articulos_catalogo_con_margen.all():
-        articulo_catalogo.save(margen_deseado=instance.margen_deseado, tasa=tasa, factor_importacion=factor_importacion)
-
 
 # endregion

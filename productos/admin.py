@@ -184,13 +184,19 @@ class ProductoAdmin(ImportExportModelAdmin):
         activar_seleccionados_ensamble
     ]
 
-    def get_queryset(self, request):
-        qs = Producto.objects.select_related(
-            "margen__proveedor__moneda",
-            "unidad_medida",
-            "margen__categoria",
-        ).all()
-        return qs
+    def get_object(self, request, object_id, from_field=None):
+        obj = super().get_object(request, object_id, from_field)
+        print('entro get object')
+        return obj
+
+    list_select_related = (
+        "unidad_medida",
+        'margen',
+        'margen__proveedor',
+        'margen__categoria',
+        'margen__proveedor__moneda',
+        'categoria_dos_por_categoria',
+    )
 
     list_display = (
         'referencia',
@@ -202,9 +208,10 @@ class ProductoAdmin(ImportExportModelAdmin):
         'get_moneda',
         'get_cambio_moneda',
         'get_factor_importacion',
-        'costo_cop',
+        'get_costo_cop',
         'get_margen',
-        'precio_base',
+        'get_precio_base',
+        'get_rentabilidad',
         'activo',
         'activo_ensamble',
         'activo_proyectos',
@@ -263,6 +270,18 @@ class ProductoAdmin(ImportExportModelAdmin):
             return ""
 
     get_moneda.short_description = 'Moneda'
+
+    def get_costo_cop(self, obj):
+        return obj.get_costo_cop()
+    get_costo_cop.short_description = 'Costo Cop'
+
+    def get_precio_base(self, obj):
+        return obj.get_precio_base()
+    get_precio_base.short_description = 'Precio Base'
+
+    def get_rentabilidad(self, obj):
+        return obj.get_rentabilidad()
+    get_rentabilidad.short_description = 'Rentabilidad'
 
     def save_model(self, request, obj, form, change):
         obj.get_nombre_automatico('estandar')

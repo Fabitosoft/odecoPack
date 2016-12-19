@@ -13,7 +13,7 @@ class EnsambladoInline(admin.TabularInline):
 
     model = Ensamblado
     raw_id_fields = ("producto",)
-    readonly_fields = ("es_para_ensamblado", "get_costo_producto", "precio_linea", "costo_cop_linea", "rentabilidad")
+    # readonly_fields = ("es_para_ensamblado", "get_costo_producto", "precio_linea", "costo_cop_linea", "rentabilidad")
     # can_delete = False
     extra = 0
 
@@ -34,6 +34,10 @@ class EnsambladoInline(admin.TabularInline):
 
 
 class BandaAdmin(admin.ModelAdmin):
+    precio_base = 0
+    costo_base = 0
+    costo_mano_obra = 0
+
     list_display = (
         "referencia",
         "descripcion_comercial",
@@ -46,12 +50,31 @@ class BandaAdmin(admin.ModelAdmin):
         'activo_proyectos',
         'activo_componentes',
         'activo_catalogo',
-        "costo_base_total",
-        "precio_banda",
-        "rentabilidad",
-        'costo_mano_obra',
-        "precio_total",
+        "get_costo_cop",
+        "get_precio_base",
+        # "rentabilidad",
+        'get_costo_mano_obra',
+        "get_precio_total",
     )
+
+    def get_costo_cop(self, obj):
+        self.costo_base = obj.get_costo_cop()
+        return self.costo_base
+    get_costo_cop.short_description = 'Costo Cop'
+
+    def get_precio_base(self, obj):
+        self.precio_base = obj.get_precio_base()
+        return self.precio_base
+    get_precio_base.short_description = 'Precio Base'
+
+    def get_costo_mano_obra(self, obj):
+        self.costo_mano_obra =obj.get_porcentaje_costo_mano_obra()*self.precio_base
+        return self.costo_mano_obra
+    get_costo_mano_obra.short_description = 'Costo Mano Obra'
+
+    def get_precio_total(self, obj):
+        return self.precio_base+self.costo_mano_obra
+    get_precio_total.short_description = 'Precio Total'
 
     search_fields = [
         'referencia',
@@ -71,8 +94,8 @@ class BandaAdmin(admin.ModelAdmin):
         'activo_componentes',
         'activo_catalogo',
     )
-    readonly_fields = (
-        "precio_total", "costo_base_total", "rentabilidad", "referencia", "costo_mano_obra", "precio_banda")
+    # readonly_fields = (
+    #     "precio_total", "costo_base_total", "rentabilidad", "referencia", "costo_mano_obra", "precio_banda")
 
     fieldsets = (
         ('Informacion General', {
@@ -121,15 +144,15 @@ class BandaAdmin(admin.ModelAdmin):
                 'aleta_identacion'
             ),
         }),
-        ('Precio y Costo', {
-            'fields': (
-                'costo_base_total',
-                'precio_banda',
-                'rentabilidad',
-                'costo_mano_obra',
-                'precio_total',
-            ),
-        }),
+        # ('Precio y Costo', {
+        #     'fields': (
+        #         'costo_base_total',
+        #         'precio_banda',
+        #         'rentabilidad',
+        #         'costo_mano_obra',
+        #         'precio_total',
+        #     ),
+        # }),
     )
 
     inlines = [
@@ -173,5 +196,5 @@ class CostoEnsambladoBlandaAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Banda, BandaAdmin)
-admin.site.register(Ensamblado, EnsambladoAdmin)
+# admin.site.register(Ensamblado, EnsambladoAdmin)
 admin.site.register(CostoEnsambladoBlanda, CostoEnsambladoBlandaAdmin)

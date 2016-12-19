@@ -117,14 +117,52 @@ class Banda(TimeStampedModel):
     activo_componentes = models.BooleanField(default=False, verbose_name="En Compo.")
     activo_proyectos = models.BooleanField(default=False, verbose_name="En Proy.")
     activo_catalogo = models.BooleanField(default=False, verbose_name="En Cata.")
+
     # endregion
 
     # region Precios y Costos
-    precio_banda = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    precio_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    costo_base_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    costo_mano_obra = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+
+    def get_costo_cop(self):
+        modulos = self.ensamblado.select_related(
+            'producto',
+            'producto__margen__proveedor',
+            'producto__margen__proveedor__moneda',
+        ).all()
+        if modulos:
+            costo = 0
+            for modulo in modulos:
+                costo += modulo.get_costo_cop_linea()
+            return costo
+        return 0
+
+    def get_precio_base(self):
+        modulos = self.ensamblado.select_related(
+            'producto',
+            'producto__margen__proveedor',
+            'producto__margen__proveedor__moneda',
+        ).all()
+        if modulos:
+            precio = 0
+            for modulo in modulos:
+                precio += modulo.get_precio_base_linea()
+            return precio
+        return 0
+
+    def get_porcentaje_costo_mano_obra(self):
+        CostoEnsambladoBlanda.objects.filter(
+            aleta=self.con_aleta,
+            empujador=self.con_empujador,
+            torneado=self.con_torneado_varilla
+        ).first()
+        if self.costo_ensamblado:
+            return self.costo_ensamblado.porcentaje / 100
+        return 0
+
+    # precio_banda = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    # precio_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    # costo_base_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    # rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    # costo_mano_obra = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     # endregion
 
     objects = models.Manager()
@@ -140,36 +178,33 @@ class Banda(TimeStampedModel):
         verbose_name_plural = '3. Bandas'
         verbose_name = '3. Banda'
 
-    def save(self):
-        modulos = self.ensamblado.all()
-        self.costo_ensamblado = CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
-                                                                     empujador=self.con_empujador,
-                                                                     torneado=self.con_torneado_varilla).first()
-        porcentaje_mano_obra = 0
-        if self.costo_ensamblado:
-            porcentaje_mano_obra = self.costo_ensamblado.porcentaje / 100
-
-        if modulos:
-            print('Entro a actualizar precio banda')
-            precio = modulos.aggregate(precio=Sum('precio_linea'))['precio']
-            self.precio_banda = precio
-            costo_base = modulos.aggregate(costo=Sum('costo_cop_linea'))['costo']
-            self.costo_base_total = costo_base
-        else:
-            self.costo_base_total = 0
-            self.precio_banda = 0
-            self.precio_total = 0
-
-        self.costo_mano_obra = self.costo_base_total * porcentaje_mano_obra
-        self.precio_total = self.precio_banda + self.costo_mano_obra
-        self.rentabilidad = self.precio_banda - self.costo_base_total
-        super().save()
+    # def save(self):
+    #     modulos = self.ensamblado.all()
+    #     self.costo_ensamblado = CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
+    #                                                                  empujador=self.con_empujador,
+    #                                                                  torneado=self.con_torneado_varilla).first()
+    #     porcentaje_mano_obra = 0
+    #     if self.costo_ensamblado:
+    #         porcentaje_mano_obra = self.costo_ensamblado.porcentaje / 100
+    #
+    #     if modulos:
+    #         print('Entro a actualizar precio banda')
+    #         precio = modulos.aggregate(precio=Sum('precio_linea'))['precio']
+    #         self.precio_banda = precio
+    #         costo_base = modulos.aggregate(costo=Sum('costo_cop_linea'))['costo']
+    #         self.costo_base_total = costo_base
+    #     else:
+    #         self.costo_base_total = 0
+    #         self.precio_banda = 0
+    #         self.precio_total = 0
+    #
+    #     self.costo_mano_obra = self.costo_base_total * porcentaje_mano_obra
+    #     self.precio_total = self.precio_banda + self.costo_mano_obra
+    #     self.rentabilidad = self.precio_banda - self.costo_base_total
+    #     super().save()
 
     def get_absolute_url(self):
         return reverse("bandas:detalle_banda", kwargs={"pk": self.pk})
-
-    def actualizar_precio_total(self):
-        self.save()
 
     def generar_referencia(self):
         referencia = (
@@ -287,10 +322,6 @@ class Ensamblado(TimeStampedModel):
     banda = models.ForeignKey(Banda, on_delete=models.CASCADE, related_name='ensamblado')
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='ensamblados')
 
-    precio_linea = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    costo_cop_linea = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-
     cortado_a = models.CharField(max_length=10, verbose_name="Cortado a", default="COMPLETA")
     cantidad = models.PositiveIntegerField(verbose_name="Cantidad")
     created_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="ensamblado_created_by")
@@ -300,29 +331,24 @@ class Ensamblado(TimeStampedModel):
         verbose_name_plural = '2. Ensamblados'
         verbose_name = '2. Ensamblado'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.precio_linea_original = self.precio_linea
-        self.cantidad_original = self.cantidad
+    def get_costo_cop_linea(self):
+        return round(self.producto.get_costo_cop() * self.cantidad, 0)
 
-    def save(self):
-        self.precio_linea = Decimal(self.producto.precio_base) * Decimal(self.cantidad)
-        self.costo_cop_linea = Decimal(self.producto.costo_cop) * Decimal(self.cantidad)
-        self.rentabilidad = self.precio_linea - self.costo_cop_linea
-        super().save()
+    def get_precio_base_linea(self):
+        return round(self.producto.get_precio_base() * Decimal(self.cantidad), 0)
 
-    def actualizar_precio_total_linea(self):
-        self.save()
+    def get_rentabilidad_linea(self):
+        return round(self.get_precio_base_linea() - self.get_costo_cop_linea(), 0)
 
 
-@receiver(post_save, sender=Ensamblado)
-def post_save_ensamblado(sender, instance, *args, **kwargs):
-    instance.banda.actualizar_precio_total()
-
-
-@receiver(post_delete, sender=Ensamblado)
-def post_delete_ensamblado(sender, instance, *args, **kwargs):
-    instance.banda.actualizar_precio_total()
+# @receiver(post_save, sender=Ensamblado)
+# def post_save_ensamblado(sender, instance, *args, **kwargs):
+#     instance.banda.actualizar_precio_total()
+#
+#
+# @receiver(post_delete, sender=Ensamblado)
+# def post_delete_ensamblado(sender, instance, *args, **kwargs):
+#     instance.banda.actualizar_precio_total()
 
 
 # endregion
