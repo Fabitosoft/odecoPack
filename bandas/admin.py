@@ -68,7 +68,8 @@ class BandaAdmin(admin.ModelAdmin):
     get_precio_base.short_description = 'Precio Base'
 
     def get_costo_mano_obra(self, obj):
-        self.costo_mano_obra =obj.get_porcentaje_costo_mano_obra()*self.precio_base
+        if obj.costo_ensamblado:
+            self.costo_mano_obra =(obj.costo_ensamblado.porcentaje/100)*self.precio_base
         return self.costo_mano_obra
     get_costo_mano_obra.short_description = 'Costo Mano Obra'
 
@@ -83,6 +84,10 @@ class BandaAdmin(admin.ModelAdmin):
         'fabricante__nombre',
         'tipo_por_categoria__tipo__nombre',
     ]
+
+    list_select_related = (
+        "costo_ensamblado",
+    )
 
     list_filter = (
         'activo', 'activo_proyectos', 'activo_componentes',
@@ -200,5 +205,5 @@ class CostoEnsambladoBlandaAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Banda, BandaAdmin)
-# admin.site.register(Ensamblado, EnsambladoAdmin)
+admin.site.register(Ensamblado, EnsambladoAdmin)
 admin.site.register(CostoEnsambladoBlanda, CostoEnsambladoBlandaAdmin)

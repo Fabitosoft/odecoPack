@@ -122,6 +122,13 @@ class Banda(TimeStampedModel):
 
     # region Precios y Costos
 
+    def save(self):
+        self.costo_ensamblado = CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
+                                                                     empujador=self.con_empujador,
+                                                                     torneado=self.con_torneado_varilla).first()
+        super().save()
+
+
     def get_costo_cop(self):
         modulos = self.ensamblado.select_related(
             'producto',
@@ -146,16 +153,6 @@ class Banda(TimeStampedModel):
             for modulo in modulos:
                 precio += modulo.get_precio_base_linea()
             return precio
-        return 0
-
-    def get_porcentaje_costo_mano_obra(self):
-        CostoEnsambladoBlanda.objects.filter(
-            aleta=self.con_aleta,
-            empujador=self.con_empujador,
-            torneado=self.con_torneado_varilla
-        ).first()
-        if self.costo_ensamblado:
-            return self.costo_ensamblado.porcentaje / 100
         return 0
 
     # precio_banda = models.DecimalField(max_digits=18, decimal_places=4, default=0)
