@@ -7,14 +7,10 @@ from .models import Banda, Ensamblado, CostoEnsambladoBlanda
 
 # region BandasAdmin
 class EnsambladoInline(admin.TabularInline):
-    def get_queryset(self, request):
-        qs = super().get_queryset(request).prefetch_related('producto')
-        return qs
-
     model = Ensamblado
     raw_id_fields = ("producto",)
-    # readonly_fields = ("es_para_ensamblado", "get_costo_producto", "precio_linea", "costo_cop_linea", "rentabilidad")
-    # can_delete = False
+    readonly_fields = ("es_para_ensamblado", "get_costo_producto", "get_precio_base_linea", "get_costo_cop_linea", "get_rentabilidad_linea")
+    can_delete = False
     extra = 0
 
     def es_para_ensamblado(self, obj):
@@ -24,6 +20,19 @@ class EnsambladoInline(admin.TabularInline):
 
     def get_costo_producto(self, obj):
         return obj.producto.costo
+    get_costo_producto.short_description = 'Costo'
+
+    def get_costo_cop_linea(self, obj):
+        return obj.get_costo_cop_linea()
+    get_costo_cop_linea.short_description = 'Costo Cop Linea'
+
+    def get_precio_base_linea(self, obj):
+        return obj.get_precio_base_linea()
+    get_precio_base_linea.short_description = 'Precio Cop Linea'
+
+    def get_rentabilidad_linea(self, obj):
+        return obj.get_rentabilidad_linea()
+    get_rentabilidad_linea.short_description = 'Rentabilidad'
 
 
         # def formfield_for_foreignkey(self, db_field, request, **kwargs):
