@@ -152,21 +152,15 @@ class ItemCotizacion(TimeStampedModel):
 
     def get_costo_cop_actual_unidad(self):
         if self.item:
-            costo = self.item.costo_cop
+            costo = self.item.get_costo_cop()
         elif self.articulo_catalogo:
-            costo = self.articulo_catalogo.costo_cop
+            costo = self.articulo_catalogo.get_costo_cop()
         else:
-            costo = self.banda.costo_base_total
+            costo = self.banda.get_costo_cop()
         return round(costo, 0)
 
     def get_costo_cop_actual_total(self):
-        if self.item:
-            costo = self.item.costo_cop
-        elif self.articulo_catalogo:
-            costo = self.articulo_catalogo.costo_cop
-        else:
-            costo = self.banda.costo_base_total
-        return round(costo * self.cantidad, 0)
+        return round(self.get_costo_cop_actual_unidad() * self.cantidad, 0)
 
     def get_rentabilidad_actual_total(self):
         costo = self.get_costo_cop_actual_total()

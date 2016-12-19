@@ -234,13 +234,14 @@ class CotizacionEmailView(View):
                 'object': obj,
             }
 
-            if request.user.user_extendido.colaborador:
-                if request.user.user_extendido.colaborador.foto_perfil:
-                    url_avatar = request.user.user_extendido.colaborador.foto_perfil.url
-                    ctx = {
-                        'object': obj,
-                        'avatar': url_avatar
-                    }
+            # if request.user.user_extendido:
+            #     if request.user.user_extendido.colaborador:
+            #         if request.user.user_extendido.colaborador.foto_perfil:
+            #             url_avatar = request.user.user_extendido.colaborador.foto_perfil.url
+            #             ctx = {
+            #                 'object': obj,
+            #                 'avatar': url_avatar
+            #             }
 
 
             text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
