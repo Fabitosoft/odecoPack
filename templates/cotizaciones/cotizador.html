@@ -37,7 +37,7 @@
                                 </thead>
                                 <tbody>
                                 {% for pro in object_list_componentes %}
-                                    {% obtener_precio_lp pro.precio_base formas_pago_porcentaje as precio %}
+                                    {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
                                     <tr>
                                         <td>{{ pro.referencia }} </td>
                                         <td>{{ pro.descripcion_comercial }} </td>
@@ -71,7 +71,7 @@
                                     </tr>
                                 {% endfor %}
                                 {% for banda in object_list_bandas %}
-                                    {% obtener_precio_lp banda.precio_total formas_pago_porcentaje as precio %}
+                                    {% obtener_precio_lp banda.get_precio_base formas_pago_porcentaje as precio %}
                                     <tr>
                                         <td>{{ banda.referencia }} </td>
                                         <td>{{ banda.descripcion_comercial }} </td>
