@@ -116,7 +116,7 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ).filter(year__in=list(map(lambda x: int(x), ano)),
                  month__in=list(map(lambda x: int(x), mes)),
                  vendedor__in=vendedores
-                 ).exclude(vendedor__id=1).order_by('day')
+                 ).order_by('day')
         return qs
 
 
