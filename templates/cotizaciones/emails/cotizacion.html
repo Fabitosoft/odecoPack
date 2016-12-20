@@ -107,9 +107,9 @@
 </header>
 <div class="texto_mensaje">----
     <p>
-        Apreciado(a) {{ object.nombres_contacto }} mi nombre es
-        {{ object.usuario.get_full_name }}, de <strong>ODECOPACK S.A.S</strong>,
-        quien realizó la cotización para <strong>{{ object.razon_social }}</strong>.
+        Apreciado(a) {{ object.nombres_contacto|title }} mi nombre es
+        {{ object.usuario.get_full_name|title }}, de <strong>ODECOPACK S.A.S</strong>,
+        quien realizó la cotización para <strong>{{ object.razon_social|title }}</strong>.
     </p>
     <p>
         Hago envío de la cotización llevada a cabo

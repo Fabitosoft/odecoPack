@@ -121,7 +121,7 @@ class Producto(TimeStampedModel):
 
     def get_precio_base(self):
         if self.margen:
-            return round(self.get_costo_cop()*(1+(self.margen.margen_deseado/100)),0)
+            return round(self.get_costo_cop()/(1-(self.margen.margen_deseado/100)),0)
         return 0
 
     def get_rentabilidad(self):
@@ -220,7 +220,7 @@ class ArticuloCatalogo(models.Model):
 
     def get_precio_base(self):
         if self.margen:
-            return round(self.get_costo_cop()*(1+(self.margen.margen_deseado/100)),0)
+            return round(self.get_costo_cop()/(1-(self.margen.margen_deseado/100)),0)
         return 0
 
     def get_rentabilidad(self):
