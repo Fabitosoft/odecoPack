@@ -22,10 +22,14 @@ class CotizacionesEstadosQuerySet(models.QuerySet):
             ~Q(estado='FIN')
         )
 
-    def inactivas(self):
+    def rechazadas(self):
         return self.filter(
-            Q(estado='ELI') &
-            Q(estado='FIN')
+            estado='ELI'
+        )
+
+    def completadas(self):
+        return self.filter(
+            estado='FIN'
         )
 
     def enviadas(self):
@@ -46,8 +50,11 @@ class CotizacionesEstadosManager(models.Manager):
     def activo(self, **kwarg):
         return self.get_queryset(**kwarg).activas()
 
-    def inactivo(self, **kwarg):
-        return self.get_queryset(**kwarg).inactivas()
+    def rechazado(self, **kwarg):
+        return self.get_queryset(**kwarg).rechazadas()
+
+    def completado(self, **kwarg):
+        return self.get_queryset(**kwarg).completadas()
 
 
 class Cotizacion(TimeStampedModel):
@@ -189,8 +196,8 @@ post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 
 # region Remisiones
 class RemisionCotizacion(TimeStampedModel):
-    nro_remision = models.CharField(max_length=20)
-    nro_factura = models.CharField(max_length=20)
+    nro_remision = models.CharField(max_length=1)
+    nro_factura = models.CharField(max_length=10)
     fecha_prometida_entrega = models.DateField()
     entregado = models.BooleanField(default=False)
     cotizacion = models.ForeignKey(Cotizacion, related_name="mis_remisiones")

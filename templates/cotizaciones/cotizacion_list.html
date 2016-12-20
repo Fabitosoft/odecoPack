@@ -6,6 +6,10 @@
         <h1>Cotizaciones</h1>
         <hr/>
         {% crispy form_busqueda %}
+        <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=1 %}">Pendientes</a>
+        <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=2 %}">Completadas</a>
+        <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=3 %}">Rechazadas</a>
+        <hr>
         <br>
         <table class="table table-bordered table-striped">
             <thead>

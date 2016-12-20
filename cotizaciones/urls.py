@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^detalle/(?P<pk>[0-9]+)$', CotizacionView.as_view(), name='detalle_cotizacion'),
     url(r'^enviar/(?P<pk>[0-9]+)$', CotizacionEmailView.as_view(), name='enviar'),
     url(r'^list/$', CotizacionesListView.as_view(), name='listar_cotizaciones'),
+    url(r'^list/(?P<tipo>[0-3]+)$', CotizacionesListView.as_view(), name='listar_cotizaciones'),
     url(r'^tareas/list/$', TareaListView.as_view(), name='listar_tareas'),
     url(r'^remisiones/list/$', RemisionListView.as_view(), name='listar_remisiones'),
     url(r'^buscar/$', CotizacionesListView.as_view(), name='buscar_cotizacion'),

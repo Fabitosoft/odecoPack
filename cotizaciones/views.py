@@ -242,7 +242,6 @@ class CotizacionEmailView(View):
                         'avatar': url_avatar
                     }
 
-
             text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
@@ -306,26 +305,28 @@ class CotizacionesListView(ListView):
         if full_permisos:
             user = None
 
-        if not query:
-            query = ""
+        qs = Cotizacion.estados.activo(usuario=user)
 
-        qs = Cotizacion.estados.activo(usuario=user).filter(
-            Q(nombres_contacto__icontains=query) |
-            Q(nro_cotizacion__icontains=query) |
-            Q(ciudad__icontains=query) |
-            Q(razon_social__icontains=query) |
-            Q(items__item__descripcion_estandar__icontains=query) |
-            Q(items__item__referencia__icontains=query)
-        ).order_by('-total').distinct()
+        if self.kwargs.get("tipo") == '2':
+            qs = Cotizacion.estados.completado(usuario=user)
+
+        if self.kwargs.get("tipo") == '3':
+            qs = Cotizacion.estados.rechazado(usuario=user)
+
+
+        if query:
+            qs = qs.filter(
+                Q(nombres_contacto__icontains=query) |
+                Q(nro_cotizacion__icontains=query) |
+                Q(ciudad__icontains=query) |
+                Q(razon_social__icontains=query) |
+                Q(items__item__descripcion_estandar__icontains=query) |
+                Q(items__item__referencia__icontains=query)
+            )
+        qs = qs.order_by('-total').distinct()
         return qs
 
     def get_context_data(self, **kwargs):
-
-        # qs = ItemCotizacion.objects.filter(
-        #     cotizacion__estado__exact="ENV"
-        # )
-        # print(qs)
-
         context = super().get_context_data(**kwargs)
         context["form_busqueda"] = BusquedaCotiForm(self.request.GET or None)
         return context
