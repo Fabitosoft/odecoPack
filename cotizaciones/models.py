@@ -189,8 +189,8 @@ post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 
 # region Remisiones
 class RemisionCotizacion(TimeStampedModel):
-    nro_remision = models.PositiveIntegerField()
-    nro_factura = models.PositiveIntegerField()
+    nro_remision = models.CharField(max_length=20)
+    nro_factura = models.CharField(max_length=20)
     fecha_prometida_entrega = models.DateField()
     entregado = models.BooleanField(default=False)
     cotizacion = models.ForeignKey(Cotizacion, related_name="mis_remisiones")
