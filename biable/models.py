@@ -58,6 +58,8 @@ class MovimientoVentaBiable(models.Model):
     id_terc_fa = models.CharField(max_length=20)
     cliente = models.CharField(max_length=200)
     proyecto = models.CharField(max_length=10)
+    tipo_documento = models.CharField(max_length=3, null=True, blank=True)
+    nro_documento = models.CharField(max_length=10, null=True, blank=True)
     item_id = models.PositiveIntegerField()
     precio_uni = models.DecimalField(max_digits=18, decimal_places=4)
     cantidad = models.DecimalField(max_digits=18, decimal_places=4)
