@@ -1,5 +1,6 @@
 from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F
 from django.db.models import Value
+from django.db.models.functions import Concat
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -109,6 +110,7 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
     def consulta(self, ano, mes):
         qs = MovimientoVentaBiable.objects.all().values('day').annotate(
             vendedor_nombre=F('vendedor__nombre'),
+            documento=Concat('tipo_documento',Value('-'),'nro_documento'),
             v_neto=Sum('venta_neto')
         ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes))
                  ).exclude(vendedor__id=1).order_by('day')
