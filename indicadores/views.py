@@ -108,11 +108,14 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
+        vendedores = VendedorBiableUser.objects.get(usuario__user=self.request.user).vendedores.all()
         qs = MovimientoVentaBiable.objects.all().values('day').annotate(
             vendedor_nombre=F('vendedor__nombre'),
             documento=Concat('tipo_documento',Value('-'),'nro_documento'),
             v_neto=Sum('venta_neto')
-        ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes))
+        ).filter(year__in=list(map(lambda x: int(x), ano)),
+                 month__in=list(map(lambda x: int(x), mes)),
+                 vendedor__in=vendedores
                  ).exclude(vendedor__id=1).order_by('day')
         return qs
 
@@ -400,8 +403,6 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ).filter(
             year__in=list(map(lambda x: int(x), ano))
         ).order_by('month')
-        print(qs.all().count())
-        print(qs)
         return qs
 
 
@@ -451,8 +452,6 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ).filter(
             year__in=list(map(lambda x: int(x), ano))
         ).order_by('month')
-        print(qs.all().count())
-        print(qs)
         return qs
 
 
