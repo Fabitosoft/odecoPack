@@ -1,7 +1,7 @@
 from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F
 from django.db.models import Value
 from django.db.models.functions import Concat
-from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
 from braces.views import JSONResponseMixin, AjaxResponseMixin
@@ -108,15 +108,18 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        vendedores = VendedorBiableUser.objects.get(usuario__user=self.request.user).vendedores.all()
-        qs = MovimientoVentaBiable.objects.all().values('day').annotate(
-            vendedor_nombre=F('vendedor__nombre'),
-            documento=Concat('tipo_documento',Value('-'),'nro_documento'),
-            v_neto=Sum('venta_neto')
-        ).filter(year__in=list(map(lambda x: int(x), ano)),
-                 month__in=list(map(lambda x: int(x), mes)),
-                 vendedor__in=vendedores
-                 ).order_by('day')
+        usuario = get_object_or_404(VendedorBiableUser, usuario__user=self.request.user)
+        qs = None
+        if usuario.vendedores.all():
+            qs = MovimientoVentaBiable.objects.all().values('day').annotate(
+                vendedor_nombre=F('vendedor__nombre'),
+                documento=Concat('tipo_documento',Value('-'),'nro_documento'),
+                tipo_documento = F('tipo_documento'),
+                v_neto=Sum('venta_neto')
+            ).filter(year__in=list(map(lambda x: int(x), ano)),
+                     month__in=list(map(lambda x: int(x), mes)),
+                     vendedor__in=usuario.vendedores.all()
+                     ).order_by('day')
         return qs
 
 
