@@ -113,6 +113,7 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         if usuario.vendedores.all():
             qs = MovimientoVentaBiable.objects.all().values('day').annotate(
                 vendedor_nombre=F('vendedor__nombre'),
+                cliente=F('cliente'),
                 documento=Concat('tipo_documento',Value('-'),'nro_documento'),
                 tipo_documento = F('tipo_documento'),
                 v_neto=Sum('venta_neto')
