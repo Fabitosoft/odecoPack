@@ -139,7 +139,6 @@ class CotizacionRemisionView(SingleObjectMixin, FormView):
         )
 
         if self.request.method == "POST":
-            print(self.request.POST)
             cotizacion = self.get_object()
 
             es_cambiar_tareas = self.request.POST.get('cambiar_tareas')
@@ -383,8 +382,7 @@ class AddItem(SingleObjectMixin, View):
         item_id = kwargs["item_id"]
         precio = kwargs["precio"]
         forma_pago_id = kwargs["forma_pago"]
-        tipo = kwargs["tipo"]
-
+        tipo = int(kwargs["tipo"])
         if tipo == 1:
             item = ItemCotizacion.objects.filter(
                 Q(item_id=item_id) &
@@ -411,9 +409,9 @@ class AddItem(SingleObjectMixin, View):
 
         item.cotizacion_id = coti_id
 
-        if int(tipo) == 1:
+        if tipo == 1:
             item.item_id = item_id
-        elif int(tipo) == 2:
+        elif tipo == 2:
             item.articulo_catalogo_id = item_id
         else:
             item.banda_id = item_id
