@@ -385,10 +385,21 @@ class AddItem(SingleObjectMixin, View):
         forma_pago_id = kwargs["forma_pago"]
         tipo = kwargs["tipo"]
 
-        item = ItemCotizacion.objects.filter(
-            Q(item_id=item_id) &
-            Q(cotizacion_id=coti_id)
-        ).first()
+        if tipo == 1:
+            item = ItemCotizacion.objects.filter(
+                Q(item_id=item_id) &
+                Q(cotizacion_id=coti_id)
+            ).first()
+        elif tipo == 2:
+            item = ItemCotizacion.objects.filter(
+                Q(articulo_catalogo_id=item_id) &
+                Q(cotizacion_id=coti_id)
+            ).first()
+        else:
+            item = ItemCotizacion.objects.filter(
+                Q(banda_id=item_id) &
+                Q(cotizacion_id=coti_id)
+            ).first()
 
         if not item:
             item = ItemCotizacion()
