@@ -4,7 +4,14 @@ from biable.models import VendedorBiable, VendedorBiableUser, LineaVendedorBiabl
 # Register your models here.
 
 class VendedorBiableAdmin(admin.ModelAdmin):
-    list_display = ('nombre','id')
+    list_display = ('nombre','id','linea_ventas')
+    list_editable = ('linea_ventas',)
+
+    def get_linea_ventas(self,obj):
+        return obj.linea_ventas.nombre
+    get_linea_ventas.short_description = 'Línea'
+
+
 
 admin.site.register(VendedorBiable,VendedorBiableAdmin)
 admin.site.register(VendedorBiableUser)
