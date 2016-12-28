@@ -84,3 +84,24 @@ class MovimientoVentaBiable(models.Model):
             ('reporte_ventas_8', 'R Vent Mes'),
             ('reporte_ventas_9', 'R Vent Vend Mes'),
         )
+
+class Cartera(models.Model):
+    vendedor = models.ForeignKey(VendedorBiable,null=True)
+    id_terc_fa = models.CharField(max_length=20)
+    cliente = models.CharField(max_length=200)
+    tipo_documento = models.CharField(max_length=3, null=True, blank=True)
+    nro_documento = models.CharField(max_length=10, null=True, blank=True)
+    forma_pago = models.PositiveIntegerField(null=True, blank=True)
+    fecha_documento = models.DateField(null=True, blank=True)
+    fecha_vencimiento = models.DateField(null=True, blank=True)
+    fecha_ultimo_pago = models.DateField(null=True, blank=True)
+    por_cobrar = models.DecimalField(max_digits=18, decimal_places=4)
+    retenciones = models.DecimalField(max_digits=18, decimal_places=4)
+    valor_contado = models.DecimalField(max_digits=18, decimal_places=4)
+    anticipo = models.DecimalField(max_digits=18, decimal_places=4)
+    a_recaudar = models.DecimalField(max_digits=18, decimal_places=4)
+    recaudado = models.DecimalField(max_digits=18, decimal_places=4)
+    debe = models.DecimalField(max_digits=18, decimal_places=4)
+    esta_vencido = models.BooleanField(default=False)
+    dias_vencido = models.PositiveIntegerField(null=True, blank=True)
+    dias_para_vencido = models.PositiveIntegerField(null=True, blank=True)
