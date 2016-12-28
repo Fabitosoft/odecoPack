@@ -42,7 +42,7 @@ class VendedorBiable(models.Model):
     nombre = models.CharField(max_length=200)
     linea = models.PositiveIntegerField(choices=LINEAS, default=4)
     linea_ventas = models.ForeignKey(LineaVendedorBiable, null=True, blank=True, related_name='mis_vendedores')
-    activo = models.BooleanField(default=True, editable=False)
+    activo = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre
