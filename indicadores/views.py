@@ -17,29 +17,40 @@ from biable.models import (
 # from crm.models import VtigerCrmentity, VtigerAccountscf
 
 # Create your views here.
-class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, TemplateView):
-    template_name = 'indicadores/ventasxvendedor.html'
 
+class InformeVentasConLineaMixin(object):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['lineas_list'] = LineaVendedorBiable.objects.all()
+        return context
 
+
+class InformeVentasConAnoMixin(object):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
         ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
         ano_fin = ano_fin + 1
-
         context['anos_list'] = list(range(ano_ini, ano_fin))
-        # accounts_list = VtigerCrmentity.objects.using('biable').values('crmid').filter(smownerid__user_name='alalopros',
-        #                                                                                setype='Accounts')
-        # nits = VtigerAccountscf.objects.using('biable').values('cf_751').filter(accountid__in=accounts_list)
-        # nits = list(nits)
-        # nits_filtro = []
-        # for nit in nits:
-        #     nits_filtro.append(nit['cf_751'])
-        # resultado = MovimientoVentaBiable.objects.filter(id_terc_fa__in=nits_filtro)
-        # print(resultado)
-        # print(nits)
-        # list(accounts_list)
         return context
+
+
+class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, TemplateView):
+    template_name = 'indicadores/ventasxvendedor.html'
+
+    # def get_context_data(self, **kwargs):
+    #     # accounts_list = VtigerCrmentity.objects.using('biable').values('crmid').filter(smownerid__user_name='alalopros',
+    #     #                                                                                setype='Accounts')
+    #     # nits = VtigerAccountscf.objects.using('biable').values('cf_751').filter(accountid__in=accounts_list)
+    #     # nits = list(nits)
+    #     # nits_filtro = []
+    #     # for nit in nits:
+    #     #     nits_filtro.append(nit['cf_751'])
+    #     # resultado = MovimientoVentaBiable.objects.filter(id_terc_fa__in=nits_filtro)
+    #     # print(resultado)
+    #     # print(nits)
+    #     # list(accounts_list)
+    #     return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -62,37 +73,27 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, TemplateView):
     def consulta(self, ano, mes):
         vendedores = VendedorBiableUser.objects.get(usuario__user=self.request.user).vendedores.all()
         qs = MovimientoVentaBiable.objects.all().values('vendedor__nombre').annotate(
-            vendedor_nombre=F('vendedor__nombre'),
+            #vendedor_nombre=F('vendedor__nombre'),
+            vendedor_nombre=Case(
+                When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
+                default=F('vendedor__nombre'),
+                output_field=CharField(),
+            ),
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
-            linea=Case(
-                When(vendedor__linea=1, then=Value('Proyectos')),
-                When(vendedor__linea=2, then=Value('Bandas y Componentes')),
-                default=Value('Posventa'),
-                output_field=CharField(),
-            ),
+            linea=F('vendedor__linea_ventas__nombre'),
         ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes)),
                  vendedor__in=vendedores)
         print(qs.all().count())
         return qs
 
 
-class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, TemplateView):
     template_name = 'indicadores/consolaxventasxvendedor.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-        ano_fin = ano_fin + 1
-
-        context['anos_list'] = list(range(ano_ini, ano_fin))
-        return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -113,31 +114,27 @@ class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         qs = None
         if usuario.vendedores.all():
             qs = MovimientoVentaBiable.objects.all().values('day').annotate(
-                vendedor_nombre=F('vendedor__nombre'),
+                vendedor_nombre=Case(
+                    When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
+                    default=F('vendedor__nombre'),
+                    output_field=CharField(),
+                ),
                 cliente=F('cliente'),
                 documento=Concat('tipo_documento',Value('-'),'nro_documento'),
                 tipo_documento = F('tipo_documento'),
-                v_neto=Sum('venta_neto')
+                v_neto=Sum('venta_neto'),
+                linea=F('vendedor__linea_ventas__nombre'),
             ).filter(year__in=list(map(lambda x: int(x), ano)),
                      month__in=list(map(lambda x: int(x), mes)),
                      vendedor__in=usuario.vendedores.all()
                      ).order_by('day')
+
+            print(qs.all().count())
         return qs
 
 
-class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+class VentasClientes(JSONResponseMixin, AjaxResponseMixin,InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/ventasxcliente.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-        ano_fin = ano_fin + 1
-
-        context['anos_list'] = list(range(ano_ini, ano_fin))
-
-        return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -149,7 +146,7 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         qs = self.consulta(ano, mes)
 
         if not linea == "0":
-            qs = qs.filter(vendedor__linea=linea)
+            qs = qs.filter(vendedor__linea_ventas_id=linea)
 
         total_fact = qs.aggregate(Sum('venta_neto'))["venta_neto__sum"]
 
@@ -192,19 +189,8 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return qs
 
 
-class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/ventasxclientexano.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-        ano_fin = ano_fin + 1
-
-        context['anos_list'] = list(range(ano_ini, ano_fin))
-
-        return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -216,7 +202,7 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         qs = self.consulta(ano, mes)
 
         if not linea == "0":
-            qs = qs.filter(vendedor__linea=linea)
+            qs = qs.filter(vendedor__linea_ventas_id=linea)
 
         max_year=qs.aggregate(Max('year'))['year__max']
         total_fact = qs.filter(year=max_year).aggregate(Sum('venta_neto'))["venta_neto__sum"]
@@ -260,22 +246,8 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return qs
 
 
-class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin,InformeVentasConAnoMixin, TemplateView):
     template_name = 'indicadores/ventasxmes.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-        ano_fin = ano_fin + 1
-
-        context['anos_list'] = list(range(ano_ini, ano_fin))
-
-
-        context['lineas_list'] = LineaVendedorBiable.objects.all()
-
-        return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -310,19 +282,8 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return qs
 
 
-class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/ventasxlineaxano.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-        ano_fin = ano_fin + 1
-
-        context['anos_list'] = list(range(ano_ini, ano_fin))
-
-        return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -334,7 +295,7 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         qs = self.consulta(ano, mes)
 
         if not linea == "0":
-            qs = qs.filter(vendedor__linea=linea)
+            qs = qs.filter(vendedor__linea_ventas_id=linea)
 
         lista = list(qs)
         for i in lista:
@@ -363,19 +324,8 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return qs
 
 
-class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/ventasxvendedorxmes.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-        ano_fin = ano_fin + 1
-
-        context['anos_list'] = list(range(ano_ini, ano_fin))
-
-        return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -386,7 +336,7 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         qs = self.consulta(ano)
 
         if not linea == "0":
-            qs = qs.filter(vendedor__linea=linea)
+            qs = qs.filter(vendedor__linea_ventas_id=linea)
 
         lista = list(qs)
         for i in lista:
@@ -413,19 +363,8 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return qs
 
 
-class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/ventasxlineaxanoxmes.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-        ano_fin = ano_fin + 1
-
-        context['anos_list'] = list(range(ano_ini, ano_fin))
-
-        return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -436,7 +375,7 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         qs = self.consulta(ano)
 
         if not linea == "0":
-            qs = qs.filter(vendedor__linea=linea)
+            qs = qs.filter(vendedor__linea_ventas_id=linea)
 
         lista = list(qs)
         for i in lista:
@@ -462,19 +401,8 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         return qs
 
 
-class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
+class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/ventasxclientexmes.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-        ano_fin = ano_fin + 1
-
-        context['anos_list'] = list(range(ano_ini, ano_fin))
-
-        return context
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -485,7 +413,7 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         qs = self.consulta(ano)
 
         if not linea == "0":
-            qs = qs.filter(vendedor__linea=linea)
+            qs = qs.filter(vendedor__linea_ventas_id=linea)
 
         total_fact = qs.aggregate(Sum('venta_neto'))["venta_neto__sum"]
 
