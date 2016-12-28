@@ -36,7 +36,7 @@ class VendedorBiable(models.Model):
     id = models.PositiveIntegerField(primary_key=True, editable=False)
     nombre = models.CharField(max_length=200)
     linea = models.PositiveIntegerField(choices=LINEAS, default=4)
-    activo = models.BooleanField(default=True)
+    activo = models.BooleanField(default=True, editable=False)
 
     def __str__(self):
         return self.nombre
