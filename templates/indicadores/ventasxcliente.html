@@ -1,5 +1,4 @@
-{% extends 'indicadores/base_indicadores.html' %}
-{% load l10n %}
+{% extends 'indicadores/base_indicadores_con_filtros.html' %}
 
 {% block title %}
     Vent x Cli
@@ -8,58 +7,28 @@
 {% block titulo_indicador %}
     Ventas por Cliente
 {% endblock %}
-{% block indicador_contenido %}
+
+{% block filtros %}
     {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_3 %}
-        <form method="get" id="form_consulta">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Línea</label>
-                        <select name="linea" class="form-control">
-                            <option value="0">Todas</option>
-                            {% for linea in lineas_list %}
-                                <option value={{ linea.id }}>{{ linea.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Mes</label>
-                        <select name="mes" class="form-control" multiple="multiple">
-                            <option value="1">Enero</option>
-                            <option value="2">Febrero</option>
-                            <option value="3">Marzo</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Mayo</option>
-                            <option value="6">Junio</option>
-                            <option value="7">Julio</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Septiembre</option>
-                            <option value="10">Octubre</option>
-                            <option value="11">Noviembre</option>
-                            <option value="12">Diciembre</option>
-                        </select>
-                    </div>
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Año</label>
-                        <select name="ano" class="form-control" multiple="multiple">
-                            {% localize off %}
-                                {% for ano in anos_list %}
-                                    <option value="{{ ano }}">{{ ano }}</option>
-                                {% endfor %}
-                            {% endlocalize %}
-                        </select>
-                    </div>
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <button type="submit" class="btn btn-primary">Consultar</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <div id="tabla_pv"></div>
+        <div class="col-sx-12 col-sm-4 col-md-3">
+            {% include 'indicadores/components/lista_lineas.html' with lineas=lineas_list %}
+        </div>
+        <div class="col-sx-12 col-sm-4 col-md-3">
+            {% include 'indicadores/components/lista_mes.html' with multiple=True %}
+        </div>
+        <div class="col-sx-12 col-sm-4 col-md-3">
+            {% include 'indicadores/components/lista_ano.html' with anos_list=anos_list multiple=True %}
+        </div>
     {% else %}
         No tiene permisos suficientes para ver este informe
     {% endif %}
 {% endblock %}
+
+{% block resultado %}
+    <div id="tabla_pv"></div>
+{% endblock %}
+
+
 
 <script>
     {% block script %}
@@ -89,7 +58,7 @@
                 'linea': linea
             };
             $.post(".", data, function (data) {
-               $('#hora_actualizacion').text("("+data.fecha_actualizacion+")");
+                $('#hora_actualizacion').text("(" + data.fecha_actualizacion + ")");
 
                 // pivot grid options
                 $('#tabla_pv').empty()
@@ -168,7 +137,7 @@
                             }
                         }
                     ],
-                    rows: ['tipo','cliente'],
+                    rows: ['tipo', 'cliente'],
                     columns: [],
                     data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
                 };

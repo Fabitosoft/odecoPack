@@ -1,0 +1,19 @@
+{% extends 'indicadores/base_indicadores.html' %}
+{% block indicador_contenido %}
+    <form method="get" id="form_consulta">
+        <div class="form-group">
+            <div class="row">
+                {% block filtros %}
+
+                {% endblock %}
+                <div class="col-sx-12 col-sm-4 col-md-3">
+                    <button type="submit" class="btn btn-primary">Consultar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    {% block resultado %}
+
+    {% endblock %}
+
+{% endblock %}

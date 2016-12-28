@@ -350,7 +350,11 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
 
     def consulta(self, ano):
         qs = MovimientoVentaBiable.objects.all().values('month').annotate(
-            vendedor_nombre=F('vendedor__nombre'),
+            vendedor_nombre=Case(
+                When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
+                default=F('vendedor__nombre'),
+                output_field=CharField(),
+            ),
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),

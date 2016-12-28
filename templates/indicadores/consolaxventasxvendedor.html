@@ -1,6 +1,4 @@
-{% extends 'indicadores/base_indicadores.html' %}
-{% load l10n %}
-
+{% extends 'indicadores/base_indicadores_con_filtros.html' %}
 {% block title %}
     Consola Ventas
 {% endblock %}
@@ -8,49 +6,23 @@
 {% block titulo_indicador %}
     Consola de Ventas
 {% endblock %}
-{% block indicador_contenido %}
-    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_2 %}
-        <form method="get" id="form_consulta">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Mes</label>
-                        <select name="mes" class="form-control" multiple="multiple">
-                            <option value="1">Enero</option>
-                            <option value="2">Febrero</option>
-                            <option value="3">Marzo</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Mayo</option>
-                            <option value="6">Junio</option>
-                            <option value="7">Julio</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Septiembre</option>
-                            <option value="10">Octubre</option>
-                            <option value="11">Noviembre</option>
-                            <option value="12">Diciembre</option>
-                        </select>
-                    </div>
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Año</label>
-                        <select name="ano" class="form-control" multiple="multiple">
-                            {% localize off %}
-                                {% for ano in anos_list %}
-                                    <option value="{{ ano }}">{{ ano }}</option>
-                                {% endfor %}
-                            {% endlocalize %}
-                        </select>
-                    </div>
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <button type="submit" class="btn btn-primary">Consultar</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <div id="calendar_basic"></div>
-        <div id="tabla_pv"></div>
+
+{% block filtros %}
+    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_3 %}
+
+        <div class="col-sx-12 col-sm-4 col-md-3">
+            {% include 'indicadores/components/lista_mes.html' with multiple=True %}
+        </div>
+        <div class="col-sx-12 col-sm-4 col-md-3">
+            {% include 'indicadores/components/lista_ano.html' with anos_list=anos_list multiple=True %}
+        </div>
     {% else %}
         No tiene permisos suficientes para ver este informe
     {% endif %}
+{% endblock %}
+
+{% block resultado %}
+    <div id="tabla_pv"></div>
 {% endblock %}
 
 

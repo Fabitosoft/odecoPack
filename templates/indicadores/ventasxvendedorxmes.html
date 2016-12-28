@@ -1,5 +1,4 @@
-{% extends 'indicadores/base_indicadores.html' %}
-{% load l10n %}
+{% extends 'indicadores/base_indicadores_con_filtros.html' %}
 
 {% block title %}
     Vent x Ven x Mes
@@ -8,40 +7,22 @@
 {% block titulo_indicador %}
     Ventas por Vendedor por Mes
 {% endblock %}
-{% block indicador_contenido %}
-    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_9 %}
-        <form method="get" id="form_consulta">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Línea</label>
-                        <select name="linea" class="form-control">
-                            <option value="0">Todas</option>
-                            {% for linea in lineas_list %}
-                                <option value={{ linea.id }}>{{ linea.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <label>Año</label>
-                        <select name="ano" class="form-control">
-                            {% localize off %}
-                                {% for ano in anos_list %}
-                                    <option value="{{ ano }}">{{ ano }}</option>
-                                {% endfor %}
-                            {% endlocalize %}
-                        </select>
-                    </div>
-                    <div class="col-sx-12 col-sm-4 col-md-3">
-                        <button type="submit" class="btn btn-primary">Consultar</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <div id="tabla_pv"></div>
+
+{% block filtros %}
+    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_3 %}
+        <div class="col-sx-12 col-sm-4 col-md-3">
+            {% include 'indicadores/components/lista_lineas.html' with lineas=lineas_list %}
+        </div>
+        <div class="col-sx-12 col-sm-4 col-md-3">
+            {% include 'indicadores/components/lista_ano.html' with anos_list=anos_list multiple=False %}
+        </div>
     {% else %}
         No tiene permisos suficientes para ver este informe
     {% endif %}
+{% endblock %}
+
+{% block resultado %}
+    <div id="tabla_pv"></div>
 {% endblock %}
 
 <script>

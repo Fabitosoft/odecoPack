@@ -1,0 +1,9 @@
+{% load l10n %}
+<label>Año</label>
+<select name="ano" class="form-control" {% if multiple %} multiple="multiple" {% endif %}>
+    {% localize off %}
+        {% for ano in anos_list %}
+            <option value="{{ ano }}">{{ ano }}</option>
+        {% endfor %}
+    {% endlocalize %}
+</select>

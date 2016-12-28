@@ -1,0 +1,7 @@
+<label>Línea</label>
+<select name="linea" class="form-control">
+    <option value="0">Todas</option>
+    {% for linea in lineas %}
+        <option value={{ linea.id }}>{{ linea.nombre }}</option>
+    {% endfor %}
+</select>
