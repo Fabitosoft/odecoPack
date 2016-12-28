@@ -9,7 +9,8 @@ from braces.views import JSONResponseMixin, AjaxResponseMixin
 from biable.models import (
     MovimientoVentaBiable,
     VendedorBiableUser,
-    Actualizacion
+    Actualizacion,
+    LineaVendedorBiable
 )
 
 
@@ -270,6 +271,10 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         ano_fin = ano_fin + 1
 
         context['anos_list'] = list(range(ano_ini, ano_fin))
+
+
+        context['lineas_list'] = LineaVendedorBiable.objects.all()
+
         return context
 
     def post_ajax(self, request, *args, **kwargs):
@@ -277,13 +282,11 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, TemplateView):
         context = {"fecha_actualizacion": ultima_actualizacion}
         ano = self.request.POST.get('ano')
         linea = self.request.POST.get('linea')
+        print(linea)
         qs = self.consulta(ano)
 
         if not linea == "0":
-            print('entro')
-            qs = qs.filter(vendedor__linea=linea)
-
-        print(qs.all().count())
+            qs = qs.filter(vendedor__linea_ventas_id=linea)
 
         lista = list(qs)
         for i in lista:

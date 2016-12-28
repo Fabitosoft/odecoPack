@@ -17,9 +17,9 @@
                         <label>Línea</label>
                         <select name="linea" class="form-control">
                             <option value="0">Todas</option>
-                            <option value="1">Proyectos</option>
-                            <option value="2">Bandas y Componentes</option>
-                            <option value="3">Posventa</option>
+                            {% for linea in lineas_list %}
+                                <option value={{ linea.id }}>{{ linea.nombre }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col-sx-12 col-sm-4 col-md-3">
