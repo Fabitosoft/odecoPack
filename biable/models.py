@@ -32,15 +32,8 @@ class LineaVendedorBiable(models.Model):
         return self.nombre
 
 class VendedorBiable(models.Model):
-    LINEAS = (
-        (1, 'Proyectos'),
-        (2, 'Bandas y Componentes'),
-        (3, 'Posventa'),
-        (4, 'Sin Definir'),
-    )
     id = models.PositiveIntegerField(primary_key=True, editable=False)
     nombre = models.CharField(max_length=200)
-    linea = models.PositiveIntegerField(choices=LINEAS, default=4)
     linea_ventas = models.ForeignKey(LineaVendedorBiable, null=True, blank=True, related_name='mis_vendedores')
     activo = models.BooleanField(default=True)
 
