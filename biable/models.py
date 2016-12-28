@@ -25,6 +25,11 @@ class Actualizacion(models.Model):
         formateada = 'Actualizado el %s a las %s'%(fecha_splited[0],fecha_splited[1])
         return formateada
 
+class LineaVendedorBiable(models.Model):
+    nombre = models.CharField(max_length=120)
+
+    def __str__(self):
+        return self.nombre
 
 class VendedorBiable(models.Model):
     LINEAS = (
@@ -36,6 +41,7 @@ class VendedorBiable(models.Model):
     id = models.PositiveIntegerField(primary_key=True, editable=False)
     nombre = models.CharField(max_length=200)
     linea = models.PositiveIntegerField(choices=LINEAS, default=4)
+    linea_ventas = models.ForeignKey(LineaVendedorBiable, null=True, blank=True, related_name='mis_vendedores')
     activo = models.BooleanField(default=True, editable=False)
 
     def __str__(self):
