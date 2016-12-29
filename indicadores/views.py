@@ -1,8 +1,14 @@
+import json
+from django.core import serializers
+from braces.views import SelectRelatedMixin
 from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F
 from django.db.models import Value
 from django.db.models.functions import Concat
+from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView
+from django.utils.safestring import mark_safe
+from django.views.generic import TemplateView, ListView
 
 from braces.views import JSONResponseMixin, AjaxResponseMixin
 
@@ -10,7 +16,8 @@ from biable.models import (
     MovimientoVentaBiable,
     VendedorBiableUser,
     Actualizacion,
-    LineaVendedorBiable
+    LineaVendedorBiable,
+    Cartera
 )
 
 
@@ -35,8 +42,9 @@ class InformeVentasConAnoMixin(object):
         return context
 
 
-class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, TemplateView):
+class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, TemplateView):
     template_name = 'indicadores/ventasxvendedor.html'
+    select_related = [u"vendedor"]
 
     # def get_context_data(self, **kwargs):
     #     # accounts_list = VtigerCrmentity.objects.using('biable').values('crmid').filter(smownerid__user_name='alalopros',
@@ -92,8 +100,9 @@ class VentasVendedor(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMi
         return qs
 
 
-class VentasVendedorConsola(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, TemplateView):
+class VentasVendedorConsola(SelectRelatedMixin,JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, TemplateView):
     template_name = 'indicadores/consolaxventasxvendedor.html'
+    select_related = [u"vendedor"]
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -324,8 +333,9 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMi
         return qs
 
 
-class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
+class VentasVendedorMes(SelectRelatedMixin,JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/ventasxvendedorxmes.html'
+    select_related = [u"vendedor"]
 
     def post_ajax(self, request, *args, **kwargs):
         ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
@@ -436,6 +446,7 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAno
         )).order_by('month','cliente')
 
         lista = list(qs)
+
         for i in lista:
             i["v_bruta"] = int(i["v_bruta"])
             i["Costo"] = int(i["Costo"])
@@ -458,3 +469,57 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAno
             year__in=list(map(lambda x: int(x), ano))
         )
         return qs
+
+
+class CarteraVencimientos(JSONResponseMixin,ListView):
+    template_name = 'indicadores/cartera/vencimientos.html'
+    model = Cartera
+    context_object_name = 'cartera_list'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        qs = self.get_queryset()
+        qs=qs.values(
+            'nro_documento',
+            'tipo_documento',
+            'forma_pago',
+            'dias_vencido',
+            'dias_para_vencido',
+            'fecha_ultimo_pago',
+            'fecha_documento',
+            'fecha_vencimiento',
+            'debe',
+            'recaudado',
+            'a_recaudar'
+        ).annotate(
+            tipo=Case(
+                When(esta_vencido=True,
+                     then=Value('Vencido')),
+                default=Value('Corriente'),
+                output_field=CharField(),
+            ),
+            vendedor_nombre=Case(
+                When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
+                default=F('vendedor__nombre'),
+                output_field=CharField(),
+            ),
+            forma_pago_tipo=Case(
+                When(forma_pago__lte=30, then=Value('0-30')),
+                When(forma_pago__lte=60, then=Value('31-60')),
+                When(forma_pago__lte=90, then=Value('61-90')),
+                default=Value('Más de 90'),
+                output_field=CharField(),
+            ),
+        ).order_by('-dias_vencido','-debe')
+
+        lista = list(qs)
+
+        for i in lista:
+            i["debe"] = int(i["debe"])
+            i["recaudado"] = int(i["recaudado"])
+            i["a_recaudar"] = int(i["a_recaudar"])
+
+        context['datos'] = json.dumps(lista,
+            cls=self.json_encoder_class,
+            **self.get_json_dumps_kwargs()).encode('utf-8')
+        return context

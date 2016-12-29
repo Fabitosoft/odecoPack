@@ -1,0 +1,87 @@
+{% extends 'indicadores/base_indicadores.html' %}
+{% block title %}
+    Cart Venc
+{% endblock %}
+
+{% block titulo_indicador %}
+    Cartera - Vencimientos
+{% endblock %}
+{% block indicador_contenido %}
+    {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_5 %}
+        <div id="tabla_pv"></div>
+    {% else %}
+        No tiene permisos suficientes para ver este informe
+    {% endif %}
+{% endblock %}
+
+<script>
+    {% block script %}
+        var obj = JSON.parse('{{ datos | escapejs }}')
+        console.log(obj)
+        // pivot grid options
+        $('#tabla_pv').empty()
+        $('#tabla_pv').append('<div id =\'pgrid\'></div>')
+        var config = {
+            dataSource: obj,
+            dataHeadersLocation: 'columns',
+            canMoveFields: true,
+            theme: 'orange',
+            toolbar: {
+                visible: true
+            },
+            grandTotal: {
+                rowsvisible: false,
+                columnsvisible: true
+            },
+            subTotal: {
+                visible: true,
+                collapsed: true
+            },
+            fields: [
+                {name: 'nro_documento', caption: 'Nro Documento'},
+                {name: 'vendedor_nombre', caption: 'Vendedor'},
+                {name: 'forma_pago_tipo', caption: 'Forma Pago'},
+                {name: 'forma_pago', caption: 'Forma Pago Días'},
+                {name: 'dias_vencido', caption: 'Días Vencido'},
+                {name: 'dias_para_vencido', caption: 'Días para Vencer'},
+                {name: 'tipo_documento', caption: 'Tipo Documento'},
+                {name: 'tipo', caption: 'Tipo'},
+                {name: 'fecha_ultimo_pago', caption: 'Fecha Ultimo Pago'},
+                {name: 'fecha_documento', caption: 'Fecha Documento'},
+                {name: 'fecha_vencimiento', caption: 'Fecha Vcto'},
+                {
+                    name: 'debe', caption: 'Valor a Recaudar',
+                    dataSettings: {
+                        aggregateFunc: 'sum',
+                        formatFunc: function (value) {
+                            return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                        }
+                    }
+                },
+                {
+                    name: 'a_recaudar', caption: 'Valor Factura',
+                    dataSettings: {
+                        aggregateFunc: 'sum',
+                        formatFunc: function (value) {
+                            return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                        }
+                    }
+                },
+                {
+                    name: 'recaudado', caption: 'Valor Recaudado',
+                    dataSettings: {
+                        aggregateFunc: 'sum',
+                        formatFunc: function (value) {
+                            return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                        }
+                    }
+                }
+            ],
+            rows: ['vendedor_nombre', 'tipo','dias_vencido', 'nro_documento'],
+            columns: [],
+            data: ['a_recaudar','recaudado','debe']
+        };
+
+        new orb.pgridwidget(config).render(document.getElementById('pgrid'));
+    {% endblock %}
+</script>
