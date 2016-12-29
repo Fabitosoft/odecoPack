@@ -490,7 +490,8 @@ class CarteraVencimientos(JSONResponseMixin,ListView):
             'fecha_vencimiento',
             'debe',
             'recaudado',
-            'a_recaudar'
+            'a_recaudar',
+            'cliente',
         ).annotate(
             tipo=Case(
                 When(esta_vencido=True,
