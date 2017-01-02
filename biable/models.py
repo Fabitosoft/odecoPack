@@ -54,7 +54,7 @@ class VendedorBiable(models.Model):
         return self.nombre
 
 class VendedorBiableUser(models.Model):
-    usuario = models.ForeignKey(UserExtended, related_name='mis_vendedores')
+    usuario = models.ForeignKey(UserExtended, related_name='mis_vendedores', unique=True)
     vendedores = models.ManyToManyField(VendedorBiable, related_name='mis_auditores')
 
     def __str__(self):
@@ -117,3 +117,9 @@ class Cartera(models.Model):
     esta_vencido = models.BooleanField(default=False)
     dias_vencido = models.PositiveIntegerField(null=True, blank=True)
     dias_para_vencido = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        permissions = (
+            ('ver_carteras', 'R Cart. Vcto'),
+            ('ver_carteras_todos', 'R Cart. Vcto Todos'),
+        )

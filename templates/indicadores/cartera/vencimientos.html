@@ -7,7 +7,7 @@
     Cartera - Vencimientos
 {% endblock %}
 {% block indicador_contenido %}
-    {% if perms.biable.reportes_ventas %}
+    {% if perms.biable.ver_carteras_todos or perms.biable.ver_carteras %}
         <div id="tabla_pv"></div>
     {% else %}
         No tiene permisos suficientes para ver este informe

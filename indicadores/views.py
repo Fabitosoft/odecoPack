@@ -1,6 +1,7 @@
 import json
 from braces.views import SelectRelatedMixin
 from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F
+from django.db.models import Q
 from django.db.models import Value
 from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404, get_list_or_404
@@ -145,10 +146,14 @@ class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseM
                 tipo_documento=F('tipo_documento'),
                 v_neto=Sum('venta_neto'),
                 linea=F('vendedor__linea_ventas__nombre'),
-            ).filter(year__in=list(map(lambda x: int(x), ano)),
-                     month__in=list(map(lambda x: int(x), mes)),
-                     vendedor__in=usuario.vendedores.all()
-                     ).order_by('day')
+            ).filter(
+                Q(year__in=list(map(lambda x: int(x), ano))) &
+                Q(month__in=list(map(lambda x: int(x), mes))) &
+                (
+                    Q(vendedor__in=usuario.vendedores.all())
+                    | Q(vendedor__activo=False)
+                )
+            ).order_by('day')
 
             print(qs.all().count())
         return qs
@@ -516,6 +521,7 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
     context_object_name = 'cartera_list'
 
     def get_context_data(self, **kwargs):
+        current_user = self.request.user
         context = super().get_context_data(**kwargs)
         ultima_actualizacion = Actualizacion.tipos.cartera_vencimiento()
         if ultima_actualizacion:
@@ -523,6 +529,7 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
             context = {"fecha_actualizacion": ultima_actualizacion.fecha_formateada()}
 
         qs = self.get_queryset()
+
         qs = qs.values(
             'nro_documento',
             'tipo_documento',
@@ -556,6 +563,24 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
                 output_field=CharField(),
             ),
         ).order_by('-dias_vencido', '-debe')
+
+        if not current_user.has_perm('biable.ver_carteras_todos'):
+            usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
+            if usuario.vendedores.all():
+                qs = qs.filter(
+                    (
+                        Q(vendedor__in=usuario.vendedores.all())
+                        | Q(vendedor__activo=False)
+                    )
+                )
+            else:
+                qs = qs.filter(
+                    (
+                        Q(vendedor__activo=False)
+                    )
+                )
+
+
 
         lista = list(qs)
 
