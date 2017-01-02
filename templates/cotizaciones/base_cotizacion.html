@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% if perms.cotizaciones.gestion_cotizaciones %}
+    {% block content %}
+        <h1>{% block titulo_pagina %} {% endblock %}</h1>
+        {% block content_page %}
+            probando
+        {% endblock %}
+    {% endblock %}
+{% endif %}

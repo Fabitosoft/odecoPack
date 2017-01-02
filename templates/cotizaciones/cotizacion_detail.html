@@ -1,186 +1,187 @@
-{% extends 'base.html' %}
+{% extends "cotizaciones/base_cotizacion.html" %}
 {% load funciones_especiales %}
 {% load crispy_forms_tags %}
-{% block content %}
-    <div class="intranet">
-        <h1>Cotizacion {{ object.nro_cotizacion }}</h1>
-        <hr/>
-        <div class="row">
-            <div class="col-xs-12 col-sm-8 col-md-9">
-                <div class="div_detalle">
-                    </h4>
-                    <h4>Fecha Envio:
-                        <small>{{ object.fecha_envio }}</small>
-                    </h4>
-                    <h4>Estado:
-                        <small>{{ object.get_estado_display }}</small>
-                    </h4>
-                </div>
-                <h2>Información Cliente</h2>
-                <div class="row div_detalle">
-                    <div class="col-xs-12 col-sm-6">
-                        <h4>Razón Social:
-                            <small>{{ object.razon_social }}</small>
-                        </h4>
-                        <h4>Nombre:
-                            <small>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</small>
-                        </h4>
-                        <h4>Correo Electrónico:
-                            <small>{{ object.email }}</small>
-                        </h4>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <h4>Número de Contacto:
-                            <small>{{ object.nro_contacto }}</small>
-                        </h4>
-                        <h4>Ubicación
-                            <small>{{ object.pais }} - {{ object.ciudad }}</small>
-                        </h4>
-                    </div>
-                </div>
+
+{% block titulo_pagina %}
+    Cotizacion {{ object.nro_cotizacion }}
+{% endblock %}
+
+{% block content_page %}
+    <div class="row">
+        <div class="col-xs-12 col-sm-8 col-md-9">
+            <div class="div_detalle">
+                </h4>
+                <h4>Fecha Envio:
+                    <small>{{ object.fecha_envio }}</small>
+                </h4>
+                <h4>Estado:
+                    <small>{{ object.get_estado_display }}</small>
+                </h4>
             </div>
-            <div class="col-xs-12 col-sm-4 col-md-3">
-                <form method="post" action="{{ object.get_absolute_url }}">
-                    {% csrf_token %}
-                    {% if object.estado == 'ENV' or object.estado == 'REC' %}
-                        <input class="btn btn-primary" name="rechazar" value="Rechazar" type="submit"/>
-                    {% endif %}
-                    {% if object.estado == 'ENV' %}
-                        <input class="btn btn-primary" name="recibida" value="Recibida" type="submit"/>
-                    {% endif %}
-                    {% if object.estado == 'REC' %}
-                        <input class="btn btn-primary" name="aceptada" value="Aceptada" type="submit"/>
-                    {% endif %}
-                    {% if object.estado == 'PRO' %}
-                        <input class="btn btn-primary" name="completada" value="Completada" type="submit"/>
-                    {% endif %}
-                </form>
+            <h2>Información Cliente</h2>
+            <div class="row div_detalle">
+                <div class="col-xs-12 col-sm-6">
+                    <h4>Razón Social:
+                        <small>{{ object.razon_social }}</small>
+                    </h4>
+                    <h4>Nombre:
+                        <small>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</small>
+                    </h4>
+                    <h4>Correo Electrónico:
+                        <small>{{ object.email }}</small>
+                    </h4>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <h4>Número de Contacto:
+                        <small>{{ object.nro_contacto }}</small>
+                    </h4>
+                    <h4>Ubicación
+                        <small>{{ object.pais }} - {{ object.ciudad }}</small>
+                    </h4>
+                </div>
             </div>
         </div>
-        <div>
-            <table class="table table-bordered table-striped">
-                <thead>
+        <div class="col-xs-12 col-sm-4 col-md-3">
+            <form method="post" action="{{ object.get_absolute_url }}">
+                {% csrf_token %}
+                {% if object.estado == 'ENV' or object.estado == 'REC' %}
+                    <input class="btn btn-primary" name="rechazar" value="Rechazar" type="submit"/>
+                {% endif %}
+                {% if object.estado == 'ENV' %}
+                    <input class="btn btn-primary" name="recibida" value="Recibida" type="submit"/>
+                {% endif %}
+                {% if object.estado == 'REC' %}
+                    <input class="btn btn-primary" name="aceptada" value="Aceptada" type="submit"/>
+                {% endif %}
+                {% if object.estado == 'PRO' %}
+                    <input class="btn btn-primary" name="completada" value="Completada" type="submit"/>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+    <div>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>
+                    Rentable
+                </th>
+                <th>
+                    Referencia
+                </th>
+                <th>
+                    Nombre
+                </th>
+                <th>
+                    Cant.
+                </th>
+                <th>
+                    Uni. Emp
+                </th>
+                <th>
+                    Pre. Uni.
+                </th>
+                <th>
+                    Total
+                </th>
+                <th>
+                    Forma de Pago
+                </th>
+                {% if perms.cotizaciones.full_cotizacion %}
+                    <th>
+                        Costo Base
+                    </th>
+                    <th>
+                        Costo Total
+                    </th>
+                    <th>
+                        Rent.
+                    </th>
+                    <th>
+                        Mrg Rent.
+                    </th>
+                {% endif %}
+                <th>
+                    Tiem. Entrega
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in object.items.all %}
                 <tr>
-                    <th>
-                        Rentable
-                    </th>
-                    <th>
-                        Referencia
-                    </th>
-                    <th>
-                        Nombre
-                    </th>
-                    <th>
-                        Cant.
-                    </th>
-                    <th>
-                        Uni. Emp
-                    </th>
-                    <th>
-                        Pre. Uni.
-                    </th>
-                    <th>
-                        Total
-                    </th>
-                    <th>
-                        Forma de Pago
-                    </th>
-                    {% if perms.cotizaciones.full_cotizacion %}
-                        <th>
-                            Costo Base
-                        </th>
-                        <th>
-                            Costo Total
-                        </th>
-                        <th>
-                            Rent.
-                        </th>
-                        <th>
-                            Mrg Rent.
-                        </th>
-                    {% endif %}
-                    <th>
-                        Tiem. Entrega
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in object.items.all %}
-                    <tr>
-                        <td>
-                            {% if item.get_margen_rentabilidad_actual < 0 %}
-                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            {% else %}
-                                <i class="fa fa-check-circle" aria-hidden="true"></i>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ item.get_referencia_item }}
-                        </td>
-                        <td>
-                            {{ item.get_nombre_item }}
-                        </td>
-                        <td>
-                            {{ item.cantidad|floatformat:2 }}
-                        </td>
-                        <td>
-                            {{ item.get_unidad_item }}
-                        </td>
-                        <td>
-                            {{ item.precio }}
-                        </td>
-                        <td>
-                            {{ item.total }}
-                        </td>
-                        <td>
-                            {{ item.forma_pago }}
-                        </td>
-                        {% if perms.cotizaciones.full_cotizacion %}
-                            <td>
-                                {{ item.get_costo_cop_actual_unidad }}
-                            </td>
-                            <td>
-                                {{ item.get_costo_cop_actual_total }}
-                            </td>
-                            <td>
-                                {{ item.get_rentabilidad_actual_total }}
-                            </td>
-                            <td>
-                                {{ item.get_margen_rentabilidad_actual }} %
-                            </td>
+                    <td>
+                        {% if item.get_margen_rentabilidad_actual < 0 %}
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        {% else %}
+                            <i class="fa fa-check-circle" aria-hidden="true"></i>
                         {% endif %}
-                        <th>
-                            {{ item.get_tiempo_entrega_prometido }}
-                        </th>
-                    </tr>
-                {% endfor %}
-                </tbody>
-                <tfoot>
-                <tr>
-                    <td class="clear"></td>
-                    <td colspan="5"> Total:</td>
-                    <td> {{ object.total }} </td>
+                    </td>
+                    <td>
+                        {{ item.get_referencia_item }}
+                    </td>
+                    <td>
+                        {{ item.get_nombre_item }}
+                    </td>
+                    <td>
+                        {{ item.cantidad|floatformat:2 }}
+                    </td>
+                    <td>
+                        {{ item.get_unidad_item }}
+                    </td>
+                    <td>
+                        {{ item.precio }}
+                    </td>
+                    <td>
+                        {{ item.total }}
+                    </td>
+                    <td>
+                        {{ item.forma_pago }}
+                    </td>
+                    {% if perms.cotizaciones.full_cotizacion %}
+                        <td>
+                            {{ item.get_costo_cop_actual_unidad }}
+                        </td>
+                        <td>
+                            {{ item.get_costo_cop_actual_total }}
+                        </td>
+                        <td>
+                            {{ item.get_rentabilidad_actual_total }}
+                        </td>
+                        <td>
+                            {{ item.get_margen_rentabilidad_actual }} %
+                        </td>
+                    {% endif %}
+                    <th>
+                        {{ item.get_tiempo_entrega_prometido }}
+                    </th>
                 </tr>
-                </tfoot>
-            </table>
-        </div>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td class="clear"></td>
+                <td colspan="5"> Total:</td>
+                <td> {{ object.total }} </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
 
-        <div class="row">
-            {% if object.estado == 'PRO' %}
-                <div class="col-md-6">
-                    <h2>Remisiones</h2>
-                    <hr/>
-                    {% crispy remisiones helper_remision %}
-                </div>
-            {% endif %}
+    <div class="row">
+        {% if object.estado == 'PRO' %}
+            <div class="col-md-6">
+                <h2>Remisiones</h2>
+                <hr/>
+                {% crispy remisiones helper_remision %}
+            </div>
+        {% endif %}
 
-            {% if object.estado == 'PRO' or object.estado == 'ENV' or object.estado == 'REC' %}
-                <div class="col-md-6">
-                    <h2>Tareas</h2>
-                    <hr/>
-                    {% crispy tareas helper_tarea %}
-                </div>
-            {% endif %}
-        </div>
+        {% if object.estado == 'PRO' or object.estado == 'ENV' or object.estado == 'REC' %}
+            <div class="col-md-6">
+                <h2>Tareas</h2>
+                <hr/>
+                {% crispy tareas helper_tarea %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

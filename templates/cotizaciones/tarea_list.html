@@ -1,62 +1,63 @@
-{% extends 'base.html' %}
-{% block content %}
-    <div class="intranet">
-        <h1>Tareas</h1>
-        <table class="table table-bordered table-striped">
-            <thead>
+{% extends "cotizaciones/base_cotizacion.html" %}
+{% block titulo_pagina %}
+    Tareas
+{% endblock %}
+
+{% block content_page %}
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Nro.
+            </th>
+            <th>
+                Nombre
+            </th>
+            <th>
+                Descripción
+            </th>
+            <th>
+                Fecha Inicio
+            </th>
+            <th>
+                Fecha Fin
+            </th>
+            <th>
+                Días a Vencer
+            </th>
+            <th>
+                Responsable
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for tarea in object_list %}
             <tr>
-                <th>
-                    Nro.
-                </th>
-                <th>
-                    Nombre
-                </th>
-                <th>
-                    Descripción
-                </th>
-                <th>
-                    Fecha Inicio
-                </th>
-                <th>
-                    Fecha Fin
-                </th>
-                <th>
-                    Días a Vencer
-                </th>
-                <th>
-                    Responsable
-                </th>
+                <td>
+                    <a href="{{ tarea.cotizacion.get_absolute_url }}">{{ tarea.cotizacion.nro_cotizacion }}</a>
+                </td>
+                <td>
+                    {{ tarea.nombre }}
+                </td>
+                <td>
+                    {{ tarea.descripcion }}
+                </td>
+                <td>
+                    {{ tarea.fecha_inicial }}
+                </td>
+                <td>
+                    {{ tarea.fecha_final }}
+                </td>
+                <td>
+                    {{ tarea.get_dias_a_fecha_fin }}
+                </td>
+                <td>
+                    {{ tarea.cotizacion.usuario }}
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            {% for tarea in object_list %}
-                <tr>
-                    <td>
-                        <a href="{{ tarea.cotizacion.get_absolute_url }}">{{ tarea.cotizacion.nro_cotizacion }}</a>
-                    </td>
-                    <td>
-                        {{ tarea.nombre }}
-                    </td>
-                    <td>
-                        {{ tarea.descripcion }}
-                    </td>
-                    <td>
-                        {{ tarea.fecha_inicial }}
-                    </td>
-                    <td>
-                        {{ tarea.fecha_final }}
-                    </td>
-                    <td>
-                        {{ tarea.get_dias_a_fecha_fin }}
-                    </td>
-                    <td>
-                        {{ tarea.cotizacion.usuario }}
-                    </td>
-                </tr>
-            {% empty %}
-                <li>Ninguna Cotización</li>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        {% empty %}
+            <li>Ninguna Cotización</li>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

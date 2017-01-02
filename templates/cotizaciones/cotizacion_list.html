@@ -1,92 +1,93 @@
-{% extends 'base.html' %}
+{% extends "cotizaciones/base_cotizacion.html" %}
 {% load humanize %}
 {% load crispy_forms_tags %}
-{% block content %}
-    <div class="intranet">
-        <h1>Cotizaciones</h1>
-        <hr/>
-        {% crispy form_busqueda %}
-        <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=1 %}">Pendientes</a>
-        <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=2 %}">Completadas</a>
-        <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=3 %}">Rechazadas</a>
-        <hr>
-        <br>
-        <table class="table table-bordered table-striped">
-            <thead>
+
+{% block titulo_pagina %}
+    Cotizaciones
+{% endblock %}
+
+{% block content_page %}
+    {% crispy form_busqueda %}
+    <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=1 %}">Pendientes</a>
+    <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=2 %}">Completadas</a>
+    <a href="{% url 'cotizaciones:listar_cotizaciones' tipo=3 %}">Rechazadas</a>
+    <hr>
+    <br>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Nro.
+            </th>
+            <th>
+                Razón S.
+            </th>
+            <th>
+                Ciudad
+            </th>
+            <th>
+                Estado
+            </th>
+            <th>
+                Fecha Env.
+            </th>
+            <th>
+                Contacto
+            </th>
+            <th>
+                Nro. Contacto
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                Usuario
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cotizacion in object_list %}
             <tr>
-                <th>
-                    Nro.
-                </th>
-                <th>
-                    Razón S.
-                </th>
-                <th>
-                    Ciudad
-                </th>
-                <th>
-                    Estado
-                </th>
-                <th>
-                    Fecha Env.
-                </th>
-                <th>
-                    Contacto
-                </th>
-                <th>
-                    Nro. Contacto
-                </th>
-                <th>
-                    Email
-                </th>
-                <th>
-                    Total
-                </th>
-                <th>
-                    Usuario
-                </th>
+                <td>
+                    <a href="{{ cotizacion.get_absolute_url }}">{{ cotizacion.nro_cotizacion }}</a>
+                </td>
+                <td>
+                    {{ cotizacion.razon_social }}
+                </td>
+                <td>
+                    {{ cotizacion.ciudad }}
+                </td>
+                <td>
+                    {{ cotizacion.get_estado_display }}
+                </td>
+                <td>
+                    {{ cotizacion.fecha_envio }}
+                </td>
+                <td>
+                    {{ cotizacion.nombres_contacto }} {{ cotizacion.apellidos_contacto }}
+                </td>
+                <td>
+                    {{ cotizacion.nro_contacto }}
+                </td>
+                <td>
+                    {{ cotizacion.email }}
+                </td>
+                <td>
+                    {{ cotizacion.total }}
+                </td>
+                <td>
+                    {{ cotizacion.usuario }}
+                </td>
+                <td>
+                    {{ cotizacion.fecha_envio|naturaltime|capfirst }}
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            {% for cotizacion in object_list %}
-                <tr>
-                    <td>
-                        <a href="{{ cotizacion.get_absolute_url }}">{{ cotizacion.nro_cotizacion }}</a>
-                    </td>
-                    <td>
-                        {{ cotizacion.razon_social }}
-                    </td>
-                    <td>
-                        {{ cotizacion.ciudad }}
-                    </td>
-                    <td>
-                        {{ cotizacion.get_estado_display }}
-                    </td>
-                    <td>
-                        {{ cotizacion.fecha_envio }}
-                    </td>
-                    <td>
-                        {{ cotizacion.nombres_contacto }} {{ cotizacion.apellidos_contacto }}
-                    </td>
-                    <td>
-                        {{ cotizacion.nro_contacto }}
-                    </td>
-                    <td>
-                        {{ cotizacion.email }}
-                    </td>
-                    <td>
-                        {{ cotizacion.total }}
-                    </td>
-                    <td>
-                        {{ cotizacion.usuario }}
-                    </td>
-                    <td>
-                        {{ cotizacion.fecha_envio|naturaltime|capfirst }}
-                    </td>
-                </tr>
-            {% empty %}
-                <li>Ninguna Cotización</li>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        {% empty %}
+            <li>Ninguna Cotización</li>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

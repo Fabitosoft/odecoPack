@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="intranet">
-        <h1>{% block titulo_indicador %} {% endblock %}<small id="hora_actualizacion"></small></h1>
-        {% block indicador_contenido %}
+    <h1>{% block titulo_indicador %} {% endblock %}
+        <small id="hora_actualizacion"></small>
+    </h1>
+    {% block indicador_contenido %}
 
-        {% endblock %}
-    </div>
+    {% endblock %}
 {% endblock %}
 
 {% block javascrip_external_sources %}

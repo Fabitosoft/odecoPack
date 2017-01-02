@@ -1,56 +1,57 @@
-{% extends 'base.html' %}
-{% block content %}
-    <div class="intranet">
-        <h1>Remisiones</h1>
-        <table class="table table-bordered table-striped">
-            <thead>
+{% extends "cotizaciones/base_cotizacion.html" %}
+{% block titulo_pagina %}
+    Remisiones
+{% endblock %}
+
+{% block content_page %}
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Nro. Coti
+            </th>
+            <th>
+                Nro. Remisión
+            </th>
+            <th>
+                Nro. Factura
+            </th>
+            <th>
+                Fecha Pro. Ent.
+            </th>
+            <th>
+                Días a Vencer
+            </th>
+            <th>
+                Responsable
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for remision in object_list %}
             <tr>
-                <th>
-                    Nro. Coti
-                </th>
-                <th>
-                    Nro. Remisión
-                </th>
-                <th>
-                    Nro. Factura
-                </th>
-                <th>
-                    Fecha Pro. Ent.
-                </th>
-                <th>
-                    Días a Vencer
-                </th>
-                <th>
-                    Responsable
-                </th>
+                <td>
+                    <a href="{{ remision.cotizacion.get_absolute_url }}">{{ remision.cotizacion.nro_cotizacion }}</a>
+                </td>
+                <td>
+                    {{ remision.nro_remision }}
+                </td>
+                <td>
+                    {{ remision.nro_factura }}
+                </td>
+                <td>
+                    {{ remision.fecha_prometida_entrega }}
+                </td>
+                <td>
+                    {{ remision.get_dias_a_fecha_fin }}
+                </td>
+                <td>
+                    {{ remision.cotizacion.usuario }}
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            {% for remision in object_list %}
-                <tr>
-                    <td>
-                        <a href="{{ remision.cotizacion.get_absolute_url }}">{{ remision.cotizacion.nro_cotizacion }}</a>
-                    </td>
-                    <td>
-                        {{ remision.nro_remision }}
-                    </td>
-                    <td>
-                        {{ remision.nro_factura }}
-                    </td>
-                    <td>
-                        {{ remision.fecha_prometida_entrega }}
-                    </td>
-                    <td>
-                        {{ remision.get_dias_a_fecha_fin }}
-                    </td>
-                    <td>
-                        {{ remision.cotizacion.usuario }}
-                    </td>
-                </tr>
-            {% empty %}
-                <li>Ninguna Remisión</li>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        {% empty %}
+            <li>Ninguna Remisión</li>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

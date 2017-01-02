@@ -1,171 +1,166 @@
-{% extends "base.html" %}
+{% extends "cotizaciones/base_cotizacion.html" %}
 {% load funciones_especiales %}
 {% load crispy_forms_tags %}
-{% block content %}
-    <div class="intranet">
-        <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation"><a href="#cotizacion" aria-controls="cotizacion" role="tab"
-                                       data-toggle="tab">{% if cotizacion_id %}Detalle Cotización{% else %} Crear
-                Cotización {% endif %}</a></li>
-            <li role="presentation" class="active"><a href="#lista_precios" aria-controls="lista_precios" role="tab"
-                                                      data-toggle="tab">Lista de Precios</a></li>
 
-        </ul>
-        <!-- Tab panes -->
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="lista_precios">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h2>
-                            <small>Lista de Precios</small>
-                        </h2>
-                        <hr/>
-                        <div class="row">
-                            {% crispy formu %}
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <thead>
+{% block titulo_pagina %}
+    Cotizador
+{% endblock %}
+
+{% block content_page %}
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation"><a href="#cotizacion" aria-controls="cotizacion" role="tab"
+                                   data-toggle="tab">{% if cotizacion_id %}Detalle Cotización{% else %} Crear
+            Cotización {% endif %}</a></li>
+        <li role="presentation" class="active"><a href="#lista_precios" aria-controls="lista_precios" role="tab"
+                                                  data-toggle="tab">Lista de Precios</a></li>
+
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="lista_precios">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        {% crispy formu %}
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <td>Referencia</td>
+                                <td>Descripción</td>
+                                <td>Cant. Emp.</td>
+                                <td>Uni. Med.</td>
+                                <td>Precio</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for pro in object_list_componentes %}
+                                {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
                                 <tr>
-                                    <td>Referencia</td>
-                                    <td>Descripción</td>
-                                    <td>Cant. Emp.</td>
-                                    <td>Uni. Med.</td>
-                                    <td>Precio</td>
+                                    <td>{{ pro.referencia }} </td>
+                                    <td>{{ pro.descripcion_comercial|title }} </td>
+                                    <td>{{ pro.cantidad_empaque }} </td>
+                                    <td>{{ pro.unidad_medida.nombre|title }} </td>
+                                    <td> {{ precio }} </td>
+                                    {% if cotizacion_id %}
+                                        <td>
+                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=1 %}">
+                                                +
+                                            </a>
+                                        </td>
+                                    {% endif %}
                                 </tr>
-                                </thead>
-                                <tbody>
-                                {% for pro in object_list_componentes %}
-                                    {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
-                                    <tr>
-                                        <td>{{ pro.referencia }} </td>
-                                        <td>{{ pro.descripcion_comercial|title }} </td>
-                                        <td>{{ pro.cantidad_empaque }} </td>
-                                        <td>{{ pro.unidad_medida.nombre|title }} </td>
-                                        <td> {{ precio }} </td>
-                                        {% if cotizacion_id %}
-                                            <td>
-                                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=1 %}">
-                                                    +
-                                                </a>
-                                            </td>
-                                        {% endif %}
-                                    </tr>
-                                {% endfor %}
-                                {% for pro in object_list_articulos_catalogo %}
-                                    {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
-                                    <tr>
-                                        <td>{{ pro.referencia }} </td>
-                                        <td>{{ pro.nombre|title }} </td>
-                                        <td>  </td>
-                                        <td>{{ pro.unidad_medida|title }} </td>
-                                        <td> {{ precio }} </td>
-                                        {% if cotizacion_id %}
-                                            <td>
-                                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=2 %}">
-                                                    +
-                                                </a>
-                                            </td>
-                                        {% endif %}
-                                    </tr>
-                                {% endfor %}
-                                {% for banda in object_list_bandas %}
-                                    {% obtener_precio_lp banda.get_precio_base formas_pago_porcentaje as precio %}
-                                    <tr>
-                                        <td>{{ banda.referencia }} </td>
-                                        <td>{{ banda.descripcion_comercial|title }} </td>
-                                        <td> {{ banda.longitud }} </td>
-                                        <td>Metro</td>
-                                        <td> {{ precio }} </td>
-                                        {% if cotizacion_id %}
-                                            <td>
-                                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=3 %}">
-                                                    +
-                                                </a>
-                                            </td>
-                                        {% endif %}
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                            {% endfor %}
+                            {% for pro in object_list_articulos_catalogo %}
+                                {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
+                                <tr>
+                                    <td>{{ pro.referencia }} </td>
+                                    <td>{{ pro.nombre|title }} </td>
+                                    <td></td>
+                                    <td>{{ pro.unidad_medida|title }} </td>
+                                    <td> {{ precio }} </td>
+                                    {% if cotizacion_id %}
+                                        <td>
+                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=2 %}">
+                                                +
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            {% for banda in object_list_bandas %}
+                                {% obtener_precio_lp banda.get_precio_base formas_pago_porcentaje as precio %}
+                                <tr>
+                                    <td>{{ banda.referencia }} </td>
+                                    <td>{{ banda.descripcion_comercial|title }} </td>
+                                    <td> {{ banda.longitud }} </td>
+                                    <td>Metro</td>
+                                    <td> {{ precio }} </td>
+                                    {% if cotizacion_id %}
+                                        <td>
+                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=3 %}">
+                                                +
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane" id="cotizacion">
-                <h2>Cotización</h2>
-                <hr/>
-                <div class="row">
-                    {% if cotizacion_id %}
-                        <div class="col-md-9">
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                <tr>
-                                    <td>Referencia</td>
-                                    <td>Nombre</td>
-                                    <td>Cantidad</td>
-                                    <td>Uni. Medida</td>
-                                    <td>Precio</td>
-                                    <td>Total</td>
-                                    <td>Días Ent.</td>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for item in items_cotizacion %}
-                                    <tr id="item-{{ item.id }}">
-                                        <td>
-                                            {{ item.get_referencia_item }}
-                                        </td>
-                                        <td>
-                                            {{ item.get_nombre_item|title }}
-                                        </td>
-                                        <td>
-                                            <input type='hidden' name='item' value='{{ item.id }}'/>
-                                            <input class="item-qty" style="width: 60px" step=any
-                                                   value="{{ item.cantidad|floatformat:2 }}"/>
-                                        </td>
-                                        <td>
-                                            {{ item.get_unidad_item }}
-                                        </td>
-                                        <td>{{ item.precio }}</td>
-                                        <td class="total">{{ item.total }}</td>
-                                        <td>
-                                            <input type='hidden' name='item' value='{{ item.id }}'/>
-                                            <input class="item-ent" style="width: 60px" step=any
-                                                   value="{{ item.dias_entrega }}"/>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                                <tfoot>
-                                <tr>
-                                    <td>
-                                        Total:
-                                    </td>
-                                    <td id="coti_val_total">
-                                        {{ cotizacion_total }}
-                                    </td>
-                                </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                        <div class="col-md-3">
-                            {% crispy cotizacion_form %}
-                            <hr/>
-                            <form method="POST">
-                                {% csrf_token %}
-                                <input name="descartar" class="btn btn-primary" type="submit" value="Descartar"/>
-                            </form>
-                        </div>
-                    {% else %}
-                        {% crispy cotizacion_form %}
-                    {% endif %}
-                </div>
-            </div>
-
         </div>
-
+        <div role="tabpanel" class="tab-pane" id="cotizacion">
+            <div class="row">
+                {% if cotizacion_id %}
+                    <div class="col-md-9">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <td>Referencia</td>
+                                <td>Nombre</td>
+                                <td>Cantidad</td>
+                                <td>Uni. Medida</td>
+                                <td>Precio</td>
+                                <td>Total</td>
+                                <td>Días Ent.</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in items_cotizacion %}
+                                <tr id="item-{{ item.id }}">
+                                    <td>
+                                        {{ item.get_referencia_item }}
+                                    </td>
+                                    <td>
+                                        {{ item.get_nombre_item|title }}
+                                    </td>
+                                    <td>
+                                        <input type='hidden' name='item' value='{{ item.id }}'/>
+                                        <input class="item-qty" style="width: 60px" step=any
+                                               value="{{ item.cantidad|floatformat:2 }}"/>
+                                    </td>
+                                    <td>
+                                        {{ item.get_unidad_item }}
+                                    </td>
+                                    <td>{{ item.precio }}</td>
+                                    <td class="total">{{ item.total }}</td>
+                                    <td>
+                                        <input type='hidden' name='item' value='{{ item.id }}'/>
+                                        <input class="item-ent" style="width: 60px" step=any
+                                               value="{{ item.dias_entrega }}"/>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td>
+                                    Total:
+                                </td>
+                                <td id="coti_val_total">
+                                    {{ cotizacion_total }}
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="col-md-3">
+                        {% crispy cotizacion_form %}
+                        <hr/>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input name="descartar" class="btn btn-primary" type="submit" value="Descartar"/>
+                        </form>
+                    </div>
+                {% else %}
+                    {% crispy cotizacion_form %}
+                {% endif %}
+            </div>
+        </div>
 
     </div>
 {% endblock %}

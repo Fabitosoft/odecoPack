@@ -13,6 +13,9 @@ class FormaPago(models.Model):
     class Meta:
         unique_together = ("canal", "forma")
         verbose_name_plural = "1. Formas de Pago"
+        # permissions = (
+        #     ('full_cotizacion', 'Full Cotizacion'),
+        # )
 
     def __str__(self):
         return "%s %s" % (self.canal, self.forma)

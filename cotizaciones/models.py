@@ -87,6 +87,8 @@ class Cotizacion(TimeStampedModel):
     class Meta:
         permissions = (
             ('full_cotizacion', 'Full Cotizacion'),
+            ('gestion_cotizaciones', 'Gestionar Cotizaciones'),
+            #('hacer_cotizacion', 'Hacer Cotización'),
         )
 
     def get_absolute_url(self):
