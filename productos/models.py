@@ -112,7 +112,8 @@ class Producto(TimeStampedModel):
     activos = ProductoActivosManager()
 
     class Meta:
-        verbose_name_plural = "Productos"
+        verbose_name_plural = "Componentes Bandas"
+        verbose_name = "Componente Banda"
 
     def get_costo_cop(self):
         if self.margen:
