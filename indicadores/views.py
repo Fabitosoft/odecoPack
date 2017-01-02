@@ -49,7 +49,7 @@ class FechaActualizacionMovimientoVentasMixin(object):
 
 class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
-    template_name = 'indicadores/ventasxvendedor.html'
+    template_name = 'indicadores/venta/ventasxvendedor.html'
     select_related = [u"vendedor"]
 
     # def get_context_data(self, **kwargs):
@@ -111,7 +111,7 @@ class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, I
 class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
                             FechaActualizacionMovimientoVentasMixin,
                             TemplateView):
-    template_name = 'indicadores/consolaxventasxvendedor.html'
+    template_name = 'indicadores/venta/consolaxventasxvendedor.html'
     select_related = [u"vendedor"]
 
     def post_ajax(self, request, *args, **kwargs):
@@ -156,7 +156,7 @@ class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseM
 
 class VentasClientes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
-    template_name = 'indicadores/ventasxcliente.html'
+    template_name = 'indicadores/venta/ventasxcliente.html'
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
@@ -216,7 +216,7 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMi
 
 class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
                         FechaActualizacionMovimientoVentasMixin, TemplateView):
-    template_name = 'indicadores/ventasxclientexano.html'
+    template_name = 'indicadores/venta/ventasxclientexano.html'
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
@@ -276,7 +276,7 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
 
 class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin, InformeVentasConAnoMixin,
                 FechaActualizacionMovimientoVentasMixin, TemplateView):
-    template_name = 'indicadores/ventasxmes.html'
+    template_name = 'indicadores/venta/ventasxmes.html'
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
@@ -316,7 +316,7 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin
 
 class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
-    template_name = 'indicadores/ventasxlineaxano.html'
+    template_name = 'indicadores/venta/ventasxlineaxano.html'
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
@@ -362,7 +362,7 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMi
 
 class VentasVendedorMes(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
                         FechaActualizacionMovimientoVentasMixin, InformeVentasConLineaMixin, TemplateView):
-    template_name = 'indicadores/ventasxvendedorxmes.html'
+    template_name = 'indicadores/venta/ventasxvendedorxmes.html'
     select_related = [u"vendedor"]
 
     def post_ajax(self, request, *args, **kwargs):
@@ -410,7 +410,7 @@ class VentasVendedorMes(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin
 
 class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
                         FechaActualizacionMovimientoVentasMixin, TemplateView):
-    template_name = 'indicadores/ventasxlineaxanoxmes.html'
+    template_name = 'indicadores/venta/ventasxlineaxanoxmes.html'
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
@@ -452,7 +452,7 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
 
 class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
                        FechaActualizacionMovimientoVentasMixin, TemplateView):
-    template_name = 'indicadores/ventasxclientexmes.html'
+    template_name = 'indicadores/venta/ventasxclientexmes.html'
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
