@@ -16,8 +16,8 @@
 
 <script>
     {% block script %}
+        $('#hora_actualizacion').text("("+'{{ fecha_actualizacion }}'+")");
         var obj = JSON.parse('{{ datos | escapejs }}')
-        console.log(obj)
         // pivot grid options
         $('#tabla_pv').empty()
         $('#tabla_pv').append('<div id =\'pgrid\'></div>')
