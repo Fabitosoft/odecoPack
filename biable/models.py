@@ -7,6 +7,12 @@ from usuarios.models import UserExtended
 
 
 # Create your models here.
+class ActualizacionManager(models.Manager):
+    def movimiento_ventas(self):
+        return self.filter(tipo='MOVIMIENTO_VENTAS')
+
+    def cartera_vencimiento(self):
+        return self.filter(tipo='CARTERA_VENCIMIENTO')
 
 class Actualizacion(models.Model):
     tipo = models.CharField(max_length=100)
@@ -14,6 +20,10 @@ class Actualizacion(models.Model):
     mes = models.PositiveIntegerField()
     ano = models.PositiveIntegerField()
     fecha = models.DateTimeField()
+
+    objects = models.Manager()
+    tipos = ActualizacionManager()
+
 
     def __str__(self):
         return '%s - %s' %(self.tipo,self.fecha)
@@ -24,6 +34,9 @@ class Actualizacion(models.Model):
         fecha_splited = fecha_splited[0].split(" ")
         formateada = 'Actualizado el %s a las %s'%(fecha_splited[0],fecha_splited[1])
         return formateada
+
+    def get_ultima_cartera_vencimiento(self):
+        return self.tipos.cartera_vencimiento().latest('fecha')
 
 class LineaVendedorBiable(models.Model):
     nombre = models.CharField(max_length=120)

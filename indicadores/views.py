@@ -1,13 +1,9 @@
 import json
-from django.core import serializers
 from braces.views import SelectRelatedMixin
 from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F
 from django.db.models import Value
 from django.db.models.functions import Concat
-from django.http import HttpResponse
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.utils.safestring import mark_safe
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.views.generic import TemplateView, ListView
 
 from braces.views import JSONResponseMixin, AjaxResponseMixin
@@ -42,7 +38,17 @@ class InformeVentasConAnoMixin(object):
         return context
 
 
-class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, TemplateView):
+class FechaActualizacionMovimientoVentasMixin(object):
+    def get_ultima_actualizacion(self, **kwargs):
+        ultima_actualizacion = Actualizacion.tipos.movimiento_ventas()
+        if ultima_actualizacion:
+            ultima_actualizacion = ultima_actualizacion.latest('fecha')
+            return ultima_actualizacion.fecha_formateada()
+        return None
+
+
+class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                     FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/ventasxvendedor.html'
     select_related = [u"vendedor"]
 
@@ -61,8 +67,10 @@ class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, I
     #     return context
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
 
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
@@ -81,7 +89,7 @@ class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, I
     def consulta(self, ano, mes):
         vendedores = VendedorBiableUser.objects.get(usuario__user=self.request.user).vendedores.all()
         qs = MovimientoVentaBiable.objects.all().values('vendedor__nombre').annotate(
-            #vendedor_nombre=F('vendedor__nombre'),
+            # vendedor_nombre=F('vendedor__nombre'),
             vendedor_nombre=Case(
                 When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
                 default=F('vendedor__nombre'),
@@ -100,13 +108,17 @@ class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, I
         return qs
 
 
-class VentasVendedorConsola(SelectRelatedMixin,JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, TemplateView):
+class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                            FechaActualizacionMovimientoVentasMixin,
+                            TemplateView):
     template_name = 'indicadores/consolaxventasxvendedor.html'
     select_related = [u"vendedor"]
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
 
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
@@ -129,8 +141,8 @@ class VentasVendedorConsola(SelectRelatedMixin,JSONResponseMixin, AjaxResponseMi
                     output_field=CharField(),
                 ),
                 cliente=F('cliente'),
-                documento=Concat('tipo_documento',Value('-'),'nro_documento'),
-                tipo_documento = F('tipo_documento'),
+                documento=Concat('tipo_documento', Value('-'), 'nro_documento'),
+                tipo_documento=F('tipo_documento'),
                 v_neto=Sum('venta_neto'),
                 linea=F('vendedor__linea_ventas__nombre'),
             ).filter(year__in=list(map(lambda x: int(x), ano)),
@@ -142,12 +154,16 @@ class VentasVendedorConsola(SelectRelatedMixin,JSONResponseMixin, AjaxResponseMi
         return qs
 
 
-class VentasClientes(JSONResponseMixin, AjaxResponseMixin,InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
+class VentasClientes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+                     FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/ventasxcliente.html'
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
+
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
         linea = self.request.POST.get('linea')
@@ -198,12 +214,15 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin,InformeVentasConAnoMix
         return qs
 
 
-class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
+class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+                        FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/ventasxclientexano.html'
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
         linea = self.request.POST.get('linea')
@@ -213,7 +232,7 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
         if not linea == "0":
             qs = qs.filter(vendedor__linea_ventas_id=linea)
 
-        max_year=qs.aggregate(Max('year'))['year__max']
+        max_year = qs.aggregate(Max('year'))['year__max']
         total_fact = qs.filter(year=max_year).aggregate(Sum('venta_neto'))["venta_neto__sum"]
 
         pareto = []
@@ -255,12 +274,16 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
         return qs
 
 
-class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin,InformeVentasConAnoMixin, TemplateView):
+class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin, InformeVentasConAnoMixin,
+                FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/ventasxmes.html'
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
+
         ano = self.request.POST.get('ano')
         linea = self.request.POST.get('linea')
         print(linea)
@@ -291,12 +314,16 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin
         return qs
 
 
-class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
+class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+                     FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/ventasxlineaxano.html'
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
+
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
         linea = self.request.POST.get('linea')
@@ -333,13 +360,17 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMi
         return qs
 
 
-class VentasVendedorMes(SelectRelatedMixin,JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
+class VentasVendedorMes(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                        FechaActualizacionMovimientoVentasMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/ventasxvendedorxmes.html'
     select_related = [u"vendedor"]
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
+
         ano = self.request.POST.getlist('ano')
         linea = self.request.POST.get('linea')
 
@@ -377,12 +408,16 @@ class VentasVendedorMes(SelectRelatedMixin,JSONResponseMixin, AjaxResponseMixin,
         return qs
 
 
-class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
+class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+                        FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/ventasxlineaxanoxmes.html'
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
+
         ano = self.request.POST.getlist('anos[]')
         linea = self.request.POST.get('linea')
 
@@ -415,12 +450,16 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
         return qs
 
 
-class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin, TemplateView):
+class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+                       FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/ventasxclientexmes.html'
 
     def post_ajax(self, request, *args, **kwargs):
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='MOVIMIENTO_VENTAS').latest('fecha').fecha_formateada()
-        context = {"fecha_actualizacion": ultima_actualizacion}
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
+
         ano = self.request.POST.getlist('ano')
         linea = self.request.POST.get('linea')
 
@@ -443,7 +482,7 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAno
                  then=Value('Pareto')),
             default=Value('Otros'),
             output_field=CharField(),
-        )).order_by('month','cliente')
+        )).order_by('month', 'cliente')
 
         lista = list(qs)
 
@@ -471,18 +510,20 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAno
         return qs
 
 
-class CarteraVencimientos(JSONResponseMixin,ListView):
+class CarteraVencimientos(JSONResponseMixin, ListView):
     template_name = 'indicadores/cartera/vencimientos.html'
     model = Cartera
     context_object_name = 'cartera_list'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ultima_actualizacion = Actualizacion.objects.filter(tipo='CARTERA_VENCIMIENTO').latest('fecha').fecha_formateada()
-        context['fecha_actualizacion'] = ultima_actualizacion
+        ultima_actualizacion = Actualizacion.tipos.cartera_vencimiento()
+        if ultima_actualizacion:
+            ultima_actualizacion = ultima_actualizacion.latest('fecha')
+            context = {"fecha_actualizacion": ultima_actualizacion.fecha_formateada()}
 
         qs = self.get_queryset()
-        qs=qs.values(
+        qs = qs.values(
             'nro_documento',
             'tipo_documento',
             'forma_pago',
@@ -514,7 +555,7 @@ class CarteraVencimientos(JSONResponseMixin,ListView):
                 default=Value('Más de 90'),
                 output_field=CharField(),
             ),
-        ).order_by('-dias_vencido','-debe')
+        ).order_by('-dias_vencido', '-debe')
 
         lista = list(qs)
 
@@ -524,6 +565,6 @@ class CarteraVencimientos(JSONResponseMixin,ListView):
             i["a_recaudar"] = int(i["a_recaudar"])
 
         context['datos'] = json.dumps(lista,
-            cls=self.json_encoder_class,
-            **self.get_json_dumps_kwargs()).encode('utf-8')
+                                      cls=self.json_encoder_class,
+                                      **self.get_json_dumps_kwargs()).encode('utf-8')
         return context
