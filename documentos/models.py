@@ -11,6 +11,7 @@ from biable.models import Cliente
 
 # Create your models here.
 class TipoDocumento(models.Model):
+    cliente = models.ForeignKey(Cliente, related_name='mis_documentos', on_delete=models.PROTECT, null=True, blank=True)
     nombre = models.CharField(max_length=100, unique=True)
     nomenclatura = models.CharField(max_length=2, unique=True)
 
@@ -27,6 +28,14 @@ class Documento(TimeStampedModel):
     def __str__(self):
         return "%s-%s"%(self.tipo,self.nro)
 
+
+def imagen_documento_upload_to(instance, filename):
+    basename, file_extention = filename.split(".")
+    documento = instance.documento
+    new_filename = "documento_digital_%s_%s.%s" % (documento.tipo, documento.nro, file_extention)
+    return "documentos/digitalizacion/imagenes/%s" % new_filename
+
+
 class ImagenDocumento(TimeStampedModel):
     def validate_image(fieldfile_obj):
         w, h = get_image_dimensions(fieldfile_obj)
@@ -38,7 +47,7 @@ class ImagenDocumento(TimeStampedModel):
             raise ValidationError("Tamaño Máximo de la imagen es 1024x800")
 
     documento = models.ForeignKey(Documento, on_delete=models.PROTECT, related_name='mis_imagenes')
-    imagen = models.ImageField(upload_to='documentos/digitalizacion/imagenes', validators=[validate_image])
+    imagen = models.ImageField(upload_to=imagen_documento_upload_to, validators=[validate_image])
     imagen_thumbnail = ImageSpecField(source='imagen',
                                       processors=[ResizeToFill(100, 50)],
                                       format='PNG',

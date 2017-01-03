@@ -15,10 +15,14 @@ class ImagenDocumentoInline(admin.TabularInline):
 
 
 class DocumentoAdmin(admin.ModelAdmin):
-    list_display = ('tipo', 'nro')
+    list_display = ('tipo','get_tipo_nomenclatura', 'nro')
     inlines = [
         ImagenDocumentoInline,
     ]
+
+    def get_tipo_nomenclatura(self, obj):
+        return obj.tipo.nomenclatura
+    get_tipo_nomenclatura.short_description = 'Tipo'
 
 
 admin.site.register(Documento, DocumentoAdmin)
