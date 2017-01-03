@@ -54,7 +54,7 @@ class VendedorBiable(models.Model):
         return self.nombre
 
 class VendedorBiableUser(models.Model):
-    usuario = models.ForeignKey(UserExtended, related_name='mis_vendedores', unique=True)
+    usuario = models.OneToOneField(UserExtended, related_name='mis_vendedores')
     vendedores = models.ManyToManyField(VendedorBiable, related_name='mis_auditores')
 
     def __str__(self):
