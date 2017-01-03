@@ -8,7 +8,7 @@ from usuarios.models import UserExtended
 
 # Create your models here.
 class Cliente(TimeStampedModel):
-    nit = models.CharField(max_length=20, primary_key=True)
+    nit = models.CharField(max_length=20)
     nombre = models.CharField(max_length=120)
 
     def __str__(self):

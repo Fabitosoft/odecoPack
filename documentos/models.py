@@ -19,7 +19,7 @@ class TipoDocumento(models.Model):
 
 
 class Documento(TimeStampedModel):
-    cliente = models.ForeignKey(Cliente, related_name='mis_documentos', on_delete=models.PROTECT, null=True, blank=True)
+    # cliente = models.ForeignKey(Cliente, related_name='mis_documentos', on_delete=models.PROTECT, null=True, blank=True)
     tipo = models.ForeignKey(TipoDocumento, on_delete=models.PROTECT, related_name='mis_documentos',
                              verbose_name='Tipo Documento')
     nro = models.CharField(max_length=10, verbose_name='Nro. Documento')
