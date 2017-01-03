@@ -74,9 +74,7 @@ class BandaAdmin(admin.ModelAdmin):
     get_precio_base.short_description = 'Precio Base'
 
     def get_costo_mano_obra(self, obj):
-        if obj.costo_ensamblado:
-            self.costo_mano_obra =(obj.costo_ensamblado.porcentaje/100)*self.precio_base
-        return self.costo_mano_obra
+        self.costo_mano_obra =obj.get_precio_mano_obra()
     get_costo_mano_obra.short_description = 'Costo Mano Obra'
 
     def get_precio_total(self, obj):
