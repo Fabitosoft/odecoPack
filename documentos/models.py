@@ -26,7 +26,7 @@ class Documento(TimeStampedModel):
     transaccion = models.ForeignKey(Transaccion, on_delete=models.PROTECT, related_name='mis_documentos')
 
 
-class Imagenes(TimeStampedModel):
+class ImagenDocumento(TimeStampedModel):
     def validate_image(fieldfile_obj):
         w, h = get_image_dimensions(fieldfile_obj)
         filesize = fieldfile_obj.file.size
