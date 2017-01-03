@@ -15,7 +15,22 @@ class ImagenDocumentoInline(admin.TabularInline):
 
 
 class DocumentoAdmin(admin.ModelAdmin):
-    list_display = ('tipo','get_tipo_nomenclatura', 'nro')
+    list_select_related = (
+        'tipo__nomenclatura',
+    )
+
+    list_filter = (
+        'tipo__nomenclatura',
+    )
+
+    search_fields = [
+        'nro',
+        'tipo',
+        'tipo__nomenclatura',
+        'cliente__nombre',
+        'cliente__nit',
+    ]
+    list_display = ('get_tipo_nomenclatura', 'nro', 'tipo')
     inlines = [
         ImagenDocumentoInline,
     ]
