@@ -154,7 +154,7 @@ class Banda(TimeStampedModel):
 
     def get_precio_mano_obra(self):
         if self.costo_ensamblado:
-            self.costo_mano_obra =(self.costo_ensamblado.porcentaje/100)*self.precio_base
+            self.costo_mano_obra =(self.costo_ensamblado.porcentaje/100)*self.get_precio_base()
         return self.costo_mano_obra
 
     def get_precio_con_mano_obra(self):
