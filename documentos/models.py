@@ -11,7 +11,6 @@ from biable.models import Cliente
 
 # Create your models here.
 class TipoDocumento(models.Model):
-    cliente = models.ForeignKey(Cliente, related_name='mis_documentos', on_delete=models.PROTECT, null=True, blank=True)
     nombre = models.CharField(max_length=100, unique=True)
     nomenclatura = models.CharField(max_length=2, unique=True)
 
@@ -19,6 +18,7 @@ class TipoDocumento(models.Model):
         return self.nombre
 
 class Documento(TimeStampedModel):
+    cliente = models.ForeignKey(Cliente, related_name='mis_documentos', on_delete=models.PROTECT, null=True, blank=True)
     tipo = models.ForeignKey(TipoDocumento, on_delete=models.PROTECT, related_name='mis_documentos', verbose_name='Tipo Documento')
     nro = models.CharField(max_length=10, verbose_name='Nro. Documento')
 
@@ -32,7 +32,7 @@ class Documento(TimeStampedModel):
 def imagen_documento_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
     documento = instance.documento
-    new_filename = "documento_digital_%s_%s.%s" % (documento.tipo, documento.nro, file_extention)
+    new_filename = "%s_%s.%s" % (documento.tipo.nomenclatura, documento.nro, file_extention)
     return "documentos/digitalizacion/imagenes/%s" % new_filename
 
 
