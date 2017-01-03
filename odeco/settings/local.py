@@ -99,6 +99,9 @@ else:
             'PASSWORD': get_secret("DATABASE2","PASSWORD"),
             'HOST': get_secret("DATABASE2","HOST"),
             'PORT': get_secret("DATABASE2","PORT"),
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            }
         },
         'biable': {
             'ENGINE': get_secret("DATABASE4", "ENGINE"),
