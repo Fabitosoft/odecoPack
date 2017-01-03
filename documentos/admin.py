@@ -26,7 +26,7 @@ class DocumentoAdmin(admin.ModelAdmin):
 
     search_fields = [
         'nro',
-        'tipo',
+        'tipo__nombre',
         'tipo__nomenclatura',
         'cliente__nombre',
         'cliente__nit',
@@ -34,10 +34,12 @@ class DocumentoAdmin(admin.ModelAdmin):
 
     raw_id_fields = ('cliente',)
 
-    list_display = ('get_tipo_nomenclatura', 'nro', 'tipo')
+    list_display = ('get_tipo_nomenclatura', 'nro', 'tipo', 'get_cliente_nombre')
     inlines = [
         ImagenDocumentoInline,
     ]
+
+    ordering = ('tipo__nombre','nro',)
 
     def get_tipo_nomenclatura(self, obj):
         return obj.tipo.nomenclatura

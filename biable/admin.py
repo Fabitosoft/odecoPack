@@ -20,6 +20,8 @@ class ClienteBiableAdmin(admin.ModelAdmin):
         'nombre',
     ]
 
+    readonly_fields = ('nit','nombre',)
+
 admin.site.register(VendedorBiable,VendedorBiableAdmin)
 admin.site.register(Cliente,ClienteBiableAdmin)
 admin.site.register(VendedorBiableUser)
