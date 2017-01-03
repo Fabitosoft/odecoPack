@@ -132,31 +132,34 @@ class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseM
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        usuario = get_object_or_404(VendedorBiableUser, usuario__user=self.request.user)
-        qs = None
-        if usuario.vendedores.all():
-            qs = MovimientoVentaBiable.objects.all().values('day').annotate(
-                vendedor_nombre=Case(
-                    When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
-                    default=F('vendedor__nombre'),
-                    output_field=CharField(),
-                ),
-                cliente=F('cliente'),
-                documento=Concat('tipo_documento', Value('-'), 'nro_documento'),
-                tipo_documento=F('tipo_documento'),
-                v_neto=Sum('venta_neto'),
-                linea=F('vendedor__linea_ventas__nombre'),
-            ).filter(
-                Q(year__in=list(map(lambda x: int(x), ano))) &
-                Q(month__in=list(map(lambda x: int(x), mes))) &
-                (
-                    Q(vendedor__in=usuario.vendedores.all())
-                    | Q(vendedor__activo=False)
-                )
-            ).order_by('day')
-
-            print(qs.all().count())
-        return qs
+        current_user = self.request.user
+        qsFinal = None
+        qs = MovimientoVentaBiable.objects.all().values('day').annotate(
+            vendedor_nombre=Case(
+                When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
+                default=F('vendedor__nombre'),
+                output_field=CharField(),
+            ),
+            cliente=F('cliente'),
+            documento=Concat('tipo_documento', Value('-'), 'nro_documento'),
+            tipo_documento=F('tipo_documento'),
+            v_neto=Sum('venta_neto'),
+            linea=F('vendedor__linea_ventas__nombre'),
+        )
+        if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
+            usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
+            if usuario.vendedores.all():
+                qsFinal = qs.filter(
+                    Q(year__in=list(map(lambda x: int(x), ano))) &
+                    Q(month__in=list(map(lambda x: int(x), mes))) &
+                    (
+                        Q(vendedor__in=usuario.vendedores.all())
+                        | Q(vendedor__activo=False)
+                    )
+                ).order_by('day')
+        else:
+            qsFinal = qs
+        return qsFinal
 
 
 class VentasClientes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
@@ -528,8 +531,9 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
             ultima_actualizacion = ultima_actualizacion.latest('fecha')
             context = {"fecha_actualizacion": ultima_actualizacion.fecha_formateada()}
 
-        qs = self.get_queryset()
+        qsFinal = None
 
+        qs = self.get_queryset()
         qs = qs.values(
             'nro_documento',
             'tipo_documento',
@@ -567,22 +571,22 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
         if not current_user.has_perm('biable.ver_carteras_todos'):
             usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
             if usuario.vendedores.all():
-                qs = qs.filter(
+                qsFinal = qs.filter(
                     (
                         Q(vendedor__in=usuario.vendedores.all())
                         | Q(vendedor__activo=False)
                     )
                 )
             else:
-                qs = qs.filter(
+                qsFinal = qs.filter(
                     (
                         Q(vendedor__activo=False)
                     )
                 )
+        else:
+            qsFinal = qs
 
-
-
-        lista = list(qs)
+        lista = list(qsFinal)
 
         for i in lista:
             i["debe"] = int(i["debe"])
