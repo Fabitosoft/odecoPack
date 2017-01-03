@@ -11,20 +11,21 @@ from biable.models import Cliente
 
 # Create your models here.
 class TipoDocumento(models.Model):
-    nombre = models.CharField(max_length=100)
-    nomenclatura = models.CharField(max_length=2)
+    nombre = models.CharField(max_length=100, unique=True)
+    nomenclatura = models.CharField(max_length=2, unique=True)
 
-
-class Transaccion(TimeStampedModel):
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name='mis_transacciones', null=True,
-                                blank=True)
-    descripcion = models.TextField(max_length=300)
-
+    def __str__(self):
+        return self.nombre
 
 class Documento(TimeStampedModel):
-    tipo = models.ForeignKey(TipoDocumento, on_delete=models.PROTECT, related_name='mis_documentos')
-    transaccion = models.ForeignKey(Transaccion, on_delete=models.PROTECT, related_name='mis_documentos')
+    tipo = models.ForeignKey(TipoDocumento, on_delete=models.PROTECT, related_name='mis_documentos', verbose_name='Tipo Documento')
+    nro = models.CharField(max_length=10, verbose_name='Nro. Documento')
 
+    class Meta:
+        unique_together = ('tipo','nro',)
+
+    def __str__(self):
+        return "%s-%s"%(self.tipo,self.nro)
 
 class ImagenDocumento(TimeStampedModel):
     def validate_image(fieldfile_obj):

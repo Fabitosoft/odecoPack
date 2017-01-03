@@ -1,7 +1,7 @@
 from django.contrib import admin
 from imagekit.admin import AdminThumbnail
 
-from .models import Documento, ImagenDocumento, TipoDocumento, Transaccion
+from .models import Documento, ImagenDocumento, TipoDocumento
 
 
 # Register your models here.
@@ -15,7 +15,7 @@ class ImagenDocumentoInline(admin.TabularInline):
 
 
 class DocumentoAdmin(admin.ModelAdmin):
-    list_display = ('tipo', 'transaccion')
+    list_display = ('tipo', 'nro')
     inlines = [
         ImagenDocumentoInline,
     ]
@@ -23,4 +23,3 @@ class DocumentoAdmin(admin.ModelAdmin):
 
 admin.site.register(Documento, DocumentoAdmin)
 admin.site.register(TipoDocumento)
-admin.site.register(Transaccion)
