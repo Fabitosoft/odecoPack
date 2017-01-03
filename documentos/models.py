@@ -37,9 +37,9 @@ def imagen_documento_upload_to(instance, filename):
     nro_foto = 1
     fotos = documento.mis_imagenes
     if fotos:
-        nro_foto = fotos.all().count()
+        nro_foto += fotos.all().count()
 
-    new_filename = "%s_%s_%s.%s" % (documento.tipo.nomenclatura, documento.nro, file_extention, nro_foto)
+    new_filename = "%s_%s_%s.%s" % (documento.tipo.nomenclatura, documento.nro, nro_foto, file_extention)
     return "documentos/digitalizacion/imagenes/%s" % new_filename
 
 
