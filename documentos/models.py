@@ -1,3 +1,5 @@
+import random
+
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
@@ -35,11 +37,12 @@ def imagen_documento_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
     documento = instance.documento
     nro_foto = 1
+    nro_aleatorio = random.randrange(100000, 999999, 6)
     fotos = documento.mis_imagenes
     if fotos:
         nro_foto += fotos.all().count()
 
-    new_filename = "%s_%s_%s.%s" % (documento.tipo.nomenclatura, documento.nro, nro_foto, file_extention)
+    new_filename = "%s_%s_%s_%s.%s" % (documento.tipo.nomenclatura, documento.nro, nro_foto, nro_aleatorio, file_extention)
     return "documentos/digitalizacion/imagenes/%s" % new_filename
 
 
