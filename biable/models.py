@@ -1,12 +1,20 @@
 from datetime import datetime
 
 from django.db import models
-
+from model_utils.models import TimeStampedModel
 
 from usuarios.models import UserExtended
 
 
 # Create your models here.
+class Cliente(TimeStampedModel):
+    nit = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=120)
+
+    def __str__(self):
+        return self.nombre
+
+
 class ActualizacionManager(models.Manager):
     def movimiento_ventas(self):
         return self.filter(tipo='MOVIMIENTO_VENTAS')

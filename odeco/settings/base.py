@@ -123,6 +123,7 @@ MY_APPS = (
     'biable',
     'productos_categorias',
     'productos_caracteristicas',
+    'documentos',
     #'crm',
 )
 
