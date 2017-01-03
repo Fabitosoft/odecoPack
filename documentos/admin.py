@@ -16,7 +16,8 @@ class ImagenDocumentoInline(admin.TabularInline):
 
 class DocumentoAdmin(admin.ModelAdmin):
     list_select_related = (
-        'tipo__nomenclatura',
+        'tipo',
+        'cliente',
     )
 
     list_filter = (
@@ -38,6 +39,10 @@ class DocumentoAdmin(admin.ModelAdmin):
     def get_tipo_nomenclatura(self, obj):
         return obj.tipo.nomenclatura
     get_tipo_nomenclatura.short_description = 'Tipo'
+
+    def get_cliente_nombre(self, obj):
+        return obj.cliente.nombre
+    get_cliente_nombre.short_description = 'Cliente'
 
 
 admin.site.register(Documento, DocumentoAdmin)
