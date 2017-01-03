@@ -31,6 +31,9 @@ class DocumentoAdmin(admin.ModelAdmin):
         'cliente__nombre',
         'cliente__nit',
     ]
+
+    raw_id_fields = ('cliente',)
+
     list_display = ('get_tipo_nomenclatura', 'nro', 'tipo')
     inlines = [
         ImagenDocumentoInline,
