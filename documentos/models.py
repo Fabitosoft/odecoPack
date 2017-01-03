@@ -17,22 +17,29 @@ class TipoDocumento(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class Documento(TimeStampedModel):
     cliente = models.ForeignKey(Cliente, related_name='mis_documentos', on_delete=models.PROTECT, null=True, blank=True)
-    tipo = models.ForeignKey(TipoDocumento, on_delete=models.PROTECT, related_name='mis_documentos', verbose_name='Tipo Documento')
+    tipo = models.ForeignKey(TipoDocumento, on_delete=models.PROTECT, related_name='mis_documentos',
+                             verbose_name='Tipo Documento')
     nro = models.CharField(max_length=10, verbose_name='Nro. Documento')
 
     class Meta:
-        unique_together = ('tipo','nro',)
+        unique_together = ('tipo', 'nro',)
 
     def __str__(self):
-        return "%s-%s"%(self.tipo,self.nro)
+        return "%s-%s" % (self.tipo, self.nro)
 
 
 def imagen_documento_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
     documento = instance.documento
-    new_filename = "%s_%s.%s" % (documento.tipo.nomenclatura, documento.nro, file_extention)
+    nro_foto = 1
+    fotos = documento.mis_imagenes
+    if fotos:
+        nro_foto = fotos.all().count()
+
+    new_filename = "%s_%s_%s.%s" % (documento.tipo.nomenclatura, documento.nro, file_extention, nro_foto)
     return "documentos/digitalizacion/imagenes/%s" % new_filename
 
 
