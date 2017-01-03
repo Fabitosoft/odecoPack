@@ -75,6 +75,7 @@ class BandaAdmin(admin.ModelAdmin):
 
     def get_costo_mano_obra(self, obj):
         self.costo_mano_obra =obj.get_precio_mano_obra()
+        return self.costo_mano_obra
     get_costo_mano_obra.short_description = 'Costo Mano Obra'
 
     def get_precio_total(self, obj):

@@ -158,7 +158,7 @@ class Banda(TimeStampedModel):
         return self.costo_mano_obra
 
     def get_precio_con_mano_obra(self):
-        return self.get_precio_con_mano_obra() + self.get_precio_base()
+        return self.get_precio_mano_obra() + self.get_precio_base()
 
     # precio_banda = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     # precio_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
