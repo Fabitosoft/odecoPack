@@ -17,6 +17,8 @@ from biable.models import (
     Cartera
 )
 
+from usuarios.models import Colaborador
+
 
 # from crm.models import VtigerCrmentity, VtigerAccountscf
 
@@ -34,6 +36,7 @@ class InformeVentasConAnoMixin(object):
         context = super().get_context_data(**kwargs)
         ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
         ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
+
         ano_fin = ano_fin + 1
         context['anos_list'] = list(range(ano_ini, ano_fin))
         return context
@@ -146,6 +149,9 @@ class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseM
             linea=F('vendedor__linea_ventas__nombre'),
         )
         if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
+            prueba = Colaborador.usuario.user=current_user
+            print('por aqui')
+            print(prueba.jefe)
             usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
             if usuario.vendedores.all():
                 qsFinal = qs.filter(
