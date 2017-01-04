@@ -327,7 +327,7 @@ class CotizacionesListView(ListView):
                         Q(vendedor__in=usuario.vendedores.all())
                         | Q(vendedor__activo=False)
                     )
-                )
+                ).order_by('-total').distinct()
             else:
                 qsFinal = qs.filter(
                     Q(nombres_contacto__icontains=query) |
@@ -336,9 +336,9 @@ class CotizacionesListView(ListView):
                     Q(razon_social__icontains=query) |
                     Q(items__item__descripcion_estandar__icontains=query) |
                     Q(items__item__referencia__icontains=query)
-                )
+                ).order_by('-total').distinct()
 
-        return qsFinal.order_by('-total').distinct()
+        return qsFinal
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
