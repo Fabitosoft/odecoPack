@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.template.loader import render_to_string, get_template
 from django.urls import reverse
 from django.db.models import Q
@@ -19,6 +19,7 @@ from django.forms import inlineformset_factory
 from django.utils import timezone
 
 from listasprecios.forms import ProductoBusqueda
+from biable.models import VendedorBiableUser
 from .models import (
     ItemCotizacion,
     Cotizacion,
@@ -298,32 +299,46 @@ class CotizacionesListView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("buscado")
-        user = self.request.user
 
-        full_permisos = user.has_perm('cotizaciones.full_cotizacion')
-        if full_permisos:
-            user = None
+        current_user = self.request.user
+        qsFinal = None
 
-        qs = Cotizacion.estados.activo(usuario=user)
+        qs = Cotizacion.estados.activo()
 
         if self.kwargs.get("tipo") == '2':
-            qs = Cotizacion.estados.completado(usuario=user)
+            qs = Cotizacion.estados.completado()
 
         if self.kwargs.get("tipo") == '3':
-            qs = Cotizacion.estados.rechazado(usuario=user)
+            qs = Cotizacion.estados.rechazado()
 
+        if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
+            usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
+            if usuario.vendedores.all():
+                qsFinal = qs.filter(
+                    (
+                        Q(nombres_contacto__icontains=query) |
+                        Q(nro_cotizacion__icontains=query) |
+                        Q(ciudad__icontains=query) |
+                        Q(razon_social__icontains=query) |
+                        Q(items__item__descripcion_estandar__icontains=query) |
+                        Q(items__item__referencia__icontains=query)
+                    ) &
+                    (
+                        Q(vendedor__in=usuario.vendedores.all())
+                        | Q(vendedor__activo=False)
+                    )
+                )
+            else:
+                qsFinal = qs.filter(
+                    Q(nombres_contacto__icontains=query) |
+                    Q(nro_cotizacion__icontains=query) |
+                    Q(ciudad__icontains=query) |
+                    Q(razon_social__icontains=query) |
+                    Q(items__item__descripcion_estandar__icontains=query) |
+                    Q(items__item__referencia__icontains=query)
+                )
 
-        if query:
-            qs = qs.filter(
-                Q(nombres_contacto__icontains=query) |
-                Q(nro_cotizacion__icontains=query) |
-                Q(ciudad__icontains=query) |
-                Q(razon_social__icontains=query) |
-                Q(items__item__descripcion_estandar__icontains=query) |
-                Q(items__item__referencia__icontains=query)
-            )
-        qs = qs.order_by('-total').distinct()
-        return qs
+        return qsFinal.order_by('-total').distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
