@@ -4,7 +4,7 @@ from biable.models import VendedorBiable, VendedorBiableUser, LineaVendedorBiabl
 # Register your models here.
 
 class VendedorBiableAdmin(admin.ModelAdmin):
-    list_display = ('nombre','id','linea_ventas','activo')
+    list_display = ('nombre','id','linea_ventas','activo','colaborador')
     list_editable = ('linea_ventas','colaborador')
     readonly_fields = ('activo',)
 
