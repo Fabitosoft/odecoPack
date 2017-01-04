@@ -39,7 +39,7 @@ class Colaborador(models.Model):
     numero_contacto = models.CharField(max_length=12)
     extencion = models.CharField(max_length=10)
     foto_perfil = models.ImageField(upload_to=colaborador_upload_to, validators=[validate_image], null=True, blank=True)
-    subalternos = models.ManyToManyField("self", related_name="subalternos", blank=True)
+    subalternos = models.ManyToManyField("self", blank=True)
 
 
     class Meta:
