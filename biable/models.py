@@ -63,16 +63,6 @@ class VendedorBiable(models.Model):
     def __str__(self):
         return self.nombre
 
-class VendedorBiableUser(models.Model):
-    usuario = models.OneToOneField(UserExtended, related_name='mis_vendedores')
-    vendedores = models.ManyToManyField(VendedorBiable, related_name='mis_auditores')
-
-    def __str__(self):
-        return self.usuario.user.get_full_name()
-
-    class Meta:
-        verbose_name_plural = "Vendedores por usuario para Indicadores"
-
 class MovimientoVentaBiable(models.Model):
     year = models.PositiveIntegerField()
     month = models.PositiveIntegerField()

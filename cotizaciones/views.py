@@ -19,7 +19,7 @@ from django.forms import inlineformset_factory
 from django.utils import timezone
 
 from listasprecios.forms import ProductoBusqueda
-from biable.models import VendedorBiableUser
+from biable.models import Colaborador
 from .models import (
     ItemCotizacion,
     Cotizacion,
@@ -323,12 +323,13 @@ class CotizacionesListView(ListView):
             )
 
         if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
-            usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
-            if usuario.vendedores.all():
-                qsFinal = qs.filter(
-                    Q(usuario__in=usuario.vendedores.all())
-                ).order_by('-total').distinct()
-        if current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
+            usuario = get_object_or_404(Colaborador, usuario__user=current_user)
+            users = usuario.subalternos.all().values('usuario__user')
+            qsFinal = qs.filter(
+                Q(usuario=current_user) |
+                Q(usuario__in=users)
+            ).order_by('-total').distinct()
+        else:
             qsFinal = qs.order_by('-total').distinct()
         return qsFinal
 

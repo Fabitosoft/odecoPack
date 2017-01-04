@@ -11,7 +11,6 @@ from braces.views import JSONResponseMixin, AjaxResponseMixin
 
 from biable.models import (
     MovimientoVentaBiable,
-    VendedorBiableUser,
     Actualizacion,
     LineaVendedorBiable,
     Cartera
@@ -91,7 +90,8 @@ class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, I
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        vendedores = VendedorBiableUser.objects.get(usuario__user=self.request.user).vendedores.all()
+        current_user = self.request.user
+        qsFinal = None
         qs = MovimientoVentaBiable.objects.all().values('vendedor__nombre').annotate(
             # vendedor_nombre=F('vendedor__nombre'),
             vendedor_nombre=Case(
@@ -106,9 +106,25 @@ class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, I
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
             linea=F('vendedor__linea_ventas__nombre'),
-        ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes)),
-                 vendedor__in=vendedores)
-        return qs
+        )
+
+        if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
+            usuario = get_object_or_404(Colaborador, usuario__user=current_user)
+            qsFinal = qs.filter(
+                (
+                    Q(year__in=list(map(lambda x: int(x), ano))) &
+                    Q(month__in=list(map(lambda x: int(x), mes)))
+                ) &
+                (
+                    Q(vendedor__colaborador__in=usuario.subalternos.all()) |
+                    Q(vendedor__colaborador=usuario)
+                )
+            )
+        else:
+            qsFinal = qs.filter(
+                Q(year__in=list(map(lambda x: int(x), ano))) &
+                Q(month__in=list(map(lambda x: int(x), mes)))).order_by('-vendedor__activo', 'day')
+        return qsFinal.order_by('-vendedor__activo')
 
 
 class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
@@ -158,11 +174,11 @@ class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseM
                     | Q(vendedor__colaborador=usuario)
                     | Q(vendedor__activo=False)
                 )
-            ).order_by('-vendedor__activo','day')
+            ).order_by('-vendedor__activo', 'day')
         else:
             qsFinal = qs.filter(
                 Q(year__in=list(map(lambda x: int(x), ano))) &
-                Q(month__in=list(map(lambda x: int(x), mes)))).order_by('-vendedor__activo','day')
+                Q(month__in=list(map(lambda x: int(x), mes)))).order_by('-vendedor__activo', 'day')
         return qsFinal
 
 
@@ -571,22 +587,19 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
         ).order_by('-dias_vencido', '-debe')
 
         if not current_user.has_perm('biable.ver_carteras_todos'):
-            usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
-            if usuario.vendedores.all():
-                clientes = Cartera.objects.values_list('client_id').filter(vendedor__in=usuario.vendedores.all()).distinct()
-                qsFinal = qs.filter(
-                    (
-                        Q(vendedor__in=usuario.vendedores.all())
-                        | Q(vendedor__activo=False)
-                        | Q(client_id__in=clientes)
-                    )
+            usuario = get_object_or_404(Colaborador, usuario__user=current_user)
+            clientes = Cartera.objects.values_list('client_id').filter(vendedor__colaborador=usuario).distinct()
+            clientes_subalternos = Cartera.objects.values_list('client_id').filter(
+                vendedor__colaborador__in=usuario.subalternos.all()).distinct()
+            qsFinal = qs.filter(
+                (
+                    Q(vendedor__colaborador__in=usuario.subalternos.all())
+                    | Q(vendedor__colaborador=usuario)
+                    | Q(vendedor__activo=False)
+                    | Q(client_id__in=clientes)
+                    | Q(client_id__in=clientes_subalternos)
                 )
-            else:
-                qsFinal = qs.filter(
-                    (
-                        Q(vendedor__activo=False)
-                    )
-                )
+            )
         else:
             qsFinal = qs
 
