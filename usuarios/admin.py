@@ -7,32 +7,7 @@ from .models import Colaborador, ClienteEmpresa, UserExtended
 
 
 # Register your models here.
-
-class ColaboradorAdmin(admin.ModelAdmin):
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if obj is not None:
-            qs1 = UserExtended.objects.filter(
-                Q(tipo='I') &
-                (
-                    Q(user_id=obj.usuario.pk) |
-                    Q(colaborador__isnull=True)
-                )
-            )
-            form.base_fields['usuario'].queryset = qs1
-        else:
-            qs1 = UserExtended.objects.filter(
-                Q(tipo='I') &
-                (
-                    Q(colaborador__isnull=True)
-                )
-            )
-            form.base_fields['usuario'].queryset = qs1
-
-        return form
-
-
-admin.site.register(Colaborador, ColaboradorAdmin)
+admin.site.register(Colaborador)
 
 
 class ClienteEmpresaAdmin(admin.ModelAdmin):
