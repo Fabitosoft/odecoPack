@@ -40,6 +40,8 @@ class Colaborador(models.Model):
     extencion = models.CharField(max_length=10)
     foto_perfil = models.ImageField(upload_to=colaborador_upload_to, validators=[validate_image], null=True, blank=True)
 
+
+
     class Meta:
         verbose_name_plural = "colaboradores"
 
