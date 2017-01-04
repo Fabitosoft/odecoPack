@@ -110,6 +110,7 @@ class Cartera(models.Model):
     vendedor = models.ForeignKey(VendedorBiable,null=True)
     id_terc_fa = models.CharField(max_length=20)
     cliente = models.CharField(max_length=200)
+    client = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True)
     tipo_documento = models.CharField(max_length=3, null=True, blank=True)
     nro_documento = models.CharField(max_length=10, null=True, blank=True)
     forma_pago = models.PositiveIntegerField(null=True, blank=True)
