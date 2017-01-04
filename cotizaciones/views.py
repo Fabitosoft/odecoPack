@@ -296,6 +296,7 @@ class RemisionListView(ListView):
 
 class CotizacionesListView(ListView):
     model = Cotizacion
+    template_name = 'cotizaciones/cotizacion_list.html'
 
     def get_queryset(self):
         query = self.request.GET.get("buscado")
@@ -311,33 +312,28 @@ class CotizacionesListView(ListView):
         if self.kwargs.get("tipo") == '3':
             qs = Cotizacion.estados.rechazado()
 
+        if query:
+            qs = qs.filter(
+                Q(nombres_contacto__icontains=query) |
+                Q(nro_cotizacion__icontains=query) |
+                Q(ciudad__icontains=query) |
+                Q(razon_social__icontains=query) |
+                Q(items__item__descripcion_estandar__icontains=query) |
+                Q(items__item__referencia__icontains=query)
+            )
+
         if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
             usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
+            print('entro por vendedores')
             if usuario.vendedores.all():
                 qsFinal = qs.filter(
-                    (
-                        Q(nombres_contacto__icontains=query) |
-                        Q(nro_cotizacion__icontains=query) |
-                        Q(ciudad__icontains=query) |
-                        Q(razon_social__icontains=query) |
-                        Q(items__item__descripcion_estandar__icontains=query) |
-                        Q(items__item__referencia__icontains=query)
-                    ) &
-                    (
-                        Q(vendedor__in=usuario.vendedores.all())
-                        | Q(vendedor__activo=False)
-                    )
+                    Q(vendedor__in=usuario.vendedores.all())
+                    | Q(vendedor__activo=False)
                 ).order_by('-total').distinct()
-            else:
-                qsFinal = qs.filter(
-                    Q(nombres_contacto__icontains=query) |
-                    Q(nro_cotizacion__icontains=query) |
-                    Q(ciudad__icontains=query) |
-                    Q(razon_social__icontains=query) |
-                    Q(items__item__descripcion_estandar__icontains=query) |
-                    Q(items__item__referencia__icontains=query)
-                ).order_by('-total').distinct()
-
+        else:
+            print('entro todos')
+            qsFinal = qs.order_by('-total').distinct()
+        print(qsFinal)
         return qsFinal
 
     def get_context_data(self, **kwargs):

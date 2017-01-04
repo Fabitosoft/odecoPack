@@ -156,12 +156,12 @@ class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseM
                         Q(vendedor__in=usuario.vendedores.all())
                         | Q(vendedor__activo=False)
                     )
-                )
+                ).order_by('day')
         else:
             qsFinal = qs.filter(
                 Q(year__in=list(map(lambda x: int(x), ano))) &
-                Q(month__in=list(map(lambda x: int(x), mes))))
-        return qsFinal.order_by('day')
+                Q(month__in=list(map(lambda x: int(x), mes)))).order_by('day')
+        return qsFinal
 
 
 class VentasClientes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
