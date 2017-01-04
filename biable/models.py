@@ -48,6 +48,7 @@ class Actualizacion(models.Model):
 
 class LineaVendedorBiable(models.Model):
     nombre = models.CharField(max_length=120)
+    colaborador = models.ForeignKey(UserExtended, null=True, blank=True, on_delete=models.PROTECT, related_name='mi_vendedor_biable')
 
     def __str__(self):
         return self.nombre

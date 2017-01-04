@@ -186,7 +186,6 @@ class ProductoAdmin(ImportExportModelAdmin):
 
     def get_object(self, request, object_id, from_field=None):
         obj = super().get_object(request, object_id, from_field)
-        print('entro get object')
         return obj
 
     list_select_related = (

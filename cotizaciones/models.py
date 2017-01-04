@@ -99,7 +99,6 @@ class Cotizacion(TimeStampedModel):
         total = 0
         items = self.items.all()
         for item in items:
-            print(item.total)
             total += item.total
         self.total = "%.2f" % total
         self.save()

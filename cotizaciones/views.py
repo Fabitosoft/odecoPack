@@ -324,16 +324,12 @@ class CotizacionesListView(ListView):
 
         if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
             usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
-            print('entro por vendedores')
             if usuario.vendedores.all():
                 qsFinal = qs.filter(
-                    Q(vendedor__in=usuario.vendedores.all())
-                    | Q(vendedor__activo=False)
+                    Q(usuario__in=usuario.vendedores.all())
                 ).order_by('-total').distinct()
-        else:
-            print('entro todos')
+        if current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
             qsFinal = qs.order_by('-total').distinct()
-        print(qsFinal)
         return qsFinal
 
     def get_context_data(self, **kwargs):

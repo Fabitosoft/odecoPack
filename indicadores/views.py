@@ -105,7 +105,6 @@ class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, I
             linea=F('vendedor__linea_ventas__nombre'),
         ).filter(year__in=list(map(lambda x: int(x), ano)), month__in=list(map(lambda x: int(x), mes)),
                  vendedor__in=vendedores)
-        print(qs.all().count())
         return qs
 
 
@@ -296,7 +295,6 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin
 
         ano = self.request.POST.get('ano')
         linea = self.request.POST.get('linea')
-        print(linea)
         qs = self.consulta(ano)
 
         if not linea == "0":
@@ -365,8 +363,6 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMi
             year__in=list(map(lambda x: int(x), ano)),
             month__in=list(map(lambda x: int(x), mes))
         ).order_by('-v_bruta')
-        print(qs.all().count())
-        print(qs)
         return qs
 
 

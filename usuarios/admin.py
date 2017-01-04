@@ -19,7 +19,6 @@ class ColaboradorAdmin(admin.ModelAdmin):
                     Q(colaborador__isnull=True)
                 )
             )
-            print(obj.usuario.pk)
             form.base_fields['usuario'].queryset = qs1
         else:
             qs1 = UserExtended.objects.filter(
