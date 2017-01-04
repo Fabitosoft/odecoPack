@@ -549,6 +549,7 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
             'recaudado',
             'a_recaudar',
             'cliente',
+            'client_id',
         ).annotate(
             tipo=Case(
                 When(esta_vencido=True,
@@ -573,10 +574,12 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
         if not current_user.has_perm('biable.ver_carteras_todos'):
             usuario = get_object_or_404(VendedorBiableUser, usuario__user=current_user)
             if usuario.vendedores.all():
+                clientes = Cartera.objects.values_list('client_id').filter(vendedor__in=usuario.vendedores.all()).distinct()
                 qsFinal = qs.filter(
                     (
                         Q(vendedor__in=usuario.vendedores.all())
                         | Q(vendedor__activo=False)
+                        | Q(client_id__in=clientes)
                     )
                 )
             else:

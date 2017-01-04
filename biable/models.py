@@ -107,7 +107,7 @@ class MovimientoVentaBiable(models.Model):
         )
 
 class Cartera(models.Model):
-    vendedor = models.ForeignKey(VendedorBiable,null=True)
+    vendedor = models.ForeignKey(VendedorBiable,null=True, related_name='mis_carteras')
     id_terc_fa = models.CharField(max_length=20)
     cliente = models.CharField(max_length=200)
     client = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True)
