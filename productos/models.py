@@ -114,6 +114,7 @@ class Producto(TimeStampedModel):
     class Meta:
         verbose_name_plural = "Componentes Bandas"
         verbose_name = "Componente Banda"
+        unique_together = ('referencia', 'fabricante')
 
     def get_costo_cop(self):
         if self.margen:
@@ -200,6 +201,7 @@ class Producto(TimeStampedModel):
 
 
 class ArticuloCatalogo(models.Model):
+    id_cguno = models.PositiveIntegerField(default=0)
     referencia = models.CharField(max_length=100)
     nombre = models.CharField(max_length=200)
     unidad_medida = models.CharField(max_length=100)
@@ -210,6 +212,9 @@ class ArticuloCatalogo(models.Model):
     margen = models.ForeignKey(MargenProvedor, null=True, blank=True, related_name="articulos_catalogo_con_margen",
                                verbose_name="Id MxC")
     activo = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('referencia','fabricante')
 
     def __str__(self):
         return self.nombre
