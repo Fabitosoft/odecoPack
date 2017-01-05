@@ -322,7 +322,13 @@ class CotizacionesListView(ListView):
                 Q(ciudad__icontains=query) |
                 Q(razon_social__icontains=query) |
                 Q(items__item__descripcion_estandar__icontains=query) |
-                Q(items__item__referencia__icontains=query)
+                Q(items__item__descripcion_comercial__icontains=query) |
+                Q(items__item__referencia__icontains=query) |
+                Q(items__banda__descripcion_estandar__icontains=query) |
+                Q(items__banda__descripcion_comercial__icontains=query) |
+                Q(items__banda__referencia__icontains=query) |
+                Q(items__articulo_catalogo__referencia__icontains=query) |
+                Q(items__articulo_catalogo__nombre__icontains=query)
             )
 
         if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
