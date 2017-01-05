@@ -304,7 +304,10 @@ class CotizacionesListView(ListView):
         current_user = self.request.user
         qsFinal = None
 
-        qs = Cotizacion.estados.activo()
+        qs = Cotizacion.objects.all()
+
+        if self.kwargs.get("tipo") == '1':
+            qs = Cotizacion.estados.activo()
 
         if self.kwargs.get("tipo") == '2':
             qs = Cotizacion.estados.completado()
