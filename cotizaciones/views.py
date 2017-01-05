@@ -239,7 +239,10 @@ class CotizacionEmailView(View):
 
             user = User.objects.get(username=request.user)
 
-            colaborador = Colaborador.objects.filter(usuario__user=user)
+            try:
+                colaborador = Colaborador.objects.get(usuario__user=user)
+            except Colaborador.DoesNotExist:
+                colaborador = None
 
             if colaborador:
                 if colaborador.foto_perfil:
