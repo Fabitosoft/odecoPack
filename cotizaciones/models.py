@@ -88,7 +88,7 @@ class Cotizacion(TimeStampedModel):
         permissions = (
             ('full_cotizacion', 'Full Cotizacion'),
             ('gestion_cotizaciones', 'Gestionar Cotizaciones'),
-            #('hacer_cotizacion', 'Hacer Cotización'),
+            # ('hacer_cotizacion', 'Hacer Cotización'),
         )
 
     def get_absolute_url(self):
@@ -175,7 +175,10 @@ class ItemCotizacion(TimeStampedModel):
         return round(self.total - costo, 0)
 
     def get_margen_rentabilidad_actual(self):
-        return round((self.get_rentabilidad_actual_total() * 100) / self.total, 2)
+        margen = 0
+        if self.total != 0:
+            round((self.get_rentabilidad_actual_total() * 100) / self.total, 2)
+        return margen
 
     def get_tiempo_entrega_prometido(self):
         if self.dias_entrega == 0:
@@ -231,7 +234,6 @@ class TareaCotizacion(TimeStampedModel):
         return "%s" % self.nombre
 
     def get_dias_a_fecha_fin(self):
-
         return (self.fecha_final - datetime.date.today()).days
 
 # endregion

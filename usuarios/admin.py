@@ -7,7 +7,17 @@ from .models import Colaborador, ClienteEmpresa, UserExtended
 
 
 # Register your models here.
-admin.site.register(Colaborador)
+
+class ColaboradorAdmin(admin.ModelAdmin):
+    list_display = ('get_colaborador_nombre','numero_contacto','extencion','jefe')
+    list_editable = ('jefe','numero_contacto','extencion','jefe')
+    readonly_fields = ('get_colaborador_nombre',)
+
+    def get_colaborador_nombre(self,obj):
+        return obj.usuario.user.get_full_name()
+    get_colaborador_nombre.short_description = 'Colaborador'
+
+admin.site.register(Colaborador, ColaboradorAdmin)
 
 
 class ClienteEmpresaAdmin(admin.ModelAdmin):

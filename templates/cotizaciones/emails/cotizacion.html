@@ -105,7 +105,7 @@
         <h3><small>Fecha: {{ object.fecha_envio }}</small></h3>
     </div>
 </header>
-<div class="texto_mensaje">----
+<div class="texto_mensaje">
     <p>
         Apreciado(a) {{ object.nombres_contacto|title }} mi nombre es
         {{ object.usuario.get_full_name|title }}, de <strong>ODECOPACK S.A.S</strong>,
@@ -134,6 +134,9 @@
                 Cant.
             </th>
             <th>
+                Pre. Uni
+            </th>
+            <th>
                 Uni. Emp
             </th>
             <th>
@@ -155,6 +158,9 @@
                 </td>
                 <td>
                     {{ item.cantidad }}
+                </td>
+                <td>
+                    {{ item.get_costo_cop_actual_unidad }}
                 </td>
                 <td>
                     {{ item.get_unidad_item }}

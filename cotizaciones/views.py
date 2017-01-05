@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
@@ -236,17 +237,21 @@ class CotizacionEmailView(View):
                 'object': obj,
             }
 
-            if request.user.user_extendido.colaborador:
-                if request.user.user_extendido.colaborador.foto_perfil:
-                    url_avatar = request.user.user_extendido.colaborador.foto_perfil.url
-                    ctx = {
-                        'object': obj,
-                        'avatar': url_avatar
-                    }
+            user = User.objects.get(username=request.user)
+
+            colaborador = Colaborador.objects.filter(usuario__user=user)
+
+            if colaborador:
+                url_avatar = colaborador.foto_perfil.url
+                ctx = {
+                    'object': obj,
+                    'avatar': url_avatar
+                }
 
             text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
         return redirect(obj)
