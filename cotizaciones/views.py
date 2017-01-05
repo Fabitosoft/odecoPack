@@ -242,11 +242,12 @@ class CotizacionEmailView(View):
             colaborador = Colaborador.objects.filter(usuario__user=user)
 
             if colaborador:
-                url_avatar = colaborador.foto_perfil.url
-                ctx = {
-                    'object': obj,
-                    'avatar': url_avatar
-                }
+                if colaborador.foto_perfil:
+                    url_avatar = colaborador.foto_perfil.url
+                    ctx = {
+                        'object': obj,
+                        'avatar': url_avatar
+                    }
 
             text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
