@@ -588,7 +588,8 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
 
         if not current_user.has_perm('biable.ver_carteras_todos'):
             usuario = get_object_or_404(Colaborador, usuario__user=current_user)
-            clientes = Cartera.objects.values_list('client_id').filter(vendedor__colaborador=usuario,esta_vencido=True).distinct()
+            clientes = Cartera.objects.values_list('client_id').filter(vendedor__colaborador=usuario,
+                                                                       esta_vencido=True).distinct()
             clientes_subalternos = Cartera.objects.values_list('client_id').filter(
                 vendedor__colaborador__in=usuario.subalternos.all()).distinct()
             qsFinal = qs.filter(
@@ -596,7 +597,7 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
                     Q(vendedor__colaborador__in=usuario.subalternos.all())
                     | Q(vendedor__colaborador=usuario)
                     | Q(vendedor__activo=False)
-                    | Q(client_id__in=clientes)
+                    | Q(client_id__in=clientes, esta_vencido=True)
                     | Q(client_id__in=clientes_subalternos)
                 )
             )
