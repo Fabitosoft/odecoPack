@@ -229,7 +229,9 @@ class CotizacionEmailView(View):
             obj.save()
 
             subject, from_email, to = "%s - %s" % (
-                'Cotizacion', obj.nro_cotizacion), settings.EMAIL_HOST_USER, obj.email
+                'Cotizacion', obj.nro_cotizacion
+            ), settings.EMAIL_HOST_USER, obj.email
+
             ctx = {
                 'object': obj,
             }
@@ -304,10 +306,7 @@ class CotizacionesListView(ListView):
         current_user = self.request.user
         qsFinal = None
 
-        qs = Cotizacion.objects.all()
-
-        if self.kwargs.get("tipo") == '1':
-            qs = Cotizacion.estados.activo()
+        qs = Cotizacion.estados.activo()
 
         if self.kwargs.get("tipo") == '2':
             qs = Cotizacion.estados.completado()
@@ -316,6 +315,7 @@ class CotizacionesListView(ListView):
             qs = Cotizacion.estados.rechazado()
 
         if query:
+            qs = Cotizacion.objects.all()
             qs = qs.filter(
                 Q(nombres_contacto__icontains=query) |
                 Q(nro_cotizacion__icontains=query) |
