@@ -229,7 +229,7 @@ class CotizacionEmailView(View):
             obj.pais = self.request.POST.get('pais')
             obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
             obj.fecha_envio = timezone.now()
-            #obj.estado = "ENV"
+            obj.estado = "ENV"
             obj.save()
 
             subject, from_email, to = "%s - %s" % (
