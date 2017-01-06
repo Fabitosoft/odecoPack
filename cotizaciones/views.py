@@ -1,4 +1,5 @@
 from decimal import Decimal
+from io import BytesIO
 
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
@@ -228,7 +229,7 @@ class CotizacionEmailView(View):
             obj.pais = self.request.POST.get('pais')
             obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
             obj.fecha_envio = timezone.now()
-            obj.estado = "ENV"
+            #obj.estado = "ENV"
             obj.save()
 
             subject, from_email, to = "%s - %s" % (
@@ -257,9 +258,13 @@ class CotizacionEmailView(View):
             text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
+            output = BytesIO()
+            HTML(string=html_content).write_pdf(target=output)
             msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email])
             msg.attach_alternative(html_content, "text/html")
+            msg.attach('Report.pdf', output.getvalue(), 'application/pdf')
             msg.send()
+            output.close()
         return redirect(obj)
 
 
