@@ -39,7 +39,8 @@ from .forms import (
     RemisionCotizacionForm,
     RemisionCotizacionFormHelper,
     TareaCotizacionForm,
-    TareaCotizacionFormHelper
+    TareaCotizacionFormHelper,
+    ItemCotizacionOtrosForm
 )
 
 
@@ -450,6 +451,33 @@ class AddItem(SingleObjectMixin, View):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+class AddItemOtro(SingleObjectMixin, View):
+    model = ItemCotizacion
+
+    def post(self, request, *args, **kwargs):
+        coti_id = request.POST.get('cotizacion_id')
+        precio = request.POST.get('precio')
+        nombre = request.POST.get('p_n_lista_descripcion')
+        referencia = request.POST.get('p_n_lista_referencia')
+        p_n_lista_unidad_medida = request.POST.get('p_n_lista_unidad_medida')
+        item = ItemCotizacion.objects.filter(
+            Q(p_n_lista_descripcion=nombre) &
+            Q(cotizacion_id=coti_id)
+        ).first()
+        if not item:
+            item = ItemCotizacion()
+            item.cantidad = 1
+            item.cotizacion_id = coti_id
+        item.p_n_lista_descripcion = nombre
+        item.p_n_lista_referencia = referencia
+        item.p_n_lista_unidad_medida = p_n_lista_unidad_medida
+        item.precio = precio
+        item.total = int(precio) * item.cantidad
+        item.save()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 # region Cotizador
 class CotizacionFormView(FormView):
     def post(self, request, *args, **kwargs):
@@ -531,6 +559,7 @@ class CotizadorTemplateView(TemplateView):
             context["cotizacion_id"] = cotizacion.id
             context["cotizacion_total"] = cotizacion.total
             context["items_cotizacion"] = cotizacion.items.all()
+            context["forma_item_otro"] = ItemCotizacionOtrosForm(initial={'cotizacion_id': cotizacion.id})
         else:
             context["cotizacion_form"] = CotizacionForm()
 

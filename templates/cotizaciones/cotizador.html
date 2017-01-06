@@ -147,8 +147,14 @@
                             </tr>
                             </tfoot>
                         </table>
+                        <div>
+                            <h3>Adicionar Item Fuera de Lista</h3>
+                            <hr>
+                            {% crispy forma_item_otro %}
+                        </div>
                     </div>
                     <div class="col-md-3">
+                        <h3>Datos Cotización</h3>
                         {% crispy cotizacion_form %}
                         <hr/>
                         <form method="POST">
@@ -157,7 +163,10 @@
                         </form>
                     </div>
                 {% else %}
-                    {% crispy cotizacion_form %}
+                    <div>
+                        <h3>Datos Cotización</h3>
+                        {% crispy cotizacion_form %}
+                    </div>
                 {% endif %}
             </div>
         </div>

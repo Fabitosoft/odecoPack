@@ -125,9 +125,12 @@ class ItemCotizacion(TimeStampedModel):
     item = models.ForeignKey(Producto, related_name="cotizaciones", null=True)
     banda = models.ForeignKey(Banda, related_name="cotizaciones", null=True)
     articulo_catalogo = models.ForeignKey(ArticuloCatalogo, related_name="cotizaciones", null=True)
-    cantidad = models.DecimalField(max_digits=18, decimal_places=3)
+    cantidad = models.DecimalField(max_digits=18, decimal_places=3, null=True)
     precio = models.DecimalField(max_digits=18, decimal_places=0)
-    forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones")
+    forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones", null=True)
+    p_n_lista_descripcion = models.CharField(max_length=120, null=True, verbose_name='Descripción Otro')
+    p_n_lista_referencia = models.CharField(max_length=120, null=True,verbose_name='Referencia Otro', blank=True)
+    p_n_lista_unidad_medida = models.CharField(max_length=120, null=True,verbose_name='Unidad Medida')
     total = models.DecimalField(max_digits=18, decimal_places=0)
     dias_entrega = models.PositiveIntegerField(default=0)
 
@@ -136,8 +139,10 @@ class ItemCotizacion(TimeStampedModel):
             nombre = self.item.descripcion_comercial
         elif self.articulo_catalogo:
             nombre = self.articulo_catalogo.nombre
-        else:
+        elif self.banda:
             nombre = self.banda.descripcion_comercial
+        else:
+            nombre = self.p_n_lista_descripcion
         return nombre
 
     def get_referencia_item(self):
@@ -145,8 +150,10 @@ class ItemCotizacion(TimeStampedModel):
             nombre = self.item.referencia
         elif self.articulo_catalogo:
             nombre = self.articulo_catalogo.referencia
-        else:
+        elif self.banda:
             nombre = self.banda.referencia
+        else:
+            nombre = self.p_n_lista_referencia
         return nombre
 
     def get_unidad_item(self):
@@ -154,8 +161,10 @@ class ItemCotizacion(TimeStampedModel):
             nombre = self.item.unidad_medida
         elif self.articulo_catalogo:
             nombre = self.articulo_catalogo.unidad_medida
-        else:
+        elif self.banda:
             nombre = "Metro"
+        else:
+            nombre = self.p_n_lista_unidad_medida
         return nombre
 
     def get_costo_cop_actual_unidad(self):
@@ -163,8 +172,10 @@ class ItemCotizacion(TimeStampedModel):
             costo = self.item.get_costo_cop()
         elif self.articulo_catalogo:
             costo = self.articulo_catalogo.get_costo_cop()
-        else:
+        elif self.banda:
             costo = self.banda.get_costo_cop()
+        else:
+            costo = 0
         return round(costo, 0)
 
     def get_costo_cop_actual_total(self):

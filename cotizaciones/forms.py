@@ -6,7 +6,7 @@ from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from django.urls import reverse
 
-from .models import Cotizacion, RemisionCotizacion, TareaCotizacion
+from .models import Cotizacion, RemisionCotizacion, TareaCotizacion, ItemCotizacion
 
 
 class BusquedaCotiForm(forms.Form):
@@ -22,6 +22,43 @@ class BusquedaCotiForm(forms.Form):
         self.helper.form_class = 'form-inline'
         self.helper.layout = Layout(
             FieldWithButtons('buscado', Submit('buscar', 'Buscar'))
+        )
+
+
+class ItemCotizacionOtrosForm(ModelForm):
+    cotizacion_id = forms.IntegerField(required=False, widget=forms.HiddenInput)
+
+    class Meta:
+        model = ItemCotizacion
+        fields = ['precio', 'p_n_lista_descripcion', 'p_n_lista_referencia', 'p_n_lista_unidad_medida']
+
+    def __init__(self, *args, **kwargs):
+        super(ItemCotizacionOtrosForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-otro-item'
+        self.helper.form_method = "POST"
+        self.helper.form_action = reverse('cotizaciones:add_item_otro_cotizacion')
+
+        # self.helper.form_class = 'form-inline'
+        self.helper.layout = Layout(
+            Field('cotizacion_id'),
+            Field('p_n_lista_descripcion'),
+            Div(
+                Div(
+                    Field('p_n_lista_referencia'),
+                    css_class='col-md-4'
+                ),
+                Div(
+                    Field('p_n_lista_unidad_medida'),
+                    css_class='col-md-4'
+                ),
+                Div(
+                    Field('precio'),
+                    css_class='col-md-4'
+                ),
+                css_class='row'
+            ),
+            Submit('add_otro', 'Adicionar'),
         )
 
 
