@@ -12,7 +12,8 @@ class MargenProvedorInline(admin.TabularInline):
 
 
 class ProveedorAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'moneda')
+    list_display = ('nombre', 'moneda','factor_importacion')
+    list_editable = ('factor_importacion',)
 
     inlines = [
         MargenProvedorInline,
@@ -20,15 +21,6 @@ class ProveedorAdmin(admin.ModelAdmin):
 
 
 class MargenProveedorAdmin(admin.ModelAdmin):
-    list_filter = ("categoria", "proveedor")
-    list_display = ('proveedor', 'categoria', 'margen_deseado')
-    list_editable = ('margen_deseado',)
-
-    def save_model(self, request, obj, form, change):
-        if form.has_changed():
-            obj.save()
-
-class MargenProveedorAdmin2(ViewAdmin):
     list_filter = ("categoria", "proveedor")
     list_display = ('proveedor', 'categoria', 'margen_deseado')
     list_editable = ('margen_deseado',)

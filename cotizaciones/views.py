@@ -18,6 +18,7 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView, FormView
 from django.forms import inlineformset_factory
 from django.utils import timezone
+from weasyprint import HTML
 
 from listasprecios.forms import ProductoBusqueda
 from biable.models import Colaborador
