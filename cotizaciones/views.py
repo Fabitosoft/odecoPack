@@ -379,7 +379,7 @@ class AddItemCantidad(SingleObjectMixin, View):
         item = ItemCotizacion.objects.get(id=item_id)
         qty = Decimal(request.GET.get("qty"))
 
-        if qty < 0.999:
+        if qty <= 0:
             delete = True
             item.delete()
         else:
