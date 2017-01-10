@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 
@@ -7,8 +6,6 @@ from django.views.generic.edit import UpdateView
 
 from cotizaciones.models import (
     Cotizacion,
-    RemisionCotizacion,
-    TareaCotizacion
 )
 from biable.models import Cartera, VendedorBiable
 from .models import TrabajoDia, TareaDiaria
@@ -22,6 +19,11 @@ class TareaDiaUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse('trabajo_diario:lista_tareas')
+
+    def get_context_data(self, **kwargs):
+        self.get_object().set_actualizar_mi_trabajo_diario()
+        return super().get_context_data(**kwargs)
+
 
 class TareaDiaListView(TemplateView):
     template_name = 'trabajo_diario/trabajo_diario_list.html'
@@ -64,7 +66,16 @@ class TareaDiaListView(TemplateView):
                         tarea.nombre, cotizacion.nro_cotizacion)
                     self.generacion_tarea_diaria("Seguimiento Tarea", descripcion, trabajo_dia)
 
+            trabajo_dia.nro_tareas_sin_atender = trabajo_dia.get_nro_tareas_sin_atender()
+            trabajo_dia.nro_tareas = trabajo_dia.get_nro_tareas()
+            trabajo_dia.nro_tareas_atendidas = trabajo_dia.get_nro_tareas_atendidas()
+            trabajo_dia.save()
+            trabajo_dia.porcentaje_atendido = trabajo_dia.get_porcentaje_gestion_tareas()
+            trabajo_dia.save()
+
         context = super().get_context_data(**kwargs)
+
+        context["porcentaje_tareas_atendidas"] = trabajo_dia.porcentaje_atendido
         context["seguimiento_tarea"] = trabajo_dia.mis_tareas.filter(tipo="Seguimiento Tarea")
         context["seguimiento_cotizacion"] = trabajo_dia.mis_tareas.filter(tipo="Seguimiento Cotización")
         context["seguimiento_remision"] = trabajo_dia.mis_tareas.filter(tipo="Seguimiento Remisión")

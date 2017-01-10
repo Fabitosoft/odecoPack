@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Trabajo del Día</h1>
+    <h1>Trabajo del Día <small>{{ porcentaje_tareas_atendidas|floatformat:1 }}% realizado</small></h1>
     Estas son tus tareas para el día de hoy
     <div class="row">
 
