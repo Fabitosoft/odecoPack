@@ -20,10 +20,6 @@ class TareaDiaUpdateView(UpdateView):
     def get_success_url(self):
         return reverse('trabajo_diario:lista_tareas')
 
-    def get_context_data(self, **kwargs):
-        self.get_object().set_actualizar_mi_trabajo_diario()
-        return super().get_context_data(**kwargs)
-
 
 class TareaDiaListView(TemplateView):
     template_name = 'trabajo_diario/trabajo_diario_list.html'

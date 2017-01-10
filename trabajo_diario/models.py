@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Count
+from django.db.models.signals import post_save
 
 from model_utils.models import TimeStampedModel
 
@@ -51,8 +52,9 @@ class TareaDiaria(TimeStampedModel):
     observacion = models.TextField(max_length=300, null=True, blank=True)
     estado = models.PositiveIntegerField(choices=ESTADOS, default=0)
 
-    def set_actualizar_mi_trabajo_diario(self):
-        trabajo_dia = self.mi_dia
+def set_actualizar_mi_trabajo_diario(sender, instance, created, **kwargs):
+    if not created:
+        trabajo_dia = instance.mi_dia
         trabajo_dia.nro_tareas_sin_atender = trabajo_dia.get_nro_tareas_sin_atender()
         trabajo_dia.nro_tareas = trabajo_dia.get_nro_tareas()
         trabajo_dia.nro_tareas_atendidas = trabajo_dia.get_nro_tareas_atendidas()
@@ -60,3 +62,4 @@ class TareaDiaria(TimeStampedModel):
         trabajo_dia.porcentaje_atendido = trabajo_dia.get_porcentaje_gestion_tareas()
         trabajo_dia.save()
 
+post_save.connect(set_actualizar_mi_trabajo_diario, sender=TareaDiaria)
