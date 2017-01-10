@@ -48,6 +48,7 @@ urlpatterns = [
     url(r'^cotizaciones/', include('cotizaciones.urls', namespace="cotizaciones")),
     url(r'^bandas/', include('bandas.urls', namespace="bandas")),
     url(r'^indicadores/', include('indicadores.urls', namespace="indicadores")),
+    url(r'^trabajo_diario/', include('trabajo_diario.urls', namespace="trabajo_diario")),
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Editar Tarea de {{ object.tipo }}</h1>
+    <p>
+        {{ object.descripcion }}
+    </p>
+    <form action="" method="post">{% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Guardar"/>
+    </form>
+{% endblock %}
