@@ -68,6 +68,7 @@ class CotizacionForm(ModelForm):
     nombres_contacto = forms.CharField(label="Nombres")
     apellidos_contacto = forms.CharField(label="Apellidos")
     razon_social = forms.CharField(label="Razón Social")
+    observaciones = forms.Textarea()
 
     class Meta:
         model = Cotizacion
@@ -94,6 +95,8 @@ class CotizacionForm(ModelForm):
                 Field('apellidos_contacto')
             ),
             PrependedText('email', '@', placeholder="Correo Electrónico"),
+            HTML('<hr/>'),
+            Field('observaciones'),
             HTML('<hr/>')
 
         )

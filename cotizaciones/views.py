@@ -19,6 +19,9 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView, FormView
 from django.forms import inlineformset_factory
 from django.utils import timezone
+
+
+import mistune
 from weasyprint import HTML
 
 from listasprecios.forms import ProductoBusqueda
@@ -219,12 +222,14 @@ class CotizacionEmailView(View):
     def post(self, request, *args, **kwargs):
         pk = kwargs['pk']
         obj = Cotizacion.objects.get(pk=pk)
+        markdown = mistune.Markdown()
         if obj.estado == "INI":
             obj.razon_social = self.request.POST.get('razon_social')
             obj.nombres_contacto = self.request.POST.get('nombres_contacto')
             obj.apellidos_contacto = self.request.POST.get('apellidos_contacto')
             obj.email = self.request.POST.get('email')
             obj.nro_contacto = self.request.POST.get('nro_contacto')
+            obj.observaciones =markdown(self.request.POST.get('observaciones'))
             obj.ciudad = self.request.POST.get('ciudad')
             obj.pais = self.request.POST.get('pais')
             obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)

@@ -131,6 +131,7 @@ THIRD_PART_APPS = (
     'import_export',
     'crispy_forms',
     'imagekit',
+    'mistune',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

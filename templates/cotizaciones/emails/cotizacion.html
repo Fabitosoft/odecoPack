@@ -101,8 +101,12 @@
         <img src="{% static "www/img/logos/logo.png" %}" alt="logo"/>
     </div>
     <div>
-        <h1><strong>Cotización Nro:<small>{{ object.nro_cotizacion }}</small></strong></h1>
-        <h3><small>Fecha: {{ object.fecha_envio }}</small></h3>
+        <h1><strong>Cotización Nro:
+            <small>{{ object.nro_cotizacion }}</small>
+        </strong></h1>
+        <h3>
+            <small>Fecha: {{ object.fecha_envio }}</small>
+        </h3>
     </div>
 </header>
 <div class="texto_mensaje">
@@ -181,6 +185,16 @@
         </tr>
         </tfoot>
     </table>
+
+    {% if object.observaciones %}
+        <div class="texto_mensaje">
+        <h3><strong>Observaciones</strong></h3>
+            <p>
+                {{ object.observaciones | safe  }}
+            </p>
+        </div>
+    {% endif %}
+
 
     <div id="email_coti_condiciones_comerciales">
         <h4>NOTAS Y CONDICCIONES COMERCIALES </h4>
