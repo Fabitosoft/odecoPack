@@ -18,26 +18,14 @@ class TrabajoDia(TimeStampedModel):
     def __str__(self):
         return "%s - %s" % (self.usuario, self.created.date())
 
-    def get_nro_tareas(self):
-        nro_tareas = int(self.mis_tareas.aggregate(Count('id'))['id__count'])
-        return nro_tareas
-
-    def get_nro_tareas_sin_atender(self):
-        nro_tareas_sin_atender = int(self.mis_tareas.filter(estado=0).aggregate(Count('id'))['id__count'])
-        return nro_tareas_sin_atender
-
-    def get_nro_tareas_atendidas(self):
-        nro_tareas_atendidas = self.get_nro_tareas() - self.get_nro_tareas_sin_atender()
-        return nro_tareas_atendidas
-
-    def get_porcentaje_gestion_tareas(self):
-        nro_tareas = self.nro_tareas
-        nro_tareas_sin_atender = self.nro_tareas_sin_atender
-        nro_tareas_atendidas = nro_tareas - nro_tareas_sin_atender
-        porcentaje_tareas_atendidas = 0
-        if nro_tareas > 0:
-            porcentaje_tareas_atendidas = nro_tareas_atendidas / nro_tareas
-        return porcentaje_tareas_atendidas * 100
+    def set_actualizar_seguimiento_trabajo(self):
+        self.nro_tareas = int(self.mis_tareas.aggregate(Count('id'))['id__count'])
+        self.nro_tareas_sin_atender = int(self.mis_tareas.filter(estado=0).aggregate(Count('id'))['id__count'])
+        self.nro_tareas_atendidas = self.nro_tareas - self.nro_tareas_sin_atender
+        self.porcentaje_atendido = 0
+        if self.nro_tareas > 0:
+            self.porcentaje_atendido = (self.nro_tareas_atendidas / self.nro_tareas)* 100
+        self.save()
 
 
 class TareaDiaria(TimeStampedModel):
@@ -55,11 +43,6 @@ class TareaDiaria(TimeStampedModel):
 def set_actualizar_mi_trabajo_diario(sender, instance, created, **kwargs):
     if not created:
         trabajo_dia = instance.mi_dia
-        trabajo_dia.nro_tareas_sin_atender = trabajo_dia.get_nro_tareas_sin_atender()
-        trabajo_dia.nro_tareas = trabajo_dia.get_nro_tareas()
-        trabajo_dia.nro_tareas_atendidas = trabajo_dia.get_nro_tareas_atendidas()
-        trabajo_dia.save()
-        trabajo_dia.porcentaje_atendido = trabajo_dia.get_porcentaje_gestion_tareas()
-        trabajo_dia.save()
+        trabajo_dia.set_actualizar_seguimiento_trabajo()
 
 post_save.connect(set_actualizar_mi_trabajo_diario, sender=TareaDiaria)
