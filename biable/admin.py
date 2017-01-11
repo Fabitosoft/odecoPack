@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from biable.models import VendedorBiable, LineaVendedorBiable,Cliente
+from biable.models import VendedorBiable, LineaVendedorBiable,Cliente, FacturasBiable
 # Register your models here.
 
 class VendedorBiableAdmin(admin.ModelAdmin):
@@ -23,6 +23,12 @@ class ClienteBiableAdmin(admin.ModelAdmin):
 
     readonly_fields = ('nit','nombre',)
 
+class FacturasBiableAdmin(admin.ModelAdmin):
+    list_filter = ('tipo_documento','year','month','day','vendedor')
+    search_fields = ('nro_documento','tipo_documento','cliente__nombre')
+    list_display = ('nro_documento','tipo_documento','cliente','vendedor')
+
 admin.site.register(Cliente,ClienteBiableAdmin)
 admin.site.register(VendedorBiable,VendedorBiableAdmin)
 admin.site.register(LineaVendedorBiable)
+admin.site.register(FacturasBiable,FacturasBiableAdmin)

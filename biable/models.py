@@ -125,3 +125,22 @@ class Cartera(models.Model):
             ('ver_carteras', 'R Cart. Vcto'),
             ('ver_carteras_todos', 'R Cart. Vcto Todos'),
         )
+
+class FacturasBiable(TimeStampedModel):
+    year = models.PositiveIntegerField(verbose_name='Año')
+    month = models.PositiveIntegerField(verbose_name='Mes')
+    day = models.PositiveIntegerField(verbose_name='Día')
+    tipo_documento = models.CharField(max_length=3, null=True, blank=True)
+    nro_documento = models.CharField(max_length=10, null=True, blank=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True)
+    vendedor = models.ForeignKey(VendedorBiable, null=True)
+    venta_bruta = models.DecimalField(max_digits=18, decimal_places=4)
+    dscto_netos = models.DecimalField(max_digits=18, decimal_places=4)
+    costo_total = models.DecimalField(max_digits=18, decimal_places=4)
+    rentabilidad = models.DecimalField(max_digits=18, decimal_places=4)
+    imp_netos = models.DecimalField(max_digits=18, decimal_places=4)
+    venta_neto = models.DecimalField(max_digits=18, decimal_places=4)
+
+    def __str__(self):
+        return "%s-%s"%(self.tipo_documento,self.nro_documento)
+

@@ -125,6 +125,7 @@ MY_APPS = (
     'productos_caracteristicas',
     'documentos',
     'trabajo_diario',
+    'despachos_mercancias',
     #'crm',
 )
 
