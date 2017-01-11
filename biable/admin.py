@@ -24,6 +24,7 @@ class ClienteBiableAdmin(admin.ModelAdmin):
     readonly_fields = ('nit','nombre',)
 
 class FacturasBiableAdmin(admin.ModelAdmin):
+    list_select_related = ['cliente','vendedor']
     list_filter = ('tipo_documento','year','month','day','vendedor')
     search_fields = ('nro_documento','tipo_documento','cliente__nombre')
     list_display = ('nro_documento','tipo_documento','cliente','vendedor')
