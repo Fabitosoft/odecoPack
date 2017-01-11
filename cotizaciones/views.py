@@ -396,7 +396,6 @@ class AddItemCantidad(SingleObjectMixin, View):
             actual_item_error = item.get_nombre_item()
             total_linea = "ERROR CANTIDAD"
             total_cotizacion = "ERROR CANTIDAD"
-            item.total = 0
             item.save()
 
         data = {
