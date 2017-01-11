@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from io import BytesIO
 
 from django.contrib.auth.models import User
@@ -19,7 +19,6 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView, FormView
 from django.forms import inlineformset_factory
 from django.utils import timezone
-
 
 import mistune
 from weasyprint import HTML
@@ -229,7 +228,7 @@ class CotizacionEmailView(View):
             obj.apellidos_contacto = self.request.POST.get('apellidos_contacto')
             obj.email = self.request.POST.get('email')
             obj.nro_contacto = self.request.POST.get('nro_contacto')
-            obj.observaciones =markdown(self.request.POST.get('observaciones'))
+            obj.observaciones = markdown(self.request.POST.get('observaciones'))
             obj.ciudad = self.request.POST.get('ciudad')
             obj.pais = self.request.POST.get('pais')
             obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
@@ -267,7 +266,7 @@ class CotizacionEmailView(View):
             HTML(string=html_content).write_pdf(target=output)
             msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email])
             msg.attach_alternative(html_content, "text/html")
-            nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf"%(obj.id)
+            nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
             msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
             msg.send()
             output.close()
@@ -375,22 +374,37 @@ class AddItemCantidad(SingleObjectMixin, View):
 
     def get(self, request, *args, **kwargs):
         delete = False
+        total_linea = 0
+        total_cotizacion = 0
+        error_cantidad = False
+        actual_item_error = ""
         item_id = request.GET.get("item")
         item = ItemCotizacion.objects.get(id=item_id)
-        qty = Decimal(request.GET.get("qty"))
-
-        if qty <= 0:
-            delete = True
-            item.delete()
-        else:
-            item.cantidad = qty
-            item.total = item.precio * qty
+        try:
+            qty = Decimal(request.GET.get("qty"))
+            if qty <= 0:
+                delete = True
+                item.delete()
+            else:
+                item.cantidad = qty
+                item.total = item.precio * qty
+                item.save()
+            total_linea = item.total
+            total_cotizacion = item.cotizacion.total
+        except InvalidOperation as e:
+            error_cantidad = True
+            actual_item_error = item.get_nombre_item()
+            total_linea = "ERROR CANTIDAD"
+            total_cotizacion = "ERROR CANTIDAD"
+            item.total = 0
             item.save()
 
         data = {
+            "error_cantidad": error_cantidad,
+            "actual_item_error": actual_item_error,
             "deleted": delete,
-            "total_line": item.total,
-            "total_cotizacion": item.cotizacion.total
+            "total_line": total_linea,
+            "total_cotizacion": total_cotizacion
         }
         return JsonResponse(data)
 
