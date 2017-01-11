@@ -4,6 +4,7 @@ from biable.models import VendedorBiable, LineaVendedorBiable,Cliente, FacturasB
 # Register your models here.
 
 class VendedorBiableAdmin(admin.ModelAdmin):
+    list_select_related = ['linea_ventas', 'colaborador']
     list_display = ('nombre','id','linea_ventas','activo','colaborador')
     list_editable = ('linea_ventas','colaborador')
     readonly_fields = ('activo',)

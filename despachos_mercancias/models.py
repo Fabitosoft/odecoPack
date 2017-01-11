@@ -44,4 +44,4 @@ class EnvioTransportadoraTCC(TimeStampedModel):
     observacion = models.TextField(max_length=200, blank=True, null=True)
     estado = models.CharField(max_length=2, choices=ESTADO_ENTREGA)
     valor = models.DecimalField(decimal_places=2, max_digits=18)
-    facturas = models.ManyToManyField(FacturasBiable, related_name='envios', null=True, blank=True)
+    facturas = models.ManyToManyField(FacturasBiable, related_name='envios', blank=True)
