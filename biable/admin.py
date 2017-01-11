@@ -28,6 +28,21 @@ class FacturasBiableAdmin(admin.ModelAdmin):
     list_filter = ('tipo_documento','year','month','day','vendedor')
     search_fields = ('nro_documento','tipo_documento','cliente__nombre')
     list_display = ('nro_documento','tipo_documento','cliente','vendedor')
+    readonly_fields = (
+        'year',
+        'month',
+        'day',
+        'tipo_documento',
+        'nro_documento',
+        'cliente',
+        'venta_bruta',
+        'dscto_netos',
+        'costo_total',
+        'rentabilidad',
+        'imp_netos',
+        'venta_neto'
+    )
+
 
 admin.site.register(Cliente,ClienteBiableAdmin)
 admin.site.register(VendedorBiable,VendedorBiableAdmin)
