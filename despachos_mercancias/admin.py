@@ -20,12 +20,15 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
         'nro_tracking',
         'cliente',
         'servicio_boom',
-        'rr'
+        'rr',
+        'get_numero_dias_entrega',
+        'get_numero_dias_desde_envio',
     )
     list_filter = ('estado','servicio_boom','rr')
     search_fields = ('cliente__nombre','cliente_alternativo')
     raw_id_fields = ('cliente',)
     inlines = (FacturasBiableInline,)
+    readonly_fields = ('get_numero_dias_entrega','get_numero_dias_desde_envio')
     fieldsets = (
         ('Informacion General', {
             'classes': ('form-control',),
@@ -62,6 +65,13 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
                 )
         }),
     )
+    def get_numero_dias_entrega(self, obj):
+        return obj.get_numero_dias_entrega()
+    get_numero_dias_entrega.short_description = 'Dias entrega'
+
+    def get_numero_dias_desde_envio(self, obj):
+        return obj.get_numero_dias_desde_envio()
+    get_numero_dias_desde_envio.short_description = 'Días en tránsito'
 
 
 admin.site.register(EnvioTransportadoraTCC, EnvioTransportadoraTCCAdmin)

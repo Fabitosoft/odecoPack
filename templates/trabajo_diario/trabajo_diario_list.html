@@ -26,6 +26,11 @@
                 {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_remision.all tipo="Seguimiento Remisiones" %}
             </div>
         {% endif %}
+        {% if seguimiento_envio.all %}
+            <div class="col-md-6">
+                {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_envio.all tipo="Seguimiento Envío TCC" %}
+            </div>
+        {% endif %}
 
     </div>
 {% endblock %}
