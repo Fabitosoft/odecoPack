@@ -58,6 +58,16 @@
         </div>
     </div>
 
+    {% if not object.fecha_entrega %}
+        <p>
+            <span class="label">Días en Transito:</span>{{ object.get_numero_dias_desde_envio }}
+        </p>
+    {% else %}
+        <p>
+            <span class="label">Día que se tomó la entrega:</span>{{ object.get_numero_dias_entrega }}
+        </p>
+    {% endif %}
+
     {% if object.observacion %}
         <p>
             <span class="label">Observación:</span> {{ object.observacion }}
