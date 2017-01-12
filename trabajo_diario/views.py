@@ -47,7 +47,7 @@ class TareaDiaListView(TemplateView):
                     if factura.vendedor in vendedores_biable.all():
                         nro_tracking =""
                         if envio.nro_tracking:
-                            nro_tracking = "Nro Seguimiento %s"(envio.nro_tracking)
+                            nro_tracking = "Nro Seguimiento %s"%(envio.nro_tracking)
                         descripcion = '%s de envío de la factura %s-%s con estado "%s". %s' % (
                             envio.get_numero_dias_desde_envio(), factura.tipo_documento, factura.nro_documento,
                             envio.get_estado_display(), nro_tracking)
