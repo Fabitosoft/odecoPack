@@ -60,7 +60,7 @@ class TareaDiaListView(TemplateView):
                 self.generacion_tarea_diaria("Seguimiento Cartera Vencida", descripcion, trabajo_dia)
 
             for cotizacion in qsCotizacion.all():
-                descripcion = "Seguimiento a la cotización %s con un valor de %s para %s" % (
+                descripcion = "Cotización %s con un valor de %s para %s" % (
                     cotizacion.nro_cotizacion, cotizacion.total, cotizacion.razon_social)
                 self.generacion_tarea_diaria("Seguimiento Cotización", descripcion, trabajo_dia)
 
@@ -70,7 +70,7 @@ class TareaDiaListView(TemplateView):
                     self.generacion_tarea_diaria("Seguimiento Remisión", descripcion, trabajo_dia)
 
                 for tarea in cotizacion.mis_tareas.filter(esta_finalizada=False).all():
-                    descripcion = 'Seguimiento a la tarea "%s" de la cotización numero %s' % (
+                    descripcion = '"%s" de la cotización numero %s' % (
                         tarea.nombre, cotizacion.nro_cotizacion)
                     self.generacion_tarea_diaria("Seguimiento Tarea", descripcion, trabajo_dia)
             trabajo_dia.set_actualizar_seguimiento_trabajo()
