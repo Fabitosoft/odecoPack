@@ -21,6 +21,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
         'cliente',
         'servicio_boom',
         'rr',
+        'fecha_entrega',
         'get_numero_dias_entrega',
         'get_numero_dias_desde_envio',
     )
@@ -28,6 +29,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
     search_fields = ('cliente__nombre','cliente_alternativo')
     raw_id_fields = ('cliente',)
     inlines = (FacturasBiableInline,)
+    list_editable = ('estado','fecha_entrega','rr','nro_tracking',)
     readonly_fields = ('get_numero_dias_entrega','get_numero_dias_desde_envio')
     fieldsets = (
         ('Informacion General', {
