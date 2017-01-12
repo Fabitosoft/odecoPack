@@ -94,7 +94,7 @@ if not DEBUG:
     ########## END EMAIL CONFIGURATION
 
 
-    ########## EMAIL ODECO CONFIGURATION
+    ########## EMAIL ODECO VENTAS CONFIGURATION
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 
     # 'EMAIL_IS_LOCAL'
