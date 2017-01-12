@@ -29,6 +29,7 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
         'referencia',
         'id_cguno',
         'nombre',
+        'unidad_medida',
         'get_fabricante',
         'margen',
         'costo',
@@ -42,7 +43,7 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
         'activo',
     )
 
-    list_editable = ['activo','margen','costo','id_cguno']
+    list_editable = ['activo','margen','costo','id_cguno','unidad_medida']
     raw_id_fields = ('margen',)
     readonly_fields = ("get_precio_base", "get_costo_cop", "get_rentabilidad")
 
