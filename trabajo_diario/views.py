@@ -45,12 +45,9 @@ class TareaDiaListView(TemplateView):
             for envio in qsEnvios.all():
                 for factura in envio.facturas.all():
                     if factura.vendedor in vendedores_biable.all():
-                        nro_tracking =""
-                        if envio.nro_tracking:
-                            nro_tracking = "Nro Seguimiento %s"%(envio.nro_tracking)
-                        descripcion = '%s de envío de la factura %s-%s con estado "%s". %s' % (
+                        descripcion = '%s de envío de la factura %s-%s con estado "%s". Nro Seguimiento %s' % (
                             envio.get_numero_dias_desde_envio(), factura.tipo_documento, factura.nro_documento,
-                            envio.get_estado_display(), nro_tracking)
+                            envio.get_estado_display(), envio.nro_tracking)
                         self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia)
 
             qsCartera = Cartera.objects.filter(esta_vencido=True, vendedor__in=vendedores_biable.all()).order_by(
