@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import os
 from .base import *
 
-if not DEBUG:
+if not str_to_bool(DEBUG):
     ########## MANAGER CONFIGURATION
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
     ADMINS = (
@@ -87,7 +87,7 @@ if not DEBUG:
     EMAIL_SUBJECT_PREFIX = '[%s] ' % SITE_NAME
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-    EMAIL_USE_TLS = os.environ['EMAIL_TLS']
+    EMAIL_USE_TLS = str_to_bool(os.environ['EMAIL_TLS'])
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
     SERVER_EMAIL = EMAIL_HOST_USER
@@ -111,7 +111,7 @@ if not DEBUG:
     EMAIL_PORT_ODECO = os.environ['EMAIL_PORT_ODECO_VENTAS']
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-    EMAIL_USE_TLS_ODECO = os.environ['EMAIL_TLS_ODECO_VENTAS']
+    EMAIL_USE_TLS_ODECO = str_to_bool(os.environ['EMAIL_TLS_ODECO_VENTAS'])
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
     SERVER_EMAIL_ODECO = EMAIL_HOST_USER_ODECO

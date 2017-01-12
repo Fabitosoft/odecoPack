@@ -14,14 +14,6 @@ import json
 # JSON-based secrets module
 from django.core.exceptions import ImproperlyConfigured
 
-def str_to_bool(s):
-    if s == 'True':
-        return True
-    elif s == 'False':
-        return False
-    else:
-        raise ValueError
-
 with open("secretsLocal.json") as f:
     secrets = json.loads(f.read())
 
