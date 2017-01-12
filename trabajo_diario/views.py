@@ -48,7 +48,7 @@ class TareaDiaListView(TemplateView):
                         descripcion = '%s de envío de la factura %s-%s con estado "%s". Nro Seguimiento %s' % (
                             envio.get_numero_dias_desde_envio(), factura.tipo_documento, factura.nro_documento,
                             envio.get_estado_display(), envio.nro_tracking)
-                        self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia)
+                        self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia,envio.get_update_url())
 
             qsCartera = Cartera.objects.filter(esta_vencido=True, vendedor__in=vendedores_biable.all()).order_by(
                 "-dias_vencido")
@@ -60,19 +60,23 @@ class TareaDiaListView(TemplateView):
                 self.generacion_tarea_diaria("Seguimiento Cartera Vencida", descripcion, trabajo_dia)
 
             for cotizacion in qsCotizacion.all():
-                descripcion = "Cotización %s con un valor de %s para %s" % (
-                    cotizacion.nro_cotizacion, cotizacion.total, cotizacion.razon_social)
-                self.generacion_tarea_diaria("Seguimiento Cotización", descripcion, trabajo_dia)
+                descripcion = "Cotización %s %s con un valor de %s para %s" % (
+                    cotizacion.get_estado_display(), cotizacion.nro_cotizacion, cotizacion.total,
+                    cotizacion.razon_social)
+                self.generacion_tarea_diaria("Seguimiento Cotización", descripcion, trabajo_dia,
+                                             cotizacion.get_absolute_url())
 
                 for remision in cotizacion.mis_remisiones.filter(entregado=False).all():
                     descripcion = "Seguimiento a la entrega de la remision %s de la factura %s para %s" % (
                         remision.nro_remision, remision.nro_factura, cotizacion.razon_social)
-                    self.generacion_tarea_diaria("Seguimiento Remisión", descripcion, trabajo_dia)
+                    self.generacion_tarea_diaria("Seguimiento Remisión", descripcion, trabajo_dia,
+                                                 cotizacion.get_absolute_url())
 
                 for tarea in cotizacion.mis_tareas.filter(esta_finalizada=False).all():
                     descripcion = '"%s" de la cotización numero %s' % (
                         tarea.nombre, cotizacion.nro_cotizacion)
-                    self.generacion_tarea_diaria("Seguimiento Tarea", descripcion, trabajo_dia)
+                    self.generacion_tarea_diaria("Seguimiento Tarea", descripcion, trabajo_dia,
+                                                 cotizacion.get_absolute_url())
             trabajo_dia.set_actualizar_seguimiento_trabajo()
         context = super().get_context_data(**kwargs)
 
@@ -84,6 +88,6 @@ class TareaDiaListView(TemplateView):
         context["seguimiento_cartera"] = trabajo_dia.mis_tareas.filter(tipo="Seguimiento Cartera Vencida")
         return context
 
-    def generacion_tarea_diaria(self, tipo, descripcion, trabajo_dia):
-        tarea = TareaDiaria(tipo=tipo, descripcion=descripcion, mi_dia=trabajo_dia)
+    def generacion_tarea_diaria(self, tipo, descripcion, trabajo_dia, url=None):
+        tarea = TareaDiaria(tipo=tipo, descripcion=descripcion, mi_dia=trabajo_dia, url=url)
         tarea.save()

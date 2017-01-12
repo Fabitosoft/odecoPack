@@ -25,6 +25,11 @@
             <td>
                 <a href="{% url 'trabajo_diario:tarea-update' pk=tarea.id %}">{{ tarea.descripcion }}</a>
             </td>
+            {% if tarea.url %}
+                <td>
+                    <a href="{{ tarea.url }}" target="_blank">Ver</a>
+                </td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>

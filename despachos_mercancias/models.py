@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 from model_utils.models import TimeStampedModel
@@ -65,3 +66,9 @@ class EnvioTransportadoraTCC(TimeStampedModel):
             else:
                 return "%s día" % (dias)
         return "Entregada"
+
+    def get_absolute_update_url(self):
+        return reverse("despacho_mercancia:envio-update", kwargs={"pk": self.pk})
+
+    def get_absolute_url(self):
+        return reverse("despacho_mercancia:envio-detail", kwargs={"pk": self.pk})

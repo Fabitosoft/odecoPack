@@ -39,6 +39,7 @@ class TareaDiaria(TimeStampedModel):
     descripcion = models.TextField(max_length=300, null=True, blank=True)
     observacion = models.TextField(max_length=300, null=True, blank=True)
     estado = models.PositiveIntegerField(choices=ESTADOS, default=0)
+    url = models.URLField(max_length=300, null=True, blank=True, editable=False)
 
 def set_actualizar_mi_trabajo_diario(sender, instance, created, **kwargs):
     if not created:

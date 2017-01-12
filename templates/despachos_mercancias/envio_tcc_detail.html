@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Detalles Envío TCC
+        {% if not object.fecha_entrega %}
+            <small><a href="{{ object.get_absolute_update_url }}"> Editar </a></small>
+        {% endif %}
+    </h1>
+    <div class="row">
+        <div class="col-md-6">
+            <p>
+                <span class="label">Cliente:</span>
+                {% if object.cliente %}{{ object.cliente }} {% else %} {{ object.cliente_alternativo }} {% endif %}
+            </p>
+            <p>
+                <span class="label">Estado:</span> {{ object.get_estado_display }}
+            </p>
+
+            {% if object.nro_factura_transportadora %}
+                <p>
+                    <span class="label">Nro Factura TCC:</span> {{ object.nro_factura_transportadora }}
+                </p>
+            {% endif %}
+
+            <p>
+                <span class="label">Fecha de Envío:</span> {{ object.fecha_envio }}
+            </p>
+
+            {% if object.fecha_entrega %}
+                <p>
+                    <span class="label">Fecha de Entrega:</span> {{ object.fecha_entrega }}
+                </p>
+            {% endif %}
+
+            <p>
+                <span class="label">Nro de seguimiento:</span> {{ object.nro_tracking }}
+            </p>
+        </div>
+        <div class="col-md-6">
+            <p>
+                <span class="label">Tipo Envío:</span> {{ object.get_tipo_display }}
+            </p>
+            <p>
+                <span class="label">Servicio Boom:</span> {{ object.servicio_boom }}
+            </p>
+            {% if object.servicio_boom %}
+                <p>
+                    <span class="label">Factura Radicada:</span> {{ object.rr }}
+                </p>
+            {% endif %}
+
+            <p>
+                <span class="label">Forma de Pago:</span> {{ object.get_forma_pago_display }}
+            </p>
+            <p>
+                <span class="label">Valor:</span> {{ object.valor }}
+            </p>
+        </div>
+    </div>
+
+    {% if object.observacion %}
+        <p>
+            <span class="label">Observación:</span> {{ object.observacion }}
+        </p>
+    {% endif %}
+
+    <h2>Documentos Relacionados</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Nro Factura
+            </th>
+            <th>
+                Vendedor
+            </th>
+            <th>
+                Cliente
+            </th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for factura in object.facturas.all %}
+            <tr>
+                <td>
+                    {{ factura.tipo_documento }}-{{ factura.nro_documento }}
+                </td>
+                <td>
+                    {{ factura.vendedor }}
+                </td>
+                <td>
+                    {{ factura.cliente }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
