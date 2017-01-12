@@ -1,6 +1,7 @@
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
 
+from django.core.mail import get_connection, send_mail
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden
@@ -238,7 +239,7 @@ class CotizacionEmailView(View):
 
             subject, from_email, to = "%s - %s" % (
                 'Cotizacion', obj.nro_cotizacion
-            ), settings.EMAIL_HOST_USER, obj.email
+            ), settings.EMAIL_HOST_USER_ODECO, obj.email
 
             ctx = {
                 'object': obj,
@@ -262,9 +263,16 @@ class CotizacionEmailView(View):
             text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
+            my_use_tls = True
+            connection = get_connection(host=settings.EMAIL_HOST_ODECO,
+                                        port=settings.EMAIL_PORT_ODECO,
+                                        username=settings.EMAIL_HOST_USER_ODECO,
+                                        password=settings.EMAIL_HOST_PASSWORD_ODECO,
+                                        use_tls=False)
+
             output = BytesIO()
             HTML(string=html_content).write_pdf(target=output)
-            msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email])
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email], connection=connection)
             msg.attach_alternative(html_content, "text/html")
             nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
             msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')

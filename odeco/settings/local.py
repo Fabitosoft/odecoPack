@@ -165,10 +165,37 @@ EMAIL_PORT = get_secret("EMAIL_SERVER","EMAIL_PORT")
 EMAIL_SUBJECT_PREFIX = '[%s] ' % SITE_NAME
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = str_to_bool(get_secret("EMAIL_SERVER","EMAIL_TLS"))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = EMAIL_HOST_USER
+########## END EMAIL CONFIGURATION
+
+
+########## EMAIL ODECO CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+
+#'EMAIL_IS_LOCAL'
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host
+EMAIL_HOST_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_HOST")
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-password
+EMAIL_HOST_PASSWORD_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_HOST_PASSWORD")
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-user
+EMAIL_HOST_USER_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_HOST_USER")
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-port
+EMAIL_PORT_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_PORT")
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
+EMAIL_USE_TLS_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_PORT")
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
+EMAIL_USE_TLS = str_to_bool(get_secret("EMAIL_SERVER_ODECO","EMAIL_TLS"))
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
+SERVER_EMAIL_ODECO = EMAIL_HOST_USER_ODECO
 ########## END EMAIL CONFIGURATION
 
 
