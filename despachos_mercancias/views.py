@@ -1,3 +1,4 @@
+from django.views.generic import TemplateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -19,7 +20,15 @@ class EnvioTransportadoraTCCDetailView(PrefetchRelatedMixin,SelectRelatedMixin,D
     select_related = ["ciudad","ciudad__departamento","cliente"]
     prefetch_related = ["facturas","facturas__cliente","facturas__vendedor"]
 
-class EnvioTransportadoraTCCReporteView(SelectRelatedMixin,ListView):
+class EnvioTransportadoraTCCReporteView(SelectRelatedMixin,TemplateView):
     template_name = 'despachos_mercancias/reporte_seguimiento.html'
     select_related = ["ciudad", "ciudad__departamento","cliente"]
-    queryset = EnvioTransportadoraTCC.pendientes
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        qs = EnvioTransportadoraTCC.pendientes
+        context["boom"] = qs.boom()
+        context["entrega"] = qs.entrega()
+        context["entrega_boom"] = qs.entrega_boom()
+        return context
+

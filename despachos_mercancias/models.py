@@ -10,14 +10,14 @@ from geografia_colombia.models import Ciudad
 
 # Create your models here.
 class EnvioTransportadoraTCCQuerySet(models.QuerySet):
-    def boom(self):
+    def con_boom(self):
         return self.filter(
             ~Q(nro_tracking_boom__exact='')
             &
             Q(fecha_entrega_boom__isnull=True)
         )
 
-    def entrega(self):
+    def con_entrega(self):
         return self.filter(
             Q(fecha_entrega__isnull=True)
         )
@@ -35,20 +35,20 @@ class EnvioTransportadoraTCCPendientesManager(models.Manager):
         )
 
     def boom(self):
-        qs1 = self.get_queryset().boom()
-        qs2 = self.get_queryset().entrega()
+        qs1 = self.get_queryset().con_boom()
+        qs2 = self.get_queryset().con_entrega()
         qsF = qs1.exclude(pk__in=qs2)
         return qsF
 
     def entrega(self):
-        qs1 = self.get_queryset().boom()
-        qs2 = self.get_queryset().entrega()
+        qs1 = self.get_queryset().con_boom()
+        qs2 = self.get_queryset().con_entrega()
         qsF = qs2.exclude(pk__in=qs1)
         return qsF
 
     def entrega_boom(self):
-        qs1 = self.get_queryset().boom()
-        qs2 = self.get_queryset().entrega()
+        qs1 = self.get_queryset().con_boom()
+        qs2 = self.get_queryset().con_entrega()
         qsF = self.get_queryset().filter(
             Q(pk__in=qs1) &
             Q(pk__in=qs2)

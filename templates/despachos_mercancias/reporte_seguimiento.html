@@ -5,14 +5,14 @@
 {% block content %}
     <h1>Reporte de Seguimiento Envios TCC</h1>
     {% if perms.despachos_mercancias.ver_segui_envio_tcc %}
-        {% if object_list.boom.all %}
-            {% include 'despachos_mercancias/components/enviosTCC_table.html' with lista_envio=object_list.boom.all titulo="Envío Solo Boom" %}
+        {% if boom %}
+            {% include 'despachos_mercancias/components/enviosTCC_table.html' with lista_envio=boom titulo="Envío Solo Boom" %}
         {% endif %}
-        {% if object_list.entrega_boom.all %}
-            {% include 'despachos_mercancias/components/enviosTCC_table.html' with lista_envio=object_list.entrega_boom.all titulo="Envío Boom y Entrega" %}
+        {% if entrega_boom %}
+            {% include 'despachos_mercancias/components/enviosTCC_table.html' with lista_envio=entrega_boom titulo="Envío Boom y Entrega" %}
         {% endif %}
-        {% if object_list.entrega.all %}
-            {% include 'despachos_mercancias/components/enviosTCC_table.html' with lista_envio=object_list.entrega.all titulo="Envío Solo Entrega" %}
+        {% if entrega %}
+            {% include 'despachos_mercancias/components/enviosTCC_table.html' with lista_envio=entrega titulo="Envío Solo Entrega" %}
         {% endif %}
     {% else %}
         No tiene permisos suficientes para ver este informe
