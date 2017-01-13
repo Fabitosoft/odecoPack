@@ -41,9 +41,8 @@ class TareaDiaListView(TemplateView):
             trabajo_dia.usuario = usuario
             trabajo_dia.save()
 
-            qsEnvios = EnvioTransportadoraTCC.objects.filter(
-                Q(fecha_entrega__isnull=True)&
-                Q(facturas__vendedor__in=vendedores_biable)
+            qsEnvios = EnvioTransportadoraTCC.pendientes.filter(
+                facturas__vendedor__in=vendedores_biable
             )
             for envio in qsEnvios.all():
                 for factura in envio.facturas.all():
