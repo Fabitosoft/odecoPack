@@ -1,0 +1,97 @@
+<h2>{{ titulo }}</h2>
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>
+            Cliente
+        </th>
+        <th>
+            Estado
+        </th>
+        <th>
+            Fecha Envío
+        </th>
+        <th>
+            Nro Tracking
+        </th>
+        <th>
+            Nro Días desde Envío
+        </th>
+        <th>
+            Días que tardo la Entrega
+        </th>
+        <th>
+            Fecha Entrega
+        </th>
+        <th>
+            Nro Tracking Boom
+        </th>
+        <th>
+            Fecha Entrega Boom
+        </th>
+        <th>
+            Nro Días desde Envío Boom
+        </th>
+        <th>
+            Días que tardo la Entrega Boom
+        </th>
+    </tr>
+
+    </thead>
+    <tbody>
+    {% for object in lista_envio %}
+        <tr>
+            <td>
+                {% if object.cliente %}{{ object.cliente }} {% else %} {{ object.cliente_alternativo }} {% endif %}
+            </td>
+            <td>
+                {{ object.get_estado_display }}
+            </td>
+            <td>
+                {{ object.fecha_envio }}
+            </td>
+            <td>
+                {{ object.nro_tracking }}
+            </td>
+            <td>
+                {{ object.get_numero_dias_desde_envio }}
+            </td>
+            <td>
+                {{ object.get_numero_dias_entrega }}
+            </td>
+            <td>
+                {% if object.fecha_entrega %}
+                    {{ object.fecha_entrega }}
+                {% else %}
+                    Sin Entregar
+                {% endif %}
+            </td>
+            <td>
+                {% if object.nro_tracking_boom %}
+                    {{ object.nro_tracking_boom }}
+                {% else %}
+
+                {% endif %}
+            </td>
+            <td>
+                {% if object.fecha_entrega_boom %}
+                    {{ object.fecha_entrega_boom }}
+                {% elif not object.nro_tracking_boom %}
+
+                {% else %}
+                    Sin Entregar
+                {% endif %}
+            </td>
+            <td>
+                {{ object.get_numero_dias_desde_envio_boom }}
+            </td>
+            <td>
+                {{ object.get_numero_dias_entrega_boom }}
+            </td>
+            <td>
+                <a href="{{ object.get_absolute_url }}" target="_blank">Ver</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

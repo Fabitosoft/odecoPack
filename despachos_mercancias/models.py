@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
@@ -8,6 +9,53 @@ from biable.models import Cliente, FacturasBiable
 
 
 # Create your models here.
+class EnvioTransportadoraTCCQuerySet(models.QuerySet):
+    def boom(self):
+        return self.filter(
+            ~Q(nro_tracking_boom__exact='')
+            &
+            Q(fecha_entrega_boom__isnull=True)
+        )
+
+    def entrega(self):
+        return self.filter(
+            Q(fecha_entrega__isnull=True)
+        )
+
+
+class EnvioTransportadoraTCCPendientesManager(models.Manager):
+    def get_queryset(self):
+        return EnvioTransportadoraTCCQuerySet(self.model, using=self._db).filter(
+            (
+                ~Q(nro_tracking_boom__exact='') &
+                Q(fecha_entrega_boom__isnull=True)
+            )
+            |
+            Q(fecha_entrega__isnull=True)
+        )
+
+    def boom(self):
+        qs1 = self.get_queryset().boom()
+        qs2 = self.get_queryset().entrega()
+        qsF = qs1.exclude(pk__in=qs2)
+        return qsF
+
+    def entrega(self):
+        qs1 = self.get_queryset().boom()
+        qs2 = self.get_queryset().entrega()
+        qsF = qs2.exclude(pk__in=qs1)
+        return qsF
+
+    def entrega_boom(self):
+        qs1 = self.get_queryset().boom()
+        qs2 = self.get_queryset().entrega()
+        qsF = self.get_queryset().filter(
+            Q(pk__in=qs1) &
+            Q(pk__in=qs2)
+        )
+        return qsF
+
+
 class EnvioTransportadoraTCC(TimeStampedModel):
     TIPO_ENVIO = (
         ('PQ', 'Paquetería'),
@@ -48,6 +96,9 @@ class EnvioTransportadoraTCC(TimeStampedModel):
     valor = models.DecimalField(decimal_places=2, max_digits=18)
     facturas = models.ManyToManyField(FacturasBiable, related_name='envios', blank=True, verbose_name='Facturas')
 
+    objects = models.Manager()
+    pendientes = EnvioTransportadoraTCCPendientesManager()
+
     def get_numero_dias_entrega(self):
         if self.fecha_entrega:
             dias = (abs((self.fecha_entrega - self.fecha_envio).days))
@@ -60,6 +111,25 @@ class EnvioTransportadoraTCC(TimeStampedModel):
     def get_numero_dias_desde_envio(self):
         fecha_actual = timezone.now().date()
         if not self.fecha_entrega:
+            dias = (abs((fecha_actual - self.fecha_envio).days))
+            if dias > 1:
+                return "%s días" % (dias)
+            else:
+                return "%s día" % (dias)
+        return "Entregada"
+
+    def get_numero_dias_entrega_boom(self):
+        if self.fecha_entrega_boom:
+            dias = (abs((self.fecha_entrega_boom - self.fecha_envio).days))
+            if dias > 1:
+                return "%s días" % (dias)
+            else:
+                return "%s día" % (dias)
+        return "Sin Entregar"
+
+    def get_numero_dias_desde_envio_boom(self):
+        fecha_actual = timezone.now().date()
+        if not self.fecha_entrega_boom:
             dias = (abs((fecha_actual - self.fecha_envio).days))
             if dias > 1:
                 return "%s días" % (dias)
