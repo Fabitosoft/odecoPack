@@ -13,6 +13,7 @@ class FacturasBiableInline(admin.TabularInline):
 
 
 class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
+    list_select_related = ('ciudad',)
     list_display = (
         'fecha_envio',
         'estado',
@@ -27,7 +28,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
     list_filter = (
     'estado', ('fecha_envio', DateFieldListFilter), ('fecha_entrega', DateFieldListFilter),
     ('fecha_entrega_boom', DateFieldListFilter),)
-    search_fields = ('cliente__nombre', 'cliente_alternativo','nro_tracking','nro_tracking_boom','estado','observacion')
+    search_fields = ('cliente__nombre', 'cliente_alternativo','nro_tracking','nro_tracking_boom','estado','observacion','ciudad__nombre')
     raw_id_fields = ('cliente',)
     inlines = (FacturasBiableInline,)
     list_editable = ('estado', 'fecha_entrega', 'fecha_entrega_boom')
@@ -38,6 +39,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
                 (
                     ('cliente', 'cliente_alternativo'),
                     'fecha_envio',
+                    'ciudad',
                     'nro_factura_transportadora',
                     ('tipo', 'forma_pago'),
                     'valor'
