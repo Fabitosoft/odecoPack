@@ -95,7 +95,7 @@ class EnvioTransportadoraTCC(TimeStampedModel):
     estado = models.CharField(max_length=2, choices=ESTADO_ENTREGA)
     valor = models.DecimalField(decimal_places=2, max_digits=18)
     facturas = models.ManyToManyField(FacturasBiable, related_name='envios', blank=True, verbose_name='Facturas')
-    ciudad = models.ForeignKey(Ciudad,related_name='mis_envios_tcc',on_delete=models.PROTECT, blank=True, null=True)
+    ciudad = models.ForeignKey(Ciudad,related_name='mis_envios_tcc',on_delete=models.PROTECT)
 
     objects = models.Manager()
     pendientes = EnvioTransportadoraTCCPendientesManager()
