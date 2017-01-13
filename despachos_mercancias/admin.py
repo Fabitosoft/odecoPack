@@ -16,6 +16,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
     list_select_related = ('ciudad',)
     list_display = (
         'fecha_envio',
+        'ciudad',
         'estado',
         'cliente',
         'tipo',

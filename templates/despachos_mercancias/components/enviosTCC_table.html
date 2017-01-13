@@ -6,6 +6,13 @@
             Cliente
         </th>
         <th>
+            Departamento
+        </th>
+
+        <th>
+            Ciudad
+        </th>
+        <th>
             Estado
         </th>
         <th>
@@ -43,6 +50,12 @@
         <tr>
             <td>
                 {% if object.cliente %}{{ object.cliente }} {% else %} {{ object.cliente_alternativo }} {% endif %}
+            </td>
+            <td>
+                {{ object.ciudad.departamento.nombre }}
+            </td>
+            <td>
+                {{ object.ciudad.nombre }}
             </td>
             <td>
                 {{ object.get_estado_display }}
