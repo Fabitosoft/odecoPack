@@ -27,8 +27,8 @@ class EnvioTransportadoraTCCReporteView(SelectRelatedMixin,TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         qs = EnvioTransportadoraTCC.pendientes
-        context["boom"] = qs.boom()
-        context["entrega"] = qs.entrega()
-        context["entrega_boom"] = qs.entrega_boom()
+        context["boom"] = qs.boom().select_related("ciudad", "ciudad__departamento","cliente")
+        context["entrega"] = qs.entrega().select_related("ciudad", "ciudad__departamento","cliente")
+        context["entrega_boom"] = qs.entrega_boom().select_related("ciudad", "ciudad__departamento","cliente")
         return context
 
