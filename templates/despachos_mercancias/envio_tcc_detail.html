@@ -17,6 +17,12 @@
                 {% if object.cliente %}{{ object.cliente }} {% else %} {{ object.cliente_alternativo }} {% endif %}
             </p>
             <p>
+                <span class="label">Departamento:</span> {{ object.ciudad.departamento.nombre }}
+            </p>
+            <p>
+                <span class="label">Ciudad:</span> {{ object.ciudad.nombre }}
+            </p>
+            <p>
                 <span class="label">Estado:</span> {{ object.get_estado_display }}
             </p>
 
