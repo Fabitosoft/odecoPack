@@ -9,7 +9,10 @@ class DepartamentoAdmin(ImportExportModelAdmin):
     pass
 
 class CiudadAdmin(ImportExportModelAdmin):
+    list_select_related = ('departamento',)
     list_display = ('nombre','departamento')
+    list_filter = ('departamento',)
+    search_fields = ('nombre','departamento__nombre')
 
 
 admin.site.register(Departamento,DepartamentoAdmin)
