@@ -38,7 +38,6 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
                 (
                     ('cliente', 'cliente_alternativo'),
                     'fecha_envio',
-                    'ciudad',
                     'nro_factura_transportadora',
                     ('tipo', 'forma_pago'),
                     'valor'
