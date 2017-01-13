@@ -13,13 +13,14 @@ class EnvioTccForm(ModelForm):
     fecha_entrega = forms.DateField(
         widget=forms.TextInput(
             attrs={'type': 'date'}
-        )
+        ), required=False
     )
     fecha_entrega_boom = forms.DateField(
         widget=forms.TextInput(
             attrs={'type': 'date'}
-        )
+        ), required=False
     )
+
     class Meta:
         model = EnvioTransportadoraTCC
         fields = ('fecha_entrega', 'fecha_entrega_boom', 'estado', 'observacion')
@@ -32,21 +33,38 @@ class EnvioTccForm(ModelForm):
 
         self.helper.form_class = 'form-inline'
         self.helper.layout = Layout(
+            HTML('<h2>Seguimiento</h2>'),
             Div(
-                Div(
-                    Field('fecha_entrega'),
-                    Field('estado'),
-                ),
+                Field('fecha_entrega'),
+                Field('estado'),
+            ),
+        )
+
+        boom = Div(
+            HTML('<h2>Seguimiento Boom</h2>'),
+            Div(
+                Field('fecha_entrega_boom'),
+            )
+        )
+        if not self.instance.nro_tracking_boom:
+            boom = Div(
                 Div(
                     Field('fecha_entrega_boom'),
-                ),
-                Div(
-                    Field('observacion')
-                )
+                ), style="display:none"
+            )
+
+        observacion = Div(
+            HTML('<h2>Observaciones</h2>'),
+            Div(
+                Field('observacion')
             ),
             FormActions(
                 Submit('guardar', 'Guardar')
             )
         )
+
+        self.helper.layout.fields.append(boom)
+
+        self.helper.layout.fields.append(observacion)
+
         self.helper.all().wrap(Field, css_class="form-control")
-        # self.helper.filter_by_widget(forms.CharField).wrap(Field, css_class="form-control")
