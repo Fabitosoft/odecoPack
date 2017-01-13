@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <h1>Editar Envío TCC</h1>
-    {% crispy form %}
+    {% if not object.fecha_entrega %}
+        <h1>Editar Envío TCC</h1>
+        {% crispy form %}
+    {% elif not object.fecha_entrega_boom and object.nro_tracking_boom %}
+        <h1>Editar Envío TCC</h1>
+        {% crispy form %}
+    {% else %}
+        Despacho esta cerrado, comunicarse con el administrador de despachos TCC para cualquier cambio
+    {% endif %}
 {% endblock %}
