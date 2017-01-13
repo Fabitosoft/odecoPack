@@ -124,23 +124,27 @@ class EnvioTransportadoraTCC(TimeStampedModel):
         return "Entregada"
 
     def get_numero_dias_entrega_boom(self):
-        if self.fecha_entrega_boom:
-            dias = (abs((self.fecha_entrega_boom - self.fecha_envio).days))
-            if dias > 1:
-                return "%s días" % (dias)
-            else:
-                return "%s día" % (dias)
-        return "Sin Entregar"
+        if self.nro_tracking_boom:
+            if self.fecha_entrega_boom:
+                dias = (abs((self.fecha_entrega_boom - self.fecha_envio).days))
+                if dias > 1:
+                    return "%s días" % (dias)
+                else:
+                    return "%s día" % (dias)
+            return "Sin Entregar"
+        return ""
 
     def get_numero_dias_desde_envio_boom(self):
-        fecha_actual = timezone.now().date()
-        if not self.fecha_entrega_boom:
-            dias = (abs((fecha_actual - self.fecha_envio).days))
-            if dias > 1:
-                return "%s días" % (dias)
-            else:
-                return "%s día" % (dias)
-        return "Entregada"
+        if self.nro_tracking_boom:
+            fecha_actual = timezone.now().date()
+            if not self.fecha_entrega_boom:
+                dias = (abs((fecha_actual - self.fecha_envio).days))
+                if dias > 1:
+                    return "%s días" % (dias)
+                else:
+                    return "%s día" % (dias)
+            return "Entregada"
+        return ""
 
     def get_absolute_update_url(self):
         return reverse("despacho_mercancia:envio-update", kwargs={"pk": self.pk})

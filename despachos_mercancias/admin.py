@@ -27,7 +27,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
     list_filter = (
     'estado', ('fecha_envio', DateFieldListFilter), ('fecha_entrega', DateFieldListFilter),
     ('fecha_entrega_boom', DateFieldListFilter),)
-    search_fields = ('cliente__nombre', 'cliente_alternativo')
+    search_fields = ('cliente__nombre', 'cliente_alternativo','nro_tracking','nro_tracking_boom','estado','observacion')
     raw_id_fields = ('cliente',)
     inlines = (FacturasBiableInline,)
     list_editable = ('estado', 'fecha_entrega', 'fecha_entrega_boom')
