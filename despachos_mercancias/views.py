@@ -2,6 +2,8 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from braces.views import SelectRelatedMixin, PrefetchRelatedMixin
+
 from .models import EnvioTransportadoraTCC
 from .forms import EnvioTccForm
 # Create your views here.
@@ -11,10 +13,13 @@ class EnvioTransportadoraTCCUpdateView(UpdateView):
     model = EnvioTransportadoraTCC
     form_class = EnvioTccForm
 
-class EnvioTransportadoraTCCDetailView(DetailView):
+class EnvioTransportadoraTCCDetailView(PrefetchRelatedMixin,SelectRelatedMixin,DetailView):
     template_name = 'despachos_mercancias/envio_tcc_detail.html'
     model = EnvioTransportadoraTCC
+    select_related = ["ciudad","ciudad__departamento","cliente"]
+    prefetch_related = ["facturas","facturas__cliente","facturas__vendedor"]
 
-class EnvioTransportadoraTCCReporteView(ListView):
+class EnvioTransportadoraTCCReporteView(SelectRelatedMixin,ListView):
     template_name = 'despachos_mercancias/reporte_seguimiento.html'
+    select_related = ["ciudad", "ciudad__departamento","cliente"]
     queryset = EnvioTransportadoraTCC.pendientes
