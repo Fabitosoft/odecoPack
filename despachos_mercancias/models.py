@@ -99,6 +99,11 @@ class EnvioTransportadoraTCC(TimeStampedModel):
     objects = models.Manager()
     pendientes = EnvioTransportadoraTCCPendientesManager()
 
+    class Meta:
+        permissions = (
+            ('ver_segui_envio_tcc', 'Seg. Envios TCC'),
+        )
+
     def get_numero_dias_entrega(self):
         if self.fecha_entrega:
             dias = (abs((self.fecha_entrega - self.fecha_envio).days))
