@@ -43,9 +43,16 @@
             <p>
                 <span class="label">Servicio Boom:</span> {{ object.servicio_boom }}
             </p>
-            {% if object.servicio_boom %}
+
+            {% if object.nro_tracking_boom %}
                 <p>
-                    <span class="label">Factura Radicada:</span> {{ object.rr }}
+                    <span class="label">Nro de Seguimiento Boom:</span> {{ object.nro_tracking_boom }}
+                </p>
+            {% endif %}
+
+            {% if object.fecha_entrega_boom %}
+                <p>
+                    <span class="label">Fecha Entrega Boom:</span> {{ object.fecha_entrega_boom }}
                 </p>
             {% endif %}
 

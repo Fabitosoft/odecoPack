@@ -15,9 +15,14 @@ class EnvioTccForm(ModelForm):
             attrs={'type': 'date'}
         )
     )
+    fecha_entrega_boom = forms.DateField(
+        widget=forms.TextInput(
+            attrs={'type': 'date'}
+        )
+    )
     class Meta:
         model = EnvioTransportadoraTCC
-        fields = ('fecha_entrega', 'rr', 'estado', 'observacion')
+        fields = ('fecha_entrega', 'fecha_entrega_boom', 'estado', 'observacion')
 
     def __init__(self, *args, **kwargs):
         super(EnvioTccForm, self).__init__(*args, **kwargs)
@@ -33,7 +38,7 @@ class EnvioTccForm(ModelForm):
                     Field('estado'),
                 ),
                 Div(
-                    Field('rr'),
+                    Field('fecha_entrega_boom'),
                 ),
                 Div(
                     Field('observacion')

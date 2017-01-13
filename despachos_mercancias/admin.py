@@ -20,16 +20,17 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
         'nro_tracking',
         'cliente',
         'servicio_boom',
-        'rr',
+        'nro_tracking_boom',
+        'fecha_entrega_boom',
         'fecha_entrega',
         'get_numero_dias_entrega',
         'get_numero_dias_desde_envio',
     )
-    list_filter = ('estado','servicio_boom','rr')
+    list_filter = ('estado','servicio_boom')
     search_fields = ('cliente__nombre','cliente_alternativo')
     raw_id_fields = ('cliente',)
     inlines = (FacturasBiableInline,)
-    list_editable = ('estado','fecha_entrega','rr','nro_tracking',)
+    list_editable = ('estado','fecha_entrega','fecha_entrega_boom','nro_tracking',)
     readonly_fields = ('get_numero_dias_entrega','get_numero_dias_desde_envio')
     fieldsets = (
         ('Informacion General', {
@@ -56,7 +57,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
             'classes': ('form-control',),
             'fields':
                 (
-                    ('servicio_boom', 'rr'),
+                    ('servicio_boom', 'nro_tracking_boom' ,'fecha_entrega_boom'),
                 )
         }),
         ('Observaciones', {
