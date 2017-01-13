@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
@@ -40,15 +41,18 @@ class TareaDiaListView(TemplateView):
             trabajo_dia.usuario = usuario
             trabajo_dia.save()
 
-            qsEnvios = EnvioTransportadoraTCC.objects.filter(fecha_entrega__isnull=True,
-                                                             facturas__vendedor__in=vendedores_biable)
+            qsEnvios = EnvioTransportadoraTCC.objects.filter(
+                Q(fecha_entrega__isnull=True)&
+                Q(facturas__vendedor__in=vendedores_biable)
+            )
             for envio in qsEnvios.all():
                 for factura in envio.facturas.all():
                     if factura.vendedor in vendedores_biable.all():
                         descripcion = '%s de envío de la factura %s-%s con estado "%s". Nro Seguimiento %s' % (
                             envio.get_numero_dias_desde_envio(), factura.tipo_documento, factura.nro_documento,
                             envio.get_estado_display(), envio.nro_tracking)
-                        self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia,envio.get_absolute_url())
+                        self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia,
+                                                     envio.get_absolute_url())
 
             qsCartera = Cartera.objects.filter(esta_vencido=True, vendedor__in=vendedores_biable.all()).order_by(
                 "-dias_vencido")

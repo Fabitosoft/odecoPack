@@ -40,7 +40,6 @@ class EnvioTransportadoraTCC(TimeStampedModel):
     cliente = models.ForeignKey(Cliente, null=True, blank=True)
     cliente_alternativo = models.CharField(max_length=60, null=True, blank=True)
     tipo = models.CharField(max_length=2, choices=TIPO_ENVIO, default='PQ')
-    servicio_boom = models.BooleanField(default=False)
     nro_tracking_boom = models.CharField(max_length=60, blank=True, null=True)
     fecha_entrega_boom = models.DateField(null=True, blank=True)
     forma_pago = models.CharField(max_length=3, choices=FORMA_PAGO)

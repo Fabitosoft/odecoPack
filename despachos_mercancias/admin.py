@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin import DateFieldListFilter
 
 from .models import EnvioTransportadoraTCC
 
@@ -15,23 +16,21 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
     list_display = (
         'fecha_envio',
         'estado',
+        'cliente',
         'tipo',
         'forma_pago',
         'nro_tracking',
-        'cliente',
-        'servicio_boom',
+        'fecha_entrega',
         'nro_tracking_boom',
         'fecha_entrega_boom',
-        'fecha_entrega',
-        'get_numero_dias_entrega',
-        'get_numero_dias_desde_envio',
     )
-    list_filter = ('estado','servicio_boom')
-    search_fields = ('cliente__nombre','cliente_alternativo')
+    list_filter = (
+    'estado', ('fecha_envio', DateFieldListFilter), ('fecha_entrega', DateFieldListFilter),
+    ('fecha_entrega_boom', DateFieldListFilter),)
+    search_fields = ('cliente__nombre', 'cliente_alternativo')
     raw_id_fields = ('cliente',)
     inlines = (FacturasBiableInline,)
-    list_editable = ('estado','fecha_entrega','fecha_entrega_boom','nro_tracking',)
-    readonly_fields = ('get_numero_dias_entrega','get_numero_dias_desde_envio')
+    list_editable = ('estado', 'fecha_entrega', 'fecha_entrega_boom')
     fieldsets = (
         ('Informacion General', {
             'classes': ('form-control',),
@@ -57,7 +56,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
             'classes': ('form-control',),
             'fields':
                 (
-                    ('servicio_boom', 'nro_tracking_boom' ,'fecha_entrega_boom'),
+                    ('nro_tracking_boom', 'fecha_entrega_boom'),
                 )
         }),
         ('Observaciones', {
@@ -68,13 +67,6 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
                 )
         }),
     )
-    def get_numero_dias_entrega(self, obj):
-        return obj.get_numero_dias_entrega()
-    get_numero_dias_entrega.short_description = 'Dias entrega'
-
-    def get_numero_dias_desde_envio(self, obj):
-        return obj.get_numero_dias_desde_envio()
-    get_numero_dias_desde_envio.short_description = 'Días en tránsito'
 
 
 admin.site.register(EnvioTransportadoraTCC, EnvioTransportadoraTCCAdmin)
