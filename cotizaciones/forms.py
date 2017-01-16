@@ -194,7 +194,6 @@ class RemisionCotizacionFormHelper(FormHelper):
             Div(
                 Div(
                     Field('nro_remision'),
-                    Field('nro_factura'),
                     Field('fecha_prometida_entrega'),
                 ),
                 Div(

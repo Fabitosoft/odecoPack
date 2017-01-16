@@ -65,15 +65,14 @@ class CotizacionDetailView(SelectRelatedMixin, DetailView):
         RemisionFormSet = inlineformset_factory(
             parent_model=Cotizacion,
             model=RemisionCotizacion,
-            fields=('nro_factura',
-                    'nro_remision',
+            fields=('nro_remision',
                     'fecha_prometida_entrega',
                     'entregado',
                     ),
             form=RemisionCotizacionForm,
             can_delete=True,
             can_order=True,
-            extra=2
+            extra=1
         )
 
         TareaFormSet = inlineformset_factory(
@@ -121,15 +120,14 @@ class CotizacionRemisionView(SingleObjectMixin,SelectRelatedMixin,FormView):
         RemisionFormSet = inlineformset_factory(
             parent_model=Cotizacion,
             model=RemisionCotizacion,
-            fields=('nro_factura',
-                    'nro_remision',
+            fields=('nro_remision',
                     'fecha_prometida_entrega',
                     'entregado',
                     ),
             form=RemisionCotizacionForm,
             can_delete=True,
             can_order=True,
-            extra=2
+            extra=1
         )
 
         TareaFormSet = inlineformset_factory(
