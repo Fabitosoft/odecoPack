@@ -31,10 +31,10 @@
         {% for remision in object_list %}
             <tr>
                 <td>
-                    <a href="{{ remision.cotizacion.get_absolute_url }}">{{ remision.tipo_remision }}-0{{ remision.nro_remision|title }}</a>
+                    <a href="{{ remision.cotizacion.get_absolute_url }}">{{ remision.cotizacion.nro_cotizacion }}</a>
                 </td>
                 <td>
-                    {{ remision.nro_remision }}
+                    {{ remision.tipo_remision }}-0{{ remision.nro_remision|title }}
                 </td>
                 <td>
                     {% if remision.factura_biable %}
