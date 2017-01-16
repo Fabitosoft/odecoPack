@@ -128,8 +128,8 @@ class ItemCotizacion(TimeStampedModel):
     precio = models.DecimalField(max_digits=18, decimal_places=0)
     forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones", null=True)
     p_n_lista_descripcion = models.CharField(max_length=120, null=True, verbose_name='Descripción Otro')
-    p_n_lista_referencia = models.CharField(max_length=120, null=True,verbose_name='Referencia Otro', blank=True)
-    p_n_lista_unidad_medida = models.CharField(max_length=120, null=True,verbose_name='Unidad Medida')
+    p_n_lista_referencia = models.CharField(max_length=120, null=True, verbose_name='Referencia Otro', blank=True)
+    p_n_lista_unidad_medida = models.CharField(max_length=120, null=True, verbose_name='Unidad Medida')
     total = models.DecimalField(max_digits=18, decimal_places=0)
     dias_entrega = models.PositiveIntegerField(default=0)
 
@@ -211,7 +211,7 @@ post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 # region Remisiones
 class RemisionCotizacion(TimeStampedModel):
     nro_remision = models.CharField(max_length=10)
-    nro_factura = models.CharField(max_length=10)
+    nro_factura = models.CharField(max_length=10, null=True, blank=True)
     fecha_prometida_entrega = models.DateField()
     entregado = models.BooleanField(default=False)
     cotizacion = models.ForeignKey(Cotizacion, related_name="mis_remisiones")
@@ -246,11 +246,11 @@ class TareaCotizacion(TimeStampedModel):
     def get_dias_a_fecha_fin(self):
         return (self.fecha_final - datetime.date.today()).days
 
+
 class ComentarioCotizacion(TimeStampedModel):
     comentario = models.TextField(max_length=300)
     usuario = models.ForeignKey(User, on_delete=models.PROTECT, related_name='comentarios_cotizaciones')
     cotizacion = models.ForeignKey(Cotizacion, null=True, blank=True, related_name="mis_comentarios")
-
 
     class Meta:
         ordering = ['-created']
