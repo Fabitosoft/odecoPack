@@ -24,6 +24,8 @@ from django.utils import timezone
 import mistune
 from weasyprint import HTML
 
+from braces.views import SelectRelatedMixin, PrefetchRelatedMixin
+
 from listasprecios.forms import ProductoBusqueda
 from biable.models import Colaborador
 from .models import (
@@ -50,15 +52,13 @@ from .forms import (
 )
 
 
-class CotizacionDetailView(DetailView):
+class CotizacionDetailView(SelectRelatedMixin, DetailView):
     model = Cotizacion
-
-    def get_object(self, queryset=None):
-        obj = self.model.objects \
-            .select_related('usuario', 'usuario__user_extendido', 'usuario__user_extendido__colaborador') \
-            .prefetch_related('items__item', 'items__forma_pago', 'mis_tareas', 'mis_comentarios') \
-            .get(id=self.kwargs["pk"])
-        return obj
+    select_related = (
+        'usuario',
+        'usuario__user_extendido',
+        'usuario__user_extendido__colaborador'
+    )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -106,17 +106,15 @@ class CotizacionDetailView(DetailView):
         return context
 
 
-class CotizacionRemisionView(SingleObjectMixin, FormView):
+class CotizacionRemisionView(SingleObjectMixin,SelectRelatedMixin,FormView):
     template_name = "cotizaciones/cotizacion_detail.html"
     form_class = RemisionCotizacionForm
     model = Cotizacion
-
-    def get_object(self, queryset=None):
-        obj = self.model.objects \
-            .select_related('usuario', 'usuario__user_extendido', 'usuario__user_extendido__colaborador') \
-            .prefetch_related('items__item', 'items__forma_pago', 'mis_tareas') \
-            .get(id=self.kwargs["pk"])
-        return obj
+    select_related = (
+        'usuario',
+        'usuario__user_extendido',
+        'usuario__user_extendido__colaborador'
+    )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -199,6 +197,8 @@ class CotizacionRemisionView(SingleObjectMixin, FormView):
         context["remisiones"] = remision_formset
         helper_remision = RemisionCotizacionFormHelper()
         context["helper_remision"] = helper_remision
+
+        context["comentario_form"] = ComentarioCotizacionForm(initial={"cotizacion": self.get_object()})
         return context
 
     def post(self, request, *args, **kwargs):
