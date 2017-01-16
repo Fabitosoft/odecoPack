@@ -218,6 +218,12 @@
             <th>
                 Nro Factura
             </th>
+            <th>
+                Cliente
+            </th>
+            <th>
+                Vendedor
+            </th>
         </tr>
 
         </thead>
@@ -225,10 +231,22 @@
         {% for remision in object.mis_remisiones.all %}
             <tr>
                 <td>
-                    {{ remision.tipo_remision }}-{{ remision.nro_remision }}
+                    {{ remision.tipo_remision }}-0{{ remision.nro_remision|title }}
                 </td>
                 <td>
-                    {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                    {% if remision.factura_biable %}
+                        {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if remision.factura_biable %}
+                        {{ remision.factura_biable.cliente }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if remision.factura_biable %}
+                        {{ remision.factura_biable.vendedor }}
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}
