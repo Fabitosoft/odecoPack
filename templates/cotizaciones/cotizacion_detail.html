@@ -208,4 +208,30 @@
             </div>
         {% endif %}
     </div>
+    <h2>Documentos Relacionados</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Remision
+            </th>
+            <th>
+                Nro Factura
+            </th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for remision in object.mis_remisiones.all %}
+            <tr>
+                <td>
+                    {{ remision.tipo_remision }}-{{ remision.nro_remision }}
+                </td>
+                <td>
+                    {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
