@@ -65,10 +65,12 @@ class CotizacionDetailView(SelectRelatedMixin, DetailView):
         RemisionFormSet = inlineformset_factory(
             parent_model=Cotizacion,
             model=RemisionCotizacion,
-            fields=('nro_remision',
-                    'fecha_prometida_entrega',
-                    'entregado',
-                    ),
+            fields=(
+                'tipo_remision',
+                'nro_remision',
+                'fecha_prometida_entrega',
+                'entregado',
+            ),
             form=RemisionCotizacionForm,
             can_delete=True,
             can_order=True,
@@ -105,7 +107,7 @@ class CotizacionDetailView(SelectRelatedMixin, DetailView):
         return context
 
 
-class CotizacionRemisionView(SingleObjectMixin,SelectRelatedMixin,FormView):
+class CotizacionRemisionView(SingleObjectMixin, SelectRelatedMixin, FormView):
     template_name = "cotizaciones/cotizacion_detail.html"
     form_class = RemisionCotizacionForm
     model = Cotizacion
@@ -120,10 +122,12 @@ class CotizacionRemisionView(SingleObjectMixin,SelectRelatedMixin,FormView):
         RemisionFormSet = inlineformset_factory(
             parent_model=Cotizacion,
             model=RemisionCotizacion,
-            fields=('nro_remision',
-                    'fecha_prometida_entrega',
-                    'entregado',
-                    ),
+            fields=(
+                'tipo_remision',
+                'nro_remision',
+                'fecha_prometida_entrega',
+                'entregado',
+            ),
             form=RemisionCotizacionForm,
             can_delete=True,
             can_order=True,

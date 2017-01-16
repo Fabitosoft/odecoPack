@@ -193,6 +193,7 @@ class RemisionCotizacionFormHelper(FormHelper):
         self.layout = Layout(
             Div(
                 Div(
+                    Field('tipo_remision'),
                     Field('nro_remision'),
                     Field('fecha_prometida_entrega'),
                 ),

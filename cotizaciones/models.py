@@ -11,6 +11,7 @@ from bandas.models import Banda
 from utils.models import TimeStampedModel
 from productos.models import Producto, ArticuloCatalogo
 from listasprecios.models import FormaPago
+from biable.models import FacturasBiable
 
 
 # Create your models here.
@@ -210,8 +211,9 @@ post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 
 # region Remisiones
 class RemisionCotizacion(TimeStampedModel):
-    nro_remision = models.CharField(max_length=10)
-    nro_factura = models.CharField(max_length=10, null=True, blank=True)
+    tipo_remision = models.CharField(max_length=2, choices=(('RM', 'RM'), ('RY', 'RY')), default='RM')
+    nro_remision = models.PositiveIntegerField()
+    factura_biable = models.ForeignKey(FacturasBiable, null=True, blank=True)
     fecha_prometida_entrega = models.DateField()
     entregado = models.BooleanField(default=False)
     cotizacion = models.ForeignKey(Cotizacion, related_name="mis_remisiones")
