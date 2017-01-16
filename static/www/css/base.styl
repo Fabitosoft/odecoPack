@@ -80,3 +80,31 @@ main
 .fa-check-circle
   color green
 
+//Comments
+.thumbnail
+  padding 0px
+
+.panel
+  position relative
+  & > .panel-heading
+    &:after
+      border-width 7px
+      border-right-color #f7f7f7
+      margin-top 1px
+      margin-left 2px
+    &:before
+      border-right-color #ddd
+      border-width 8px
+
+.panel>.panel-heading:after,.panel>.panel-heading:before
+  position absolute
+  top 11px
+  left -16px
+  right 100%
+  width 0
+  height 0
+  display block
+  content " "
+  border-color transparent
+  border-style solid solid outset
+  pointer-events none

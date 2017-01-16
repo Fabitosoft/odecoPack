@@ -30,8 +30,8 @@ from .models import (
     ItemCotizacion,
     Cotizacion,
     RemisionCotizacion,
-    TareaCotizacion
-)
+    TareaCotizacion,
+    ComentarioCotizacion)
 from productos.models import (
     Producto,
     ArticuloCatalogo
@@ -45,7 +45,8 @@ from .forms import (
     RemisionCotizacionFormHelper,
     TareaCotizacionForm,
     TareaCotizacionFormHelper,
-    ItemCotizacionOtrosForm
+    ItemCotizacionOtrosForm,
+    ComentarioCotizacionForm
 )
 
 
@@ -55,7 +56,7 @@ class CotizacionDetailView(DetailView):
     def get_object(self, queryset=None):
         obj = self.model.objects \
             .select_related('usuario', 'usuario__user_extendido', 'usuario__user_extendido__colaborador') \
-            .prefetch_related('items__item', 'items__forma_pago', 'mis_tareas') \
+            .prefetch_related('items__item', 'items__forma_pago', 'mis_tareas', 'mis_comentarios') \
             .get(id=self.kwargs["pk"])
         return obj
 
@@ -100,6 +101,8 @@ class CotizacionDetailView(DetailView):
         context["remisiones"] = remision_formset
         helper_remision = RemisionCotizacionFormHelper()
         context["helper_remision"] = helper_remision
+
+        context["comentario_form"] = ComentarioCotizacionForm(initial={"cotizacion": self.get_object()})
         return context
 
 
@@ -208,6 +211,18 @@ class CotizacionRemisionView(SingleObjectMixin, FormView):
         return reverse('cotizaciones:detalle_cotizacion', kwargs={'pk': self.object.pk})
 
 
+class ComentarCotizacionView(View):
+    def post(self, request, *args, **kwargs):
+        cotizacion = Cotizacion.objects.get(pk=request.POST.get('cotizacion'))
+        comentario = ComentarioCotizacion(
+            usuario=self.request.user,
+            comentario=request.POST.get('comentario'),
+            cotizacion=cotizacion
+        )
+        comentario.save()
+        return redirect(cotizacion)
+
+
 class CotizacionView(View):
     def get(self, request, *args, **kwargs):
         view = CotizacionDetailView.as_view()
@@ -271,7 +286,8 @@ class CotizacionEmailView(View):
 
             output = BytesIO()
             HTML(string=html_content).write_pdf(target=output)
-            msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email], connection=connection)
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
+                                         connection=connection)
             msg.attach_alternative(html_content, "text/html")
             nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
             msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')

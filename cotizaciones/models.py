@@ -246,4 +246,13 @@ class TareaCotizacion(TimeStampedModel):
     def get_dias_a_fecha_fin(self):
         return (self.fecha_final - datetime.date.today()).days
 
+class ComentarioCotizacion(TimeStampedModel):
+    comentario = models.TextField(max_length=300)
+    usuario = models.ForeignKey(User, on_delete=models.PROTECT, related_name='comentarios_cotizaciones')
+    cotizacion = models.ForeignKey(Cotizacion, null=True, blank=True, related_name="mis_comentarios")
+
+
+    class Meta:
+        ordering = ['-created']
+
 # endregion

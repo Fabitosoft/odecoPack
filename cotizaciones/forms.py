@@ -6,7 +6,13 @@ from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from django.urls import reverse
 
-from .models import Cotizacion, RemisionCotizacion, TareaCotizacion, ItemCotizacion
+from .models import (
+    Cotizacion,
+    RemisionCotizacion,
+    TareaCotizacion,
+    ItemCotizacion,
+    ComentarioCotizacion
+)
 
 
 class BusquedaCotiForm(forms.Form):
@@ -120,6 +126,32 @@ class CotizacionForm(ModelForm):
 
         self.helper.all().wrap(Field, css_class="form-control")
         # self.helper.filter_by_widget(forms.CharField).wrap(Field, css_class="form-control")
+
+
+class ComentarioCotizacionForm(ModelForm):
+    class Meta:
+        model = ComentarioCotizacion
+        fields = ('comentario', 'cotizacion',)
+
+    def __init__(self, *args, **kwargs):
+        super(ComentarioCotizacionForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-comentario'
+        self.helper.form_method = "POST"
+        self.helper.form_action = reverse('cotizaciones:comentar')
+
+        self.helper.layout = Layout(
+            Field('cotizacion', type="hidden"),
+            Div(
+                Field('comentario'),
+                css_class="col-xs-12"
+            ),
+            Div(
+                FormActions(
+                    Submit('comentar', 'Publicar Comentario'),
+                )
+            )
+        )
 
 
 class RemisionCotizacionForm(ModelForm):
