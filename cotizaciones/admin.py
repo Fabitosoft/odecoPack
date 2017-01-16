@@ -37,8 +37,9 @@ class RemisionInline(admin.TabularInline):
 
     fields = \
         (
+            'tipo_remision',
             'nro_remision',
-            "nro_factura",
+            "factura_biable",
             "fecha_prometida_entrega",
             "entregado"
         )

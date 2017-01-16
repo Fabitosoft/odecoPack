@@ -42,6 +42,13 @@
             </div>
         </div>
         <div class="col-xs-12 col-sm-4 col-md-3">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             <form method="post" action="{{ object.get_absolute_url }}">
                 {% csrf_token %}
                 {% if object.estado == 'ENV' or object.estado == 'REC' %}
@@ -208,48 +215,50 @@
             </div>
         {% endif %}
     </div>
-    <h2>Documentos Relacionados</h2>
-    <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <th>
-                Remision
-            </th>
-            <th>
-                Nro Factura
-            </th>
-            <th>
-                Cliente
-            </th>
-            <th>
-                Vendedor
-            </th>
-        </tr>
-
-        </thead>
-        <tbody>
-        {% for remision in object.mis_remisiones.all %}
+    {% if object.mis_remisiones.all %}
+        <h2>Documentos Relacionados</h2>
+        <table class="table table-bordered table-striped">
+            <thead>
             <tr>
-                <td>
-                    {{ remision.tipo_remision }}-0{{ remision.nro_remision|title }}
-                </td>
-                <td>
-                    {% if remision.factura_biable %}
-                        {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
-                    {% endif %}
-                </td>
-                <td>
-                    {% if remision.factura_biable %}
-                        {{ remision.factura_biable.cliente }}
-                    {% endif %}
-                </td>
-                <td>
-                    {% if remision.factura_biable %}
-                        {{ remision.factura_biable.vendedor }}
-                    {% endif %}
-                </td>
+                <th>
+                    Remision
+                </th>
+                <th>
+                    Nro Factura
+                </th>
+                <th>
+                    Cliente
+                </th>
+                <th>
+                    Vendedor
+                </th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+
+            </thead>
+            <tbody>
+            {% for remision in object.mis_remisiones.all %}
+                <tr>
+                    <td>
+                        {{ remision.tipo_remision }}-0{{ remision.nro_remision|title }}
+                    </td>
+                    <td>
+                        {% if remision.factura_biable %}
+                            {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if remision.factura_biable %}
+                            {{ remision.factura_biable.cliente }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if remision.factura_biable %}
+                            {{ remision.factura_biable.vendedor }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

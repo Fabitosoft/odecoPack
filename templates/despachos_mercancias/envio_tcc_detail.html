@@ -85,37 +85,39 @@
             <span class="label">Observación:</span> {{ object.observacion }}
         </p>
     {% endif %}
-
-    <h2>Documentos Relacionados</h2>
-    <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <th>
-                Nro Factura
-            </th>
-            <th>
-                Vendedor
-            </th>
-            <th>
-                Cliente
-            </th>
-        </tr>
-
-        </thead>
-        <tbody>
-        {% for factura in object.facturas.all %}
+    {% if object.facturas.all %}
+        <h2>Documentos Relacionados</h2>
+        <table class="table table-bordered table-striped">
+            <thead>
             <tr>
-                <td>
-                    {{ factura.tipo_documento }}-{{ factura.nro_documento }}
-                </td>
-                <td>
-                    {{ factura.vendedor }}
-                </td>
-                <td>
-                    {{ factura.cliente }}
-                </td>
+                <th>
+                    Nro Factura
+                </th>
+                <th>
+                    Vendedor
+                </th>
+                <th>
+                    Cliente
+                </th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+
+            </thead>
+            <tbody>
+            {% for factura in object.facturas.all %}
+                <tr>
+                    <td>
+                        {{ factura.tipo_documento }}-{{ factura.nro_documento }}
+                    </td>
+                    <td>
+                        {{ factura.vendedor }}
+                    </td>
+                    <td>
+                        {{ factura.cliente }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
 {% endblock %}

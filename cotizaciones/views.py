@@ -20,6 +20,7 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView, FormView
 from django.forms import inlineformset_factory
 from django.utils import timezone
+from django.contrib import messages
 
 import mistune
 from weasyprint import HTML
@@ -169,7 +170,11 @@ class CotizacionRemisionView(SingleObjectMixin, SelectRelatedMixin, FormView):
 
             if es_completada:
                 cotizacion.estado = 'FIN'
-                cotizacion.save()
+                if cotizacion.mis_remisiones.count() > 0:
+                    cotizacion.save()
+                else:
+                    mensaje = "No es posible terminar la cotización %s sin relacionar ninguna remisión"%(cotizacion.nro_cotizacion)
+                    messages.add_message(self.request, messages.ERROR, mensaje)
 
             if es_recibida:
                 cotizacion.estado = 'REC'
