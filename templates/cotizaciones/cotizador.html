@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block titulo_pagina %}
-    Cotizador
+    Cotizador {% if cotizacion_edit %}Editando {{ cotizacion_edit }}{% endif %}
 {% endblock %}
 
 {% block content_page %}

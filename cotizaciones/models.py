@@ -80,6 +80,8 @@ class Cotizacion(TimeStampedModel):
     total = models.DecimalField(max_digits=18, decimal_places=0, default=0)
     usuario = models.ForeignKey(User, default=1)
     observaciones = models.TextField(max_length=300, blank=True, null=True)
+    en_edicion = models.BooleanField(default=False)
+    version = models.PositiveIntegerField(default=1)
 
     estados = CotizacionesEstadosManager()
     objects = models.Manager()

@@ -107,6 +107,11 @@ class CotizacionDetailView(SelectRelatedMixin, DetailView):
         context["comentario_form"] = ComentarioCotizacionForm(initial={"cotizacion": self.get_object()})
         return context
 
+    def get(self, request, *args, **kwargs):
+        if self.get_object().en_edicion:
+            return redirect(reverse('cotizaciones:cotizador'))
+        return super().get(request, *args, **kwargs)
+
 
 class CotizacionRemisionView(SingleObjectMixin, SelectRelatedMixin, FormView):
     template_name = "cotizaciones/cotizacion_detail.html"
@@ -174,7 +179,7 @@ class CotizacionRemisionView(SingleObjectMixin, SelectRelatedMixin, FormView):
                     cotizacion.save()
                 else:
                     mensaje = "No es posible terminar la cotización %s sin relacionar ninguna remisión" % (
-                    cotizacion.nro_cotizacion)
+                        cotizacion.nro_cotizacion)
                     messages.add_message(self.request, messages.ERROR, mensaje)
 
             if es_recibida:
@@ -215,8 +220,14 @@ class CotizacionRemisionView(SingleObjectMixin, SelectRelatedMixin, FormView):
         self.object = self.get_object()
         return super().post(request, *args, **kwargs)
 
-    def get_success_url(self):
-        return reverse('cotizaciones:detalle_cotizacion', kwargs={'pk': self.object.pk})
+
+class EditarCotizacion(View):
+    def post(self, request, *args, **kwargs):
+        coti_id = request.POST.get('editar')
+        cotizacion = get_object_or_404(Cotizacion, pk=coti_id)
+        cotizacion.en_edicion = True
+        cotizacion.save()
+        return redirect(reverse('cotizaciones:cotizador'))
 
 
 class ComentarCotizacionView(View):
@@ -260,9 +271,18 @@ class CotizacionEmailView(View):
             obj.estado = "ENV"
             obj.save()
 
-        subject, from_email, to = "%s - %s" % (
-            'Cotizacion', obj.nro_cotizacion
-        ), settings.EMAIL_HOST_USER_ODECO, obj.email
+        esta_en_edicion = obj.en_edicion
+        if obj.en_edicion:
+            obj.en_edicion = False
+            obj.fecha_envio = timezone.now()
+            obj.version += 1
+            obj.save()
+
+        from_email = settings.EMAIL_HOST_USER_ODECO
+        to = obj.email
+        subject = "%s - %s" % ('Cotizacion', obj.nro_cotizacion)
+        if esta_en_edicion:
+            subject = "%s, version %s" % (subject, obj.version)
 
         ctx = {
             'object': obj,
@@ -278,10 +298,11 @@ class CotizacionEmailView(View):
         if colaborador:
             if colaborador.foto_perfil:
                 url_avatar = colaborador.foto_perfil.url
-                ctx = {
-                    'object': obj,
-                    'avatar': url_avatar
-                }
+                ctx['avatar'] = url_avatar
+
+        if esta_en_edicion:
+            ctx['version'] = obj.version
+
 
         text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
         html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
@@ -299,6 +320,9 @@ class CotizacionEmailView(View):
                                      connection=connection)
         msg.attach_alternative(html_content, "text/html")
         nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
+        if esta_en_edicion:
+            nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (obj.id, obj.version)
+
         msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
         msg.send()
         output.close()
@@ -607,12 +631,25 @@ class CotizadorTemplateView(TemplateView):
 
         cotizacion = Cotizacion.objects.filter(
             Q(usuario=self.request.user) &
-            Q(estado__exact="INI")
+            Q(en_edicion=True)
         ).last()
+
+        if not cotizacion:
+            try:
+                cotizacion = Cotizacion.objects.get(
+                    Q(usuario=self.request.user) &
+                    Q(estado__exact="INI")
+                )
+            except Cotizacion.DoesNotExist:
+                cotizacion = None
 
         if cotizacion:
             context["cotizacion_form"] = CotizacionForm(instance=cotizacion)
             context["cotizacion_form"].id = cotizacion.id
+
+            if cotizacion.en_edicion:
+                context["cotizacion_edit"] = cotizacion.nro_cotizacion
+
             context["cotizacion_id"] = cotizacion.id
             context["cotizacion_total"] = cotizacion.total
             context["items_cotizacion"] = cotizacion.items.all()

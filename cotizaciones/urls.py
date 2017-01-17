@@ -11,7 +11,8 @@ from .views import (
     RemisionListView,
     CotizacionEmailView,
     CotizadorView,
-    ComentarCotizacionView
+    ComentarCotizacionView,
+    EditarCotizacion
 )
 
 urlpatterns = [
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^remisiones/list/$', RemisionListView.as_view(), name='listar_remisiones'),
     url(r'^buscar/$', CotizacionesListView.as_view(), name='buscar_cotizacion'),
     url(r'^cotizador/', CotizadorView.as_view(), name='cotizador'),
+    url(r'^editar_cotizacion/', EditarCotizacion.as_view(), name='editar_cotizacion'),
     url(r'^comentar/', ComentarCotizacionView.as_view(), name='comentar'),
     url(r'^add_otro/', AddItemOtro.as_view(), name='add_item_otro_cotizacion'),
 

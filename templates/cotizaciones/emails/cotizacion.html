@@ -116,7 +116,7 @@
     </div>
     <div>
         <h1><strong>Cotización Nro:
-            <small>{{ object.nro_cotizacion }}</small>
+            <small>{{ object.nro_cotizacion }} {% if version %}, ver. {{ version }} {% endif %}</small>
         </strong></h1>
         <h3>
             <small>Fecha: {{ object.fecha_envio }}</small>
@@ -132,7 +132,7 @@
     <p>
         Hago envío de la cotización llevada a cabo
         el {{ object.modified }} hora local y referenciada con el <strong> número de
-        cotizacion {{ object.nro_cotizacion }}</strong>.
+        cotizacion {{ object.nro_cotizacion }}</strong>{% if version %} que contiene las modificaciones requeridas{% endif %}.
     </p>
     <p>
         A continuación relaciono los items cotizados con sus respectivas cantidades y precios:
