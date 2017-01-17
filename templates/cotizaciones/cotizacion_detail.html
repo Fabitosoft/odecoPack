@@ -58,7 +58,7 @@
             {% endif %}
             <form method="post" action="{{ object.get_absolute_url }}">
                 {% csrf_token %}
-                {% if object.estado == 'FIN' or object.estado == 'REC' %}
+                {% if not object.estado == 'FIN' and not object.estado == 'REC' %}
                     <input class="btn btn-primary" name="rechazar" value="Rechazar" type="submit"/>
                 {% endif %}
                 {% if object.estado == 'ENV' %}
