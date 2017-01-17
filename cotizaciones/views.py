@@ -303,7 +303,6 @@ class CotizacionEmailView(View):
         if esta_en_edicion:
             ctx['version'] = obj.version
 
-
         text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
         html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
@@ -583,7 +582,11 @@ class CotizacionFormView(FormView):
             cotizacion.save()
 
         if self.request.POST.get('descartar') and cotizacion:
-            cotizacion.delete()
+            if cotizacion.en_edicion:
+                cotizacion.en_edicion = False
+                cotizacion.save()
+            else:
+                cotizacion.delete()
         return HttpResponseRedirect(reverse('cotizaciones:cotizador'))
 
 
