@@ -59,7 +59,7 @@ class EnvioTransportadoraTCCAdmin(admin.ModelAdmin):
             'classes': ('form-control',),
             'fields':
                 (
-                    ('nro_tracking_boom', 'fecha_entrega_boom'),
+                    ('nro_tracking_boom', 'fecha_entrega_boom', 'valor_boom'),
                 )
         }),
         ('Observaciones', {

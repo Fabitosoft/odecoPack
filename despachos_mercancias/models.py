@@ -8,6 +8,7 @@ from model_utils.models import TimeStampedModel
 from biable.models import Cliente, FacturasBiable
 from geografia_colombia.models import Ciudad
 
+
 # Create your models here.
 class EnvioTransportadoraTCCQuerySet(models.QuerySet):
     def con_boom(self):
@@ -93,9 +94,10 @@ class EnvioTransportadoraTCC(TimeStampedModel):
     forma_pago = models.CharField(max_length=3, choices=FORMA_PAGO)
     observacion = models.TextField(max_length=200, blank=True, null=True)
     estado = models.CharField(max_length=2, choices=ESTADO_ENTREGA)
-    valor = models.DecimalField(decimal_places=2, max_digits=18)
+    valor = models.DecimalField(decimal_places=2, max_digits=18, null=True, blank=True)
+    valor_boom = models.DecimalField(decimal_places=2, max_digits=18, null=True, blank=True)
     facturas = models.ManyToManyField(FacturasBiable, related_name='envios', blank=True, verbose_name='Facturas')
-    ciudad = models.ForeignKey(Ciudad,related_name='mis_envios_tcc',on_delete=models.PROTECT)
+    ciudad = models.ForeignKey(Ciudad, related_name='mis_envios_tcc', on_delete=models.PROTECT)
 
     objects = models.Manager()
     pendientes = EnvioTransportadoraTCCPendientesManager()
