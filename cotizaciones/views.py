@@ -288,8 +288,7 @@ class CotizacionEmailView(View):
         connection = get_connection(host=settings.EMAIL_HOST_ODECO,
                                     port=settings.EMAIL_PORT_ODECO,
                                     username=settings.EMAIL_HOST_USER_ODECO,
-                                    password=settings.EMAIL_HOST_PASSWORD_ODECO,
-                                    use_tls=settings.EMAIL_USE_TLS_ODECO)
+                                    password=settings.EMAIL_HOST_PASSWORD_ODECO)
 
         output = BytesIO()
         HTML(string=html_content).write_pdf(target=output)
