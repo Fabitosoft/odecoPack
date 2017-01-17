@@ -173,7 +173,8 @@ class CotizacionRemisionView(SingleObjectMixin, SelectRelatedMixin, FormView):
                 if cotizacion.mis_remisiones.count() > 0:
                     cotizacion.save()
                 else:
-                    mensaje = "No es posible terminar la cotización %s sin relacionar ninguna remisión"%(cotizacion.nro_cotizacion)
+                    mensaje = "No es posible terminar la cotización %s sin relacionar ninguna remisión" % (
+                    cotizacion.nro_cotizacion)
                     messages.add_message(self.request, messages.ERROR, mensaje)
 
             if es_recibida:
@@ -289,7 +290,8 @@ class CotizacionEmailView(View):
                                     port=settings.EMAIL_PORT_ODECO,
                                     username=settings.EMAIL_HOST_USER_ODECO,
                                     password=settings.EMAIL_HOST_PASSWORD_ODECO,
-                                    use_tls=False)
+                                    use_tls=settings.EMAIL_USE_TLS_ODECO
+                                    )
 
         output = BytesIO()
         HTML(string=html_content).write_pdf(target=output)
