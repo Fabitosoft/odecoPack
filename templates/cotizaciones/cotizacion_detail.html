@@ -11,18 +11,21 @@
             <button type="submit"><i class="fa fa-envelope" aria-hidden="true"></i> Reenviar Email</button>
         </small>
     </form>
-    <form method="post" action="{% url 'cotizaciones:editar_cotizacion' %}">
-        {% csrf_token %}
-        {% if not object.en_edicion %}
-            <p>
-                <small>
-                    <button name="editar" value="{{ object.pk }}" type="submit"><i class="fa fa-pencil" aria-hidden="true"></i>
-                        Editar
-                    </button>
-                </small>
-            </p>
-        {% endif %}
-    </form>
+    {% if not object.estado == 'FIN' and not object.estado == 'ELI' %}
+        <form method="post" action="{% url 'cotizaciones:editar_cotizacion' %}">
+            {% csrf_token %}
+            {% if not object.en_edicion %}
+                <p>
+                    <small>
+                        <button name="editar" value="{{ object.pk }}" type="submit"><i class="fa fa-pencil"
+                                                                                       aria-hidden="true"></i>
+                            Editar
+                        </button>
+                    </small>
+                </p>
+            {% endif %}
+        </form>
+    {% endif %}
 {% endblock %}
 
 {% block content_page %}
