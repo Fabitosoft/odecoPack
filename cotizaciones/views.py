@@ -563,8 +563,18 @@ class CotizacionFormView(FormView):
     def post(self, request, *args, **kwargs):
         cotizacion = Cotizacion.objects.filter(
             Q(usuario=self.request.user) &
-            Q(estado__exact="INI")
+            Q(en_edicion=True)
         ).last()
+
+        if not cotizacion:
+            try:
+                cotizacion = Cotizacion.objects.get(
+                    Q(usuario=self.request.user) &
+                    Q(estado__exact="INI")
+                )
+            except Cotizacion.DoesNotExist:
+                cotizacion = None
+
         if self.request.POST.get('crear') and not cotizacion:
             cotizacion = Cotizacion()
             cotizacion.usuario = self.request.user
@@ -582,7 +592,7 @@ class CotizacionFormView(FormView):
             cotizacion.save()
 
         if self.request.POST.get('descartar') and cotizacion:
-            if cotizacion.en_edicion:
+            if cotizacion and cotizacion.en_edicion:
                 cotizacion.en_edicion = False
                 cotizacion.save()
             else:
