@@ -3,15 +3,17 @@
 {% load crispy_forms_tags %}
 
 {% block titulo_pagina %}
-    Cotizacion {{ object.nro_cotizacion }}{% if object.en_edicion %}
-    <small> En Edicion</small>{% endif %}
-    <form method="post" action="{% url 'cotizaciones:enviar' pk=object.pk %}">
-        {% csrf_token %}
-        <small>
-            <button type="submit"><i class="fa fa-envelope" aria-hidden="true"></i> Reenviar Email</button>
-        </small>
-    </form>
+    Cotizacion {{ object.nro_cotizacion }}
     {% if not object.estado == 'FIN' and not object.estado == 'ELI' %}
+        {% if object.en_edicion %}
+            <small> En Edicion</small>{% endif %}
+        <form method="post" action="{% url 'cotizaciones:enviar' pk=object.pk %}">
+            {% csrf_token %}
+            <small>
+                <button type="submit"><i class="fa fa-envelope" aria-hidden="true"></i> Reenviar Email</button>
+            </small>
+        </form>
+
         <form method="post" action="{% url 'cotizaciones:editar_cotizacion' %}">
             {% csrf_token %}
             {% if not object.en_edicion %}
