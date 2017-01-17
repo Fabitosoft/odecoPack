@@ -259,47 +259,47 @@ class CotizacionEmailView(View):
             obj.estado = "ENV"
             obj.save()
 
-            subject, from_email, to = "%s - %s" % (
-                'Cotizacion', obj.nro_cotizacion
-            ), settings.EMAIL_HOST_USER_ODECO, obj.email
+        subject, from_email, to = "%s - %s" % (
+            'Cotizacion', obj.nro_cotizacion
+        ), settings.EMAIL_HOST_USER_ODECO, obj.email
 
-            ctx = {
-                'object': obj,
-            }
+        ctx = {
+            'object': obj,
+        }
 
-            user = User.objects.get(username=request.user)
+        user = User.objects.get(username=request.user)
 
-            try:
-                colaborador = Colaborador.objects.get(usuario__user=user)
-            except Colaborador.DoesNotExist:
-                colaborador = None
+        try:
+            colaborador = Colaborador.objects.get(usuario__user=user)
+        except Colaborador.DoesNotExist:
+            colaborador = None
 
-            if colaborador:
-                if colaborador.foto_perfil:
-                    url_avatar = colaborador.foto_perfil.url
-                    ctx = {
-                        'object': obj,
-                        'avatar': url_avatar
-                    }
+        if colaborador:
+            if colaborador.foto_perfil:
+                url_avatar = colaborador.foto_perfil.url
+                ctx = {
+                    'object': obj,
+                    'avatar': url_avatar
+                }
 
-            text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
-            html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
+        text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
+        html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
-            connection = get_connection(host=settings.EMAIL_HOST_ODECO,
-                                        port=settings.EMAIL_PORT_ODECO,
-                                        username=settings.EMAIL_HOST_USER_ODECO,
-                                        password=settings.EMAIL_HOST_PASSWORD_ODECO,
-                                        use_tls=settings.EMAIL_USE_TLS_ODECO)
+        connection = get_connection(host=settings.EMAIL_HOST_ODECO,
+                                    port=settings.EMAIL_PORT_ODECO,
+                                    username=settings.EMAIL_HOST_USER_ODECO,
+                                    password=settings.EMAIL_HOST_PASSWORD_ODECO,
+                                    use_tls=settings.EMAIL_USE_TLS_ODECO)
 
-            output = BytesIO()
-            HTML(string=html_content).write_pdf(target=output)
-            msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
-                                         connection=connection)
-            msg.attach_alternative(html_content, "text/html")
-            nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
-            msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
-            msg.send()
-            output.close()
+        output = BytesIO()
+        HTML(string=html_content).write_pdf(target=output)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
+                                     connection=connection)
+        msg.attach_alternative(html_content, "text/html")
+        nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
+        msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
+        msg.send()
+        output.close()
         return redirect(obj)
 
 
