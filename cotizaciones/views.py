@@ -287,6 +287,7 @@ class EmailPrueba(View):
                                      connection=connection)
         msg.content_subtype = 'html'  # Main content is text/html
         msg.mixed_subtype = 'related'  # This is critical, otherwise images will be displayed as attachments!
+        msg.attach_alternative(html_content, "text/html")
         nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
 
         msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
