@@ -370,8 +370,7 @@ class CotizacionEmailView(View):
             obj.save()
 
         from_email = settings.EMAIL_HOST_USER_ODECO
-        # to = obj.email
-        to = "fabio.garcia.sanchez@gmail.com"
+        to = obj.email
         subject = "%s - %s" % ('Cotizacion', obj.nro_cotizacion)
         if esta_en_edicion:
             subject = "%s, version %s" % (subject, obj.version)
