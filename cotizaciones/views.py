@@ -278,12 +278,12 @@ class EmailPrueba(View):
         ctx = {
             'object': obj,
         }
-        text_content = "Probandito"
-        html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
+        text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx).encode('utf-8')
+        html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx)).encode('utf-8')
 
         msg = EmailMultiAlternatives(subject, text_content, from_email=from_email, to=[to],
                                      connection=connection)
-        # msg.attach_alternative(html_content, "text/html")
+        msg.attach_alternative(html_content, "text/html")
 
         # nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
 
