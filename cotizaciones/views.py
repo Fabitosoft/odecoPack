@@ -318,7 +318,7 @@ class CotizacionEmailView(View):
             obj.version += 1
             obj.save()
 
-        from_email = settings.EMAIL_HOST_USER_ODECO
+        from_email = settings.EMAIL_HOST_USER
         to = obj.email
         subject = "%s - %s" % ('Cotizacion', obj.nro_cotizacion)
         if esta_en_edicion:
