@@ -327,7 +327,7 @@ class EmailPrueba(View):
 
         output = BytesIO()
         HTML(string=html_content).write_pdf(target=output)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
+        msg = EmailMultiAlternatives(subject, text_content,'ODECOPACK / VENTAS', from_email, to=[to], bcc=[user.email],
                                      connection=connection)
         msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
         msg.send()
