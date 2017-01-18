@@ -278,14 +278,25 @@ class EmailPrueba(View):
         ctx = {
             'object': obj,
         }
-        text_content = render_to_string('cotizaciones/emails/cotizacion2.html', ctx)
+        user = User.objects.get(username=request.user)
+
+        try:
+            colaborador = Colaborador.objects.get(usuario__user=user)
+        except Colaborador.DoesNotExist:
+            colaborador = None
+
+        if colaborador:
+            if colaborador.foto_perfil:
+                url_avatar = colaborador.foto_perfil.url
+                ctx['avatar'] = url_avatar
+
+        text_content = "Adjunto la cotización requerida"
         html_content = get_template('cotizaciones/emails/cotizacion2.html').render(Context(ctx))
 
         output = BytesIO()
         HTML(string=html_content).write_pdf(target=output)
         msg = EmailMultiAlternatives(subject, text_content, from_email=from_email, to=[to],
                                      connection=connection)
-        msg.attach_alternative(html_content, "text/html")
 
         nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
 
