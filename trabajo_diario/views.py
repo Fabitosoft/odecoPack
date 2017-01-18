@@ -1,3 +1,4 @@
+from braces.views import LoginRequiredMixin
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
@@ -23,7 +24,7 @@ class TareaDiaUpdateView(UpdateView):
         return reverse('trabajo_diario:lista_tareas')
 
 
-class TareaDiaListView(TemplateView):
+class TareaDiaListView(LoginRequiredMixin,TemplateView):
     template_name = 'trabajo_diario/trabajo_diario_list.html'
 
     def get_context_data(self, **kwargs):
