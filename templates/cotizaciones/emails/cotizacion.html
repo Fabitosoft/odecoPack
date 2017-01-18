@@ -4,25 +4,28 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
     <style type="text/css">
 
-        h1{
+        h1 {
             font-size: 16px;
         }
-        h2{
+
+        h2 {
             font-size: 14px;
         }
-        h3{
+
+        h3 {
             font-size: 12px;
         }
-        p{
+
+        p {
             font-size: 10px;
         }
-        table{
+
+        table {
             font-size: 9px;
         }
-
-
 
         .img-circle {
             border-radius: 50%;
@@ -108,7 +111,9 @@
             padding: 0;
         }
     </style>
+
 </head>
+
 <body id="email_body">
 <header>
     <div>
@@ -129,10 +134,13 @@
         {{ object.usuario.get_full_name|title }}, de <strong>ODECOPACK S.A.S</strong>,
         quien realizó la cotización para <strong>{{ object.razon_social|title }}</strong>.
     </p>
+
     <p>
         Hago envío de la cotización llevada a cabo
         el {{ object.modified }} hora local y referenciada con el <strong> número de
-        cotizacion {{ object.nro_cotizacion }}</strong>{% if version %} que contiene las modificaciones requeridas{% endif %}.
+        cotizacion {{ object.nro_cotizacion }}</strong>{% if version %} que contiene las modificaciones
+        requeridas{% endif %}.
+
     </p>
     <p>
         A continuación relaciono los items cotizados con sus respectivas cantidades y precios:
@@ -199,17 +207,14 @@
         </tr>
         </tfoot>
     </table>
-
-    {% if object.observaciones %}
+    {% if object.observaciones.all %}
         <div class="texto_mensaje">
-        <h3><strong>Observaciones</strong></h3>
+            <h3><strong>Observaciones</strong></h3>
             <p>
-                {{ object.observaciones | safe  }}
+                {{ object.observaciones | safe }}
             </p>
         </div>
     {% endif %}
-
-
     <div id="email_coti_condiciones_comerciales">
         <h4>NOTAS Y CONDICCIONES COMERCIALES </h4>
         <ol>
@@ -240,7 +245,6 @@
             <p>Colombia - Cali</p>
         </div>
     </div>
-
 </div>
 <footer>
     <span class="center">

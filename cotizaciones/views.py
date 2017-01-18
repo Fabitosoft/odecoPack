@@ -252,6 +252,46 @@ class CotizacionView(View):
         return view(request, *args, **kwargs)
 
 
+class EmailPrueba(View):
+    def get(self, request, *args, **kwargs):
+        print("Entro a enviar correo prueba")
+        connection = get_connection(host=settings.EMAIL_HOST_ODECO,
+                                    port=settings.EMAIL_PORT_ODECO,
+                                    username=settings.EMAIL_HOST_USER_ODECO,
+                                    password=settings.EMAIL_HOST_PASSWORD_ODECO,
+                                    use_tls=settings.EMAIL_USE_TLS_ODECO
+                                    )
+        send_mail(
+            'Subject here',
+            'Here is the message.',
+            'costos@odecopack.com',
+            ['fabio.garcia.sanchez@gmail.com'],
+            connection=connection,
+            fail_silently=False,
+        )
+
+        obj = Cotizacion.objects.first()
+        from_email = "costos@odecopack.com"
+        to = "fabio.garcia.sanchez@gmail.com"
+        subject = "Pruebita"
+
+        ctx = {
+            'object': obj,
+        }
+        text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
+        html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email=from_email, to=[to],
+                                     connection=connection)
+        msg.attach_alternative(html_content, "text/html")
+
+        # nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
+
+        # msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
+        msg.send()
+        return redirect(obj)
+
+
 class CotizacionEmailView(View):
     def post(self, request, *args, **kwargs):
         pk = kwargs['pk']
@@ -306,17 +346,17 @@ class CotizacionEmailView(View):
         text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
         html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
-        connection = get_connection(host=settings.EMAIL_HOST_ODECO,
-                                    port=settings.EMAIL_PORT_ODECO,
-                                    username=settings.EMAIL_HOST_USER_ODECO,
-                                    password=settings.EMAIL_HOST_PASSWORD_ODECO,
-                                    use_tls=settings.EMAIL_USE_TLS_ODECO
-                                    )
+        # connection = get_connection(host=settings.EMAIL_HOST_ODECO,
+        #                             port=settings.EMAIL_PORT_ODECO,
+        #                             username=settings.EMAIL_HOST_USER_ODECO,
+        #                             password=settings.EMAIL_HOST_PASSWORD_ODECO,
+        #                             use_tls=settings.EMAIL_USE_TLS_ODECO
+        #                             )
 
         output = BytesIO()
         HTML(string=html_content).write_pdf(target=output)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
-                                     connection=connection)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email])
+        # connection=connection)
         msg.attach_alternative(html_content, "text/html")
         nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
         if esta_en_edicion:

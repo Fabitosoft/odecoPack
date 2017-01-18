@@ -12,7 +12,8 @@ from .views import (
     CotizacionEmailView,
     CotizadorView,
     ComentarCotizacionView,
-    EditarCotizacion
+    EditarCotizacion,
+    EmailPrueba
 )
 
 urlpatterns = [
@@ -31,5 +32,6 @@ urlpatterns = [
     url(r'^editar_cotizacion/', EditarCotizacion.as_view(), name='editar_cotizacion'),
     url(r'^comentar/', ComentarCotizacionView.as_view(), name='comentar'),
     url(r'^add_otro/', AddItemOtro.as_view(), name='add_item_otro_cotizacion'),
+    url(r'^prueba/', EmailPrueba.as_view(), name='prueba'),
 
 ]
