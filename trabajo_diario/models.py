@@ -27,6 +27,11 @@ class TrabajoDia(TimeStampedModel):
             self.porcentaje_atendido = (self.nro_tareas_atendidas / self.nro_tareas)* 100
         self.save()
 
+    class Meta:
+        permissions = (
+            ('ver_trabajo_diario', 'Ver Trabajo Diario'),
+        )
+
 
 class TareaDiaria(TimeStampedModel):
     ESTADOS = (
