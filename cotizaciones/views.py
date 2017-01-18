@@ -294,7 +294,7 @@ class EmailPrueba(View):
             obj.version += 1
             obj.save()
 
-        from_email = settings.EMAIL_HOST_USER_ODECO
+        from_email = "ODECOPACK / COMPONENTES <%s>" % (settings.EMAIL_HOST_USER_ODECO)
         # to = obj.email
         to = "fabio.garcia.sanchez@gmail.com"
         subject = "%s - %s" % ('Cotizacion', obj.nro_cotizacion)
