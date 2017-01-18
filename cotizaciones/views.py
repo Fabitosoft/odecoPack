@@ -494,9 +494,9 @@ class CotizacionesListView(ListView):
             qsFinal = qs.filter(
                 Q(usuario=current_user) |
                 Q(usuario__in=users)
-            ).distinct()
+            ).order_by('-id').distinct()
         else:
-            qsFinal = qs.distinct()
+            qsFinal = qs.order_by('-id').distinct()
         return qsFinal
 
     def get_context_data(self, **kwargs):
