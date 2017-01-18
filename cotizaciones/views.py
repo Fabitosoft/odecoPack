@@ -271,13 +271,41 @@ class EmailPrueba(View):
         )
 
         obj = Cotizacion.objects.first()
-        from_email = "costos@odecopack.com"
+
+
+        markdown = mistune.Markdown()
+        if obj.estado == "INI":
+            obj.razon_social = self.request.POST.get('razon_social')
+            obj.nombres_contacto = self.request.POST.get('nombres_contacto')
+            obj.apellidos_contacto = self.request.POST.get('apellidos_contacto')
+            obj.email = self.request.POST.get('email')
+            obj.nro_contacto = self.request.POST.get('nro_contacto')
+            obj.observaciones = markdown(self.request.POST.get('observaciones'))
+            obj.ciudad = self.request.POST.get('ciudad')
+            obj.pais = self.request.POST.get('pais')
+            obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
+            obj.fecha_envio = timezone.now()
+            obj.estado = "ENV"
+            obj.save()
+
+        esta_en_edicion = obj.en_edicion
+        if obj.en_edicion:
+            obj.en_edicion = False
+            obj.fecha_envio = timezone.now()
+            obj.version += 1
+            obj.save()
+
+        from_email = settings.EMAIL_HOST_USER_ODECO
+        #to = obj.email
         to = "fabio.garcia.sanchez@gmail.com"
-        subject = "Pruebita"
+        subject = "%s - %s" % ('Cotizacion', obj.nro_cotizacion)
+        if esta_en_edicion:
+            subject = "%s, version %s" % (subject, obj.version)
 
         ctx = {
             'object': obj,
         }
+
         user = User.objects.get(username=request.user)
 
         try:
@@ -290,16 +318,18 @@ class EmailPrueba(View):
                 url_avatar = colaborador.foto_perfil.url
                 ctx['avatar'] = url_avatar
 
-        text_content = "Adjunto la cotización requerida"
-        html_content = get_template('cotizaciones/emails/cotizacion2.html').render(Context(ctx))
+        nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
+        if esta_en_edicion:
+            ctx['version'] = obj.version
+            nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (obj.id, obj.version)
+
+        text_content = "Adjunto, en archivo pdf, la cotización CB-%s que fue solicitada." % (obj.id)
+        html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
         output = BytesIO()
         HTML(string=html_content).write_pdf(target=output)
-        msg = EmailMultiAlternatives(subject, text_content, from_email=from_email, to=[to],
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
                                      connection=connection)
-
-        nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
-
         msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
         msg.send()
         output.close()
