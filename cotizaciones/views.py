@@ -283,7 +283,7 @@ class EmailPrueba(View):
 
         msg = EmailMultiAlternatives(subject, text_content, from_email=from_email, to=[to],
                                      connection=connection)
-        msg.attach_alternative(html_content, "text/html")
+        # msg.attach_alternative(html_content, "text/html")
 
         # nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
 
