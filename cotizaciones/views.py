@@ -281,14 +281,15 @@ class EmailPrueba(View):
         text_content = "Cosita"
         html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
+        output = BytesIO()
+        HTML(string=html_content).write_pdf(target=output)
         msg = EmailMultiAlternatives(subject, text_content, from_email=from_email, to=[to],
                                      connection=connection)
-        msg.attach_alternative(html_content, "text/html")
+        nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
 
-        # nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
-
-        # msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
+        msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
         msg.send()
+        output.close()
         return redirect(obj)
 
 
