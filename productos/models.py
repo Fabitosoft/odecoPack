@@ -205,7 +205,6 @@ class Producto(TimeStampedModel):
 
 
 class ArticuloCatalogo(models.Model):
-    id_cguno = models.PositiveIntegerField(default=0)
     cg_uno = models.ForeignKey(ItemsBiable, null=True, blank=True, related_name='mis_articulos_catalogo',
                                verbose_name='producto cguno')
     referencia = models.CharField(max_length=100)
