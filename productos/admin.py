@@ -149,7 +149,7 @@ class ProductoAdmin(ImportExportModelAdmin):
             'classes': ('form-control',),
             'fields':
                 (
-                    ('id_cguno', 'cg_uno', 'referencia'),
+                    ('id_cguno', 'referencia'),
                     'fabricante', 'serie',
                     'descripcion_estandar',
                     'descripcion_comercial',
