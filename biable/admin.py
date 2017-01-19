@@ -1,6 +1,14 @@
 from django.contrib import admin
 
-from biable.models import VendedorBiable, LineaVendedorBiable, Cliente, FacturasBiable, ItemsBiable, Cartera
+from biable.models import (
+    VendedorBiable,
+    LineaVendedorBiable,
+    Cliente,
+    FacturasBiable,
+    ItemsBiable,
+    Cartera,
+    MovimientoVentaBiable
+)
 
 
 # Register your models here.
@@ -68,3 +76,4 @@ admin.site.register(LineaVendedorBiable)
 admin.site.register(FacturasBiable, FacturasBiableAdmin)
 admin.site.register(ItemsBiable, ItemsBiableAdmin)
 admin.site.register(Cartera)
+admin.site.register(MovimientoVentaBiable)
