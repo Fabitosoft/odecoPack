@@ -46,7 +46,7 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
     )
 
     list_editable = ['activo','margen','costo','id_cguno','unidad_medida']
-    raw_id_fields = ('margen',)
+    raw_id_fields = ('margen','cg_uno')
     readonly_fields = ("get_precio_base", "get_costo_cop", "get_rentabilidad")
 
     def get_margen(self, obj):
