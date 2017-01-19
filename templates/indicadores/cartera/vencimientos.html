@@ -7,7 +7,11 @@
     Cartera - Vencimientos
 {% endblock %}
 {% block indicador_contenido %}
-    <div id="tabla_pv"></div>
+    {% if perms.biable.ver_carteras_todos or perms.biable.ver_carteras %}
+        <div id="tabla_pv"></div>
+    {% else %}
+        No tiene permisos suficientes para ver este informe
+    {% endif %}
 {% endblock %}
 
 <script>
@@ -34,7 +38,15 @@
                 collapsed: true
             },
             fields: [
-                {name: 'nro_documento', caption: 'Nro Documento'},
+                {
+                    name: 'nro_documento', caption: 'Nro Documento',
+                    dataSettings: {
+                        aggregateFunc: 'sum',
+                        formatFunc: function (value) {
+                            return '<a>' + value + '<a>';
+                        }
+                    }
+                },
                 {name: 'vendedor_nombre', caption: 'Vendedor'},
                 {name: 'forma_pago_tipo', caption: 'Forma Pago'},
                 {name: 'forma_pago', caption: 'Forma Pago Días'},
