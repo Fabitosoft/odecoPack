@@ -19,7 +19,7 @@ class ItemsBiable(models.Model):
     id_procedencia = models.CharField(max_length=1)
 
     def __str__(self):
-        return self.nombre
+        return self.descripcion
 
 
 class Cliente(TimeStampedModel):
