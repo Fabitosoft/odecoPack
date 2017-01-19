@@ -1,12 +1,12 @@
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
 
-from django.core.mail import get_connection, send_mail
+from django.core.mail import get_connection
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
-from django.template.loader import render_to_string, get_template
+from django.template.loader import get_template
 from django.urls import reverse
 from django.db.models import Q
 from django.template import Context
@@ -314,7 +314,23 @@ class EmailPrueba(View):
             ctx['version'] = obj.version
             nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (obj.id, obj.version)
 
-        text_content = "Buen día. Adjunto, en archivo pdf, la cotización CB-%s que fue solicitada. Este correo ha sido generado automáticamente <br>asdfasdfasdf<br>asdfasfasdfasdf<br>asdfasdfasdf" % (obj.id)
+        hora = int(timezone.localtime(timezone.now()).hour)
+        if hora > 6 and hora < 12:
+            tiempo_saludo = "Buenos días"
+        elif hora > 11 and hora < 18:
+            tiempo_saludo = "Buenas tardes"
+        else:
+            tiempo_saludo = "Buenas noches"
+
+        saludo = "%s, mi nombre es %s" % (tiempo_saludo, colaborador.usuario.user.get_full_name())
+
+        text_content = "%s.<br>%s %s.<br>%s." % (
+            saludo,
+            "Adjunto, en pdf, envío la cotización solicitada con número CB ",
+            obj.id,
+            "Yo y Odecopack, le deseamos un felíz día. Gracias por preferirnos"
+        )
+
         html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
         output = BytesIO()
@@ -390,13 +406,30 @@ class CotizacionEmailView(View):
                 ctx['version'] = obj.version
                 nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (obj.id, obj.version)
 
-            text_content = "Adjunto, en archivo pdf, la cotización CB-%s que fue solicitada." % (obj.id)
+            hora = int(timezone.localtime(timezone.now()).hour)
+            if hora > 6 and hora < 12:
+                tiempo_saludo = "Buenos días"
+            elif hora > 11 and hora < 18:
+                tiempo_saludo = "Buenas tardes"
+            else:
+                tiempo_saludo = "Buenas noches"
+
+            saludo = "%s, mi nombre es %s" % (tiempo_saludo, colaborador.usuario.user.get_full_name())
+
+            text_content = "%s.<br>%s %s.<br>%s." % (
+                saludo,
+                "Adjunto, en pdf, envío la cotización solicitada con número CB ",
+                obj.id,
+                "Yo y Odecopack, le deseamos un felíz día. Gracias por preferirnos"
+            )
+
             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
             output = BytesIO()
             HTML(string=html_content).write_pdf(target=output)
             msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
                                          connection=connection)
+            msg.content_subtype = "html"
             msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
             msg.send()
             output.close()
