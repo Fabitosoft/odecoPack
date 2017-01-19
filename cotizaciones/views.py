@@ -261,14 +261,6 @@ class EmailPrueba(View):
                                     password=settings.EMAIL_HOST_PASSWORD_ODECO,
                                     use_tls=settings.EMAIL_USE_TLS_ODECO
                                     )
-        send_mail(
-            'Subject here',
-            'Here is the message.',
-            'Probando ando <costos@odecopack.com>',
-            ['fabio.garcia.sanchez@gmail.com'],
-            connection=connection,
-            fail_silently=False,
-        )
 
         obj = Cotizacion.objects.first()
 
@@ -297,7 +289,7 @@ class EmailPrueba(View):
         from_email = "ODECOPACK / COMPONENTES <%s>" % (settings.EMAIL_HOST_USER_ODECO)
         # to = obj.email
         to = "fabio.garcia.sanchez@gmail.com"
-        subject = "%s - %s" % ('Cotizacion', obj.nro_cotizacion)
+        subject = "Ignorara Correo de Prueba Fabio"
         if esta_en_edicion:
             subject = "%s, version %s" % (subject, obj.version)
 
