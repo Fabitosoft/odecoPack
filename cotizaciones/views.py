@@ -340,73 +340,78 @@ class CotizacionEmailView(View):
         pk = kwargs['pk']
         obj = Cotizacion.objects.get(pk=pk)
 
-        connection = get_connection(host=settings.EMAIL_HOST_ODECO,
-                                    port=settings.EMAIL_PORT_ODECO,
-                                    username=settings.EMAIL_HOST_USER_ODECO,
-                                    password=settings.EMAIL_HOST_PASSWORD_ODECO,
-                                    use_tls=settings.EMAIL_USE_TLS_ODECO
-                                    )
+        if obj.items.all().count() > 0:
+            connection = get_connection(host=settings.EMAIL_HOST_ODECO,
+                                        port=settings.EMAIL_PORT_ODECO,
+                                        username=settings.EMAIL_HOST_USER_ODECO,
+                                        password=settings.EMAIL_HOST_PASSWORD_ODECO,
+                                        use_tls=settings.EMAIL_USE_TLS_ODECO
+                                        )
 
-        markdown = mistune.Markdown()
-        if obj.estado == "INI":
-            obj.razon_social = self.request.POST.get('razon_social')
-            obj.nombres_contacto = self.request.POST.get('nombres_contacto')
-            obj.apellidos_contacto = self.request.POST.get('apellidos_contacto')
-            obj.email = self.request.POST.get('email')
-            obj.nro_contacto = self.request.POST.get('nro_contacto')
-            obj.observaciones = markdown(self.request.POST.get('observaciones'))
-            obj.ciudad = self.request.POST.get('ciudad')
-            obj.pais = self.request.POST.get('pais')
-            obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
-            obj.fecha_envio = timezone.now()
-            obj.estado = "ENV"
-            obj.save()
+            markdown = mistune.Markdown()
+            if obj.estado == "INI":
+                obj.razon_social = self.request.POST.get('razon_social')
+                obj.nombres_contacto = self.request.POST.get('nombres_contacto')
+                obj.apellidos_contacto = self.request.POST.get('apellidos_contacto')
+                obj.email = self.request.POST.get('email')
+                obj.nro_contacto = self.request.POST.get('nro_contacto')
+                obj.observaciones = markdown(self.request.POST.get('observaciones'))
+                obj.ciudad = self.request.POST.get('ciudad')
+                obj.pais = self.request.POST.get('pais')
+                obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
+                obj.fecha_envio = timezone.now()
+                obj.estado = "ENV"
+                obj.save()
 
-        esta_en_edicion = obj.en_edicion
-        if obj.en_edicion:
-            obj.en_edicion = False
-            obj.fecha_envio = timezone.now()
-            obj.version += 1
-            obj.save()
+            esta_en_edicion = obj.en_edicion
+            if obj.en_edicion:
+                obj.en_edicion = False
+                obj.fecha_envio = timezone.now()
+                obj.version += 1
+                obj.save()
 
-        from_email = "ODECOPACK / COMPONENTES <%s>" % (settings.EMAIL_HOST_USER_ODECO)
-        to = obj.email
-        subject = "%s - %s" % ('Cotizacion', obj.nro_cotizacion)
-        if esta_en_edicion:
-            subject = "%s, version %s" % (subject, obj.version)
+            from_email = "ODECOPACK / COMPONENTES <%s>" % (settings.EMAIL_HOST_USER_ODECO)
+            to = obj.email
+            subject = "%s - %s" % ('Cotizacion', obj.nro_cotizacion)
+            if esta_en_edicion:
+                subject = "%s, version %s" % (subject, obj.version)
 
-        ctx = {
-            'object': obj,
-        }
+            ctx = {
+                'object': obj,
+            }
 
-        user = User.objects.get(username=request.user)
+            user = User.objects.get(username=request.user)
 
-        try:
-            colaborador = Colaborador.objects.get(usuario__user=user)
-        except Colaborador.DoesNotExist:
-            colaborador = None
+            try:
+                colaborador = Colaborador.objects.get(usuario__user=user)
+            except Colaborador.DoesNotExist:
+                colaborador = None
 
-        if colaborador:
-            if colaborador.foto_perfil:
-                url_avatar = colaborador.foto_perfil.url
-                ctx['avatar'] = url_avatar
+            if colaborador:
+                if colaborador.foto_perfil:
+                    url_avatar = colaborador.foto_perfil.url
+                    ctx['avatar'] = url_avatar
 
-        nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
-        if esta_en_edicion:
-            ctx['version'] = obj.version
-            nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (obj.id, obj.version)
+            nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
+            if esta_en_edicion:
+                ctx['version'] = obj.version
+                nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (obj.id, obj.version)
 
-        text_content = "Adjunto, en archivo pdf, la cotización CB-%s que fue solicitada." % (obj.id)
-        html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
+            text_content = "Adjunto, en archivo pdf, la cotización CB-%s que fue solicitada." % (obj.id)
+            html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
-        output = BytesIO()
-        HTML(string=html_content).write_pdf(target=output)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
-                                     connection=connection)
-        msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
-        msg.send()
-        output.close()
-        return redirect(obj)
+            output = BytesIO()
+            HTML(string=html_content).write_pdf(target=output)
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
+                                         connection=connection)
+            msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
+            msg.send()
+            output.close()
+            return redirect(obj)
+        else:
+            mensaje = "No se puede enviar una cotización sin items"
+            messages.add_message(self.request, messages.ERROR, mensaje)
+            return redirect(reverse('cotizaciones:cotizador'))
 
 
 class TareaListView(ListView):

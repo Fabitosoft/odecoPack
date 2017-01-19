@@ -7,6 +7,17 @@
 {% endblock %}
 
 {% block content_page %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Atención!: {% endif %}
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation"><a href="#cotizacion" aria-controls="cotizacion" role="tab"
@@ -130,7 +141,8 @@
                                     <td class="total">{{ item.total }}</td>
                                     <td>
                                         <input type='hidden' name='item' value='{{ item.id }}'/>
-                                        <input type="number" pattern="[0-9]" class="item-ent" style="width: 60px" min="0" step="1"
+                                        <input type="number" pattern="[0-9]" class="item-ent" style="width: 60px"
+                                               min="0" step="1"
                                                value="{{ item.dias_entrega }}"/>
                                     </td>
                                 </tr>
@@ -184,8 +196,8 @@
                 qty: qty
             };
             $.get("{% url 'cotizaciones:add_qty_item_cotizacion' %}", data, function (data) {
-                if (data.error_cantidad){
-                    alert("Digitar correctamente la cantidad para "+data.actual_item_error)
+                if (data.error_cantidad) {
+                    alert("Digitar correctamente la cantidad para " + data.actual_item_error)
                 }
                 $("#coti_val_total").html(numberWithCommas(data.total_cotizacion));
                 if (data.deleted) {

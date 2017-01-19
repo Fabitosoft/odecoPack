@@ -7,16 +7,12 @@
     Cartera - Vencimientos
 {% endblock %}
 {% block indicador_contenido %}
-    {% if perms.biable.ver_carteras_todos or perms.biable.ver_carteras %}
-        <div id="tabla_pv"></div>
-    {% else %}
-        No tiene permisos suficientes para ver este informe
-    {% endif %}
+    <div id="tabla_pv"></div>
 {% endblock %}
 
 <script>
     {% block script %}
-        $('#hora_actualizacion').text("("+'{{ fecha_actualizacion }}'+")");
+        $('#hora_actualizacion').text("(" + '{{ fecha_actualizacion }}' + ")");
         var obj = JSON.parse('{{ datos | escapejs }}')
         // pivot grid options
         $('#tabla_pv').empty()
@@ -78,9 +74,9 @@
                     }
                 }
             ],
-            rows: ['vendedor_nombre', 'tipo','dias_vencido','cliente', 'nro_documento'],
+            rows: ['vendedor_nombre', 'tipo', 'dias_vencido', 'cliente', 'nro_documento'],
             columns: [],
-            data: ['a_recaudar','recaudado','debe']
+            data: ['a_recaudar', 'recaudado', 'debe']
         };
 
         new orb.pgridwidget(config).render(document.getElementById('pgrid'));
