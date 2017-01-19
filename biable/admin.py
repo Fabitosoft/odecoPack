@@ -10,8 +10,12 @@ class ItemsBiableAdmin(admin.ModelAdmin):
         'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
         'unidad_medida_inventario', 'id_procedencia')
     readonly_fields = (
-    'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
-    'unidad_medida_inventario', 'id_procedencia')
+        'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
+        'unidad_medida_inventario', 'id_procedencia')
+
+    search_fields = ('id_item', 'id_referencia', 'descripcion', 'descripcion_dos')
+
+    list_filter = ('activo', 'id_procedencia')
 
 
 class VendedorBiableAdmin(admin.ModelAdmin):
