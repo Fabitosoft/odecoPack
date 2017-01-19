@@ -120,7 +120,7 @@
                                     </td>
                                     <td>
                                         <input type='hidden' name='item' value='{{ item.id }}'/>
-                                        <input type="number" min="0" class="item-qty" style="width: 60px" step=any
+                                        <input class="item-qty" style="width: 60px" step=any
                                                value="{{ item.cantidad|floatformat:2 }}"/>
                                     </td>
                                     <td>
@@ -130,7 +130,7 @@
                                     <td class="total">{{ item.total }}</td>
                                     <td>
                                         <input type='hidden' name='item' value='{{ item.id }}'/>
-                                        <input type="number" pattern="[0-9]" class="item-ent" style="width: 60px" min="0" step="1"
+                                        <input class="item-ent" style="width: 60px" step=any
                                                value="{{ item.dias_entrega }}"/>
                                     </td>
                                 </tr>
