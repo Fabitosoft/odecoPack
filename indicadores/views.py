@@ -7,7 +7,7 @@ from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.views.generic import TemplateView, ListView
 
-from braces.views import JSONResponseMixin, AjaxResponseMixin
+from braces.views import JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
 
 from biable.models import (
     MovimientoVentaBiable,
@@ -50,7 +50,8 @@ class FechaActualizacionMovimientoVentasMixin(object):
         return None
 
 
-class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+class VentasVendedor(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin,
+                     InformeVentasConAnoMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxvendedor.html'
     select_related = [u"vendedor"]
@@ -127,7 +128,8 @@ class VentasVendedor(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, I
         return qsFinal.order_by('-vendedor__activo')
 
 
-class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+class VentasVendedorConsola(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin,
+                            InformeVentasConAnoMixin,
                             FechaActualizacionMovimientoVentasMixin,
                             TemplateView):
     template_name = 'indicadores/venta/consolaxventasxvendedor.html'
@@ -182,7 +184,8 @@ class VentasVendedorConsola(SelectRelatedMixin, JSONResponseMixin, AjaxResponseM
         return qsFinal
 
 
-class VentasClientes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+class VentasClientes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                     InformeVentasConLineaMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxcliente.html'
 
@@ -242,7 +245,8 @@ class VentasClientes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMi
         return qs
 
 
-class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+class VentasClientesAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                        InformeVentasConLineaMixin,
                         FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxclientexano.html'
 
@@ -302,7 +306,8 @@ class VentasClientesAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
         return qs
 
 
-class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin, InformeVentasConAnoMixin,
+class VentasMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin,
+                InformeVentasConAnoMixin,
                 FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxmes.html'
 
@@ -341,7 +346,8 @@ class VentasMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin
         return qs
 
 
-class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+class VentasLineaAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                     InformeVentasConLineaMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxlineaxano.html'
 
@@ -385,7 +391,8 @@ class VentasLineaAno(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMi
         return qs
 
 
-class VentasVendedorMes(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+class VentasVendedorMes(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin,
+                        InformeVentasConAnoMixin,
                         FechaActualizacionMovimientoVentasMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxvendedorxmes.html'
     select_related = [u"vendedor"]
@@ -433,7 +440,8 @@ class VentasVendedorMes(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin
         return qs
 
 
-class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+class VentasLineaAnoMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                        InformeVentasConLineaMixin,
                         FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxlineaxanoxmes.html'
 
@@ -475,7 +483,8 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
         return qs
 
 
-class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+class VentasClienteMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                       InformeVentasConLineaMixin,
                        FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxclientexmes.html'
 
@@ -535,7 +544,7 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAno
         return qs
 
 
-class CarteraVencimientos(JSONResponseMixin, ListView):
+class CarteraVencimientos(LoginRequiredMixin, JSONResponseMixin, ListView):
     template_name = 'indicadores/cartera/vencimientos.html'
     model = Cartera
     context_object_name = 'cartera_list'
