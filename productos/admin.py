@@ -149,7 +149,7 @@ class ProductoAdmin(ImportExportModelAdmin):
             'classes': ('form-control',),
             'fields':
                 (
-                    ('id_cguno', 'referencia'),
+                    ('id_cguno', 'id_cguno', 'referencia'),
                     'fabricante', 'serie',
                     'descripcion_estandar',
                     'descripcion_comercial',
@@ -241,7 +241,7 @@ class ProductoAdmin(ImportExportModelAdmin):
 
     list_editable = ['activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes', 'activo_catalogo', 'margen',
                      'costo', 'id_cguno']
-    raw_id_fields = ('margen',)
+    raw_id_fields = ('margen','id_cguno')
     readonly_fields = ("precio_base", "costo_cop", "rentabilidad")
 
     def get_margen(self, obj):
