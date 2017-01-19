@@ -27,8 +27,8 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
     ]
 
     list_display = (
-        'cg_uno',
         'referencia',
+        'cg_uno',
         'id_cguno',
         'nombre',
         'unidad_medida',
