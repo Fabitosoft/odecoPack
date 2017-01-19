@@ -159,7 +159,7 @@ class ProductoAdmin(ImportExportModelAdmin):
             'classes': ('form-control',),
             'fields':
                 (
-                    ('id_cguno', 'cg_uno', 'referencia'),
+                    ('cg_uno', 'referencia'),
                     'fabricante', 'serie',
                     'descripcion_estandar',
                     'descripcion_comercial',
@@ -204,7 +204,6 @@ class ProductoAdmin(ImportExportModelAdmin):
 
     list_display = (
         'referencia',
-        'id_cguno',
         'cg_uno',
         'descripcion_estandar',
         'unidad_medida',
@@ -240,7 +239,7 @@ class ProductoAdmin(ImportExportModelAdmin):
         'activo_catalogo', 'serie')
 
     list_editable = ['activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes', 'activo_catalogo', 'margen',
-                     'costo', 'id_cguno','cg_uno']
+                     'costo','cg_uno']
     raw_id_fields = ('margen','cg_uno')
     readonly_fields = ("precio_base", "costo_cop", "rentabilidad")
 

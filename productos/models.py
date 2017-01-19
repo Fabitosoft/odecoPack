@@ -61,7 +61,6 @@ class Producto(TimeStampedModel):
         if filesize > megabyte_limit * 1024 * 1024:
             raise ValidationError("Max file size is %sMB" % str(megabyte_limit))
 
-    id_cguno = models.PositiveIntegerField(default=0)
     cg_uno = models.ForeignKey(ItemsBiable, null=True, blank=True, related_name='mis_componentes_bandas', verbose_name='producto cguno')
     referencia = models.CharField(max_length=120, unique=True)
     descripcion_estandar = models.CharField(max_length=200, default='AUTOMATICO')
