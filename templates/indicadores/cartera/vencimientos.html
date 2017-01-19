@@ -16,7 +16,7 @@
 
 <script>
     {% block script %}
-        $('#hora_actualizacion').text("(" + '{{ fecha_actualizacion }}' + ")");
+        $('#hora_actualizacion').text("("+'{{ fecha_actualizacion }}'+")");
         var obj = JSON.parse('{{ datos | escapejs }}')
         // pivot grid options
         $('#tabla_pv').empty()
@@ -38,15 +38,7 @@
                 collapsed: true
             },
             fields: [
-                {
-                    name: 'nro_documento', caption: 'Nro Documento',
-                    dataSettings: {
-                        aggregateFunc: 'sum',
-                        formatFunc: function (value) {
-                            return '<a>' + value + '<a>';
-                        }
-                    }
-                },
+                {name: 'nro_documento', caption: 'Nro Documento'},
                 {name: 'vendedor_nombre', caption: 'Vendedor'},
                 {name: 'forma_pago_tipo', caption: 'Forma Pago'},
                 {name: 'forma_pago', caption: 'Forma Pago Días'},
@@ -86,9 +78,9 @@
                     }
                 }
             ],
-            rows: ['vendedor_nombre', 'tipo', 'dias_vencido', 'cliente', 'nro_documento'],
+            rows: ['vendedor_nombre', 'tipo','dias_vencido','cliente', 'nro_documento'],
             columns: [],
-            data: ['a_recaudar', 'recaudado', 'debe']
+            data: ['a_recaudar','recaudado','debe']
         };
 
         new orb.pgridwidget(config).render(document.getElementById('pgrid'));
