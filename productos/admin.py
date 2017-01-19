@@ -45,7 +45,7 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
         'activo',
     )
 
-    list_editable = ['activo','margen','costo','id_cguno','unidad_medida']
+    list_editable = ['activo','margen','costo','id_cguno','unidad_medida','cg_uno']
     raw_id_fields = ('margen','cg_uno')
     readonly_fields = ("get_precio_base", "get_costo_cop", "get_rentabilidad")
 
@@ -144,6 +144,16 @@ activar_seleccionados_ensamble.short_description = "Activar en Ensamble Bandas"
 # endregion
 
 class ProductoAdmin(ImportExportModelAdmin):
+    list_select_related = (
+        "unidad_medida",
+        'margen',
+        'margen__categoria',
+        'margen__proveedor',
+        'margen__proveedor__moneda',
+        'categoria_dos_por_categoria',
+        'cg_uno',
+    )
+
     fieldsets = (
         ('Informacion General', {
             'classes': ('form-control',),
@@ -192,16 +202,6 @@ class ProductoAdmin(ImportExportModelAdmin):
         obj = super().get_object(request, object_id, from_field)
         return obj
 
-    list_select_related = (
-        "unidad_medida",
-        'margen',
-        'margen__proveedor',
-        'margen__categoria',
-        'margen__proveedor__moneda',
-        'categoria_dos_por_categoria',
-        'cg_uno',
-    )
-
     list_display = (
         'referencia',
         'id_cguno',
@@ -240,7 +240,7 @@ class ProductoAdmin(ImportExportModelAdmin):
         'activo_catalogo', 'serie')
 
     list_editable = ['activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes', 'activo_catalogo', 'margen',
-                     'costo', 'id_cguno']
+                     'costo', 'id_cguno','cg_uno']
     raw_id_fields = ('margen','cg_uno')
     readonly_fields = ("precio_base", "costo_cop", "rentabilidad")
 
