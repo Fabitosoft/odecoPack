@@ -9,7 +9,7 @@ from django.views.generic.edit import UpdateView
 from cotizaciones.models import (
     Cotizacion,
 )
-from biable.models import Cartera, VendedorBiable
+from biable.models import Cartera, VendedorBiable, MovimientoVentaBiable
 from .models import TrabajoDia, TareaDiaria
 from despachos_mercancias.models import EnvioTransportadoraTCC
 
@@ -30,10 +30,16 @@ class TareaDiaListView(LoginRequiredMixin,TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         usuario = self.request.user
+        vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario)
+
+        qs = MovimientoVentaBiable.objects.annotate().filter(vendedor__in=vendedores_biable)
+
+
+
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
             fecha_hoy = timezone.now().date()
             usuario = self.request.user
-            vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario)
+
 
             try:
                 trabajo_dia = TrabajoDia.objects.get(created__date=fecha_hoy, usuario=usuario)
