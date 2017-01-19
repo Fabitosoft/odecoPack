@@ -91,6 +91,7 @@ class MovimientoVentaBiable(models.Model):
     proyecto = models.CharField(max_length=10)
     tipo_documento = models.CharField(max_length=3, null=True, blank=True)
     nro_documento = models.CharField(max_length=10, null=True, blank=True)
+    factura = models.ForeignKey('FacturasBiable', null=True, blank=True, related_name='mis_movimientos_venta')
     item_id = models.PositiveIntegerField()
     precio_uni = models.DecimalField(max_digits=18, decimal_places=4)
     cantidad = models.DecimalField(max_digits=18, decimal_places=4)
