@@ -47,21 +47,56 @@
             <th>
                 Cantidad
             </th>
+            <th>
+                Venta Bruta
+            </th>
+            <th>
+                Descuentos Netos
+            </th>
+            <th>
+                Costo Total
+            </th>
+            <th>
+                Rentabilidad
+            </th>
+            <th>
+                Impuestos Netos
+            </th>
+            <th>
+                Venta Neta
+            </th>
         </tr>
 
         </thead>
         <tbody>
-        {{ object.mis_movimientos_venta }}
         {% for item in object.mis_movimientos_venta.all %}
             <tr>
                 <td>
                     {{ item.item_id }}
                 </td>
                 <td>
-                    {{ item.precio_uni }}
+                    {{ item.precio_uni|floatformat:2 }}
                 </td>
                 <td>
-                    {{ item.cantidad }}
+                    {{ item.cantidad|floatformat }}
+                </td>
+                <td>
+                    {{ item.venta_bruta|floatformat:2 }}
+                </td>
+                <td>
+                    {{ item.dscto_netos|floatformat:2 }}
+                </td>
+                <td>
+                    {{ item.costo_total|floatformat:2 }}
+                </td>
+                <td>
+                    {{ item.rentabilidad|floatformat:2 }}
+                </td>
+                <td>
+                    {{ item.imp_netos|floatformat:2 }}
+                </td>
+                <td>
+                    {{ item.venta_neto|floatformat:2 }}
                 </td>
             </tr>
         {% endfor %}
