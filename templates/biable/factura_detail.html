@@ -33,39 +33,38 @@
         </div>
     </div>
 
-    {% if object.facturas.all %}
-        <h2>Items Relacionados</h2>
-        <table class="table table-bordered table-striped">
-            <thead>
+
+    <h2>Items Relacionados</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Item
+            </th>
+            <th>
+                Precio Unitario
+            </th>
+            <th>
+                Cantidad
+            </th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for item in object.mis_movimientos_venta.all %}
             <tr>
-                <th>
-                    Item
-                </th>
-                <th>
-                    Precio Unitario
-                </th>
-                <th>
-                    Cantidad
-                </th>
+                <td>
+                    {{ item.item_id }}
+                </td>
+                <td>
+                    {{ item.precio_uni }}
+                </td>
+                <td>
+                    {{ item.cantidad }}
+                </td>
             </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
-            </thead>
-            <tbody>
-            {% for item in object.mis_movimientos_venta.all %}
-                <tr>
-                    <td>
-                        {{ item.item_id }}
-                    </td>
-                    <td>
-                        {{ item.precio_uni }}
-                    </td>
-                    <td>
-                        {{ item.cantidad }}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-
-    {% endif %}
 {% endblock %}
