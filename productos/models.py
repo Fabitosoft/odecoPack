@@ -13,6 +13,8 @@ from productos_caracteristicas.models import (
     FabricanteProducto,
     UnidadMedida
 )
+from biable.models import ItemsBiable
+
 
 # region Productos
 def productos_upload_to(instance, filename):
@@ -60,6 +62,7 @@ class Producto(TimeStampedModel):
             raise ValidationError("Max file size is %sMB" % str(megabyte_limit))
 
     id_cguno = models.PositiveIntegerField(default=0)
+    cg_uno = models.ForeignKey(ItemsBiable, null=True, blank=True, related_name='mis_componentes_bandas', verbose_name='producto cguno')
     referencia = models.CharField(max_length=120, unique=True)
     descripcion_estandar = models.CharField(max_length=200, default='AUTOMATICO')
     descripcion_comercial = models.CharField(max_length=200, default='AUTOMATICO')
@@ -118,17 +121,17 @@ class Producto(TimeStampedModel):
 
     def get_costo_cop(self):
         if self.margen:
-            return round(self.margen.proveedor.moneda.cambio*self.margen.proveedor.factor_importacion*self.costo,0)
+            return round(self.margen.proveedor.moneda.cambio * self.margen.proveedor.factor_importacion * self.costo, 0)
         return 0
 
     def get_precio_base(self):
         if self.margen:
-            return round(self.get_costo_cop()/(1-(self.margen.margen_deseado/100)),0)
+            return round(self.get_costo_cop() / (1 - (self.margen.margen_deseado / 100)), 0)
         return 0
 
     def get_rentabilidad(self):
         if self.margen:
-            return round(self.get_precio_base()-self.get_costo_cop(),0)
+            return round(self.get_precio_base() - self.get_costo_cop(), 0)
         return 0
 
     def __str__(self):
@@ -197,11 +200,15 @@ class Producto(TimeStampedModel):
 
             if tipo == 'estandar':
                 self.descripcion_estandar = nombre.strip().upper()
+
+
 # endregion
 
 
 class ArticuloCatalogo(models.Model):
     id_cguno = models.PositiveIntegerField(default=0)
+    cg_uno = models.ForeignKey(ItemsBiable, null=True, blank=True, related_name='mis_articulos_catalogo',
+                               verbose_name='producto cguno')
     referencia = models.CharField(max_length=100)
     nombre = models.CharField(max_length=200)
     unidad_medida = models.CharField(max_length=100)
@@ -214,22 +221,22 @@ class ArticuloCatalogo(models.Model):
     activo = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ('referencia','fabricante')
+        unique_together = ('referencia', 'fabricante')
 
     def __str__(self):
         return self.nombre
 
     def get_costo_cop(self):
         if self.margen:
-            return round(self.margen.proveedor.moneda.cambio*self.margen.proveedor.factor_importacion*self.costo,0)
+            return round(self.margen.proveedor.moneda.cambio * self.margen.proveedor.factor_importacion * self.costo, 0)
         return 0
 
     def get_precio_base(self):
         if self.margen:
-            return round(self.get_costo_cop()/(1-(self.margen.margen_deseado/100)),0)
+            return round(self.get_costo_cop() / (1 - (self.margen.margen_deseado / 100)), 0)
         return 0
 
     def get_rentabilidad(self):
         if self.margen:
-            return round(self.get_precio_base()-self.get_costo_cop(),0)
+            return round(self.get_precio_base() - self.get_costo_cop(), 0)
         return 0

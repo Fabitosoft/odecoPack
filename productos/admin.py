@@ -13,7 +13,8 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
         'margen__proveedor',
         'margen__categoria',
         'margen__proveedor__moneda',
-        'fabricante'
+        'fabricante',
+        'cg_uno'
     )
 
     list_filter = (
@@ -26,6 +27,7 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
     ]
 
     list_display = (
+        'cg_uno',
         'referencia',
         'id_cguno',
         'nombre',
@@ -147,7 +149,7 @@ class ProductoAdmin(ImportExportModelAdmin):
             'classes': ('form-control',),
             'fields':
                 (
-                    ('id_cguno', 'referencia'),
+                    ('id_cguno', 'cg_uno', 'referencia'),
                     'fabricante', 'serie',
                     'descripcion_estandar',
                     'descripcion_comercial',
@@ -197,11 +199,13 @@ class ProductoAdmin(ImportExportModelAdmin):
         'margen__categoria',
         'margen__proveedor__moneda',
         'categoria_dos_por_categoria',
+        'cg_uno',
     )
 
     list_display = (
         'referencia',
         'id_cguno',
+        'cg_uno',
         'descripcion_estandar',
         'unidad_medida',
         'margen',
