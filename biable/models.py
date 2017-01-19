@@ -125,6 +125,7 @@ class Cartera(models.Model):
     client = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True)
     tipo_documento = models.CharField(max_length=3, null=True, blank=True)
     nro_documento = models.CharField(max_length=10, null=True, blank=True)
+    factura = models.ForeignKey('FacturasBiable', null=True, blank=True, related_name='mis_cartera_venta')
     forma_pago = models.PositiveIntegerField(null=True, blank=True)
     fecha_documento = models.DateField(null=True, blank=True)
     fecha_vencimiento = models.DateField(null=True, blank=True)
