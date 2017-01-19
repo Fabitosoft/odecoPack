@@ -1,4 +1,112 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 {% block content %}
-    Aqui el detalle de la factura
+    <h1>Detalles Factura {{ object.tipo_documento }}-{{ object.nro_documento }} </h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Información Factura</h3>
+            <hr>
+            <p>
+                <span class="label">Cliente:</span> {{ object.cliente }}
+            </p>
+            <p>
+                <span class="label">Vendedor:</span> {{ object.vendedor.nombre }}
+            </p>
+            <p>
+                <span class="label">Facturación Bruta:</span> {{ object.venta_bruta }}
+            </p>
+            <p>
+                <span class="label">Descuentos Netos:</span> {{ object.dscto_netos }}
+            </p>
+            <p>
+                <span class="label">Costo Total:</span> {{ object.costo_total }}
+            </p>
+            <p>
+                <span class="label">Rentabilidad:</span> {{ object.rentabilidad }}
+            </p>
+            <p>
+                <span class="label">Impuesto Netos:</span> {{ object.imp_netos }}
+            </p>
+            <p>
+                <span class="label">Valor Neto:</span> {{ object.venta_neto }}
+            </p>
+        </div>
+        <div class="col-md-6">
+            <h3>Seguimiento Entrega</h3>
+            <hr>
+            <p>
+                <span class="label">Nro de seguimiento:</span> {{ object.nro_tracking }}
+            </p>
+            {% if object.fecha_entrega %}
+                <p>
+                    <span class="label">Fecha de Entrega:</span> {{ object.fecha_entrega }}
+                </p>
+            {% endif %}
+            {% if not object.fecha_entrega %}
+                <p>
+                    <span class="label">Días en Transito:</span>{{ object.get_numero_dias_desde_envio }}
+                </p>
+            {% else %}
+                <p>
+                    <span class="label">Día que se tomó la entrega:</span>{{ object.get_numero_dias_entrega }}
+                </p>
+            {% endif %}
+            {% if object.nro_tracking_boom %}
+                <h3>Servicio Boom</h3>
+                <hr>
+                <p>
+                    <span class="label">Nro de Seguimiento Boom:</span> {{ object.nro_tracking_boom }}
+                </p>
+                <p>
+                    <span class="label">Valor Boom:</span> {{ object.valor_boom }}
+                </p>
+                {% if object.fecha_entrega_boom %}
+                    <p>
+                        <span class="label">Fecha Entrega Boom:</span> {{ object.fecha_entrega_boom }}
+                    </p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    {% if object.observacion %}
+        <p>
+            <span class="label">Observación:</span> {{ object.observacion }}
+        </p>
+    {% endif %}
+    {% if object.facturas.all %}
+        <h2>Items Relacionados</h2>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>
+                    Nro Factura
+                </th>
+                <th>
+                    Vendedor
+                </th>
+                <th>
+                    Cliente
+                </th>
+            </tr>
+
+            </thead>
+            <tbody>
+            {% for factura in object.facturas.all %}
+                <tr>
+                    <td>
+                        {{ factura.tipo_documento }}-{{ factura.nro_documento }}
+                    </td>
+                    <td>
+                        {{ factura.vendedor }}
+                    </td>
+                    <td>
+                        {{ factura.cliente }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
 {% endblock %}
