@@ -7,6 +7,21 @@ from usuarios.models import UserExtended, Colaborador
 
 
 # Create your models here.
+class ItemsBiable(models.Model):
+    id_item = models.PositiveIntegerField(primary_key=True)
+    id_referencia = models.CharField(max_length=20)
+    descripcion = models.CharField(max_length=40)
+    descripcion_dos = models.CharField(max_length=40)
+    activo = models.BooleanField(default=True)
+    nombre_tercero = models.CharField(max_length=120)
+    desc_item_padre = models.CharField(max_length=40)
+    unidad_medida_inventario = models.CharField(max_length=6)
+    id_procedencia = models.CharField(max_length=1)
+
+    def __str__(self):
+        return self.nombre
+
+
 class Cliente(TimeStampedModel):
     nit = models.CharField(max_length=20, primary_key=True)
     nombre = models.CharField(max_length=120)
@@ -22,6 +37,7 @@ class ActualizacionManager(models.Manager):
     def cartera_vencimiento(self):
         return self.filter(tipo='CARTERA_VENCIMIENTO')
 
+
 class Actualizacion(models.Model):
     tipo = models.CharField(max_length=100)
     dia = models.PositiveIntegerField()
@@ -32,25 +48,26 @@ class Actualizacion(models.Model):
     objects = models.Manager()
     tipos = ActualizacionManager()
 
-
     def __str__(self):
-        return '%s - %s' %(self.tipo,self.fecha)
+        return '%s - %s' % (self.tipo, self.fecha)
 
     def fecha_formateada(self):
-        fecha = '%s'%(self.fecha)
-        fecha_splited = fecha.split(sep=".",maxsplit=1)
+        fecha = '%s' % (self.fecha)
+        fecha_splited = fecha.split(sep=".", maxsplit=1)
         fecha_splited = fecha_splited[0].split(" ")
-        formateada = 'Actualizado el %s a las %s'%(fecha_splited[0],fecha_splited[1])
+        formateada = 'Actualizado el %s a las %s' % (fecha_splited[0], fecha_splited[1])
         return formateada
 
     def get_ultima_cartera_vencimiento(self):
         return self.tipos.cartera_vencimiento().latest('fecha')
+
 
 class LineaVendedorBiable(models.Model):
     nombre = models.CharField(max_length=120)
 
     def __str__(self):
         return self.nombre
+
 
 class VendedorBiable(models.Model):
     id = models.PositiveIntegerField(primary_key=True, editable=False)
@@ -63,11 +80,12 @@ class VendedorBiable(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class MovimientoVentaBiable(models.Model):
     year = models.PositiveIntegerField()
     month = models.PositiveIntegerField()
     day = models.PositiveIntegerField()
-    vendedor = models.ForeignKey(VendedorBiable,null=True)
+    vendedor = models.ForeignKey(VendedorBiable, null=True)
     id_terc_fa = models.CharField(max_length=20)
     cliente = models.CharField(max_length=200)
     proyecto = models.CharField(max_length=10)
@@ -98,8 +116,9 @@ class MovimientoVentaBiable(models.Model):
             ('reporte_ventas_todos_vendedores', 'R Vent Vend Todos'),
         )
 
+
 class Cartera(models.Model):
-    vendedor = models.ForeignKey(VendedorBiable,null=True, related_name='mis_carteras')
+    vendedor = models.ForeignKey(VendedorBiable, null=True, related_name='mis_carteras')
     id_terc_fa = models.CharField(max_length=20)
     cliente = models.CharField(max_length=200)
     client = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True)
@@ -126,6 +145,7 @@ class Cartera(models.Model):
             ('ver_carteras_todos', 'R Cart. Vcto Todos'),
         )
 
+
 class FacturasBiable(TimeStampedModel):
     year = models.PositiveIntegerField(verbose_name='Año')
     month = models.PositiveIntegerField(verbose_name='Mes')
@@ -142,5 +162,4 @@ class FacturasBiable(TimeStampedModel):
     venta_neto = models.DecimalField(max_digits=18, decimal_places=4)
 
     def __str__(self):
-        return "%s-%s"%(self.tipo_documento,self.nro_documento)
-
+        return "%s-%s" % (self.tipo_documento, self.nro_documento)
