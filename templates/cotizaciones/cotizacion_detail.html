@@ -276,7 +276,9 @@
                     </td>
                     <td>
                         {% if remision.factura_biable %}
-                            {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                            <a href="{{ remisiones.factura_biable.get_absolute_url }}">
+                                {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                            </a>
                         {% endif %}
                     </td>
                     <td>

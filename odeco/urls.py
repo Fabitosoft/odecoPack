@@ -22,7 +22,7 @@ from django.contrib.auth import views as auth_views
 from trabajo_diario.views import TareaDiaListView
 
 urlpatterns = [
-    url(r'^$', TareaDiaListView.as_view(),name='index'),
+    url(r'^$', TareaDiaListView.as_view(), name='index'),
     url(r'^admin/', admin.site.urls),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^accounts/', include('registration.backends.default.urls')),
@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'^indicadores/', include('indicadores.urls', namespace="indicadores")),
     url(r'^trabajo_diario/', include('trabajo_diario.urls', namespace="trabajo_diario")),
     url(r'^despacho_mercancia/', include('despachos_mercancias.urls', namespace="despacho_mercancia")),
+    url(r'^biable/', include('biable.urls', namespace="biable")),
 ]
 
 if settings.DEBUG:

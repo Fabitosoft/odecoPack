@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db import models
+from django.urls import reverse
 from model_utils.models import TimeStampedModel
 
 from usuarios.models import UserExtended, Colaborador
@@ -165,3 +166,6 @@ class FacturasBiable(TimeStampedModel):
 
     def __str__(self):
         return "%s-%s" % (self.tipo_documento, self.nro_documento)
+
+    def get_absolute_url(self):
+        return reverse("biable:detalle_factura", kwargs={"pk": self.pk})
