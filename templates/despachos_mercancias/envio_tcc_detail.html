@@ -109,7 +109,9 @@
             {% for factura in object.facturas.all %}
                 <tr>
                     <td>
-                        {{ factura.tipo_documento }}-{{ factura.nro_documento }}
+                        <a href="{{ factura.get_absolute_url }}">
+                            {{ factura.tipo_documento }}-{{ factura.nro_documento }}
+                        </a>
                     </td>
                     <td>
                         {{ factura.vendedor }}
