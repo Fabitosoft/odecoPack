@@ -11,7 +11,8 @@ from bandas.models import Banda
 from utils.models import TimeStampedModel
 from productos.models import Producto, ArticuloCatalogo
 from listasprecios.models import FormaPago
-from biable.models import FacturasBiable
+from biable.models import FacturasBiable, Cliente
+from geografia_colombia.models import Ciudad
 
 
 # Create your models here.
@@ -83,6 +84,7 @@ class Cotizacion(TimeStampedModel):
     observaciones = models.TextField(max_length=300, blank=True, null=True)
     en_edicion = models.BooleanField(default=False)
     version = models.PositiveIntegerField(default=1)
+    ciudad_despacho = models.ForeignKey(Ciudad, null=True, blank=True)
 
     estados = CotizacionesEstadosManager()
     objects = models.Manager()
@@ -104,7 +106,7 @@ class Cotizacion(TimeStampedModel):
         items = self.items.all()
         for item in items:
             total += item.total
-            descuento +=item.descuento
+            descuento += item.descuento
         self.total = "%.2f" % total
         self.descuento = "%.2f" % descuento
         self.save()

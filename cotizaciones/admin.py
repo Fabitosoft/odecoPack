@@ -72,13 +72,23 @@ class TareasInline(admin.TabularInline):
 
 
 class CotizacionAdmin(admin.ModelAdmin):
-    list_display = ('estado', 'razon_social', 'modified', 'usuario')
+    list_display = (
+        'estado',
+        'razon_social',
+        'modified',
+        'usuario',
+        'ciudad_despacho',
+        'ciudad',
+        'pais',
+    )
     readonly_fields = ('total',)
+    list_editable = ('ciudad_despacho',)
     inlines = [
         ListaPrecioInline,
         RemisionInline,
         TareasInline,
     ]
+    raw_id_fields = ('ciudad_despacho',)
 
 
 admin.site.register(Cotizacion, CotizacionAdmin)
