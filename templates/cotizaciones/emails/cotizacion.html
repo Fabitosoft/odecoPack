@@ -197,9 +197,13 @@
                     {{ item.get_unidad_item|title }}
                 </td>
                 {% if object.descuento > 0 %}
-                    <td>
-                        {{ item.descuento }}
-                    </td>
+                    {% if item.descuento > 0 %}
+                        <td>
+                            {{ item.descuento }}
+                        </td>
+                    {% else %}
+                        0
+                    {% endif %}
                 {% endif %}
                 <td>
                     {{ item.total }}

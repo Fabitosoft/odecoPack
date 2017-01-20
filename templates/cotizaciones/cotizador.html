@@ -142,7 +142,7 @@
                                     <td>{{ item.precio }}</td>
                                     <td>
                                         <input type='hidden' name='item' value='{{ item.id }}'/>
-                                        <input class="item-desc" style="width: 60px" step=any
+                                        <input type="number" class="item-desc" style="width: 60px" step=any
                                                value="{{ item.porcentaje_descuento|floatformat:2 }}"/>
                                     </td>
                                     <td class="descuento">{{ item.descuento }}</td>
