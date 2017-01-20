@@ -549,7 +549,6 @@ class AddItemCantidad(SingleObjectMixin, View):
             actual_item_error = item.get_nombre_item()
             total_linea = "ERROR CANTIDAD"
             total_cotizacion = "ERROR CANTIDAD"
-            item.save()
 
         data = {
             "error_cantidad": error_cantidad,
@@ -587,21 +586,45 @@ class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
     def get(self, request, *args, **kwargs):
         item_id = request.GET.get("item")
         item = ItemCotizacion.objects.get(id=item_id)
-        desc = Decimal(request.GET.get("desc"))
+        error_porcentaje = False
+        error_mensaje=""
 
-        item.porcentaje_descuento = desc
-        descuento = int((item.precio * item.cantidad) * (desc / 100))
-        item.descuento = descuento
-        item.total = (item.precio * item.cantidad) - descuento
-
-        item.save()
+        try:
+            desc = Decimal(request.GET.get("desc"))
+            if desc >= 0:
+                item.porcentaje_descuento = desc
+                descuento = int((item.precio * item.cantidad) * (desc / 100))
+                item.descuento = descuento
+                item.total = (item.precio * item.cantidad) - descuento
+                item.save()
+                total_linea = int(round(float(item.total)))
+                descuento_linea = item.descuento
+                descuento_cotizacion = int(round(float(item.cotizacion.descuento)))
+                total_cotizacion = int(round(float(item.cotizacion.total)))
+            else:
+                error_porcentaje = True
+                error_mensaje = "Error en el porcentaje aplicado a %s, debe de ser un número igual o mayor a 1" % (
+                item.get_nombre_item())
+                total_linea = "Error en % descuento"
+                descuento_linea = "Error en % descuento"
+                descuento_cotizacion = "Error en % descuento"
+                total_cotizacion = "Error en % descuento"
+        except InvalidOperation as e:
+            error_porcentaje = True
+            error_mensaje = "Error en el porcentaje aplicado a %s, debe ser un número valido" % (item.get_nombre_item())
+            total_linea = "Error en % descuento"
+            descuento_linea = "Error en % descuento"
+            descuento_cotizacion = "Error en % descuento"
+            total_cotizacion = "Error en % descuento"
 
         data = {
+            "error_porcentaje": error_porcentaje,
+            "error_mensaje": error_mensaje,
             "desc": item.porcentaje_descuento,
-            "total_line": int(round(float(item.total))),
-            "descuento": item.descuento,
-            "descuento_total": int(round(float(item.cotizacion.descuento))),
-            "total_cotizacion": int(round(float(item.cotizacion.total)))
+            "total_line": total_linea,
+            "descuento": descuento_linea,
+            "descuento_total": descuento_cotizacion,
+            "total_cotizacion": total_cotizacion
         }
         return JsonResponse(data)
 
