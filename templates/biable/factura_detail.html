@@ -60,17 +60,19 @@
                 Descuentos Netos
             </th>
             <th>
-                Costo Total
-            </th>
-            <th>
-                Rentabilidad
-            </th>
-            <th>
                 Impuestos Netos
             </th>
             <th>
                 Venta Neta
             </th>
+            {% if perms.biable.ver_info_admon_ventas %}
+                <th>
+                    Costo Total
+                </th>
+                <th>
+                    Rentabilidad
+                </th>
+            {% endif %}
         </tr>
 
         </thead>
@@ -99,17 +101,19 @@
                     {{ item.dscto_netos|floatformat:2 }}
                 </td>
                 <td>
-                    {{ item.costo_total|floatformat:2 }}
-                </td>
-                <td>
-                    {{ item.rentabilidad|floatformat:2 }}
-                </td>
-                <td>
                     {{ item.imp_netos|floatformat:2 }}
                 </td>
                 <td>
                     {{ item.venta_neto|floatformat:2 }}
                 </td>
+                {% if perms.biable.ver_info_admon_ventas %}
+                    <td>
+                        {{ item.costo_total|floatformat:2 }}
+                    </td>
+                    <td>
+                        {{ item.rentabilidad|floatformat:2 }}
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

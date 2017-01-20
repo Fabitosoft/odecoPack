@@ -169,3 +169,8 @@ class FacturasBiable(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse("biable:detalle_factura", kwargs={"pk": self.pk})
+
+    class Meta:
+        permissions = (
+            ('ver_info_admon_ventas', 'Ver Info Admon Factura'),
+        )
