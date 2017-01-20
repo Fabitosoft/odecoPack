@@ -116,6 +116,8 @@
                                 <td>Cantidad</td>
                                 <td>Uni. Medida</td>
                                 <td>Precio</td>
+                                <td>Porcentaje Descuento %</td>
+                                <td>Descuento $</td>
                                 <td>Total</td>
                                 <td>Días Ent.</td>
                             </tr>
@@ -138,6 +140,12 @@
                                         {{ item.get_unidad_item }}
                                     </td>
                                     <td>{{ item.precio }}</td>
+                                    <td>
+                                        <input type='hidden' name='item' value='{{ item.id }}'/>
+                                        <input class="item-desc" style="width: 60px" step=any
+                                               value="{{ item.porcentaje_descuento|floatformat:2 }}"/>
+                                    </td>
+                                    <td class="descuento">{{ item.descuento }}</td>
                                     <td class="total">{{ item.total }}</td>
                                     <td>
                                         <input type='hidden' name='item' value='{{ item.id }}'/>
@@ -149,6 +157,14 @@
                             {% endfor %}
                             </tbody>
                             <tfoot>
+                            <tr>
+                                <td>
+                                    Descuentos:
+                                </td>
+                                <td id="coti_val_descuento">
+                                    {{ cotizacion_descuento }}
+                                </td>
+                            </tr>
                             <tr>
                                 <td>
                                     Total:
@@ -200,11 +216,13 @@
                     alert("Digitar correctamente la cantidad para " + data.actual_item_error)
                 }
                 $("#coti_val_total").html(numberWithCommas(data.total_cotizacion));
+                $("#coti_val_descuento").html(numberWithCommas(data.descuento_total));
                 if (data.deleted) {
                     $("#item-" + item).fadeOut();
                 }
                 else {
                     $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
+                    $("#item-" + item).find('.descuento').html(numberWithCommas(data.descuento))
                 }
             });
         });
@@ -216,12 +234,25 @@
                 dias: dias
             };
             $.get("{% url 'cotizaciones:cambiar_dias_item_cotizacion' %}", data, function (data) {
-                console.log(data)
+
+            });
+        });
+        $(".item-desc").change(function () {
+            var item = $(this).prev("input[type='hidden']").val();
+            var desc = $(this).val();
+            var data = {
+                item: item,
+                desc: desc
+            };
+            $.get("{% url 'cotizaciones:cambiar_descuento_item_cotizacion' %}", data, function (data) {
+                $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
+                $("#item-" + item).find('.descuento').html(numberWithCommas(data.descuento))
+                $("#coti_val_total").html(numberWithCommas(data.total_cotizacion));
+                $("#coti_val_descuento").html(numberWithCommas(data.descuento_total));
             });
         });
 
         function numberWithCommas(x) {
-            x.replace(".00", "Cop")
             var parts = x.toString().split(",");
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             return parts.join(",");

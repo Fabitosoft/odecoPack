@@ -122,6 +122,9 @@
                     Pre. Uni.
                 </th>
                 <th>
+                    Descuento
+                </th>
+                <th>
                     Total
                 </th>
                 <th>
@@ -172,6 +175,9 @@
                         {{ item.precio }}
                     </td>
                     <td>
+                        {{ item.descuento }}
+                    </td>
+                    <td>
                         {{ item.total }}
                     </td>
                     <td>
@@ -200,7 +206,11 @@
             <tfoot>
             <tr>
                 <td class="clear"></td>
-                <td colspan="5"> Total:</td>
+                <td colspan="5"> Descuento:</td>
+                <td> {{ object.descuento }} </td>
+            </tr>            <tr>
+                <td class="clear"></td>
+                <td colspan="6"> Total:</td>
                 <td> {{ object.total }} </td>
             </tr>
             </tfoot>

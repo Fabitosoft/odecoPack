@@ -78,6 +78,7 @@ class Cotizacion(TimeStampedModel):
     nro_cotizacion = models.CharField(max_length=120)
     fecha_envio = models.DateTimeField(null=True, blank=True)
     total = models.DecimalField(max_digits=18, decimal_places=0, default=0)
+    descuento = models.DecimalField(max_digits=18, decimal_places=0, default=0)
     usuario = models.ForeignKey(User, default=1)
     observaciones = models.TextField(max_length=300, blank=True, null=True)
     en_edicion = models.BooleanField(default=False)
@@ -99,10 +100,13 @@ class Cotizacion(TimeStampedModel):
     def update_total(self):
         "updating..."
         total = 0
+        descuento = 0
         items = self.items.all()
         for item in items:
             total += item.total
+            descuento +=item.descuento
         self.total = "%.2f" % total
+        self.descuento = "%.2f" % descuento
         self.save()
 
     def set_estado(self, estado):
@@ -135,6 +139,8 @@ class ItemCotizacion(TimeStampedModel):
     p_n_lista_unidad_medida = models.CharField(max_length=120, null=True, verbose_name='Unidad Medida')
     total = models.DecimalField(max_digits=18, decimal_places=0)
     dias_entrega = models.PositiveIntegerField(default=0)
+    porcentaje_descuento = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    descuento = models.DecimalField(max_digits=18, decimal_places=0, default=0)
 
     def get_nombre_item(self):
         if self.item:

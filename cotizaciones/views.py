@@ -415,6 +415,7 @@ class CotizacionEmailView(View):
             msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
                                          connection=connection, reply_to=[user.email])
             msg.attach_alternative(html_content, "text/html")
+
             msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
             msg.send()
             output.close()
@@ -526,8 +527,6 @@ class AddItemCantidad(SingleObjectMixin, View):
 
     def get(self, request, *args, **kwargs):
         delete = False
-        total_linea = 0
-        total_cotizacion = 0
         error_cantidad = False
         actual_item_error = ""
         item_id = request.GET.get("item")
@@ -539,7 +538,9 @@ class AddItemCantidad(SingleObjectMixin, View):
                 item.delete()
             else:
                 item.cantidad = qty
-                item.total = item.precio * qty
+                descuento = int((item.precio * qty) * (item.porcentaje_descuento / 100))
+                item.descuento = descuento
+                item.total = (item.precio * qty) - descuento
                 item.save()
             total_linea = item.total
             total_cotizacion = item.cotizacion.total
@@ -554,8 +555,10 @@ class AddItemCantidad(SingleObjectMixin, View):
             "error_cantidad": error_cantidad,
             "actual_item_error": actual_item_error,
             "deleted": delete,
-            "total_line": total_linea,
-            "total_cotizacion": total_cotizacion
+            "total_line": int(round(float(total_linea))),
+            "descuento": item.descuento,
+            "descuento_total": int(round(float(item.cotizacion.descuento))),
+            "total_cotizacion": int(round(float(total_cotizacion)))
         }
         return JsonResponse(data)
 
@@ -574,6 +577,31 @@ class CambiarDiaEntregaView(SingleObjectMixin, View):
 
         data = {
             "dias": item.dias_entrega
+        }
+        return JsonResponse(data)
+
+
+class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
+    model = ItemCotizacion
+
+    def get(self, request, *args, **kwargs):
+        item_id = request.GET.get("item")
+        item = ItemCotizacion.objects.get(id=item_id)
+        desc = Decimal(request.GET.get("desc"))
+
+        item.porcentaje_descuento = desc
+        descuento = int((item.precio * item.cantidad) * (desc / 100))
+        item.descuento = descuento
+        item.total = (item.precio * item.cantidad) - descuento
+
+        item.save()
+
+        data = {
+            "desc": item.porcentaje_descuento,
+            "total_line": int(round(float(item.total))),
+            "descuento": item.descuento,
+            "descuento_total": int(round(float(item.cotizacion.descuento))),
+            "total_cotizacion": int(round(float(item.cotizacion.total)))
         }
         return JsonResponse(data)
 
@@ -761,6 +789,7 @@ class CotizadorTemplateView(TemplateView):
                 context["cotizacion_edit"] = cotizacion.nro_cotizacion
 
             context["cotizacion_id"] = cotizacion.id
+            context["cotizacion_descuento"] = cotizacion.descuento
             context["cotizacion_total"] = cotizacion.total
             context["items_cotizacion"] = cotizacion.items.all()
             context["forma_item_otro"] = ItemCotizacionOtrosForm(initial={'cotizacion_id': cotizacion.id})

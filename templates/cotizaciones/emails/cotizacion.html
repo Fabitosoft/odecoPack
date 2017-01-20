@@ -165,6 +165,11 @@
             <th>
                 Uni. Emp
             </th>
+            {% if object.descuento > 0 %}
+                <th>
+                    Descuentos
+                </th>
+            {% endif %}
             <th>
                 Total
             </th>
@@ -191,6 +196,11 @@
                 <td>
                     {{ item.get_unidad_item|title }}
                 </td>
+                {% if object.descuento > 0 %}
+                    <td>
+                        {{ item.descuento }}
+                    </td>
+                {% endif %}
                 <td>
                     {{ item.total }}
                 </td>
@@ -201,10 +211,22 @@
         {% endfor %}
         </tbody>
         <tfoot>
-        <tr>
-            <td colspan="5"> Total:</td>
-            <td> {{ object.total }} </td>
-        </tr>
+        {% if object.descuento > 0 %}
+            <tr>
+                <td colspan="5"> Descuentos:</td>
+                <td> {{ object.descuento }} </td>
+            </tr>
+            <tr>
+                <td colspan="6"> Total:</td>
+                <td> {{ object.total }} </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5"> Total:</td>
+                <td> {{ object.total }} </td>
+            </tr>
+        {% endif %}
+
         </tfoot>
     </table>
     {% if object.observaciones %}
