@@ -89,6 +89,7 @@ class CotizacionAdmin(admin.ModelAdmin):
         TareasInline,
     ]
     raw_id_fields = ('ciudad_despacho',)
+    search_fields = ('pais','ciudad','razon_social','estado')
 
 
 admin.site.register(Cotizacion, CotizacionAdmin)
