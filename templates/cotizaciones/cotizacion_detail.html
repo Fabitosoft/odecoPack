@@ -275,6 +275,9 @@
                 <th>
                     Vendedor
                 </th>
+                <th>
+                    Venta Neta
+                </th>
             </tr>
 
             </thead>
@@ -299,6 +302,11 @@
                     <td>
                         {% if remision.factura_biable %}
                             {{ remision.factura_biable.vendedor }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if remision.factura_biable %}
+                            {{ remision.factura_biable.venta_neto|floatformat:2 }}
                         {% endif %}
                     </td>
                 </tr>
