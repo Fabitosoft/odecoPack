@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
 from django.urls import reverse
 from django.db.models import Q
 from django.template import Context
@@ -406,30 +406,15 @@ class CotizacionEmailView(View):
                 ctx['version'] = obj.version
                 nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (obj.id, obj.version)
 
-            hora = int(timezone.localtime(timezone.now()).hour)
-            if hora > 6 and hora < 12:
-                tiempo_saludo = "Buenos días"
-            elif hora > 11 and hora < 18:
-                tiempo_saludo = "Buenas tardes"
-            else:
-                tiempo_saludo = "Buenas noches"
-
-            saludo = "%s, mi nombre es %s" % (tiempo_saludo, colaborador.usuario.user.get_full_name())
-
-            text_content = "%s.<br>%s %s.<br>%s." % (
-                saludo,
-                "Adjunto, en pdf, envío la cotización solicitada con número CB ",
-                obj.id,
-                "Yo y Odecopack, le deseamos un felíz día. Gracias por preferirnos"
-            )
+            text_content = render_to_string('cotizaciones/emails/cotizacion.html', ctx)
 
             html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
 
             output = BytesIO()
             HTML(string=html_content).write_pdf(target=output)
             msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
-                                         connection=connection)
-            msg.content_subtype = "html"
+                                         connection=connection, reply_to=[user.email])
+            msg.attach_alternative(html_content, "text/html")
             msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
             msg.send()
             output.close()
