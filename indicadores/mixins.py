@@ -88,7 +88,7 @@ class IndicadorMesMixin(object):
                 facturacion_cotizaciones_dia = float(qsCotizacionesDia[0]['valor'])
                 cantidad_cotizaciones_dia = float(qsCotizacionesDia[0]['cantidad'])
 
-            if facturacion_ventas_mes > 0:
+            if facturacion_cotizaciones_mes > 0:
                 tasa_conversion_ventas_mes = (facturacion_ventas_mes / facturacion_cotizaciones_mes)*100
             else:
                 tasa_conversion_ventas_mes = 0
