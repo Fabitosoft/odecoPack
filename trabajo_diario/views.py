@@ -1,5 +1,4 @@
 from braces.views import LoginRequiredMixin
-from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
@@ -9,9 +8,10 @@ from django.views.generic.edit import UpdateView
 from cotizaciones.models import (
     Cotizacion,
 )
-from biable.models import Cartera, VendedorBiable, MovimientoVentaBiable
+from biable.models import Cartera, VendedorBiable
 from .models import TrabajoDia, TareaDiaria
 from despachos_mercancias.models import EnvioTransportadoraTCC
+from indicadores.mixins import IndicadorMesMixin
 
 
 # Create your views here.
@@ -24,7 +24,7 @@ class TareaDiaUpdateView(UpdateView):
         return reverse('trabajo_diario:lista_tareas')
 
 
-class TareaDiaListView(LoginRequiredMixin,TemplateView):
+class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
     template_name = 'trabajo_diario/trabajo_diario_list.html'
 
     def get_context_data(self, **kwargs):
@@ -32,14 +32,9 @@ class TareaDiaListView(LoginRequiredMixin,TemplateView):
         usuario = self.request.user
         vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario)
 
-        qs = MovimientoVentaBiable.objects.annotate().filter(vendedor__in=vendedores_biable)
-
-
-
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
-            fecha_hoy = timezone.now().date()
+            fecha_hoy = timezone.localtime(timezone.now()).date()
             usuario = self.request.user
-
 
             try:
                 trabajo_dia = TrabajoDia.objects.get(created__date=fecha_hoy, usuario=usuario)

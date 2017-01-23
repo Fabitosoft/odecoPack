@@ -1,0 +1,46 @@
+<h2>Mis Indicadores</h2>
+<table class="table table-bordered table-striped">
+    <thead>
+    <th>
+        Tipo
+    </th>
+    <th>
+        Val. Mes $
+    </th>
+    <th>
+        Val. Día $
+    </th>
+    <th>
+        Cant. Mes #
+    </th>
+    <th>
+        Cant. Día #
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Mis Ventas</td>
+        <td>{{ indicadores.facturacion_venta_mes|floatformat }}</td>
+        <td>{{ indicadores.facturacion_venta_dia|floatformat }}</td>
+        <td>{{ indicadores.cantidad_venta_mes|floatformat }}</td>
+        <td>{{ indicadores.cantidad_venta_dia|floatformat }}</td>
+    </tr>
+    <tr>
+        <td>Mis Cotizaciones</td>
+        <td>{{ indicadores.valor_cotizacion_mes|floatformat }}</td>
+        <td>{{ indicadores.valor_cotizacion_dia|floatformat }}</td>
+        <td>{{ indicadores.cantidad_cotizaciones_mes|floatformat }}</td>
+        <td>{{ indicadores.cantidad_cotizaciones_dia|floatformat }}</td>
+    </tr>
+    <tr>
+        <td>Mi Tasa Conversion Ventas</td>
+        <td>{{ indicadores.tasa_conversion_ventas_mes|floatformat }} %</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    </tbody>
+    <tfoot>
+
+    </tfoot>
+</table>

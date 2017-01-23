@@ -6,35 +6,41 @@
         </h1>
         Estas son tus tareas para el día de hoy
         <div class="row">
+            <div class="col-md-9">
+                <div class="row">
+                    {% if seguimiento_cartera.all %}
+                        <div class="col-md-6">
+                            {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_cartera.all tipo="Seguimiento Cartera" %}
+                        </div>
+                    {% endif %}
 
-            {% if seguimiento_cartera.all %}
-                <div class="col-md-6">
-                    {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_cartera.all tipo="Seguimiento Cartera" %}
-                </div>
-            {% endif %}
+                    {% if seguimiento_cotizacion.all %}
+                        <div class="col-md-6">
+                            {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_cotizacion.all tipo="Seguimiento Cotizaciones" %}
+                        </div>
+                    {% endif %}
 
-            {% if seguimiento_cotizacion.all %}
-                <div class="col-md-6">
-                    {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_cotizacion.all tipo="Seguimiento Cotizaciones" %}
-                </div>
-            {% endif %}
+                    {% if seguimiento_tarea.all %}
+                        <div class="col-md-6">
+                            {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_tarea.all tipo="Seguimiento Tareas" %}
+                        </div>
+                    {% endif %}
+                    {% if seguimiento_remision.all %}
+                        <div class="col-md-6">
+                            {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_remision.all tipo="Seguimiento Remisiones" %}
+                        </div>
+                    {% endif %}
+                    {% if seguimiento_envio.all %}
+                        <div class="col-md-6">
+                            {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_envio.all tipo="Seguimiento Envío TCC" %}
+                        </div>
+                    {% endif %}
 
-            {% if seguimiento_tarea.all %}
-                <div class="col-md-6">
-                    {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_tarea.all tipo="Seguimiento Tareas" %}
                 </div>
-            {% endif %}
-            {% if seguimiento_remision.all %}
-                <div class="col-md-6">
-                    {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_remision.all tipo="Seguimiento Remisiones" %}
-                </div>
-            {% endif %}
-            {% if seguimiento_envio.all %}
-                <div class="col-md-6">
-                    {% include 'trabajo_diario/components/tabla_tareas.html' with lista_tareas=seguimiento_envio.all tipo="Seguimiento Envío TCC" %}
-                </div>
-            {% endif %}
-
+            </div>
+            <div class="col-md-3">
+                {% include 'indicadores/indicadores_barra.html' with indicadores=indicadores %}
+            </div>
         </div>
     {% endif %}
 {% endblock %}
