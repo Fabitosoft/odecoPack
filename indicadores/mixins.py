@@ -13,9 +13,9 @@ class IndicadorMesMixin(object):
 
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
             fecha_hoy = timezone.localtime(timezone.now()).date()
-            day = 5
-            year = 2016  # fecha_hoy.year
-            month = 12  # fecha_hoy.month
+            day = fecha_hoy.day
+            year = fecha_hoy.year
+            month = fecha_hoy.month
             usuario = self.request.user
 
             qsVentasMes = MovimientoVentaBiable.objects.values('vendedor__colaborador').annotate(
