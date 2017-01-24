@@ -83,7 +83,7 @@ class CotizacionAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('total',)
     list_editable = ('ciudad_despacho',)
-    filter = ('estado',)
+    list_filter = ('estado',)
     inlines = [
         ListaPrecioInline,
         RemisionInline,
