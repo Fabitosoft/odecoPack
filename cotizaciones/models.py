@@ -79,7 +79,7 @@ class Cotizacion(TimeStampedModel):
     nro_cotizacion = models.CharField(max_length=120)
     fecha_envio = models.DateTimeField(null=True, blank=True)
     total = models.DecimalField(max_digits=18, decimal_places=0, default=0)
-    descuento = models.DecimalField(max_digits=18, decimal_places=0, default=0)
+    descuento = models.DecimalField(max_digits=18, decimal_places=2, default=0)
     usuario = models.ForeignKey(User, default=1)
     observaciones = models.TextField(max_length=300, blank=True, null=True)
     en_edicion = models.BooleanField(default=False)
@@ -107,8 +107,8 @@ class Cotizacion(TimeStampedModel):
         for item in items:
             total += item.total
             descuento += item.descuento
-        self.total = "%.2f" % total
-        self.descuento = "%.2f" % descuento
+        self.total = total
+        self.descuento = descuento
         self.save()
 
     def set_estado(self, estado):
@@ -134,15 +134,15 @@ class ItemCotizacion(TimeStampedModel):
     banda = models.ForeignKey(Banda, related_name="cotizaciones", null=True)
     articulo_catalogo = models.ForeignKey(ArticuloCatalogo, related_name="cotizaciones", null=True)
     cantidad = models.DecimalField(max_digits=18, decimal_places=3, null=True)
-    precio = models.DecimalField(max_digits=18, decimal_places=0)
+    precio = models.DecimalField(max_digits=18, decimal_places=2)
     forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones", null=True)
     p_n_lista_descripcion = models.CharField(max_length=120, null=True, verbose_name='Descripción Otro')
     p_n_lista_referencia = models.CharField(max_length=120, null=True, verbose_name='Referencia Otro', blank=True)
     p_n_lista_unidad_medida = models.CharField(max_length=120, null=True, verbose_name='Unidad Medida')
-    total = models.DecimalField(max_digits=18, decimal_places=0)
+    total = models.DecimalField(max_digits=18, decimal_places=2)
     dias_entrega = models.PositiveIntegerField(default=0)
     porcentaje_descuento = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    descuento = models.DecimalField(max_digits=18, decimal_places=0, default=0)
+    descuento = models.DecimalField(max_digits=18, decimal_places=2, default=0)
 
     def get_nombre_item(self):
         if self.item:

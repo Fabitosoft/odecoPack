@@ -538,12 +538,12 @@ class AddItemCantidad(SingleObjectMixin, View):
                 item.delete()
             else:
                 item.cantidad = qty
-                descuento = int((item.precio * qty) * (item.porcentaje_descuento / 100))
+                descuento = (item.precio * qty) * (item.porcentaje_descuento / 100)
                 item.descuento = descuento
                 item.total = (item.precio * qty) - descuento
                 item.save()
             total_linea = item.total
-            total_cotizacion = item.cotizacion.total
+            total_cotizacion = round(item.cotizacion.total, 2)
         except InvalidOperation as e:
             error_cantidad = True
             actual_item_error = item.get_nombre_item()
@@ -554,11 +554,12 @@ class AddItemCantidad(SingleObjectMixin, View):
             "error_cantidad": error_cantidad,
             "actual_item_error": actual_item_error,
             "deleted": delete,
-            "total_line": int(round(float(total_linea))),
-            "descuento": item.descuento,
-            "descuento_total": int(round(float(item.cotizacion.descuento))),
-            "total_cotizacion": int(round(float(total_cotizacion)))
+            "total_line": round(total_linea, 2),
+            "descuento": round(item.descuento, 2),
+            "descuento_total": round(item.cotizacion.descuento, 2),
+            "total_cotizacion": round(total_cotizacion)
         }
+
         return JsonResponse(data)
 
 
@@ -587,24 +588,24 @@ class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
         item_id = request.GET.get("item")
         item = ItemCotizacion.objects.get(id=item_id)
         error_porcentaje = False
-        error_mensaje=""
+        error_mensaje = ""
 
         try:
             desc = Decimal(request.GET.get("desc"))
             if desc >= 0:
                 item.porcentaje_descuento = desc
-                descuento = int((item.precio * item.cantidad) * (desc / 100))
+                descuento = (item.precio * item.cantidad) * (desc / 100)
                 item.descuento = descuento
                 item.total = (item.precio * item.cantidad) - descuento
                 item.save()
-                total_linea = int(round(float(item.total)))
+                total_linea = round(float(item.total))
                 descuento_linea = item.descuento
-                descuento_cotizacion = int(round(float(item.cotizacion.descuento)))
-                total_cotizacion = int(round(float(item.cotizacion.total)))
+                descuento_cotizacion = round(float(item.cotizacion.descuento))
+                total_cotizacion = round(float(item.cotizacion.total))
             else:
                 error_porcentaje = True
                 error_mensaje = "Error en el porcentaje aplicado a %s, debe de ser un número igual o mayor a 1" % (
-                item.get_nombre_item())
+                    item.get_nombre_item())
                 total_linea = "Error en % descuento"
                 descuento_linea = "Error en % descuento"
                 descuento_cotizacion = "Error en % descuento"
@@ -620,11 +621,11 @@ class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
         data = {
             "error_porcentaje": error_porcentaje,
             "error_mensaje": error_mensaje,
-            "desc": item.porcentaje_descuento,
-            "total_line": total_linea,
-            "descuento": descuento_linea,
-            "descuento_total": descuento_cotizacion,
-            "total_cotizacion": total_cotizacion
+            "desc": round(item.porcentaje_descuento, 2),
+            "total_line": round(total_linea, 2),
+            "descuento": round(descuento_linea, 2),
+            "descuento_total": round(descuento_cotizacion, 2),
+            "total_cotizacion": round(total_cotizacion, 2)
         }
         return JsonResponse(data)
 
@@ -673,7 +674,7 @@ class AddItem(SingleObjectMixin, View):
 
         item.precio = precio
         item.forma_pago_id = forma_pago_id
-        item.total = int(precio) * item.cantidad
+        item.total = float(precio) * float(item.cantidad)
         item.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -700,7 +701,7 @@ class AddItemOtro(SingleObjectMixin, View):
         item.p_n_lista_referencia = referencia
         item.p_n_lista_unidad_medida = p_n_lista_unidad_medida
         item.precio = precio
-        item.total = int(precio) * item.cantidad
+        item.total = precio * item.cantidad
         item.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
