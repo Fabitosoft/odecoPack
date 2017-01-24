@@ -15,14 +15,13 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         context = super().get_context_data(**kwargs)
         usuario = self.request.user
 
-        try:
-            if not usuario.has_perm('biable.reporte_ventas_todos_vendedores'):
-                usuario = Colaborador.objects.get(usuario__user=usuario)
-                subalternos = usuario.subalternos.all()
-            else:
-                subalternos = Colaborador.objects.all()
-        except Colaborador.DoesNotExist:
-            subalternos = None
+        if not usuario.has_perm('biable.reporte_ventas_todos_vendedores'):
+            try:
+                subalternos = Colaborador.objects.get(usuario__user=usuario).subalternos.all()
+            except Colaborador.DoesNotExist:
+                subalternos = None
+        else:
+            subalternos = Colaborador.objects.all()
 
         vendedores_biable = VendedorBiable.objects.select_related('colaborador__usuario__user').filter(
             Q(colaborador__in=subalternos) &
