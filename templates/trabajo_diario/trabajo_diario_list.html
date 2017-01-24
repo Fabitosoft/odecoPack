@@ -37,6 +37,7 @@
                     {% endif %}
 
                     {% if trabajo_diario_subalternos %}
+                        <h2>Trabajo Diario Colaboradores</h2>
                         <table class="table table-bordered table-striped">
                             <thead>
                             <tr>
@@ -62,7 +63,7 @@
                             {% for subalterno in trabajo_diario_subalternos.all %}
                                 <tr>
                                     <td>
-                                        {{ subalterno.usuario }}
+                                        {{ subalterno.usuario.get_full_name }}
                                     </td>
                                     <td>
                                         {{ subalterno.nro_tareas }}
