@@ -26,9 +26,9 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         )
 
         fecha_hoy = timezone.localtime(timezone.now()).date()
-        day = fecha_hoy.day  # 5
-        year = fecha_hoy.year  # 2016
-        month = fecha_hoy.month  # 12
+        day = 5  # fecha_hoy.day  # 5
+        year = 2016  # fecha_hoy.year  # 2016
+        month = 12  # fecha_hoy.month  # 12
 
         # qsClientesVentasMes = MovimientoVentaBiable.objects.values('factura__cliente').annotate(
         #     cantidad=Count('id_terc_fa')
@@ -109,7 +109,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
 
         vendedores_usuario = []  # Traemos vendedores biable relacionados al usuario actual
         if usuario_sesion:
-            VendedorBiable.objects.select_related('colaborador__usuario__user').filter(
+            vendedores_usuario = VendedorBiable.objects.select_related('colaborador__usuario__user').filter(
                 colaborador__usuario__user=usuario_sesion)
 
         facturacion_ventas_mes = 0
