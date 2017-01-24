@@ -25,11 +25,6 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             ~Q(colaborador__usuario__user=usuario)
         )
 
-        vendedor_usuario = VendedorBiable.objects.select_related('colaborador__usuario__user').filter(
-            colaborador__usuario__user=usuario)
-
-        print(vendedor_usuario)
-
         fecha_hoy = timezone.localtime(timezone.now()).date()
         day = fecha_hoy.day  # 5
         year = fecha_hoy.year  # 2016
@@ -62,7 +57,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         # Indicadores de Venta
         for vendedor in vendedores_biable:
             indicadores_vendedores.append(self.consulta(year, month, day, vendedor=vendedor))
-        indicadores_vendedores.append(self.consulta(year, month, day, usuario_sesion=vendedor_usuario))
+        indicadores_vendedores.append(self.consulta(year, month, day, usuario_sesion=usuario))
         # for venta in qsVentasMes:
         #     qsVentasDia = qsVentasMes.filter(day=day)
 
@@ -110,7 +105,13 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         context['indicadores_venta'] = indicadores_vendedores
         return context
 
-    def consulta(self, year, month, day, vendedor=None, usuario_sesion=[]):
+    def consulta(self, year, month, day, vendedor=None, usuario_sesion=None):
+
+        vendedores_usuario = []  # Traemos vendedores biable relacionados al usuario actual
+        if usuario_sesion:
+            VendedorBiable.objects.select_related('colaborador__usuario__user').filter(
+                colaborador__usuario__user=usuario_sesion)
+
         facturacion_ventas_mes = 0
         cantidad_venta_mes = 0
         facturacion_ventas_dia = 0
@@ -134,7 +135,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             Q(month=month) &
             (
                 Q(vendedor=vendedor) |
-                Q(vendedor__in=usuario_sesion)
+                Q(vendedor__in=vendedores_usuario)
             )
         )
 
@@ -158,7 +159,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             Q(fecha_envio__year=year) &
             (
                 Q(usuario__user_extendido__colaborador__mi_vendedor_biable=vendedor) |
-                Q(usuario__user_extendido__colaborador__mi_vendedor_biable__in=usuario_sesion)
+                Q(usuario=usuario_sesion)
             )
         )
 
