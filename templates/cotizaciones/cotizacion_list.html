@@ -90,6 +90,16 @@
                 <td>
                     {{ cotizacion.fecha_envio|naturaltime|capfirst }}
                 </td>
+                <td>
+                    {% for remision in cotizacion.mis_remisiones.all %}
+                        {% if remision.factura_biable %}
+                            <a href="{{ remision.factura_biable.get_absolute_url }}">
+                                {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                            </a>
+                        {% endif %}
+                        -
+                    {% endfor %}
+                </td>
             </tr>
         {% empty %}
             <li>Ninguna Cotización</li>
