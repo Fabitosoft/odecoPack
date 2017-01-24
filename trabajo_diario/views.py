@@ -1,4 +1,5 @@
 from braces.views import LoginRequiredMixin
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
@@ -9,6 +10,7 @@ from cotizaciones.models import (
     Cotizacion,
 )
 from biable.models import Cartera, VendedorBiable
+from usuarios.models import Colaborador
 from .models import TrabajoDia, TareaDiaria
 from despachos_mercancias.models import EnvioTransportadoraTCC
 from indicadores.mixins import IndicadorMesMixin
@@ -29,6 +31,8 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        fecha_hoy = timezone.localtime(timezone.now()).date()
         usuario = self.request.user
         vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario)
 
@@ -94,6 +98,22 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
             context["seguimiento_remision"] = trabajo_dia.mis_tareas.filter(tipo="Seguimiento Remisión")
             context["seguimiento_envio"] = trabajo_dia.mis_tareas.filter(tipo="Seguimiento Envío")
             context["seguimiento_cartera"] = trabajo_dia.mis_tareas.filter(tipo="Seguimiento Cartera Vencida")
+
+        if not usuario.has_perm('biable.reporte_ventas_todos_vendedores'):
+            try:
+                subalternos = Colaborador.objects.get(usuario__user=usuario).subalternos.all()
+            except Colaborador.DoesNotExist:
+                subalternos = None
+        else:
+            subalternos = Colaborador.objects.values('usuario__user')
+        if subalternos:
+            trabajo_diario_subalternos = TrabajoDia.objects.select_related('usuario').filter(
+                Q(usuario__in=subalternos) &
+                Q(created__date__exact=fecha_hoy) &
+                ~Q(usuario=usuario)
+            )
+            context['trabajo_diario_subalternos'] = trabajo_diario_subalternos
+
         return context
 
     def generacion_tarea_diaria(self, tipo, descripcion, trabajo_dia, url=None):
