@@ -56,7 +56,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         indicadores_vendedores = []
         # Indicadores de Venta
         for vendedor in vendedores_biable:
-            indicadores_vendedores.append(self.consulta(year, month, day, vendedor=vendedor))
+            indicadores_vendedores.append(self.consulta(year, month, day, vendedor_subalterno=vendedor))
         indicadores_vendedores.append(self.consulta(year, month, day, usuario_sesion=usuario))
         # for venta in qsVentasMes:
         #     qsVentasDia = qsVentasMes.filter(day=day)
@@ -105,7 +105,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         context['indicadores_venta'] = indicadores_vendedores
         return context
 
-    def consulta(self, year, month, day, vendedor=None, usuario_sesion=None):
+    def consulta(self, year, month, day, vendedor_subalterno=None, usuario_sesion=None):
 
         vendedores_usuario = []  # Traemos vendedores biable relacionados al usuario actual
         if usuario_sesion:
@@ -131,13 +131,18 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             fact_neta=Sum('venta_neto'),
             cantidad=Count('nro_documento', 'tipo_documento')
         ).filter(
-            Q(year=year) &
-            Q(month=month) &
-            (
-                Q(vendedor=vendedor) |
-                Q(vendedor__in=vendedores_usuario)
-            )
+            year=year,
+            month=month
         )
+
+        if vendedor_subalterno:
+            qsVentasMes = qsVentasMes.filter(
+                vendedor=vendedor_subalterno
+            )
+        elif usuario_sesion:
+            qsVentasMes = qsVentasMes.filter(
+                vendedor__in=vendedores_usuario
+            )
 
         print(qsVentasMes)
 
@@ -155,13 +160,18 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             valor=Sum('total'),
             cantidad=Count('id')
         ).filter(
-            Q(fecha_envio__month=month) &
-            Q(fecha_envio__year=year) &
-            (
-                Q(usuario__user_extendido__colaborador__mi_vendedor_biable=vendedor) |
-                Q(usuario=usuario_sesion)
-            )
+            fecha_envio__month=month,
+            fecha_envio__year=year
         )
+
+        if vendedor_subalterno:
+            qsCotizacionesMes = qsCotizacionesMes.filter(
+                usuario__user_extendido__colaborador__mi_vendedor_biable=vendedor_subalterno
+            )
+        elif usuario_sesion:
+            qsCotizacionesMes = qsCotizacionesMes.filter(
+                usuario=usuario_sesion
+            )
 
         if qsCotizacionesMes.exists():
             facturacion_cotizaciones_mes = float(qsCotizacionesMes[0]['valor'])
@@ -178,8 +188,8 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         else:
             tasa_conversion_ventas_mes = 0
 
-        if vendedor:
-            nombre = vendedor.colaborador.usuario.user.get_full_name()
+        if vendedor_subalterno:
+            nombre = vendedor_subalterno.colaborador.usuario.user.get_full_name()
         else:
             nombre = "Mi Indicador"
 
