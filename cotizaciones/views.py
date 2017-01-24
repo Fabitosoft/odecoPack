@@ -542,7 +542,7 @@ class AddItemCantidad(SingleObjectMixin, View):
                 item.descuento = descuento
                 item.total = (item.precio * qty) - descuento
                 item.save()
-            total_linea = item.total
+            total_linea = round(item.total, 2)
             total_cotizacion = round(item.cotizacion.total, 2)
         except InvalidOperation as e:
             error_cantidad = True
@@ -554,10 +554,10 @@ class AddItemCantidad(SingleObjectMixin, View):
             "error_cantidad": error_cantidad,
             "actual_item_error": actual_item_error,
             "deleted": delete,
-            "total_line": round(total_linea, 2),
+            "total_line": total_linea,
             "descuento": round(item.descuento, 2),
             "descuento_total": round(item.cotizacion.descuento, 2),
-            "total_cotizacion": round(total_cotizacion)
+            "total_cotizacion": total_cotizacion
         }
 
         return JsonResponse(data)
@@ -598,10 +598,10 @@ class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
                 item.descuento = descuento
                 item.total = (item.precio * item.cantidad) - descuento
                 item.save()
-                total_linea = round(float(item.total))
-                descuento_linea = item.descuento
-                descuento_cotizacion = round(float(item.cotizacion.descuento))
-                total_cotizacion = round(float(item.cotizacion.total))
+                total_linea = round(item.total,2)
+                descuento_linea = round(item.descuento,2)
+                descuento_cotizacion = round(item.cotizacion.descuento,2)
+                total_cotizacion = round(item.cotizacion.total,2)
             else:
                 error_porcentaje = True
                 error_mensaje = "Error en el porcentaje aplicado a %s, debe de ser un número igual o mayor a 1" % (
@@ -622,10 +622,10 @@ class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
             "error_porcentaje": error_porcentaje,
             "error_mensaje": error_mensaje,
             "desc": round(item.porcentaje_descuento, 2),
-            "total_line": round(total_linea, 2),
-            "descuento": round(descuento_linea, 2),
-            "descuento_total": round(descuento_cotizacion, 2),
-            "total_cotizacion": round(total_cotizacion, 2)
+            "total_line": total_linea,
+            "descuento": descuento_linea,
+            "descuento_total": descuento_cotizacion,
+            "total_cotizacion": total_cotizacion
         }
         return JsonResponse(data)
 
