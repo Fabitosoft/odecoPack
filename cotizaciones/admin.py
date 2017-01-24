@@ -42,7 +42,7 @@ class RemisionInline(admin.TabularInline):
         "fecha_prometida_entrega",
         "entregado"
     )
-    raw_id_fields = ('factura_biable', )
+    raw_id_fields = ('factura_biable',)
     extra = 0
 
 
@@ -83,6 +83,7 @@ class CotizacionAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('total',)
     list_editable = ('ciudad_despacho',)
+    filter = ('estado',)
     inlines = [
         ListaPrecioInline,
         RemisionInline,
