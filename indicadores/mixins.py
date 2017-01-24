@@ -16,7 +16,11 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         usuario = self.request.user
 
         try:
-            subalternos = Colaborador.objects.get(usuario__user=usuario).subalternos.all()
+            if not usuario.has_perm('biable.reporte_ventas_todos_vendedores'):
+                usuario = Colaborador.objects.get(usuario__user=usuario)
+                subalternos = usuario.subalternos.all()
+            else:
+                subalternos = Colaborador.objects.all()
         except Colaborador.DoesNotExist:
             subalternos = None
 
@@ -143,8 +147,6 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             qsVentasMes = qsVentasMes.filter(
                 vendedor__in=vendedores_usuario
             )
-
-        print(qsVentasMes)
 
         if qsVentasMes.exists():
             facturacion_ventas_mes = float(qsVentasMes[0]['fact_neta'])
