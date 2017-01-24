@@ -93,7 +93,8 @@
                 <td>
                     {% for remision in cotizacion.mis_remisiones.all %}
                         {% if remision.factura_biable %}
-                            <a href="{{ remision.factura_biable.get_absolute_url }}" onClick="return popup(this, 'stevie')">
+                            <a href="{{ remision.factura_biable.get_absolute_url }}" target="popup"
+                               onclick="window.open('{{ remision.factura_biable.get_absolute_url }}','popup','width=600,height=600'); return false;">
                                 {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
                             </a>
                         {% endif %}
