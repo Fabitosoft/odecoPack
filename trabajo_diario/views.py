@@ -1,10 +1,12 @@
 from braces.views import LoginRequiredMixin
+from braces.views import SelectRelatedMixin
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
 from django.views.generic import TemplateView
 from django.views.generic.edit import UpdateView
+from django.views.generic.detail import DetailView
 
 from cotizaciones.models import (
     Cotizacion,
@@ -119,3 +121,9 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
     def generacion_tarea_diaria(self, tipo, descripcion, trabajo_dia, url=None):
         tarea = TareaDiaria(tipo=tipo, descripcion=descripcion, mi_dia=trabajo_dia, url=url)
         tarea.save()
+
+
+class TrabajoDiarioDetailView(SelectRelatedMixin, DetailView):
+    model = TrabajoDia
+    select_related = ["usuario"]
+    template_name = 'trabajo_diario/trabajo_diario_detail.html'

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Tareas del Día de
+        <small>{{ object.usuario.get_full_name }}</small>
+    </h1>
+    {% regroup object.mis_tareas.all|dictsort:"tipo" by tipo as tipo_list %}
+    <ul>
+        {% for tipo in tipo_list %}
+            <li><h2>{{ tipo.grouper }}</h2>
+                <ul>
+                    {% for tarea in tipo.list %}
+                        <li>
+                            {% if tarea.estado == 0 %}
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                            {% endif %} <span style="color: blue">{{ tarea.descripcion }}</span>
+                            {% if tarea.observacion %}
+                                <ul>
+                                    <li>
+                                        <i class="fa fa-comments" aria-hidden="true"></i> {{ tarea.observacion }}
+                                    </li>
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

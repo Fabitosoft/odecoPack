@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django.db.models.signals import post_save
+from django.urls import reverse
 
 from model_utils.models import TimeStampedModel
 
@@ -18,13 +19,16 @@ class TrabajoDia(TimeStampedModel):
     def __str__(self):
         return "%s - %s" % (self.usuario, self.created.date())
 
+    def get_absolute_url(self):
+        return reverse("trabajo_diario:tarea-detail", kwargs={"pk": self.pk})
+
     def set_actualizar_seguimiento_trabajo(self):
         self.nro_tareas = int(self.mis_tareas.aggregate(Count('id'))['id__count'])
         self.nro_tareas_sin_atender = int(self.mis_tareas.filter(estado=0).aggregate(Count('id'))['id__count'])
         self.nro_tareas_atendidas = self.nro_tareas - self.nro_tareas_sin_atender
         self.porcentaje_atendido = 0
         if self.nro_tareas > 0:
-            self.porcentaje_atendido = (self.nro_tareas_atendidas / self.nro_tareas)* 100
+            self.porcentaje_atendido = (self.nro_tareas_atendidas / self.nro_tareas) * 100
         self.save()
 
     class Meta:
@@ -46,9 +50,11 @@ class TareaDiaria(TimeStampedModel):
     estado = models.PositiveIntegerField(choices=ESTADOS, default=0)
     url = models.URLField(max_length=300, null=True, blank=True, editable=False)
 
+
 def set_actualizar_mi_trabajo_diario(sender, instance, created, **kwargs):
     if not created:
         trabajo_dia = instance.mi_dia
         trabajo_dia.set_actualizar_seguimiento_trabajo()
+
 
 post_save.connect(set_actualizar_mi_trabajo_diario, sender=TareaDiaria)
