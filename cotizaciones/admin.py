@@ -35,15 +35,14 @@ class ListaPrecioInline(admin.TabularInline):
 class RemisionInline(admin.TabularInline):
     model = RemisionCotizacion
 
-    fields = \
-        (
-            'tipo_remision',
-            'nro_remision',
-            "factura_biable",
-            "fecha_prometida_entrega",
-            "entregado"
-        )
-
+    fields = (
+        'tipo_remision',
+        'nro_remision',
+        "factura_biable",
+        "fecha_prometida_entrega",
+        "entregado"
+    )
+    raw_id_fields = ('factura_biable', )
     extra = 0
 
 
@@ -73,6 +72,7 @@ class TareasInline(admin.TabularInline):
 
 class CotizacionAdmin(admin.ModelAdmin):
     list_display = (
+        'nro_cotizacion',
         'estado',
         'razon_social',
         'modified',
@@ -89,7 +89,7 @@ class CotizacionAdmin(admin.ModelAdmin):
         TareasInline,
     ]
     raw_id_fields = ('ciudad_despacho',)
-    search_fields = ('pais','ciudad','razon_social','estado')
+    search_fields = ('pais', 'ciudad', 'razon_social', 'estado', 'nro_cotizacion')
 
 
 admin.site.register(Cotizacion, CotizacionAdmin)
