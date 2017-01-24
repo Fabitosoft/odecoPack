@@ -39,7 +39,6 @@
                 </div>
             </div>
             <div class="col-md-3">
-            {{ indicadores_venta }}
                 {% for indicador in indicadores_venta %}
                     {% include 'indicadores/indicadores_barra.html' with indicadores=indicador %}
                 {% endfor %}
