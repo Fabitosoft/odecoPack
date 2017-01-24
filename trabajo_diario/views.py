@@ -103,7 +103,7 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
 
         if not usuario.has_perm('biable.reporte_ventas_todos_vendedores'):
             try:
-                subalternos = Colaborador.objects.get(usuario__user=usuario).subalternos.all()
+                subalternos = Colaborador.objects.get(usuario__user=usuario).subalternos.values('usuario__user').all()
             except Colaborador.DoesNotExist:
                 subalternos = None
         else:
