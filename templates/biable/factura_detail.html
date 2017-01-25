@@ -18,12 +18,14 @@
             <p>
                 <span class="label">Descuentos Netos:</span> {{ object.dscto_netos|floatformat:2 }}
             </p>
-            <p>
-                <span class="label">Costo Total:</span> {{ object.costo_total|floatformat:2 }}
-            </p>
-            <p>
-                <span class="label">Rentabilidad:</span> {{ object.rentabilidad|floatformat:2 }}
-            </p>
+            {% if perms.biable.ver_info_admon_ventas %}
+                <p>
+                    <span class="label">Costo Total:</span> {{ object.costo_total|floatformat:2 }}
+                </p>
+                <p>
+                    <span class="label">Rentabilidad:</span> {{ object.rentabilidad|floatformat:2 }}
+                </p>
+            {% endif %}
             <p>
                 <span class="label">Impuesto Netos:</span> {{ object.imp_netos|floatformat:2 }}
             </p>
