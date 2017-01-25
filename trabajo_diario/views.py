@@ -49,7 +49,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
             for cartera in qsCartera.all():
                 factura = cartera.factura
                 try:
-                    tarea_envio = factura.Tarea
+                    tarea_envio = factura.tarea
                     tarea_envio.estado = 0
                 except TareaCartera.DoesNotExist:
                     tarea_envio = TareaCartera()
