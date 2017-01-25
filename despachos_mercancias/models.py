@@ -53,7 +53,7 @@ class EnvioTransportadoraTCCPendientesManager(models.Manager):
         qsF = self.get_queryset().filter(
             Q(pk__in=qs1) &
             Q(pk__in=qs2)
-        )
+        ).distinct()
         return qsF
 
 

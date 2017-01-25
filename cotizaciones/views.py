@@ -444,7 +444,7 @@ class TareaListView(ListView):
         qs = self.model.objects.filter(
             Q(esta_finalizada=False) &
             Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
-        ).order_by('fecha_final')
+        ).distinct().order_by('fecha_final')
         return qs
 
 
@@ -466,7 +466,7 @@ class RemisionListView(ListView):
         qs = self.model.objects.filter(
             Q(entregado=False) &
             Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
-        ).order_by('fecha_prometida_entrega')
+        ).distinct().order_by('fecha_prometida_entrega')
         return qs
 
 
@@ -511,7 +511,7 @@ class CotizacionesListView(ListView):
             qsFinal = qs.filter(
                 Q(usuario=current_user) |
                 Q(usuario__in=users)
-            ).order_by('-id').distinct()
+            ).distinct().order_by('-id').distinct()
         else:
             qsFinal = qs.order_by('-id').distinct()
         return qsFinal

@@ -26,7 +26,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         vendedores_biable = VendedorBiable.objects.select_related('colaborador__usuario__user').filter(
             Q(colaborador__in=subalternos) &
             ~Q(colaborador__usuario__user=usuario)
-        )
+        ).distinct()
 
         fecha_hoy = timezone.localtime(timezone.now()).date()
         day = fecha_hoy.day  # 5
@@ -145,7 +145,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         elif usuario_sesion:
             qsVentasMes = qsVentasMes.filter(
                 vendedor__in=vendedores_usuario
-            )
+            ).distinct()
 
         if qsVentasMes.exists():
             facturacion_ventas_mes = float(qsVentasMes[0]['fact_neta'])

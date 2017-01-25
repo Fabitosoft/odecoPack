@@ -119,7 +119,7 @@ class VentasVendedor(LoginRequiredMixin,SelectRelatedMixin, JSONResponseMixin, A
                     Q(vendedor__colaborador__in=usuario.subalternos.all()) |
                     Q(vendedor__colaborador=usuario)
                 )
-            )
+            ).distinct()
         else:
             qsFinal = qs.filter(
                 Q(year__in=list(map(lambda x: int(x), ano))) &
@@ -174,7 +174,7 @@ class VentasVendedorConsola(LoginRequiredMixin,SelectRelatedMixin, JSONResponseM
                     | Q(vendedor__colaborador=usuario)
                     | Q(vendedor__activo=False)
                 )
-            ).order_by('-vendedor__activo', 'day')
+            ).distinct().order_by('-vendedor__activo', 'day')
         else:
             qsFinal = qs.filter(
                 Q(year__in=list(map(lambda x: int(x), ano))) &
@@ -600,7 +600,7 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
                     | Q(client_id__in=clientes, esta_vencido=True)
                     | Q(client_id__in=clientes_subalternos)
                 )
-            )
+            ).distinct()
         else:
             qsFinal = qs
 

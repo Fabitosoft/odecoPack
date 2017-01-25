@@ -69,7 +69,7 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                     self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia,
                                                  envio.get_absolute_url())
 
-                qsCartera = Cartera.objects.filter(esta_vencido=True, vendedor__in=vendedores_biable.all()).order_by(
+                qsCartera = Cartera.objects.filter(esta_vencido=True, vendedor__in=vendedores_biable.all()).distinct().order_by(
                     "-dias_vencido")
                 qsCotizacion = Cotizacion.estados.activo().filter(created__date__lt=fecha_hoy,
                                                                   usuario=usuario).order_by(
@@ -118,7 +118,7 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                 Q(usuario__in=subalternos) &
                 Q(created__date__exact=fecha_hoy) &
                 ~Q(usuario=usuario)
-            )
+            ).distinct()
             context['trabajo_diario_subalternos'] = trabajo_diario_subalternos
 
         return context
