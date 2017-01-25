@@ -5,9 +5,77 @@ from django.db.models.signals import post_save
 from django.urls import reverse
 
 from model_utils.models import TimeStampedModel
+from cotizaciones.models import Cotizacion
+from despachos_mercancias.models import EnvioTransportadoraTCC
+from biable.models import FacturasBiable
 
 
 # Create your models here.
+class Tarea(TimeStampedModel):
+    ESTADOS = (
+        (0, 'Pendiente'),
+        (1, 'Atendida en Proceso'),
+        (2, 'Atendida Terminada'),
+    )
+    estado = models.PositiveIntegerField(choices=ESTADOS, default=0)
+    descripcion = models.TextField(max_length=400, null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+# region Tarea Cotizacion
+class TareaCotizacion(Tarea):
+    cotizacion = models.OneToOneField(Cotizacion, related_name='tarea', null=True, blank=True,
+                                      on_delete=models.SET_NULL)
+
+
+class SeguimientoCotizacion(TimeStampedModel):
+    observacion = models.TextField(max_length=300)
+    tarea = models.ForeignKey(TareaCotizacion, related_name='seguimientos')
+
+
+# endregion
+
+# region EnvioTCC
+class TareaEnvioTCC(Tarea):
+    envio = models.OneToOneField(EnvioTransportadoraTCC, related_name='tarea', null=True, blank=True,
+                                 on_delete=models.SET_NULL)
+
+    def get_descripcion_tarea(self):
+        facturas = ""
+        for factura in self.envio.facturas.all():
+            nro_factura = "(%s-%s)" % (factura.tipo_documento, factura.nro_documento)
+            facturas += nro_factura
+        descripcion = "Envio TCC con facturas: %s. NRO Seguimiento: %s" % (facturas, self.envio.nro_tracking)
+        return descripcion
+
+
+class SeguimientoEnvioTCC(TimeStampedModel):
+    observacion = models.TextField(max_length=300)
+    tarea = models.ForeignKey(TareaEnvioTCC, related_name='seguimientos')
+
+
+# enregion
+
+
+# region TareaCartera
+class TareaCartera(Tarea):
+    factura = models.OneToOneField(FacturasBiable, related_name='tarea', null=True, blank=True,
+                                   on_delete=models.SET_NULL)
+
+    def get_descripcion_tarea(self):
+        descripcion = "%s tiene la factura %s-%s" % (
+            self.factura.cliente, self.factura.tipo_documento, self.factura.nro_documento)
+        return descripcion
+
+
+class SeguimientoCartera(TimeStampedModel):
+    observacion = models.TextField(max_length=300)
+    tarea = models.ForeignKey(TareaCartera, related_name='seguimientos')
+
+
+# enregion
 
 class TrabajoDia(TimeStampedModel):
     usuario = models.ForeignKey(User)

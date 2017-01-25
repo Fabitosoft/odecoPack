@@ -1,0 +1,37 @@
+{% load l10n %}
+<h2>Seguimiento Envios TCC</h2>
+{{ cartera.all }}
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>
+            Estado
+        </th>
+        <th>
+            Descripción
+        </th>
+    </tr>
+
+    </thead>
+    <tbody>
+    {% for envio in envios_pendientes %}
+        <tr>
+            <td>
+                {% if envio.estado != 0 %}
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                {% else %}
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                {% endif %}
+            </td>
+            <td>
+                {{ envio.tarea.descripcion }}
+            </td>
+
+            <td>
+                <a href="{{ envio.get_absolute_url }}" target="_blank">Ver</a>
+            </td>
+
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -13,12 +13,59 @@ from cotizaciones.models import (
 )
 from biable.models import Cartera, VendedorBiable
 from usuarios.models import Colaborador
-from .models import TrabajoDia, TareaDiaria
+from .models import TrabajoDia, TareaDiaria, TareaEnvioTCC, TareaCartera
 from despachos_mercancias.models import EnvioTransportadoraTCC
 from indicadores.mixins import IndicadorMesMixin
 
 
 # Create your views here.
+class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
+    template_name = 'trabajo_diario/trabajo_dia.html'
+
+    def get_context_data(self, **kwargs):
+        usuario = self.request.user
+        vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario).distinct()
+
+        if vendedores_biable.exists():
+            qsEnvios = EnvioTransportadoraTCC.pendientes.filter(
+                facturas__vendedor__in=vendedores_biable
+            ).distinct()
+            for envio in qsEnvios.all():
+                try:
+                    tarea_envio = envio.tarea
+                    tarea_envio.estado = 0
+                except TareaEnvioTCC.DoesNotExist:
+                    tarea_envio = TareaEnvioTCC()
+                    tarea_envio.envio = envio
+                    tarea_envio.descripcion = tarea_envio.get_descripcion_tarea()
+                print(tarea_envio.descripcion)
+                tarea_envio.save()
+
+            qsCartera = Cartera.objects.filter(
+                esta_vencido=True,
+                vendedor__in=vendedores_biable).distinct().order_by(
+                "-dias_vencido")
+            for cartera in qsCartera.all():
+                factura = cartera.factura
+                try:
+                    tarea_envio = factura.Tarea
+                    tarea_envio.estado = 0
+                except TareaEnvioTCC.DoesNotExist:
+                    tarea_envio = TareaCartera()
+                    tarea_envio.factura = factura
+                    tarea_envio.descripcion = "%s con %s dia(s) de vendido" % (
+                    tarea_envio.get_descripcion_tarea(), cartera.dias_vencido)
+                print(tarea_envio.descripcion)
+                tarea_envio.save()
+
+        # if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
+
+        context = super().get_context_data(**kwargs)
+        context['envios_tcc'] = qsEnvios
+        context['cartera']=qsCartera
+        return context
+
+
 class TareaDiaUpdateView(UpdateView):
     template_name = 'trabajo_diario/tarea_dia_update.html'
     model = TareaDiaria
@@ -39,9 +86,6 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
         vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario)
 
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
-            fecha_hoy = timezone.localtime(timezone.now()).date()
-            usuario = self.request.user
-
             try:
                 trabajo_dia = TrabajoDia.objects.get(created__date=fecha_hoy, usuario=usuario)
             except TrabajoDia.DoesNotExist:
@@ -69,7 +113,8 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                     self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia,
                                                  envio.get_absolute_url())
 
-                qsCartera = Cartera.objects.filter(esta_vencido=True, vendedor__in=vendedores_biable.all()).distinct().order_by(
+                qsCartera = Cartera.objects.filter(esta_vencido=True,
+                                                   vendedor__in=vendedores_biable.all()).distinct().order_by(
                     "-dias_vencido")
                 qsCotizacion = Cotizacion.estados.activo().filter(created__date__lt=fecha_hoy,
                                                                   usuario=usuario).order_by(
