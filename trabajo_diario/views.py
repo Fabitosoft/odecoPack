@@ -41,28 +41,28 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                 print(tarea_envio.descripcion)
                 tarea_envio.save()
 
-            # qsCartera = Cartera.objects.filter(
-            #     esta_vencido=True,
-            #     vendedor__in=vendedores_biable).distinct().order_by(
-            #     "-dias_vencido")
-            # for cartera in qsCartera.all():
-            #     factura = cartera.factura
-            #     try:
-            #         tarea_envio = factura.Tarea
-            #         tarea_envio.estado = 0
-            #     except TareaEnvioTCC.DoesNotExist:
-            #         tarea_envio = TareaCartera()
-            #         tarea_envio.factura = factura
-            #         tarea_envio.descripcion = "%s con %s dia(s) de vendido" % (
-            #         tarea_envio.get_descripcion_tarea(), cartera.dias_vencido)
-            #     print(tarea_envio.descripcion)
-            #     tarea_envio.save()
+            qsCartera = Cartera.objects.filter(
+                esta_vencido=True,
+                vendedor__in=vendedores_biable).distinct().order_by(
+                "-dias_vencido")
+            for cartera in qsCartera.all():
+                factura = cartera.factura
+                try:
+                    tarea_envio = factura.Tarea
+                    tarea_envio.estado = 0
+                except TareaEnvioTCC.DoesNotExist:
+                    tarea_envio = TareaCartera()
+                    tarea_envio.factura = factura
+                    tarea_envio.descripcion = "%s con %s dia(s) de vendido" % (
+                    tarea_envio.get_descripcion_tarea(), cartera.dias_vencido)
+                print(tarea_envio.descripcion)
+                tarea_envio.save()
 
         # if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
 
-        context = super().get_context_data(**kwargs)
-        context['envios_tcc'] = qsEnvios
-        # context['cartera']=qsCartera
+            context = super().get_context_data(**kwargs)
+            context['envios_tcc'] = qsEnvios
+            context['cartera']=qsCartera
         return context
 
 
