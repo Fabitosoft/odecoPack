@@ -51,7 +51,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                 try:
                     tarea_envio = factura.Tarea
                     tarea_envio.estado = 0
-                except TareaEnvioTCC.DoesNotExist:
+                except TareaCartera.DoesNotExist:
                     tarea_envio = TareaCartera()
                     tarea_envio.factura = factura
                     tarea_envio.descripcion = "%s con %s dia(s) de vendido" % (
