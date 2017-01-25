@@ -1,5 +1,5 @@
 {% load l10n %}
-<h2>Seguimiento Envios TCC</h2>
+<h2>Seguimiento Cotizaciones</h2>
 <table class="table table-bordered table-striped">
     <thead>
     <tr>
@@ -13,21 +13,21 @@
 
     </thead>
     <tbody>
-    {% for envio in envios_pendientes %}
+    {% for cotizacion in cotizaciones_pendientes %}
         <tr>
             <td>
-                {% if envio.tarea.estado == 0 %}
+                {% if cotizacion.tarea.estado == 0 %}
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 {% else %}
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
                 {% endif %}
             </td>
             <td>
-                {{ envio.tarea.descripcion }}
+                {{ cotizacion.tarea.descripcion }}
             </td>
 
             <td>
-                <a href="{{ envio.get_absolute_url }}" target="_blank">Ver</a>
+                <a href="{{ cotizacion.get_absolute_url }}" target="_blank">Ver</a>
             </td>
 
         </tr>

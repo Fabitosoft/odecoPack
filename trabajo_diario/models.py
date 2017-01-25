@@ -29,6 +29,11 @@ class TareaCotizacion(Tarea):
     cotizacion = models.OneToOneField(Cotizacion, related_name='tarea', null=True, blank=True,
                                       on_delete=models.SET_NULL)
 
+    def get_descripcion_tarea(self):
+        descripcion = "Cotizacion %s con estado %s" % (
+            self.cotizacion.nro_cotizacion, self.cotizacion.get_estado_display())
+        return descripcion
+
 
 class SeguimientoCotizacion(TimeStampedModel):
     observacion = models.TextField(max_length=300)

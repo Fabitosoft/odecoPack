@@ -9,11 +9,10 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.detail import DetailView
 
 from cotizaciones.models import (
-    Cotizacion,
-)
+    Cotizacion)
 from biable.models import Cartera, VendedorBiable
 from usuarios.models import Colaborador
-from .models import TrabajoDia, TareaDiaria, TareaEnvioTCC, TareaCartera
+from .models import TrabajoDia, TareaDiaria, TareaEnvioTCC, TareaCartera, TareaCotizacion
 from despachos_mercancias.models import EnvioTransportadoraTCC
 from indicadores.mixins import IndicadorMesMixin
 
@@ -25,6 +24,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         usuario = self.request.user
         vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario).distinct()
+        fecha_hoy = timezone.localtime(timezone.now()).date()
 
         context = super().get_context_data(**kwargs)
         if vendedores_biable.exists():
@@ -38,7 +38,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                 except TareaEnvioTCC.DoesNotExist:
                     tarea_envio = TareaEnvioTCC()
                     tarea_envio.envio = envio
-                    tarea_envio.descripcion = tarea_envio.get_descripcion_tarea()
+                tarea_envio.descripcion = tarea_envio.get_descripcion_tarea()
                 print(tarea_envio.descripcion)
                 tarea_envio.save()
 
@@ -61,7 +61,23 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
             # context['cartera'] = qsCartera
 
         # if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
+
+            qsCotizacion = Cotizacion.estados.activo().filter(created__date__lt=fecha_hoy,
+                                                              usuario=usuario).order_by(
+                '-total')
+            for cotizacion in qsCotizacion.all():
+                try:
+                    tarea_cotizacion = cotizacion.tarea
+                    tarea_cotizacion.estado = 0
+                except TareaCotizacion.DoesNotExist:
+                    tarea_cotizacion = TareaCotizacion()
+                    tarea_cotizacion.cotizacion = cotizacion
+                tarea_cotizacion.descripcion = tarea_cotizacion.get_descripcion_tarea()
+                print(tarea_cotizacion.descripcion)
+                tarea_cotizacion.save()
+
             context['envios_tcc'] = qsEnvios
+            context['cotizaciones'] = qsCotizacion
         return context
 
 

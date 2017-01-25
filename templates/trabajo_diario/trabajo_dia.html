@@ -4,13 +4,21 @@
         <h1>Trabajo del Día
             <small>{{ porcentaje_tareas_atendidas|floatformat:1 }}% realizado</small>
         </h1>
-        Estas son tus tareas para el día de hoy
-        {% if envios_tcc.all %}
-            <div class="col-md-6">
-                {% include 'trabajo_diario/components/tabla_seguimiento_envios_TCC.html' with envios_pendientes=envios_tcc.all %}
-            </div>
-        {% endif %}
         <div class="row">
+            <div class="col-md-9">
+                <div class="row">
+                    {% if envios_tcc.all %}
+                        <div class="col-md-6">
+                            {% include 'trabajo_diario/components/tabla_seguimiento_envios_TCC.html' with envios_pendientes=envios_tcc.all %}
+                        </div>
+                    {% endif %}
+                    {% if cotizaciones.all %}
+                        <div class="col-md-6">
+                            {% include 'trabajo_diario/components/tabla_seguimiento_cotizaciones.html' with cotizaciones_pendientes=cotizaciones.all %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
             <div class="col-md-3">
                 {% for indicador in indicadores_venta %}
                     {% include 'indicadores/indicadores_barra.html' with indicadores=indicador %}
