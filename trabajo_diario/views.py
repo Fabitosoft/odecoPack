@@ -54,7 +54,7 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
 
                 qsEnvios = EnvioTransportadoraTCC.pendientes.filter(
                     facturas__vendedor__in=vendedores_biable
-                )
+                ).distinct()
                 for envio in qsEnvios.all():
                     for factura in envio.facturas.all():
                         if factura.vendedor in vendedores_biable.all():
