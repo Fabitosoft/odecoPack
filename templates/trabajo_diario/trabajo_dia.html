@@ -17,6 +17,11 @@
                             {% include 'trabajo_diario/components/tabla_seguimiento_cotizaciones.html' with cotizaciones_pendientes=cotizaciones.all %}
                         </div>
                     {% endif %}
+                    {% if carteras.all %}
+                        <div class="col-md-6">
+                            {% include 'trabajo_diario/components/tabla_seguimiento_cartera.html' with carteras=carteras.all %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-3">

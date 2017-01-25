@@ -1,0 +1,36 @@
+{% load l10n %}
+<h2>Seguimiento Cartera</h2>
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>
+            Estado
+        </th>
+        <th>
+            Descripción
+        </th>
+    </tr>
+
+    </thead>
+    <tbody>
+    {% for cartera in carteras.all %}
+        <tr>
+            <td>
+                {% if cartera.factura.tarea.estado == 0 %}
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                {% else %}
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                {% endif %}
+            </td>
+            <td>
+                {{ cartera.factura.tarea.descripcion }}
+            </td>
+
+            <td>
+                <a href="{{ cartera.factura.get_absolute_url }}" target="_blank">Ver</a>
+            </td>
+
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

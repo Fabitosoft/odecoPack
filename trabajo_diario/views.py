@@ -28,7 +28,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
 
         context = super().get_context_data(**kwargs)
         if vendedores_biable.exists():
-            qsEnvios = EnvioTransportadoraTCC.pendientes.filter(
+            qsEnvios = EnvioTransportadoraTCC.pendientes.select_related('tarea').filter(
                 facturas__vendedor__in=vendedores_biable
             ).distinct()
             for envio in qsEnvios.all():
@@ -39,30 +39,28 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                     tarea_envio = TareaEnvioTCC()
                     tarea_envio.envio = envio
                 tarea_envio.descripcion = tarea_envio.get_descripcion_tarea()
-                print(tarea_envio.descripcion)
                 tarea_envio.save()
 
-            # qsCartera = Cartera.objects.filter(
-            #     esta_vencido=True,
-            #     vendedor__in=vendedores_biable).distinct().order_by(
-            #     "-dias_vencido")
-            # for cartera in qsCartera.all():
-            #     factura = cartera.factura
-            #     try:
-            #         tarea_envio = factura.tarea
-            #         tarea_envio.estado = 0
-            #     except TareaCartera.DoesNotExist:
-            #         tarea_envio = TareaCartera()
-            #         tarea_envio.factura = factura
-            #         tarea_envio.descripcion = "%s con %s dia(s) de vendido" % (
-            #         tarea_envio.get_descripcion_tarea(), cartera.dias_vencido)
-            #     print(tarea_envio.descripcion)
-            #     tarea_envio.save()
-            # context['cartera'] = qsCartera
+            qsCartera = Cartera.objects.select_related('factura','factura__tarea').filter(
+                esta_vencido=True,
+                vendedor__in=vendedores_biable).distinct().order_by(
+                "-dias_vencido")
+            for cartera in qsCartera.all():
+                factura = cartera.factura
+                if factura:
+                    try:
+                        tarea_cartera = factura.tarea
+                        tarea_cartera.estado = 0
+                    except TareaCartera.DoesNotExist:
+                        tarea_cartera = TareaCartera()
+                        tarea_cartera.factura = factura
+                    tarea_cartera.descripcion = "%s con %s dia(s) de vendido" % (
+                        tarea_cartera.get_descripcion_tarea(), cartera.dias_vencido)
+                    tarea_cartera.save()
 
-        # if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
+                    # if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
 
-            qsCotizacion = Cotizacion.estados.activo().filter(created__date__lt=fecha_hoy,
+            qsCotizacion = Cotizacion.estados.activo().select_related('tarea').filter(created__date__lt=fecha_hoy,
                                                               usuario=usuario).order_by(
                 '-total')
             for cotizacion in qsCotizacion.all():
@@ -73,9 +71,9 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                     tarea_cotizacion = TareaCotizacion()
                     tarea_cotizacion.cotizacion = cotizacion
                 tarea_cotizacion.descripcion = tarea_cotizacion.get_descripcion_tarea()
-                print(tarea_cotizacion.descripcion)
                 tarea_cotizacion.save()
 
+            context['carteras'] = qsCartera
             context['envios_tcc'] = qsEnvios
             context['cotizaciones'] = qsCotizacion
         return context
