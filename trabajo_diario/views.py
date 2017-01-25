@@ -26,6 +26,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
         usuario = self.request.user
         vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario).distinct()
 
+        context = super().get_context_data(**kwargs)
         if vendedores_biable.exists():
             qsEnvios = EnvioTransportadoraTCC.pendientes.filter(
                 facturas__vendedor__in=vendedores_biable
@@ -59,8 +60,6 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                 tarea_envio.save()
 
         # if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
-
-            context = super().get_context_data(**kwargs)
             context['envios_tcc'] = qsEnvios
             context['cartera']=qsCartera
         return context
