@@ -56,13 +56,18 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                     facturas__vendedor__in=vendedores_biable
                 ).distinct()
                 for envio in qsEnvios.all():
+                    facturas = ""
                     for factura in envio.facturas.all():
                         if factura.vendedor in vendedores_biable.all():
-                            descripcion = '%s de envío de la factura %s-%s con estado "%s". Nro Seguimiento %s' % (
-                                envio.get_numero_dias_desde_envio(), factura.tipo_documento, factura.nro_documento,
-                                envio.get_estado_display(), envio.nro_tracking)
-                            self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia,
-                                                         envio.get_absolute_url())
+                            facturas += " (%s-%s) " % (factura.tipo_documento, factura.nro_documento)
+                    descripcion = '%s de envío de la(s) factura(s) %s con estado "%s". Nro Seguimiento %s' % (
+                        envio.get_numero_dias_desde_envio(),
+                        facturas,
+                        envio.get_estado_display(),
+                        envio.nro_tracking
+                    )
+                    self.generacion_tarea_diaria("Seguimiento Envío", descripcion, trabajo_dia,
+                                                 envio.get_absolute_url())
 
                 qsCartera = Cartera.objects.filter(esta_vencido=True, vendedor__in=vendedores_biable.all()).order_by(
                     "-dias_vencido")
