@@ -87,8 +87,12 @@ class TareaCotizacion(Tarea):
         return reverse("trabajo_diario:tarea-cotizacion-detalle", kwargs={"pk": self.pk})
 
     def get_descripcion_tarea(self):
-        descripcion = "Cotizacion %s con estado %s" % (
-            self.cotizacion.nro_cotizacion, self.cotizacion.get_estado_display())
+        descripcion = "Cotizacion %s %s para %s con un valor de %s" % (
+            self.cotizacion.nro_cotizacion,
+            self.cotizacion.get_estado_display(),
+            self.cotizacion.razon_social,
+            self.cotizacion.total
+        )
         return descripcion
 
 
@@ -116,7 +120,7 @@ class TareaEnvioTCC(Tarea):
         for factura in self.envio.facturas.all():
             nro_factura = "(%s-%s)" % (factura.tipo_documento, factura.nro_documento)
             facturas += nro_factura
-        descripcion = "Envio TCC con facturas: %s. NRO Seguimiento: %s" % (facturas, self.envio.nro_tracking)
+        descripcion = "Envio TCC con facturas: %s con estado %s. NRO Seguimiento: %s" % (facturas, self.envio.get_estado_display(), self.envio.nro_tracking)
         return descripcion
 
 

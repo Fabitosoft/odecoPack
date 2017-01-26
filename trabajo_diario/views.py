@@ -38,7 +38,6 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                 trabajo_diario = None
 
             if not trabajo_diario:
-                print('entro no hay trabajo diario')
                 trabajo_diario = TrabajoDiario()
                 trabajo_diario.usuario = usuario
                 trabajo_diario.save()
@@ -73,7 +72,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                             except TareaCartera.DoesNotExist:
                                 tarea_cartera = TareaCartera()
                                 tarea_cartera.factura = factura
-                            tarea_cartera.descripcion = "%s con %s dia(s) de vendido" % (
+                            tarea_cartera.descripcion = "%s vencida por %s dia(s)" % (
                                 tarea_cartera.get_descripcion_tarea(), cartera.dias_vencido)
                             tarea_cartera.trabajo_diario = trabajo_diario
                             tarea_cartera.save()
