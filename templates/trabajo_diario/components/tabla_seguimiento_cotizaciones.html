@@ -13,21 +13,21 @@
 
     </thead>
     <tbody>
-    {% for cotizacion in cotizaciones_pendientes %}
+    {% for tarea in cotizaciones_pendientes.all %}
         <tr>
             <td>
-                {% if cotizacion.tarea.estado == 0 %}
+                {% if tarea.estado == 0 %}
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 {% else %}
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
                 {% endif %}
             </td>
             <td>
-                <a href="{{ cotizacion.tarea.get_absolute_url }}">{{ cotizacion.tarea.descripcion }}</a>
+                <a href="{{ tarea.get_absolute_url }}">{{ tarea.descripcion }}</a>
             </td>
 
             <td>
-                <a href="{{ cotizacion.get_absolute_url }}" target="_blank">Ver</a>
+                <a href="{{ tarea.cotizacion.get_absolute_url }}" target="_blank">Ver</a>
             </td>
 
         </tr>

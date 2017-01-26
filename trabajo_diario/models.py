@@ -11,6 +11,34 @@ from biable.models import FacturasBiable
 
 
 # Create your models here.
+
+class TrabajoDiario(TimeStampedModel):
+    usuario = models.ForeignKey(User)
+    nro_tareas = models.PositiveIntegerField(default=0)
+    nro_tareas_sin_atender = models.PositiveIntegerField(default=0)
+    nro_tareas_atendidas = models.PositiveIntegerField(default=0)
+    porcentaje_atendido = models.DecimalField(max_digits=4, decimal_places=1, default=0)
+
+    # def set_actualizar_seguimiento_trabajo(self):
+    #     self.nro_tareas = int(self.mis_tareas.aggregate(Count('id'))['id__count'])
+    #     self.nro_tareas_sin_atender = int(self.mis_tareas.filter(estado=0).aggregate(Count('id'))['id__count'])
+    #     self.nro_tareas_atendidas = self.nro_tareas - self.nro_tareas_sin_atender
+    #     self.porcentaje_atendido = 0
+    #     if self.nro_tareas > 0:
+    #         self.porcentaje_atendido = (self.nro_tareas_atendidas / self.nro_tareas) * 100
+    #     self.save()
+
+
+    class Meta:
+        permissions = (
+            ('ver_trabajo_diario', 'Ver Trabajo Diario'),
+        )
+
+
+# post_save.connect(set_actualizar_mi_trabajo_diario, sender=TareaDiaria)
+
+
+# region Bases Seguimiento Tareas
 class Seguimiento(TimeStampedModel):
     observacion = models.TextField(max_length=300)
     usuario = models.ForeignKey(User)
@@ -33,10 +61,14 @@ class Tarea(TimeStampedModel):
         abstract = True
 
 
+# endregion
+
 # region Tarea Cotizacion
 class TareaCotizacion(Tarea):
     cotizacion = models.OneToOneField(Cotizacion, related_name='tarea', null=True, blank=True,
                                       on_delete=models.SET_NULL)
+    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.CASCADE, related_name='tareas_cotizacion',
+                                       null=True)
 
     def get_absolute_url(self):
         return reverse("trabajo_diario:tarea-cotizacion-detalle", kwargs={"pk": self.pk})
@@ -57,6 +89,8 @@ class SeguimientoCotizacion(Seguimiento):
 class TareaEnvioTCC(Tarea):
     envio = models.OneToOneField(EnvioTransportadoraTCC, related_name='tarea', null=True, blank=True,
                                  on_delete=models.SET_NULL)
+    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.CASCADE, related_name='tareas_envios_tcc',
+                                       null=True)
 
     def get_absolute_url(self):
         return reverse("trabajo_diario:tarea-enviotcc-detalle", kwargs={"pk": self.pk})
@@ -74,13 +108,14 @@ class SeguimientoEnvioTCC(Seguimiento):
     tarea = models.ForeignKey(TareaEnvioTCC, related_name='seguimientos')
 
 
-# enregion
-
+# endregion
 
 # region TareaCartera
 class TareaCartera(Tarea):
     factura = models.OneToOneField(FacturasBiable, related_name='tarea', null=True, blank=True,
                                    on_delete=models.SET_NULL)
+    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.CASCADE, related_name='tareas_cartera',
+                                       null=True)
 
     def get_absolute_url(self):
         return reverse("trabajo_diario:tarea-cartera-detalle", kwargs={"pk": self.pk})
@@ -95,7 +130,7 @@ class SeguimientoCartera(Seguimiento):
     tarea = models.ForeignKey(TareaCartera, related_name='seguimientos')
 
 
-# enregion
+# endregion
 
 class TrabajoDia(TimeStampedModel):
     usuario = models.ForeignKey(User)
@@ -118,11 +153,6 @@ class TrabajoDia(TimeStampedModel):
         if self.nro_tareas > 0:
             self.porcentaje_atendido = (self.nro_tareas_atendidas / self.nro_tareas) * 100
         self.save()
-
-    class Meta:
-        permissions = (
-            ('ver_trabajo_diario', 'Ver Trabajo Diario'),
-        )
 
 
 class TareaDiaria(TimeStampedModel):

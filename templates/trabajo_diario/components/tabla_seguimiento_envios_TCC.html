@@ -13,21 +13,21 @@
 
     </thead>
     <tbody>
-    {% for envio in envios_pendientes %}
+    {% for tarea in envios_pendientes.all %}
         <tr>
             <td>
-                {% if envio.tarea.estado == 0 %}
+                {% if tarea.estado == 0 %}
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 {% else %}
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
                 {% endif %}
             </td>
             <td>
-                <a href="{{ envio.tarea.get_absolute_url }}">{{ envio.tarea.descripcion }}</a>
+                <a href="{{ tarea.get_absolute_url }}">{{ tarea.descripcion }}</a>
             </td>
 
             <td>
-                <a href="{{ envio.tarea.get_absolute_url }}" target="_blank">Ver</a>
+                <a href="{{ tarea.envio.get_absolute_url }}" target="_blank">Ver</a>
             </td>
 
         </tr>

@@ -15,72 +15,157 @@ from biable.models import Cartera, VendedorBiable
 from .forms import SeguimientoTareaForm
 from usuarios.models import Colaborador
 from .models import TrabajoDia, TareaDiaria, TareaEnvioTCC, TareaCartera, TareaCotizacion, SeguimientoCotizacion, \
-    SeguimientoCartera, SeguimientoEnvioTCC
+    SeguimientoCartera, SeguimientoEnvioTCC, TrabajoDiario
 from despachos_mercancias.models import EnvioTransportadoraTCC
 from indicadores.mixins import IndicadorMesMixin
 
 
 # Create your views here.
+
+# region Trabajo Diario
 class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
     template_name = 'trabajo_diario/trabajo_dia.html'
 
     def get_context_data(self, **kwargs):
-        usuario = self.request.user
-        vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario).distinct()
-        fecha_hoy = timezone.localtime(timezone.now()).date()
-
         context = super().get_context_data(**kwargs)
-        if vendedores_biable.exists():
-            qsEnvios = EnvioTransportadoraTCC.pendientes.select_related('tarea').filter(
-                facturas__vendedor__in=vendedores_biable
-            ).distinct()
-            for envio in qsEnvios.all():
-                try:
-                    tarea_envio = envio.tarea
-                    tarea_envio.estado = 0
-                except TareaEnvioTCC.DoesNotExist:
-                    tarea_envio = TareaEnvioTCC()
-                    tarea_envio.envio = envio
-                tarea_envio.descripcion = tarea_envio.get_descripcion_tarea()
-                tarea_envio.save()
+        usuario = self.request.user
+        if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
+            fecha_hoy = timezone.localtime(timezone.now()).date()
+            try:
+                trabajo_diario = TrabajoDiario.objects.get(created__date=fecha_hoy, usuario=usuario)
+            except TrabajoDiario.DoesNotExist:
+                trabajo_diario = None
 
-            qsCartera = Cartera.objects.select_related('factura', 'factura__tarea').filter(
-                esta_vencido=True,
-                vendedor__in=vendedores_biable).distinct().order_by(
-                "-dias_vencido")
-            for cartera in qsCartera.all():
-                factura = cartera.factura
-                if factura:
-                    try:
-                        tarea_cartera = factura.tarea
-                        tarea_cartera.estado = 0
-                    except TareaCartera.DoesNotExist:
-                        tarea_cartera = TareaCartera()
-                        tarea_cartera.factura = factura
-                    tarea_cartera.descripcion = "%s con %s dia(s) de vendido" % (
-                        tarea_cartera.get_descripcion_tarea(), cartera.dias_vencido)
-                    tarea_cartera.save()
+            if not trabajo_diario:
+                print('entro no hay trabajo diario')
+                trabajo_diario = TrabajoDiario()
+                trabajo_diario.usuario = usuario
+                trabajo_diario.save()
 
-                    # if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
+                vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario).distinct()
 
-            qsCotizacion = Cotizacion.estados.activo().select_related('tarea').filter(created__date__lt=fecha_hoy,
-                                                                                      usuario=usuario).order_by(
-                '-total')
-            for cotizacion in qsCotizacion.all():
-                try:
-                    tarea_cotizacion = cotizacion.tarea
-                    tarea_cotizacion.estado = 0
-                except TareaCotizacion.DoesNotExist:
-                    tarea_cotizacion = TareaCotizacion()
-                    tarea_cotizacion.cotizacion = cotizacion
-                tarea_cotizacion.descripcion = tarea_cotizacion.get_descripcion_tarea()
-                tarea_cotizacion.save()
+                if vendedores_biable.exists():
+                    qsEnvios = EnvioTransportadoraTCC.pendientes.select_related('tarea').filter(
+                        facturas__vendedor__in=vendedores_biable
+                    ).distinct()
+                    for envio in qsEnvios.all():
+                        try:
+                            tarea_envio = envio.tarea
+                            tarea_envio.estado = 0
+                        except TareaEnvioTCC.DoesNotExist:
+                            tarea_envio = TareaEnvioTCC()
+                            tarea_envio.envio = envio
+                        tarea_envio.descripcion = tarea_envio.get_descripcion_tarea()
+                        tarea_envio.trabajo_diario = trabajo_diario
+                        tarea_envio.save()
 
-            context['carteras'] = qsCartera
-            context['envios_tcc'] = qsEnvios
-            context['cotizaciones'] = qsCotizacion
+                    qsCartera = Cartera.objects.select_related('factura', 'factura__tarea').filter(
+                        esta_vencido=True,
+                        vendedor__in=vendedores_biable).distinct().order_by(
+                        "-dias_vencido")
+                    for cartera in qsCartera.all():
+                        factura = cartera.factura
+                        if factura:
+                            try:
+                                tarea_cartera = factura.tarea
+                                tarea_cartera.estado = 0
+                            except TareaCartera.DoesNotExist:
+                                tarea_cartera = TareaCartera()
+                                tarea_cartera.factura = factura
+                            tarea_cartera.descripcion = "%s con %s dia(s) de vendido" % (
+                                tarea_cartera.get_descripcion_tarea(), cartera.dias_vencido)
+                            tarea_cartera.trabajo_diario = trabajo_diario
+                            tarea_cartera.save()
+
+                    qsCotizacion = Cotizacion.estados.activo().select_related('tarea').filter(
+                        created__date__lt=fecha_hoy,
+                        usuario=usuario).order_by(
+                        '-total')
+                    for cotizacion in qsCotizacion.all():
+                        try:
+                            tarea_cotizacion = cotizacion.tarea
+                            tarea_cotizacion.estado = 0
+                        except TareaCotizacion.DoesNotExist:
+                            tarea_cotizacion = TareaCotizacion()
+                            tarea_cotizacion.cotizacion = cotizacion
+                        tarea_cotizacion.descripcion = tarea_cotizacion.get_descripcion_tarea()
+                        tarea_cotizacion.trabajo_diario = trabajo_diario
+                        tarea_cotizacion.save()
+
+            context['carteras'] = trabajo_diario.tareas_cartera
+            context['envios_tcc'] = trabajo_diario.tareas_envios_tcc
+            context['cotizaciones'] = trabajo_diario.tareas_cotizacion
         return context
 
+
+# endregion
+
+# region Tareas Diarias
+class TareaUpdateView(UpdateView):
+    template_name = 'trabajo_diario/tarea_detail.html'
+    fields = ('estado',)
+
+    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
+        pass
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.get_object().estado})
+        return context
+
+    def post(self, request, *args, **kwargs):
+        estado = request.POST.get('estado')
+        tarea = self.get_object()
+
+        observacion = request.POST.get('observacion')
+        if observacion:
+            seguimiento = self.crear_nuevo_seguimiento(observacion, tarea, self.request.user)
+            seguimiento.save()
+
+        if estado != tarea.estado:
+            tarea.estado = estado
+            tarea.save()
+
+        return redirect(reverse('trabajo_diario:tareas_hoy'))
+
+
+class TareaCotizacionDetailView(TareaUpdateView):
+    model = TareaCotizacion
+
+    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
+        seguimiento = SeguimientoCotizacion(
+            observacion=observacion,
+            tarea=tarea,
+            usuario=usuario
+        )
+        return seguimiento
+
+
+class TareaEnvioTccDetailView(TareaUpdateView):
+    model = TareaEnvioTCC
+
+    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
+        seguimiento = SeguimientoEnvioTCC(
+            observacion=observacion,
+            tarea=tarea,
+            usuario=usuario
+        )
+        return seguimiento
+
+
+class TareaCarteraDetailView(TareaUpdateView):
+    model = TareaCartera
+
+    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
+        seguimiento = SeguimientoCartera(
+            observacion=observacion,
+            tarea=tarea,
+            usuario=usuario
+        )
+        return seguimiento
+
+
+# endregion
 
 class TareaDiaUpdateView(UpdateView):
     template_name = 'trabajo_diario/tarea_dia_update.html'
@@ -193,67 +278,3 @@ class TrabajoDiarioDetailView(SelectRelatedMixin, DetailView):
     model = TrabajoDia
     select_related = ["usuario"]
     template_name = 'trabajo_diario/trabajo_diario_detail.html'
-
-
-class TareaUpdateView(UpdateView):
-    template_name = 'trabajo_diario/tarea_detail.html'
-    fields = ('estado',)
-
-    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
-        pass
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.get_object().estado})
-        return context
-
-    def post(self, request, *args, **kwargs):
-        estado = request.POST.get('estado')
-        tarea = self.get_object()
-
-        observacion = request.POST.get('observacion')
-        if observacion:
-            seguimiento = self.crear_nuevo_seguimiento(observacion, tarea, self.request.user)
-            seguimiento.save()
-
-        if estado != tarea.estado:
-            tarea.estado = estado
-            tarea.save()
-
-        return super().post(request, *args, **kwargs)
-
-
-class TareaCotizacionDetailView(TareaUpdateView):
-    model = TareaCotizacion
-
-    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
-        seguimiento = SeguimientoCotizacion(
-            observacion=observacion,
-            tarea=tarea,
-            usuario=usuario
-        )
-        return seguimiento
-
-
-class TareaEnvioTccDetailView(TareaUpdateView):
-    model = TareaEnvioTCC
-
-    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
-        seguimiento = SeguimientoEnvioTCC(
-            observacion=observacion,
-            tarea=tarea,
-            usuario=usuario
-        )
-        return seguimiento
-
-
-class TareaCarteraDetailView(TareaUpdateView):
-    model = TareaCartera
-
-    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
-        seguimiento = SeguimientoCartera(
-            observacion=observacion,
-            tarea=tarea,
-            usuario=usuario
-        )
-        return seguimiento
