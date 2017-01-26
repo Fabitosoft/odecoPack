@@ -3,29 +3,76 @@
     <h1>Tareas del Día de
         <small>{{ object.usuario.get_full_name }}</small>
     </h1>
-    {% regroup object.mis_tareas.all|dictsort:"tipo" by tipo as tipo_list %}
-    <ul>
-        {% for tipo in tipo_list %}
-            <li><h2>{{ tipo.grouper }}</h2>
-                <ul>
-                    {% for tarea in tipo.list %}
-                        <li>
-                            {% if tarea.estado == 0 %}
-                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            {% else %}
-                                <i class="fa fa-check-circle" aria-hidden="true"></i>
-                            {% endif %} <span style="color: blue">{{ tarea.descripcion }}</span>
-                            {% if tarea.observacion %}
-                                <ul>
-                                    <li>
-                                        <i class="fa fa-comments" aria-hidden="true"></i> {{ tarea.observacion }}
-                                    </li>
-                                </ul>
-                            {% endif %}
-                        </li>
+
+    {% if object.tareas_cotizacion.all %}
+        <h2>Seguimiento Cotizaciones</h2>
+        <ul>
+            {% for tarea in object.tareas_cotizacion.all %}
+                <li>
+                    {% if tarea.estado == 0 %}
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    {% else %}
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    {% endif %} <span style="color: blue">{{ tarea.descripcion }}</span>
+                    {% for seguimiento in tarea.seguimientos.all|slice:":3" %}
+                        <ul>
+                            <li>
+                                <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }} -
+                                <small> {{ seguimiento.created }}</small>
+                            </li>
+                        </ul>
                     {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
+                </li>
+
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if object.tareas_cartera.all %}
+        <h2>Seguimiento Cartera</h2>
+        <ul>
+            {% for tarea in object.tareas_cartera.all %}
+                <li>
+                    {% if tarea.estado == 0 %}
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    {% else %}
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    {% endif %} <span style="color: blue">{{ tarea.descripcion }}</span>
+                    {% for seguimiento in tarea.seguimientos.all|slice:":3" %}
+                        <ul>
+                            <li>
+                                <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }} -
+                                <small> {{ seguimiento.created }}</small>
+                            </li>
+                        </ul>
+                    {% endfor %}
+                </li>
+
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if object.tareas_envios_tcc.all %}
+        <h2>Seguimiento Envios TCC</h2>
+        <ul>
+            {% for tarea in object.tareas_envios_tcc.all %}
+                <li>
+                    {% if tarea.estado == 0 %}
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    {% else %}
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    {% endif %} <span style="color: blue">{{ tarea.descripcion }}</span>
+                    {% for seguimiento in tarea.seguimientos.all|slice:":3" %}
+                        <ul>
+                            <li>
+                                <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }} -
+                                <small> {{ seguimiento.created }}</small>
+                            </li>
+                        </ul>
+                    {% endfor %}
+                </li>
+
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}

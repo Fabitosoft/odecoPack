@@ -29,8 +29,9 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         usuario = self.request.user
+        fecha_hoy = timezone.localtime(timezone.now()).date()
+
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
-            fecha_hoy = timezone.localtime(timezone.now()).date()
             try:
                 trabajo_diario = TrabajoDiario.objects.get(created__date=fecha_hoy, usuario=usuario)
             except TrabajoDiario.DoesNotExist:
@@ -92,9 +93,29 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                         tarea_cotizacion.trabajo_diario = trabajo_diario
                         tarea_cotizacion.save()
 
+                trabajo_diario.set_actualizar_seguimiento_trabajo()
+
             context['carteras'] = trabajo_diario.tareas_cartera
             context['envios_tcc'] = trabajo_diario.tareas_envios_tcc
             context['cotizaciones'] = trabajo_diario.tareas_cotizacion
+            context["porcentaje_tareas_atendidas"] = trabajo_diario.porcentaje_atendido
+
+        if not usuario.has_perm('biable.reporte_ventas_todos_vendedores'):
+            try:
+                subalternos = Colaborador.objects.get(usuario__user=usuario).subalternos.values(
+                    'usuario__user').all()
+            except Colaborador.DoesNotExist:
+                subalternos = None
+        else:
+            subalternos = Colaborador.objects.values('usuario__user')
+        if subalternos:
+            trabajo_diario_subalternos = TrabajoDiario.objects.select_related('usuario').filter(
+                Q(usuario__in=subalternos) &
+                Q(created__date__exact=fecha_hoy) &
+                ~Q(usuario=usuario)
+            ).distinct()
+            context['trabajo_diario_subalternos'] = trabajo_diario_subalternos
+
         return context
 
 
@@ -163,6 +184,12 @@ class TareaCarteraDetailView(TareaUpdateView):
             usuario=usuario
         )
         return seguimiento
+
+
+class TrabajoDiarioDetailView(SelectRelatedMixin, DetailView):
+    model = TrabajoDiario
+    select_related = ["usuario"]
+    template_name = 'trabajo_diario/trabajo_diario_detail.html'
 
 
 # endregion
@@ -272,9 +299,3 @@ class TareaDiaListView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
     def generacion_tarea_diaria(self, tipo, descripcion, trabajo_dia, url=None):
         tarea = TareaDiaria(tipo=tipo, descripcion=descripcion, mi_dia=trabajo_dia, url=url)
         tarea.save()
-
-
-class TrabajoDiarioDetailView(SelectRelatedMixin, DetailView):
-    model = TrabajoDia
-    select_related = ["usuario"]
-    template_name = 'trabajo_diario/trabajo_diario_detail.html'

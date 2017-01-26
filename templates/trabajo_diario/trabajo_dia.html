@@ -22,6 +22,57 @@
                             {% include 'trabajo_diario/components/tabla_seguimiento_envios_TCC.html' with envios_pendientes=envios_tcc.all %}
                         </div>
                     {% endif %}
+                    {% if trabajo_diario_subalternos %}
+                        <div class="col-xs-12">
+                            <h2>Trabajo Diario Colaboradores</h2>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th>
+                                        Colaborador
+                                    </th>
+                                    <th>
+                                        Nro Tareas
+                                    </th>
+                                    <th>
+                                        Nro Tareas sin Atender
+                                    </th>
+                                    <th>
+                                        Nro Tareas Atendidas
+                                    </th>
+                                    <th>
+                                        Porcentaje Atendido
+                                    </th>
+                                </tr>
+
+                                </thead>
+                                <tbody>
+                                {% for subalterno in trabajo_diario_subalternos.all %}
+                                    <tr>
+                                        <td>
+                                            {{ subalterno.usuario.get_full_name }}
+                                        </td>
+                                        <td>
+                                            {{ subalterno.nro_tareas }}
+                                        </td>
+                                        <td>
+                                            {{ subalterno.nro_tareas_sin_atender }}
+                                        </td>
+                                        <td>
+                                            {{ subalterno.nro_tareas_atendidas }}
+                                        </td>
+                                        <td>
+                                            {{ subalterno.porcentaje_atendido }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ subalterno.get_absolute_url }}">Ver</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-3">

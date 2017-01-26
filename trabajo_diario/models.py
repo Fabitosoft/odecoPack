@@ -19,15 +19,25 @@ class TrabajoDiario(TimeStampedModel):
     nro_tareas_atendidas = models.PositiveIntegerField(default=0)
     porcentaje_atendido = models.DecimalField(max_digits=4, decimal_places=1, default=0)
 
-    # def set_actualizar_seguimiento_trabajo(self):
-    #     self.nro_tareas = int(self.mis_tareas.aggregate(Count('id'))['id__count'])
-    #     self.nro_tareas_sin_atender = int(self.mis_tareas.filter(estado=0).aggregate(Count('id'))['id__count'])
-    #     self.nro_tareas_atendidas = self.nro_tareas - self.nro_tareas_sin_atender
-    #     self.porcentaje_atendido = 0
-    #     if self.nro_tareas > 0:
-    #         self.porcentaje_atendido = (self.nro_tareas_atendidas / self.nro_tareas) * 100
-    #     self.save()
+    def get_absolute_url(self):
+        return reverse("trabajo_diario:tarea-detail", kwargs={"pk": self.pk})
 
+    def set_actualizar_seguimiento_trabajo(self):
+        nro_tareas_envio_tcc = self.tareas_envios_tcc.aggregate(Count('id'))['id__count']
+        nro_tareas_cotizacion = self.tareas_cotizacion.aggregate(Count('id'))['id__count']
+        nro_tareas_cartera = self.tareas_cartera.aggregate(Count('id'))['id__count']
+
+        nro_tareas_envio_tcc_sin_antender = self.tareas_envios_tcc.filter(estado=0).aggregate(Count('id'))['id__count']
+        nro_tareas_cotizacion_sin_antender = self.tareas_cotizacion.filter(estado=0).aggregate(Count('id'))['id__count']
+        nro_tareas_cartera_sin_antender = self.tareas_cartera.filter(estado=0).aggregate(Count('id'))['id__count']
+
+        self.nro_tareas = nro_tareas_envio_tcc + nro_tareas_cotizacion + nro_tareas_cartera
+        self.nro_tareas_sin_atender = nro_tareas_envio_tcc_sin_antender + nro_tareas_cotizacion_sin_antender + nro_tareas_cartera_sin_antender
+        self.nro_tareas_atendidas = self.nro_tareas - self.nro_tareas_sin_atender
+        self.porcentaje_atendido = 0
+        if self.nro_tareas > 0:
+            self.porcentaje_atendido = (self.nro_tareas_atendidas / self.nro_tareas) * 100
+        self.save()
 
     class Meta:
         permissions = (
@@ -35,7 +45,10 @@ class TrabajoDiario(TimeStampedModel):
         )
 
 
-# post_save.connect(set_actualizar_mi_trabajo_diario, sender=TareaDiaria)
+def set_actualizar_porcentaje_trabajo_diario(sender, instance, created, **kwargs):
+    if not created:
+        trabajo_dia = instance.trabajo_diario
+        trabajo_dia.set_actualizar_seguimiento_trabajo()
 
 
 # region Bases Seguimiento Tareas
@@ -79,6 +92,9 @@ class TareaCotizacion(Tarea):
         return descripcion
 
 
+post_save.connect(set_actualizar_porcentaje_trabajo_diario, sender=TareaCotizacion)
+
+
 class SeguimientoCotizacion(Seguimiento):
     tarea = models.ForeignKey(TareaCotizacion, related_name='seguimientos')
 
@@ -104,6 +120,9 @@ class TareaEnvioTCC(Tarea):
         return descripcion
 
 
+post_save.connect(set_actualizar_porcentaje_trabajo_diario, sender=TareaEnvioTCC)
+
+
 class SeguimientoEnvioTCC(Seguimiento):
     tarea = models.ForeignKey(TareaEnvioTCC, related_name='seguimientos')
 
@@ -124,6 +143,9 @@ class TareaCartera(Tarea):
         descripcion = "%s tiene la factura %s-%s" % (
             self.factura.cliente, self.factura.tipo_documento, self.factura.nro_documento)
         return descripcion
+
+
+post_save.connect(set_actualizar_porcentaje_trabajo_diario, sender=TareaCartera)
 
 
 class SeguimientoCartera(Seguimiento):

@@ -31,7 +31,7 @@ class SeguimientoTareaForm(forms.Form):
             ),
             Div(
                 FormActions(
-                    Submit('comentar', 'Publicar Comentario'),
+                    Submit('guardar', 'Guardar Cambios'),
                 )
             )
         )
