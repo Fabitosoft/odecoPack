@@ -153,7 +153,7 @@ class TareaUpdateView(UpdateView):
             tarea.estado = estado
             tarea.save()
 
-        return redirect(reverse('trabajo_diario:tareas_hoy'))
+        return redirect(reverse('index'))
 
 
 class TareaCotizacionDetailView(TareaUpdateView):
