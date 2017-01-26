@@ -69,11 +69,15 @@ class FacturasBiableAdmin(admin.ModelAdmin):
         'venta_neto'
     )
 
+class CarteraAdmin(admin.ModelAdmin):
+    list_display = ('tipo_documento','nro_documento','fecha_documentos','fecha_vencimiento','esta_vencido','dias_vencido')
+    search_fields = ('vendedor__nombre','tipo_documento','nro_documento')
+    list_filter = ('tipo_documento','esta_vencido')
 
 admin.site.register(Cliente, ClienteBiableAdmin)
 admin.site.register(VendedorBiable, VendedorBiableAdmin)
 admin.site.register(LineaVendedorBiable)
 admin.site.register(FacturasBiable, FacturasBiableAdmin)
 admin.site.register(ItemsBiable, ItemsBiableAdmin)
-admin.site.register(Cartera)
+admin.site.register(Cartera,CarteraAdmin)
 admin.site.register(MovimientoVentaBiable)
