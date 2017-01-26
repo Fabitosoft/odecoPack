@@ -19,10 +19,10 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
-from trabajo_diario.views import TareaDiaListView
+from trabajo_diario.views import TrabajoDiaView
 
 urlpatterns = [
-    url(r'^$', TareaDiaListView.as_view(), name='index'),
+    url(r'^$', TrabajoDiaView.as_view(), name='index'),
     url(r'^admin/', admin.site.urls),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^accounts/', include('registration.backends.default.urls')),
