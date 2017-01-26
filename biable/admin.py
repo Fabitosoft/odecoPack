@@ -70,7 +70,7 @@ class FacturasBiableAdmin(admin.ModelAdmin):
     )
 
 class CarteraAdmin(admin.ModelAdmin):
-    list_display = ('tipo_documento','nro_documento','fecha_documentos','fecha_vencimiento','esta_vencido','dias_vencido')
+    list_display = ('tipo_documento','nro_documento','fecha_documento','fecha_vencimiento','esta_vencido','dias_vencido')
     search_fields = ('vendedor__nombre','tipo_documento','nro_documento')
     list_filter = ('tipo_documento','esta_vencido')
 
