@@ -1,6 +1,7 @@
 from braces.views import LoginRequiredMixin
 from braces.views import SelectRelatedMixin
 from django.db.models import Q
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 
@@ -11,8 +12,10 @@ from django.views.generic.detail import DetailView
 from cotizaciones.models import (
     Cotizacion)
 from biable.models import Cartera, VendedorBiable
+from .forms import SeguimientoTareaForm
 from usuarios.models import Colaborador
-from .models import TrabajoDia, TareaDiaria, TareaEnvioTCC, TareaCartera, TareaCotizacion
+from .models import TrabajoDia, TareaDiaria, TareaEnvioTCC, TareaCartera, TareaCotizacion, SeguimientoCotizacion, \
+    SeguimientoCartera, SeguimientoEnvioTCC
 from despachos_mercancias.models import EnvioTransportadoraTCC
 from indicadores.mixins import IndicadorMesMixin
 
@@ -41,7 +44,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                 tarea_envio.descripcion = tarea_envio.get_descripcion_tarea()
                 tarea_envio.save()
 
-            qsCartera = Cartera.objects.select_related('factura','factura__tarea').filter(
+            qsCartera = Cartera.objects.select_related('factura', 'factura__tarea').filter(
                 esta_vencido=True,
                 vendedor__in=vendedores_biable).distinct().order_by(
                 "-dias_vencido")
@@ -61,7 +64,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                     # if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
 
             qsCotizacion = Cotizacion.estados.activo().select_related('tarea').filter(created__date__lt=fecha_hoy,
-                                                              usuario=usuario).order_by(
+                                                                                      usuario=usuario).order_by(
                 '-total')
             for cotizacion in qsCotizacion.all():
                 try:
@@ -190,3 +193,67 @@ class TrabajoDiarioDetailView(SelectRelatedMixin, DetailView):
     model = TrabajoDia
     select_related = ["usuario"]
     template_name = 'trabajo_diario/trabajo_diario_detail.html'
+
+
+class TareaUpdateView(UpdateView):
+    template_name = 'trabajo_diario/tarea_detail.html'
+    fields = ('estado',)
+
+    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
+        pass
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.get_object().estado})
+        return context
+
+    def post(self, request, *args, **kwargs):
+        estado = request.POST.get('estado')
+        tarea = self.get_object()
+
+        observacion = request.POST.get('observacion')
+        if observacion:
+            seguimiento = self.crear_nuevo_seguimiento(observacion, tarea, self.request.user)
+            seguimiento.save()
+
+        if estado != tarea.estado:
+            tarea.estado = estado
+            tarea.save()
+
+        return super().post(request, *args, **kwargs)
+
+
+class TareaCotizacionDetailView(TareaUpdateView):
+    model = TareaCotizacion
+
+    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
+        seguimiento = SeguimientoCotizacion(
+            observacion=observacion,
+            tarea=tarea,
+            usuario=usuario
+        )
+        return seguimiento
+
+
+class TareaEnvioTccDetailView(TareaUpdateView):
+    model = TareaEnvioTCC
+
+    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
+        seguimiento = SeguimientoEnvioTCC(
+            observacion=observacion,
+            tarea=tarea,
+            usuario=usuario
+        )
+        return seguimiento
+
+
+class TareaCarteraDetailView(TareaUpdateView):
+    model = TareaCartera
+
+    def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
+        seguimiento = SeguimientoCartera(
+            observacion=observacion,
+            tarea=tarea,
+            usuario=usuario
+        )
+        return seguimiento

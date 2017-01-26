@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Editar Tarea de {{ object.tipo }}</h1>
+    <p>
+        {{ object.descripcion }}
+    </p>
+    <p>
+        Último Segimiento hace {{ object.modified|timesince }}
+    </p>
+    <div>
+        {% crispy observacion_form %}
+    </div>
+    {% if object.seguimientos.all %}
+        {% for observacion in object.seguimientos.all %}
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>{{ observacion.usuario.get_full_name }}</strong> <span
+                        class="text-muted">Hace {{ observacion.created|timesince }}, creado {{ observacion.created }}</span>
+                </div>
+                <div class="panel-body">
+                    {{ observacion.observacion }}
+                </div><!-- /panel-body -->
+            </div><!-- /panel panel-default -->
+        {% endfor %}
+    {% endif %}
+{% endblock %}

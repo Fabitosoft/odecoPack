@@ -23,7 +23,7 @@
                 {% endif %}
             </td>
             <td>
-                {{ cotizacion.tarea.descripcion }}
+                <a href="{{ cotizacion.tarea.get_absolute_url }}">{{ cotizacion.tarea.descripcion }}</a>
             </td>
 
             <td>

@@ -11,6 +11,15 @@ from biable.models import FacturasBiable
 
 
 # Create your models here.
+class Seguimiento(TimeStampedModel):
+    observacion = models.TextField(max_length=300)
+    usuario = models.ForeignKey(User)
+
+    class Meta:
+        abstract = True
+        ordering = ('-created',)
+
+
 class Tarea(TimeStampedModel):
     ESTADOS = (
         (0, 'Pendiente'),
@@ -29,14 +38,16 @@ class TareaCotizacion(Tarea):
     cotizacion = models.OneToOneField(Cotizacion, related_name='tarea', null=True, blank=True,
                                       on_delete=models.SET_NULL)
 
+    def get_absolute_url(self):
+        return reverse("trabajo_diario:tarea-cotizacion-detalle", kwargs={"pk": self.pk})
+
     def get_descripcion_tarea(self):
         descripcion = "Cotizacion %s con estado %s" % (
             self.cotizacion.nro_cotizacion, self.cotizacion.get_estado_display())
         return descripcion
 
 
-class SeguimientoCotizacion(TimeStampedModel):
-    observacion = models.TextField(max_length=300)
+class SeguimientoCotizacion(Seguimiento):
     tarea = models.ForeignKey(TareaCotizacion, related_name='seguimientos')
 
 
@@ -47,6 +58,9 @@ class TareaEnvioTCC(Tarea):
     envio = models.OneToOneField(EnvioTransportadoraTCC, related_name='tarea', null=True, blank=True,
                                  on_delete=models.SET_NULL)
 
+    def get_absolute_url(self):
+        return reverse("trabajo_diario:tarea-enviotcc-detalle", kwargs={"pk": self.pk})
+
     def get_descripcion_tarea(self):
         facturas = ""
         for factura in self.envio.facturas.all():
@@ -56,8 +70,7 @@ class TareaEnvioTCC(Tarea):
         return descripcion
 
 
-class SeguimientoEnvioTCC(TimeStampedModel):
-    observacion = models.TextField(max_length=300)
+class SeguimientoEnvioTCC(Seguimiento):
     tarea = models.ForeignKey(TareaEnvioTCC, related_name='seguimientos')
 
 
@@ -69,14 +82,16 @@ class TareaCartera(Tarea):
     factura = models.OneToOneField(FacturasBiable, related_name='tarea', null=True, blank=True,
                                    on_delete=models.SET_NULL)
 
+    def get_absolute_url(self):
+        return reverse("trabajo_diario:tarea-cartera-detalle", kwargs={"pk": self.pk})
+
     def get_descripcion_tarea(self):
         descripcion = "%s tiene la factura %s-%s" % (
             self.factura.cliente, self.factura.tipo_documento, self.factura.nro_documento)
         return descripcion
 
 
-class SeguimientoCartera(TimeStampedModel):
-    observacion = models.TextField(max_length=300)
+class SeguimientoCartera(Seguimiento):
     tarea = models.ForeignKey(TareaCartera, related_name='seguimientos')
 
 
