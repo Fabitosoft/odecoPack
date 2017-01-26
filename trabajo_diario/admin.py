@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import TrabajoDia, TareaDiaria
+from .models import TrabajoDiario, TareaDiaria
 
 
 # Register your models here.
@@ -16,4 +16,4 @@ class TrabajoDiaAdmin(admin.ModelAdmin):
                     'porcentaje_atendido']
     readonly_fields = ['nro_tareas', 'nro_tareas_atendidas','nro_tareas_sin_atender','porcentaje_atendido','usuario']
 
-admin.site.register(TrabajoDia, TrabajoDiaAdmin)
+admin.site.register(TrabajoDiario, TrabajoDiaAdmin)

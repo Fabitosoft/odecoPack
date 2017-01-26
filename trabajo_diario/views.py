@@ -189,7 +189,7 @@ class TareaCarteraDetailView(TareaUpdateView):
 class TrabajoDiarioDetailView(SelectRelatedMixin, DetailView):
     model = TrabajoDiario
     select_related = ["usuario"]
-    template_name = 'trabajo_diario/trabajo_diario_detail.html'
+    template_name = 'trabajo_diario/trabajo_diario_por_vendedor.html'
 
 
 # endregion
