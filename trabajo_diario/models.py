@@ -73,9 +73,8 @@ class Tarea(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if self.__original_trabajo_diario_id == self.trabajo_diario.id:
-            print('Entro a cambiar unidades')
+            super().save(*args, **kwargs)
             self.trabajo_diario.set_actualizar_seguimiento_trabajo()
-        super().save(*args, **kwargs)
 
 
 # endregion
