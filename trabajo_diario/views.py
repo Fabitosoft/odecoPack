@@ -137,7 +137,10 @@ class TareaUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.get_object().estado})
+
+        if self.get_object().trabajo_diario.usuario == self.request.user:
+            context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.get_object().estado})
+
         return context
 
     def post(self, request, *args, **kwargs):

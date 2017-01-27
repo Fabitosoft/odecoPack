@@ -80,7 +80,7 @@ class Tarea(TimeStampedModel):
 class TareaCotizacion(Tarea):
     cotizacion = models.OneToOneField(Cotizacion, related_name='tarea', null=True, blank=True,
                                       on_delete=models.SET_NULL)
-    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.CASCADE, related_name='tareas_cotizacion',
+    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.PROTECT, related_name='tareas_cotizacion',
                                        null=True)
 
     def get_absolute_url(self):
@@ -109,7 +109,7 @@ class SeguimientoCotizacion(Seguimiento):
 class TareaEnvioTCC(Tarea):
     envio = models.OneToOneField(EnvioTransportadoraTCC, related_name='tarea', null=True, blank=True,
                                  on_delete=models.SET_NULL)
-    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.CASCADE, related_name='tareas_envios_tcc',
+    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.PROTECT, related_name='tareas_envios_tcc',
                                        null=True)
 
     def get_absolute_url(self):
@@ -138,7 +138,7 @@ class SeguimientoEnvioTCC(Seguimiento):
 class TareaCartera(Tarea):
     factura = models.OneToOneField(FacturasBiable, related_name='tarea', null=True, blank=True,
                                    on_delete=models.SET_NULL)
-    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.CASCADE, related_name='tareas_cartera',
+    trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.PROTECT, related_name='tareas_cartera',
                                        null=True)
 
     def get_absolute_url(self):
@@ -157,4 +157,4 @@ class SeguimientoCartera(Seguimiento):
     tarea = models.ForeignKey(TareaCartera, related_name='seguimientos')
 
 
-    # endregion
+# endregion
