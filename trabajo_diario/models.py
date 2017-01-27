@@ -87,12 +87,20 @@ class TareaCotizacion(Tarea):
         return reverse("trabajo_diario:tarea-cotizacion-detalle", kwargs={"pk": self.pk})
 
     def get_descripcion_tarea(self):
-        descripcion = "Cotizacion %s %s para %s con un valor de %s" % (
+        nro_tareas = self.cotizacion.mis_tareas.filter(esta_finalizada=False).aggregate(Count('id'))['id__count']
+        nro_seguimiento_remisiones = self.cotizacion.mis_remisiones.filter(entregado=False).aggregate(Count('id'))[
+            'id__count']
+        descripcion = "Cotizacion %s %s para %s con un valor de %s." % (
             self.cotizacion.nro_cotizacion,
             self.cotizacion.get_estado_display(),
             self.cotizacion.razon_social,
             self.cotizacion.total
         )
+        if nro_tareas:
+            descripcion += " (Nro. Tareas: %s)." % (nro_tareas)
+        if nro_seguimiento_remisiones:
+            descripcion += " (Nro. Remisiones: %s)." % (nro_seguimiento_remisiones)
+
         return descripcion
 
 
@@ -121,7 +129,7 @@ class TareaEnvioTCC(Tarea):
             nro_factura = "(%s-%s)" % (factura.tipo_documento, factura.nro_documento)
             facturas += nro_factura
         descripcion = "%s con facturas: %s con estado %s. NRO Seguimiento: %s" % (
-        self.envio.cliente.nombre, facturas, self.envio.get_estado_display(), self.envio.nro_tracking)
+            self.envio.cliente.nombre, facturas, self.envio.get_estado_display(), self.envio.nro_tracking)
         return descripcion
 
 
@@ -155,6 +163,5 @@ post_save.connect(set_actualizar_porcentaje_trabajo_diario, sender=TareaCartera)
 
 class SeguimientoCartera(Seguimiento):
     tarea = models.ForeignKey(TareaCartera, related_name='seguimientos')
-
 
 # endregion
