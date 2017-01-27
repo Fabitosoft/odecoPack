@@ -9,7 +9,7 @@ from .views import (
 )
 
 urlpatterns = [
-    url(r'tarea_detail/(?P<pk>[0-9]+)/$', TrabajoDiarioDetailView.as_view(), name='tarea-detail'),
+    url(r'trabajo_detail/(?P<pk>[0-9]+)/$', TrabajoDiarioDetailView.as_view(), name='trabajo-detail'),
     url(r'tarea_cotizacion_detalle/(?P<pk>[0-9]+)/$', TareaCotizacionDetailView.as_view(),
         name='tarea-cotizacion-detalle'),
     url(r'tarea_cotizacion_detalle/(?P<pk>[0-9]+)/$', TareaCotizacionDetailView.as_view(), name='tarea-enviotcc-detalle'),

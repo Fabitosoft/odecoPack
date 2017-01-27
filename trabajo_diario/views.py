@@ -1,4 +1,5 @@
 from braces.views import LoginRequiredMixin
+from braces.views import PrefetchRelatedMixin
 from braces.views import SelectRelatedMixin
 from django.db.models import Q
 from django.shortcuts import redirect
@@ -128,33 +129,39 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
 # endregion
 
 # region Tareas Diarias
-class TareaUpdateView(UpdateView):
+class TareaUpdateView(PrefetchRelatedMixin, SelectRelatedMixin, UpdateView):
     template_name = 'trabajo_diario/tarea_detail.html'
+    prefetch_related = ["seguimientos__usuario"]
+    select_related = ["trabajo_diario","trabajo_diario__usuario","trabajo_diario__usuario"]
     fields = ('estado',)
 
     def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
         pass
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if self.get_object().trabajo_diario.usuario == self.request.user:
-            context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.get_object().estado})
+        if self.object.trabajo_diario.usuario == self.request.user:
+            context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.object.estado})
 
         return context
 
     def post(self, request, *args, **kwargs):
         estado = request.POST.get('estado')
-        tarea = self.get_object()
+        self.object = self.get_object()
 
         observacion = request.POST.get('observacion')
         if observacion:
-            seguimiento = self.crear_nuevo_seguimiento(observacion, tarea, self.request.user)
+            seguimiento = self.crear_nuevo_seguimiento(observacion, self.object, self.request.user)
             seguimiento.save()
 
-        if estado != tarea.estado:
-            tarea.estado = estado
-            tarea.save()
+        if estado != self.object.estado:
+            self.object.estado = estado
+            self.object.save()
 
         return redirect(reverse('index'))
 
@@ -195,9 +202,10 @@ class TareaCarteraDetailView(TareaUpdateView):
         return seguimiento
 
 
-class TrabajoDiarioDetailView(SelectRelatedMixin, DetailView):
+class TrabajoDiarioDetailView(SelectRelatedMixin, PrefetchRelatedMixin, DetailView):
     model = TrabajoDiario
     select_related = ["usuario"]
+    prefetch_related = ["tareas_cotizacion", "tareas_envios_tcc", "tareas_cartera"]
     template_name = 'trabajo_diario/trabajo_diario_por_vendedor.html'
 
 # endregion

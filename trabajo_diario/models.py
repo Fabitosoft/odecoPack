@@ -20,7 +20,7 @@ class TrabajoDiario(TimeStampedModel):
     porcentaje_atendido = models.DecimalField(max_digits=4, decimal_places=1, default=0)
 
     def get_absolute_url(self):
-        return reverse("trabajo_diario:tarea-detail", kwargs={"pk": self.pk})
+        return reverse("trabajo_diario:trabajo-detail", kwargs={"pk": self.pk})
 
     def set_actualizar_seguimiento_trabajo(self):
         nro_tareas_envio_tcc = self.tareas_envios_tcc.aggregate(Count('id'))['id__count']
