@@ -1,25 +1,30 @@
-{% if lista_tareas.all %}
-    <h2>{{ tipo }}</h2>
-    <ul>
-        {% for tarea in lista_tareas.all %}
-            <li>
-                {% if tarea.estado == 0 %}
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                {% else %}
-                    <i class="fa fa-check-circle" aria-hidden="true"></i>
-                {% endif %} <a href="{{ tarea.get_absolute_url }}"><span
-                    style="color: blue">{{ tarea.descripcion }}</span></a>
-                {% if tarea.seguimientos.all %}
-                    <ul>
-                        {% for seguimiento in tarea.seguimientos.all|slice:":3" %}
-                            <li>
-                                <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }} -
-                                <small> {{ seguimiento.created }}</small>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
+{% with lista=lista_tareas.all %}
+    {% if lista %}
+        <h2>{{ tipo }}</h2>
+        <ul>
+            {% for tarea in lista %}
+                <li>
+                    {% if tarea.estado == 0 %}
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    {% else %}
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    {% endif %} <a href="{{ tarea.get_absolute_url }}"><span
+                        style="color: blue">{{ tarea.descripcion }}</span></a>
+                    {% with seguimientos=tarea.seguimientos.all|slice:":3" %}
+                        {% if seguimientos %}
+                            <ul>
+                                {% for seguimiento in seguimientos %}
+                                    <li>
+                                        <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }}
+                                        -
+                                        <small> {{ seguimiento.created }}</small>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}

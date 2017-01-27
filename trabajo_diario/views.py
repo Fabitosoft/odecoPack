@@ -145,7 +145,7 @@ class TareaUpdateView(PrefetchRelatedMixin, SelectRelatedMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if self.object.trabajo_diario.usuario == self.request.user:
+        if self.object.trabajo_diario.usuario.id == self.request.user.id:
             context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.object.estado})
 
         return context
