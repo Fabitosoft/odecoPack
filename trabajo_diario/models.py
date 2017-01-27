@@ -120,7 +120,8 @@ class TareaEnvioTCC(Tarea):
         for factura in self.envio.facturas.all():
             nro_factura = "(%s-%s)" % (factura.tipo_documento, factura.nro_documento)
             facturas += nro_factura
-        descripcion = "Envio TCC con facturas: %s con estado %s. NRO Seguimiento: %s" % (facturas, self.envio.get_estado_display(), self.envio.nro_tracking)
+        descripcion = "%s con facturas: %s con estado %s. NRO Seguimiento: %s" % (
+        self.envio.cliente.nombre, facturas, self.envio.get_estado_display(), self.envio.nro_tracking)
         return descripcion
 
 
@@ -156,4 +157,4 @@ class SeguimientoCartera(Seguimiento):
     tarea = models.ForeignKey(TareaCartera, related_name='seguimientos')
 
 
-# endregion
+    # endregion
