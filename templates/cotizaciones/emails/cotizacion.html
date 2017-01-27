@@ -140,7 +140,10 @@
         el {{ object.modified }} hora local y referenciada con el <strong> número de
         cotizacion {{ object.nro_cotizacion }}</strong>{% if version %} que contiene las modificaciones
         requeridas{% endif %}.
-
+    </p>
+    <p>
+        Por favor, al responder, asegurece que el correo al
+        que lo envía es {{ object.usuario.email }}.
     </p>
     <p>
         A continuación relaciono los items cotizados con sus respectivas cantidades y precios:
@@ -197,13 +200,9 @@
                     {{ item.get_unidad_item|title }}
                 </td>
                 {% if object.descuento > 0 %}
-                    {% if item.descuento > 0 %}
-                        <td>
-                            {{ item.descuento }}
-                        </td>
-                    {% else %}
-                        0
-                    {% endif %}
+                    <td>
+                        {{ item.descuento }}
+                    </td>
                 {% endif %}
                 <td>
                     {{ item.total }}
