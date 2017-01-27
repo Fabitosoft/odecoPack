@@ -480,7 +480,7 @@ class CotizacionesListView(ListView):
         current_user = self.request.user
         qsFinal = None
 
-        qs = Cotizacion.estados.activo()
+        qs = Cotizacion.estados.activo().exclude(estado='INI')
 
         if self.kwargs.get("tipo") == '2':
             qs = Cotizacion.estados.completado()
