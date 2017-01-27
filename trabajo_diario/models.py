@@ -45,12 +45,6 @@ class TrabajoDiario(TimeStampedModel):
         )
 
 
-def set_actualizar_porcentaje_trabajo_diario(sender, instance, created, **kwargs):
-    if not created:
-        trabajo_dia = instance.trabajo_diario
-        trabajo_dia.set_actualizar_seguimiento_trabajo()
-
-
 # region Bases Seguimiento Tareas
 class Seguimiento(TimeStampedModel):
     observacion = models.TextField(max_length=300)
@@ -72,6 +66,16 @@ class Tarea(TimeStampedModel):
 
     class Meta:
         abstract = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_trabajo_diario_id = self.trabajo_diario.id
+
+    def save(self, *args, **kwargs):
+        if self.__original_trabajo_diario_id == self.trabajo_diario.id:
+            print('Entro a cambiar unidades')
+            self.trabajo_diario.set_actualizar_seguimiento_trabajo()
+        super().save(*args, **kwargs)
 
 
 # endregion
@@ -104,9 +108,6 @@ class TareaCotizacion(Tarea):
         return descripcion
 
 
-post_save.connect(set_actualizar_porcentaje_trabajo_diario, sender=TareaCotizacion)
-
-
 class SeguimientoCotizacion(Seguimiento):
     tarea = models.ForeignKey(TareaCotizacion, related_name='seguimientos')
 
@@ -133,9 +134,6 @@ class TareaEnvioTCC(Tarea):
         return descripcion
 
 
-post_save.connect(set_actualizar_porcentaje_trabajo_diario, sender=TareaEnvioTCC)
-
-
 class SeguimientoEnvioTCC(Seguimiento):
     tarea = models.ForeignKey(TareaEnvioTCC, related_name='seguimientos')
 
@@ -156,9 +154,6 @@ class TareaCartera(Tarea):
         descripcion = "%s tiene la factura %s-%s" % (
             self.factura.cliente, self.factura.tipo_documento, self.factura.nro_documento)
         return descripcion
-
-
-post_save.connect(set_actualizar_porcentaje_trabajo_diario, sender=TareaCartera)
 
 
 class SeguimientoCartera(Seguimiento):

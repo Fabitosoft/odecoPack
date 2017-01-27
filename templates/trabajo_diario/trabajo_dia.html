@@ -7,72 +7,81 @@
         <div class="row">
             <div class="col-md-9">
                 <div class="row">
-                    {% if carteras.all %}
-                        <div class="col-md-6">
-                            {% include 'trabajo_diario/components/tabla_seguimiento_cartera.html' with carteras=carteras.all %}
-                        </div>
-                    {% endif %}
-                    {% if cotizaciones.all %}
-                        <div class="col-md-6">
-                            {% include 'trabajo_diario/components/tabla_seguimiento_cotizaciones.html' with cotizaciones_pendientes=cotizaciones.all %}
-                        </div>
-                    {% endif %}
-                    {% if envios_tcc.all %}
-                        <div class="col-md-6">
-                            {% include 'trabajo_diario/components/tabla_seguimiento_envios_TCC.html' with envios_pendientes=envios_tcc.all %}
-                        </div>
-                    {% endif %}
-                    {% if trabajo_diario_subalternos %}
-                        <div class="col-xs-12">
-                            <h2>Trabajo Diario Colaboradores</h2>
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                <tr>
-                                    <th>
-                                        Colaborador
-                                    </th>
-                                    <th>
-                                        Nro Tareas
-                                    </th>
-                                    <th>
-                                        Nro Tareas sin Atender
-                                    </th>
-                                    <th>
-                                        Nro Tareas Atendidas
-                                    </th>
-                                    <th>
-                                        Porcentaje Atendido
-                                    </th>
-                                </tr>
+                    {% with lista_cartera=carteras.all %}
+                        {% if lista_cartera %}
+                            <div class="col-md-6">
+                                {% include 'trabajo_diario/components/tabla_seguimiento_cartera.html' with carteras=lista_cartera %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    {% with lista_cotizaciones=cotizaciones.all %}
+                        {% if lista_cotizaciones %}
+                            <div class="col-md-6">
+                                {% include 'trabajo_diario/components/tabla_seguimiento_cotizaciones.html' with cotizaciones_pendientes=lista_cotizaciones %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    {% with lista_envios_tcc=envios_tcc.all %}
+                        {% if lista_envios_tcc %}
+                            <div class="col-md-6">
+                                {% include 'trabajo_diario/components/tabla_seguimiento_envios_TCC.html' with envios_pendientes=lista_envios_tcc %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
 
-                                </thead>
-                                <tbody>
-                                {% for subalterno in trabajo_diario_subalternos.all %}
+                    {% with lista_trabajo_diario_subalternos=trabajo_diario_subalternos.all %}
+                        {% if lista_trabajo_diario_subalternos %}
+                            <div class="col-xs-12">
+                                <h2>Trabajo Diario Colaboradores</h2>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
                                     <tr>
-                                        <td>
-                                            {{ subalterno.usuario.get_full_name }}
-                                        </td>
-                                        <td>
-                                            {{ subalterno.nro_tareas }}
-                                        </td>
-                                        <td>
-                                            {{ subalterno.nro_tareas_sin_atender }}
-                                        </td>
-                                        <td>
-                                            {{ subalterno.nro_tareas_atendidas }}
-                                        </td>
-                                        <td>
-                                            {{ subalterno.porcentaje_atendido }}
-                                        </td>
-                                        <td>
-                                            <a href="{{ subalterno.get_absolute_url }}">Ver</a>
-                                        </td>
+                                        <th>
+                                            Colaborador
+                                        </th>
+                                        <th>
+                                            Nro Tareas
+                                        </th>
+                                        <th>
+                                            Nro Tareas sin Atender
+                                        </th>
+                                        <th>
+                                            Nro Tareas Atendidas
+                                        </th>
+                                        <th>
+                                            Porcentaje Atendido
+                                        </th>
                                     </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% endif %}
+
+                                    </thead>
+                                    <tbody>
+                                    {% for subalterno in lista_trabajo_diario_subalternos %}
+                                        <tr>
+                                            <td>
+                                                {{ subalterno.usuario.get_full_name }}
+                                            </td>
+                                            <td>
+                                                {{ subalterno.nro_tareas }}
+                                            </td>
+                                            <td>
+                                                {{ subalterno.nro_tareas_sin_atender }}
+                                            </td>
+                                            <td>
+                                                {{ subalterno.nro_tareas_atendidas }}
+                                            </td>
+                                            <td>
+                                                {{ subalterno.porcentaje_atendido }}
+                                            </td>
+                                            <td>
+                                                <a href="{{ subalterno.get_absolute_url }}">Ver</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
                 </div>
             </div>
             <div class="col-md-3">

@@ -13,7 +13,7 @@
 
     </thead>
     <tbody>
-    {% for tarea in envios_pendientes.all %}
+    {% for tarea in envios_pendientes %}
         <tr>
             <td>
                 {% if tarea.estado == 0 %}

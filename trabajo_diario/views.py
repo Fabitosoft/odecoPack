@@ -132,7 +132,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
 class TareaUpdateView(PrefetchRelatedMixin, SelectRelatedMixin, UpdateView):
     template_name = 'trabajo_diario/tarea_detail.html'
     prefetch_related = ["seguimientos__usuario"]
-    select_related = ["trabajo_diario","trabajo_diario__usuario","trabajo_diario__usuario"]
+    select_related = ["trabajo_diario","trabajo_diario__usuario"]
     fields = ('estado',)
 
     def crear_nuevo_seguimiento(self, observacion, tarea, usuario):
@@ -145,7 +145,7 @@ class TareaUpdateView(PrefetchRelatedMixin, SelectRelatedMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if self.object.trabajo_diario.usuario.id == self.request.user.id:
+        if self.object.trabajo_diario.usuario_id == self.request.user.id:
             context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.object.estado})
 
         return context
