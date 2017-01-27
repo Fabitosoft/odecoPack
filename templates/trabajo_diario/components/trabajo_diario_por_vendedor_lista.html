@@ -7,15 +7,18 @@
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 {% else %}
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
-                {% endif %} <span style="color: blue">{{ tarea.descripcion }}</span>
-                {% for seguimiento in tarea.seguimientos.all|slice:":3" %}
+                {% endif %} <a href="{{ tarea.get_absolute_url }}"><span
+                    style="color: blue">{{ tarea.descripcion }}</span></a>
+                {% if tarea.seguimientos.all %}
                     <ul>
-                        <li>
-                            <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }} -
-                            <small> {{ seguimiento.created }}</small>
-                        </li>
+                        {% for seguimiento in tarea.seguimientos.all|slice:":3" %}
+                            <li>
+                                <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }} -
+                                <small> {{ seguimiento.created }}</small>
+                            </li>
+                        {% endfor %}
                     </ul>
-                {% endfor %}
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
