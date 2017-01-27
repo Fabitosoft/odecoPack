@@ -6,10 +6,12 @@
         {{ object.descripcion }}
     </p>
     <p>
-        Último Segimiento hace {{ object.modified|timesince }}
+        Último Seguimiento hace {{ object.modified|timesince }}
     </p>
     <div>
-        {% crispy observacion_form %}
+        {% if observacion_form %}
+            {% crispy observacion_form %}
+        {% endif %}
     </div>
     {% if object.seguimientos.all %}
         {% for observacion in object.seguimientos.all %}
