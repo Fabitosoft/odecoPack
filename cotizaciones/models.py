@@ -11,7 +11,7 @@ from bandas.models import Banda
 from utils.models import TimeStampedModel
 from productos.models import Producto, ArticuloCatalogo
 from listasprecios.models import FormaPago
-from biable.models import FacturasBiable, Cliente
+from biable.models import FacturasBiable, Cliente as ClienteBiable
 from geografia_colombia.models import Ciudad
 
 
@@ -85,6 +85,7 @@ class Cotizacion(TimeStampedModel):
     en_edicion = models.BooleanField(default=False)
     version = models.PositiveIntegerField(default=1)
     ciudad_despacho = models.ForeignKey(Ciudad, null=True, blank=True)
+    #cliente_biable = models.ForeignKey(ClienteBiable, null=True, blank=True)
 
     estados = CotizacionesEstadosManager()
     objects = models.Manager()
