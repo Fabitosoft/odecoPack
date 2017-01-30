@@ -644,6 +644,7 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
             i["total_cotizaciones"] = int(i["total_cotizaciones"])
             i["descuentos_cotizaciones"] = int(i["descuentos_cotizaciones"])
             i["facturacion"] = int(i["facturacion"])
+            i["nro_ventas"] = int(i["nro_ventas"])
         context["lista"] = lista
         return self.render_json_response(context)
 
@@ -663,21 +664,20 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
             nro_cotizaciones=Count('id'),
             total_cotizaciones=Sum('total'),
             descuentos_cotizaciones=Sum('descuento'),
+            nro_ventas=Value(0,output_field=IntegerField()),
             facturacion=Value(0,output_field=IntegerField()),
             vendedor__colaborador__usuario=Value(0,output_field=IntegerField()),
 
         ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano).order_by('fecha_envio', 'dia_semana_consulta')
 
         qsFacturacion = MovimientoVentaBiable.objects.values('vendedor__colaborador__usuario').annotate(
-            usuario=Value(0,output_field=IntegerField()),
             vendedor=Concat('vendedor__colaborador__usuario__user__first_name', Value(' '),
                             'vendedor__colaborador__usuario__user__last_name'),
             ano_consulta=F('year'),
             mes_consulta=F('month'),
             dia_consulta=F('day'),
-            dia_semana_consulta=Value(0,output_field=IntegerField()),
-            hora_consulta=Value(0,output_field=IntegerField()),
             nro_cotizaciones=Value(0,output_field=IntegerField()),
+            nro_ventas=Count('id'),
             total_cotizaciones=Value(0,output_field=IntegerField()),
             descuentos_cotizaciones=Value(0,output_field=IntegerField()),
             facturacion=Sum('venta_neto'),

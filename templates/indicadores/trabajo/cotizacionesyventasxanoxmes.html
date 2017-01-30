@@ -51,7 +51,7 @@
                 'meses': meses
             };
             $.post(".", data, function (data) {
-                $('#hora_actualizacion').text("("+data.fecha_actualizacion+")");
+                $('#hora_actualizacion').text("(" + data.fecha_actualizacion + ")");
 
                 // pivot grid options
                 $('#tabla_pv').empty();
@@ -114,11 +114,20 @@
                                     return value;
                                 }
                             }
+                        },
+                        {
+                            name: 'nro_ventas', caption: 'Nro Ventas',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value;
+                                }
+                            }
                         }
                     ],
-                    rows: ['vendedor','ano_consulta','dia_consulta'],
+                    rows: ['vendedor', 'ano_consulta', 'dia_consulta'],
                     columns: ['mes_consulta'],
-                    data: ['total_cotizaciones', 'nro_cotizaciones']
+                    data: ['total_cotizaciones', 'nro_cotizaciones', 'facturacion', 'nro_ventas']
                 };
 
                 // instantiate and show the pivot grid
