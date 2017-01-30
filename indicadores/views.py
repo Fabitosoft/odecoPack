@@ -656,11 +656,13 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
             ano_consulta=Extract('fecha_envio', 'year'),
             mes_consulta=Extract('fecha_envio', 'month'),
             dia_consulta=Extract('fecha_envio', 'day'),
+            dia_semana_consulta=Extract('fecha_envio', 'week_day'),
+            hora_consulta=Extract('fecha_envio', 'hour'),
             nro_cotizaciones=Count('id'),
             total_cotizaciones=Sum('total'),
             descuentos_cotizaciones=Sum('descuento')
 
-        ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano)
+        ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano).order_by('fecha_envio')
 
         print(qsCotizacion.all())
         return qsCotizacion

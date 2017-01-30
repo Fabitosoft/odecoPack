@@ -77,6 +77,8 @@
                         {name: 'mes_consulta', caption: 'Mes'},
                         {name: 'ano_consulta', caption: 'Año'},
                         {name: 'dia_consulta', caption: 'Día'},
+                        {name: 'hora_consulta', caption: 'Hora'},
+                        {name: 'dia_semana_consulta', caption: 'Dia Semana'},
                         {
                             name: 'descuentos_cotizaciones', caption: 'Descuentos',
                             dataSettings: {
@@ -105,8 +107,8 @@
                             }
                         }
                     ],
-                    rows: ['vendedor','mes_consulta','ano_consulta'],
-                    columns: ['dia_consulta'],
+                    rows: ['vendedor','ano_consulta','dia_consulta'],
+                    columns: ['mes_consulta'],
                     data: ['total_cotizaciones', 'nro_cotizaciones']
                 };
 
