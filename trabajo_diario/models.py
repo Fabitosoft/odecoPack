@@ -75,10 +75,9 @@ class Tarea(TimeStampedModel):
             self.__original_trabajo_diario = None
 
     def save(self, *args, **kwargs):
-        if self.__original_trabajo_diario:
-            if self.__original_trabajo_diario_id == self.trabajo_diario.id:
-                super().save(*args, **kwargs)
-                self.trabajo_diario.set_actualizar_seguimiento_trabajo()
+        if self.__original_trabajo_diario_id == self.trabajo_diario.id:
+            super().save(*args, **kwargs)
+            self.trabajo_diario.set_actualizar_seguimiento_trabajo()
 
 
 # endregion
