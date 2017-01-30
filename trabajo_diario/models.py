@@ -69,13 +69,10 @@ class Tarea(TimeStampedModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.trabajo_diario:
-            self.__original_trabajo_diario_id = self.trabajo_diario.id
-        else:
-            self.__original_trabajo_diario_id = None
+        self.__original_trabajo_diario = self.trabajo_diario
 
     def save(self, *args, **kwargs):
-        if self.__original_trabajo_diario_id == self.trabajo_diario.id:
+        if self.__original_trabajo_diario == self.trabajo_diario:
             super().save(*args, **kwargs)
             self.trabajo_diario.set_actualizar_seguimiento_trabajo()
 
