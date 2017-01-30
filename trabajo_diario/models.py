@@ -69,10 +69,10 @@ class Tarea(TimeStampedModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        try:
+        if self.trabajo_diario:
             self.__original_trabajo_diario_id = self.trabajo_diario.id
-        except TrabajoDiario.DoesNotExist:
-            self.__original_trabajo_diario = None
+        else:
+            self.__original_trabajo_diario_id = None
 
     def save(self, *args, **kwargs):
         if self.__original_trabajo_diario_id == self.trabajo_diario.id:
