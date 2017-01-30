@@ -632,6 +632,7 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
+        usuario = self.request.user
         ultima_actualizacion = self.get_ultima_actualizacion()
         if ultima_actualizacion:
             context["fecha_actualizacion"] = ultima_actualizacion
@@ -639,15 +640,16 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
         ano = self.request.POST.getlist('anos[]')
         mes = self.request.POST.getlist('meses[]')
 
-        qs = self.consulta(ano, mes)
-        lista = qs
-        for i in lista:
-            i["nro_cotizaciones"] = int(i["nro_cotizaciones"])
-            i["total_cotizaciones"] = int(i["total_cotizaciones"])
-            i["descuentos_cotizaciones"] = int(i["descuentos_cotizaciones"])
-            i["facturacion"] = int(i["facturacion"])
-            i["nro_ventas"] = int(i["nro_ventas"])
-        context["lista"] = lista
+        if usuario.has_perm('biable.reporte_ventas_todos_vendedores'):
+            qs = self.consulta(ano, mes)
+            lista = qs
+            for i in lista:
+                i["nro_cotizaciones"] = int(i["nro_cotizaciones"])
+                i["total_cotizaciones"] = int(i["total_cotizaciones"])
+                i["descuentos_cotizaciones"] = int(i["descuentos_cotizaciones"])
+                i["facturacion"] = int(i["facturacion"])
+                i["nro_ventas"] = int(i["nro_ventas"])
+            context["lista"] = lista
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
