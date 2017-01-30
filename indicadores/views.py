@@ -12,7 +12,8 @@ from biable.models import (
     MovimientoVentaBiable,
     Actualizacion,
     LineaVendedorBiable,
-    Cartera
+    Cartera,
+    FacturasBiable
 )
 
 from usuarios.models import Colaborador
@@ -664,22 +665,22 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
             nro_cotizaciones=Count('id'),
             total_cotizaciones=Sum('total'),
             descuentos_cotizaciones=Sum('descuento'),
-            nro_ventas=Value(0,output_field=IntegerField()),
-            facturacion=Value(0,output_field=IntegerField()),
-            vendedor__colaborador__usuario=Value(0,output_field=IntegerField()),
+            nro_ventas=Value(0, output_field=IntegerField()),
+            facturacion=Value(0, output_field=IntegerField()),
+            vendedor__colaborador__usuario=Value(0, output_field=IntegerField()),
 
         ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano).order_by('fecha_envio', 'dia_semana_consulta')
 
-        qsFacturacion = MovimientoVentaBiable.objects.values('vendedor__colaborador__usuario').annotate(
+        qsFacturacion = FacturasBiable.objects.values('vendedor__colaborador__usuario').annotate(
             vendedor=Concat('vendedor__colaborador__usuario__user__first_name', Value(' '),
                             'vendedor__colaborador__usuario__user__last_name'),
             ano_consulta=F('year'),
             mes_consulta=F('month'),
             dia_consulta=F('day'),
-            nro_cotizaciones=Value(0,output_field=IntegerField()),
+            nro_cotizaciones=Value(0, output_field=IntegerField()),
             nro_ventas=Count('id'),
-            total_cotizaciones=Value(0,output_field=IntegerField()),
-            descuentos_cotizaciones=Value(0,output_field=IntegerField()),
+            total_cotizaciones=Value(0, output_field=IntegerField()),
+            descuentos_cotizaciones=Value(0, output_field=IntegerField()),
             facturacion=Sum('venta_neto'),
         ).filter(month__in=mes, year__in=ano)
 
