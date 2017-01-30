@@ -2,6 +2,7 @@ import json
 from braces.views import SelectRelatedMixin
 from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F, Q, Value, IntegerField
 from django.db.models.functions import Concat, Extract
+from django.db.models.functions import Upper
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView
 from django.contrib.auth.models import User
@@ -650,13 +651,8 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        current_user = self.request.user
-        qsFinal = None
-        print(ano)
-        print(mes)
-
         qsCotizacion = Cotizacion.objects.values('usuario').annotate(
-            vendedor=Concat('usuario__first_name', Value(' '), 'usuario__last_name'),
+            vendedor=Upper(Concat('usuario__first_name', Value(' '), 'usuario__last_name')),
             ano_consulta=Extract('fecha_envio', 'year'),
             mes_consulta=Extract('fecha_envio', 'month'),
             dia_consulta=Extract('fecha_envio', 'day'),
@@ -672,8 +668,12 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
         ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano).order_by('fecha_envio', 'dia_semana_consulta')
 
         qsFacturacion = FacturasBiable.objects.values('vendedor__colaborador__usuario').annotate(
-            vendedor=Concat('vendedor__colaborador__usuario__user__first_name', Value(' '),
-                            'vendedor__colaborador__usuario__user__last_name'),
+            vendedor=Upper(Case(
+                When(vendedor__colaborador__isnull=True, then=F('vendedor__nombre')),
+                default=Concat('vendedor__colaborador__usuario__user__first_name', Value(' '),
+                               'vendedor__colaborador__usuario__user__last_name'),
+                output_field=CharField(),
+            )),
             ano_consulta=F('year'),
             mes_consulta=F('month'),
             dia_consulta=F('day'),
