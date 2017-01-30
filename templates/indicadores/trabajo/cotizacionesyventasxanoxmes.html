@@ -89,6 +89,15 @@
                             }
                         },
                         {
+                            name: 'facturacion', caption: 'Facturacion',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
                             name: 'total_cotizaciones', caption: 'Total',
                             dataSettings: {
                                 aggregateFunc: 'sum',

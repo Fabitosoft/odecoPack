@@ -1,9 +1,10 @@
 import json
 from braces.views import SelectRelatedMixin
-from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F, Q, Value
+from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F, Q, Value, IntegerField
 from django.db.models.functions import Concat, Extract
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView
+from django.contrib.auth.models import User
 
 from braces.views import JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
 
@@ -637,11 +638,12 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
         mes = self.request.POST.getlist('meses[]')
 
         qs = self.consulta(ano, mes)
-        lista = list(qs)
+        lista = qs
         for i in lista:
             i["nro_cotizaciones"] = int(i["nro_cotizaciones"])
             i["total_cotizaciones"] = int(i["total_cotizaciones"])
             i["descuentos_cotizaciones"] = int(i["descuentos_cotizaciones"])
+            i["facturacion"] = int(i["facturacion"])
         context["lista"] = lista
         return self.render_json_response(context)
 
@@ -660,9 +662,30 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
             hora_consulta=Extract('fecha_envio', 'hour'),
             nro_cotizaciones=Count('id'),
             total_cotizaciones=Sum('total'),
-            descuentos_cotizaciones=Sum('descuento')
+            descuentos_cotizaciones=Sum('descuento'),
+            facturacion=Value(0,output_field=IntegerField()),
+            vendedor__colaborador__usuario=Value(0,output_field=IntegerField()),
 
-        ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano).order_by('fecha_envio')
+        ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano).order_by('fecha_envio', 'dia_semana_consulta')
 
-        print(qsCotizacion.all())
-        return qsCotizacion
+        qsFacturacion = MovimientoVentaBiable.objects.values('vendedor__colaborador__usuario').annotate(
+            usuario=Value(0,output_field=IntegerField()),
+            vendedor=Concat('vendedor__colaborador__usuario__user__first_name', Value(' '),
+                            'vendedor__colaborador__usuario__user__last_name'),
+            ano_consulta=F('year'),
+            mes_consulta=F('month'),
+            dia_consulta=F('day'),
+            dia_semana_consulta=Value(0,output_field=IntegerField()),
+            hora_consulta=Value(0,output_field=IntegerField()),
+            nro_cotizaciones=Value(0,output_field=IntegerField()),
+            total_cotizaciones=Value(0,output_field=IntegerField()),
+            descuentos_cotizaciones=Value(0,output_field=IntegerField()),
+            facturacion=Sum('venta_neto'),
+        ).filter(day__in=mes, year__in=ano)
+
+        uno = list(qsCotizacion)
+        dos = list(qsFacturacion)
+        tres = []
+        tres.extend(uno)
+        tres.extend(dos)
+        return tres
