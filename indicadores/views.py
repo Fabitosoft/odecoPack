@@ -681,7 +681,7 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
             total_cotizaciones=Value(0,output_field=IntegerField()),
             descuentos_cotizaciones=Value(0,output_field=IntegerField()),
             facturacion=Sum('venta_neto'),
-        ).filter(day__in=mes, year__in=ano)
+        ).filter(month__in=mes, year__in=ano)
 
         uno = list(qsCotizacion)
         dos = list(qsFacturacion)
