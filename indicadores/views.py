@@ -1,9 +1,7 @@
 import json
 from braces.views import SelectRelatedMixin
-from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F
-from django.db.models import Q
-from django.db.models import Value
-from django.db.models.functions import Concat
+from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F, Q, Value
+from django.db.models.functions import Concat, Extract
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.views.generic import TemplateView, ListView
 
@@ -17,6 +15,7 @@ from biable.models import (
 )
 
 from usuarios.models import Colaborador
+from cotizaciones.models import Cotizacion
 
 
 # from crm.models import VtigerCrmentity, VtigerAccountscf
@@ -50,7 +49,8 @@ class FechaActualizacionMovimientoVentasMixin(object):
         return None
 
 
-class VentasVendedor(LoginRequiredMixin,SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+class VentasVendedor(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin,
+                     InformeVentasConAnoMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxvendedor.html'
     select_related = [u"vendedor"]
@@ -127,7 +127,8 @@ class VentasVendedor(LoginRequiredMixin,SelectRelatedMixin, JSONResponseMixin, A
         return qsFinal.order_by('-vendedor__activo')
 
 
-class VentasVendedorConsola(LoginRequiredMixin,SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+class VentasVendedorConsola(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin,
+                            InformeVentasConAnoMixin,
                             FechaActualizacionMovimientoVentasMixin,
                             TemplateView):
     template_name = 'indicadores/venta/consolaxventasxvendedor.html'
@@ -182,7 +183,8 @@ class VentasVendedorConsola(LoginRequiredMixin,SelectRelatedMixin, JSONResponseM
         return qsFinal
 
 
-class VentasClientes(LoginRequiredMixin,JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+class VentasClientes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                     InformeVentasConLineaMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxcliente.html'
 
@@ -242,7 +244,8 @@ class VentasClientes(LoginRequiredMixin,JSONResponseMixin, AjaxResponseMixin, In
         return qs
 
 
-class VentasClientesAno(LoginRequiredMixin,JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+class VentasClientesAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                        InformeVentasConLineaMixin,
                         FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxclientexano.html'
 
@@ -302,7 +305,8 @@ class VentasClientesAno(LoginRequiredMixin,JSONResponseMixin, AjaxResponseMixin,
         return qs
 
 
-class VentasMes(LoginRequiredMixin,JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin, InformeVentasConAnoMixin,
+class VentasMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConLineaMixin,
+                InformeVentasConAnoMixin,
                 FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxmes.html'
 
@@ -341,7 +345,8 @@ class VentasMes(LoginRequiredMixin,JSONResponseMixin, AjaxResponseMixin, Informe
         return qs
 
 
-class VentasLineaAno(LoginRequiredMixin,JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin, InformeVentasConLineaMixin,
+class VentasLineaAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+                     InformeVentasConLineaMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxlineaxano.html'
 
@@ -615,3 +620,47 @@ class CarteraVencimientos(JSONResponseMixin, ListView):
                                       cls=self.json_encoder_class,
                                       **self.get_json_dumps_kwargs()).encode('utf-8')
         return context
+
+
+class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin,
+                                           InformeVentasConAnoMixin,
+                                           FechaActualizacionMovimientoVentasMixin, TemplateView):
+    template_name = 'indicadores/trabajo/cotizacionesyventasxanoxmes.html'
+
+    def post_ajax(self, request, *args, **kwargs):
+        context = {}
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
+
+        ano = self.request.POST.getlist('anos[]')
+        mes = self.request.POST.getlist('meses[]')
+
+        qs = self.consulta(ano, mes)
+        lista = list(qs)
+        for i in lista:
+            i["nro_cotizaciones"] = int(i["nro_cotizaciones"])
+            i["total_cotizaciones"] = int(i["total_cotizaciones"])
+            i["descuentos_cotizaciones"] = int(i["descuentos_cotizaciones"])
+        context["lista"] = lista
+        return self.render_json_response(context)
+
+    def consulta(self, ano, mes):
+        current_user = self.request.user
+        qsFinal = None
+        print(ano)
+        print(mes)
+
+        qsCotizacion = Cotizacion.objects.values('usuario').annotate(
+            vendedor=Concat('usuario__first_name', Value(' '), 'usuario__last_name'),
+            ano_consulta=Extract('fecha_envio', 'year'),
+            mes_consulta=Extract('fecha_envio', 'month'),
+            dia_consulta=Extract('fecha_envio', 'day'),
+            nro_cotizaciones=Count('id'),
+            total_cotizaciones=Sum('total'),
+            descuentos_cotizaciones=Sum('descuento')
+
+        ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano)
+
+        print(qsCotizacion.all())
+        return qsCotizacion
