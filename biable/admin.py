@@ -1,5 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
+from import_export import resources
 
 from biable.models import (
     VendedorBiable,
@@ -14,10 +15,17 @@ from biable.models import (
 
 # Register your models here.
 
+class ItemResource(resources.ModelResource):
+
+    class Meta:
+        model = ItemsBiable
+        import_id_fields = ('id_item',)
+
 class ItemsBiableAdmin(ImportExportModelAdmin):
     list_display = (
         'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
         'unidad_medida_inventario', 'id_procedencia')
+    resource_class = ItemResource
     # readonly_fields = (
     #     'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
     #     'unidad_medida_inventario', 'id_procedencia')
