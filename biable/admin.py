@@ -26,9 +26,9 @@ class ItemsBiableAdmin(ImportExportModelAdmin):
         'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
         'unidad_medida_inventario', 'id_procedencia')
     resource_class = ItemResource
-    # readonly_fields = (
-    #     'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
-    #     'unidad_medida_inventario', 'id_procedencia')
+    readonly_fields = (
+        'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
+        'unidad_medida_inventario', 'id_procedencia')
 
     search_fields = ('id_item', 'id_referencia', 'descripcion', 'descripcion_dos')
 
