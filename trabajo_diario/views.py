@@ -38,14 +38,18 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         usuario = self.request.user
         fecha_hoy = timezone.localtime(timezone.now()).date()
+        print(fecha_hoy)
 
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
             try:
+                print('entro a existe')
                 trabajo_diario = TrabajoDiario.objects.get(created__date=fecha_hoy, usuario=usuario)
             except TrabajoDiario.DoesNotExist:
+                print('entro a no existe')
                 trabajo_diario = None
 
             if not trabajo_diario:
+                print('entro trabajo diario')
                 trabajo_diario = TrabajoDiario()
                 trabajo_diario.usuario = usuario
                 trabajo_diario.save()
@@ -147,7 +151,6 @@ class TareaUpdateView(PrefetchRelatedMixin, SelectRelatedMixin, UpdateView):
 
         if self.object.trabajo_diario.usuario_id == self.request.user.id:
             context["observacion_form"] = SeguimientoTareaForm(initial={'estado': self.object.estado})
-
         return context
 
     def post(self, request, *args, **kwargs):
@@ -157,6 +160,7 @@ class TareaUpdateView(PrefetchRelatedMixin, SelectRelatedMixin, UpdateView):
         observacion = request.POST.get('observacion')
         if observacion:
             seguimiento = self.crear_nuevo_seguimiento(observacion, self.object, self.request.user)
+            print('entro')
             seguimiento.save()
 
         if estado != self.object.estado:

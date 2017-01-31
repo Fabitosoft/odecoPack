@@ -15,6 +15,8 @@ class ItemsBiable(models.Model):
     descripcion_dos = models.CharField(max_length=40)
     activo = models.BooleanField(default=True)
     nombre_tercero = models.CharField(max_length=120)
+    categoria_mercadeo = models.CharField(max_length=120, null=True, blank=True)
+    categoria_mercadeo_dos = models.CharField(max_length=120, null=True, blank=True)
     desc_item_padre = models.CharField(max_length=40)
     unidad_medida_inventario = models.CharField(max_length=6)
     id_procedencia = models.CharField(max_length=1)

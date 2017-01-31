@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
 from biable.models import (
     VendedorBiable,
@@ -13,7 +14,7 @@ from biable.models import (
 
 # Register your models here.
 
-class ItemsBiableAdmin(admin.ModelAdmin):
+class ItemsBiableAdmin(ImportExportModelAdmin):
     list_display = (
         'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
         'unidad_medida_inventario', 'id_procedencia')

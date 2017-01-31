@@ -85,12 +85,12 @@ if 'test' in sys.argv:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': get_secret("DATABASE2","ENGINE"),
-            'NAME': get_secret("DATABASE2","NAME"),
-            'USER': get_secret("DATABASE2","USER"),
-            'PASSWORD': get_secret("DATABASE2","PASSWORD"),
-            'HOST': get_secret("DATABASE2","HOST"),
-            'PORT': get_secret("DATABASE2","PORT"),
+            'ENGINE': get_secret("DATABASE_LOCAL","ENGINE"),
+            'NAME': get_secret("DATABASE_LOCAL","NAME"),
+            'USER': get_secret("DATABASE_LOCAL","USER"),
+            'PASSWORD': get_secret("DATABASE_LOCAL","PASSWORD"),
+            'HOST': get_secret("DATABASE_LOCAL","HOST"),
+            'PORT': get_secret("DATABASE_LOCAL","PORT"),
             'OPTIONS': {
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             }
