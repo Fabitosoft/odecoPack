@@ -9,8 +9,8 @@ from biable.models import (
     FacturasBiable,
     ItemsBiable,
     Cartera,
-    MovimientoVentaBiable
-)
+    MovimientoVentaBiable,
+    DepartamentoBiable, PaisBiable, CiudadBiable)
 
 
 # Register your models here.
@@ -123,6 +123,23 @@ class CarteraAdmin(admin.ModelAdmin):
     list_filter = ('tipo_documento', 'esta_vencido')
 
 
+class DepartamentoAdmin(admin.ModelAdmin):
+    list_select_related = ('pais',)
+    list_display = ('nombre', 'pais')
+    list_filter = ('pais',)
+    search_fields = ('nombre', 'pais__nombre')
+
+
+class CiudadAdmin(admin.ModelAdmin):
+    list_select_related = ('departamento',)
+    list_display = ('nombre', 'departamento')
+    list_filter = ('departamento', 'departamento__pais')
+    search_fields = ('nombre', 'departamento__nombre')
+
+
+admin.site.register(DepartamentoBiable, DepartamentoAdmin)
+admin.site.register(PaisBiable)
+admin.site.register(CiudadBiable, CiudadAdmin)
 admin.site.register(Cliente, ClienteBiableAdmin)
 admin.site.register(VendedorBiable, VendedorBiableAdmin)
 admin.site.register(LineaVendedorBiable)

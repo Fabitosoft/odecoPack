@@ -8,6 +8,45 @@ from usuarios.models import UserExtended, Colaborador
 
 
 # Create your models here.
+
+class PaisBiable(models.Model):
+    pais_id = models.PositiveIntegerField(primary_key=True)
+    nombre = models.CharField(max_length=120)
+
+    class Meta:
+        verbose_name = 'País'
+        verbose_name_plural = 'C-0.1 Paises'
+
+    def __str__(self):
+        return self.nombre
+
+
+class DepartamentoBiable(models.Model):
+    departamento_id = models.PositiveIntegerField(primary_key=True)
+    nombre = models.CharField(max_length=120)
+    pais = models.ForeignKey(PaisBiable)
+
+    class Meta:
+        verbose_name = 'Departamento'
+        verbose_name_plural = 'C-0.2 Departamentos'
+
+    def __str__(self):
+        return self.nombre
+
+
+class CiudadBiable(models.Model):
+    ciudad_id = models.PositiveIntegerField(primary_key=True)
+    nombre = models.CharField(max_length=120)
+    departamento = models.ForeignKey(DepartamentoBiable)
+
+    class Meta:
+        verbose_name = 'Ciudad'
+        verbose_name_plural = 'C-0.3 Ciudades'
+
+    def __str__(self):
+        return self.nombre
+
+
 class ItemsBiable(models.Model):
     id_item = models.PositiveIntegerField(primary_key=True)
     id_referencia = models.CharField(max_length=20)
@@ -33,6 +72,10 @@ class ItemsBiable(models.Model):
     unidad_medida_inventario = models.CharField(max_length=6)
     id_procedencia = models.CharField(max_length=1)
 
+    class Meta:
+        verbose_name = 'Item'
+        verbose_name_plural = 'C-2.1 Items'
+
     def __str__(self):
         return self.descripcion
 
@@ -40,6 +83,10 @@ class ItemsBiable(models.Model):
 class Cliente(TimeStampedModel):
     nit = models.CharField(max_length=20, primary_key=True)
     nombre = models.CharField(max_length=120)
+
+    class Meta:
+        verbose_name = 'Cliente'
+        verbose_name_plural = 'C-1.1 Clientes'
 
     def __str__(self):
         return self.nombre
@@ -80,6 +127,10 @@ class Actualizacion(models.Model):
 class LineaVendedorBiable(models.Model):
     nombre = models.CharField(max_length=120)
 
+    class Meta:
+        verbose_name = 'Linea Vendedor CGUno'
+        verbose_name_plural = 'I-0.1 Lineas Vendedor CGUno'
+
     def __str__(self):
         return self.nombre
 
@@ -91,6 +142,10 @@ class VendedorBiable(models.Model):
     activo = models.BooleanField(default=True)
     colaborador = models.ForeignKey(Colaborador, null=True, blank=True, on_delete=models.PROTECT,
                                     related_name='mi_vendedor_biable')
+
+    class Meta:
+        verbose_name = 'Vendedor'
+        verbose_name_plural = 'C-1.2 Vendedores'
 
     def __str__(self):
         return self.nombre
@@ -132,6 +187,8 @@ class MovimientoVentaBiable(models.Model):
             ('reporte_ventas_10', 'R Vent Pro Año Mes'),
             ('reporte_ventas_todos_vendedores', 'R Vent Vend Todos'),
         )
+        verbose_name = 'Movimiento Venta'
+        verbose_name_plural = 'T-0.2 Movimiento Ventas'
 
 
 class Cartera(models.Model):
@@ -162,6 +219,8 @@ class Cartera(models.Model):
             ('ver_carteras', 'R Cart. Vcto'),
             ('ver_carteras_todos', 'R Cart. Vcto Todos'),
         )
+        verbose_name = 'Cartera'
+        verbose_name_plural = 'T-0.3 Carteras'
 
 
 class FacturasBiable(TimeStampedModel):
@@ -189,3 +248,5 @@ class FacturasBiable(TimeStampedModel):
         permissions = (
             ('ver_info_admon_ventas', 'Ver Info Admon Factura'),
         )
+        verbose_name = 'Factura'
+        verbose_name_plural = 'T-0.1 Facturas'
