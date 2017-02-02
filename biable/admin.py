@@ -63,6 +63,7 @@ class ItemsBiableAdmin(ImportExportModelAdmin):
     )
 
     list_filter = (
+        'nombre_tercero',
         'activo',
         'id_procedencia',
         'serie',
