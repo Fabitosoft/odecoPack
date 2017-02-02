@@ -68,8 +68,6 @@ class ItemsBiableAdmin(ImportExportModelAdmin):
         'serie',
         'linea',
         'categoria_mercadeo',
-        'categoria_mercadeo_dos',
-        'categoria_mercadeo_tres',
     )
 
 
