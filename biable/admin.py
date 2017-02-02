@@ -55,6 +55,7 @@ class ItemsBiableAdmin(ImportExportModelAdmin):
         'id_referencia',
         'descripcion',
         'descripcion_dos',
+        'nombre_tercero',
         'serie',
         'linea',
         'categoria_mercadeo',
