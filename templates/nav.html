@@ -65,11 +65,18 @@
                             {% if perms.biable.reporte_ventas_2 %}
                                 <li><a href="{% url 'indicadores:consolaventas' %}">Consola de Ventas</a></li>
                             {% endif %}
+
+                            {% if perms.biable.reporte_ventas_10 %}
+                                <li><a href="{% url 'indicadores:ventasxproductoxanoxmes' %}">Ventas x Producto x Año x
+                                    Mes</a></li>
+                            {% endif %}
+
                             {% if perms.biable.ver_carteras_todos or perms.biable.ver_carteras %}
                                 <li><a href="{% url 'indicadores:cartera_vencimientos' %}">Cartera Vencimientos</a></li>
                             {% endif %}
                             {% if perms.biable.reporte_ventas_todos_vendedores %}
-                                <li><a href="{% url 'indicadores:cotizacion_venta_vendedorxanoxmes' %}">Cotizaciones vs Ventas</a></li>
+                                <li><a href="{% url 'indicadores:cotizacion_venta_vendedorxanoxmes' %}">Cotizaciones vs
+                                    Ventas</a></li>
                             {% endif %}
 
                         </ul>

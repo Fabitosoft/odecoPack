@@ -37,8 +37,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         usuario = self.request.user
-        fecha_hoy = timezone.localtime(timezone.now()).date()
-        print(fecha_hoy)
+        fecha_hoy = timezone.now().date()
 
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
             try:
@@ -136,7 +135,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
 class TareaUpdateView(PrefetchRelatedMixin, SelectRelatedMixin, UpdateView):
     template_name = 'trabajo_diario/tarea_detail.html'
     prefetch_related = ["seguimientos__usuario"]
-    select_related = ["trabajo_diario","trabajo_diario__usuario"]
+    select_related = ["trabajo_diario", "trabajo_diario__usuario"]
     fields = ('estado',)
 
     def crear_nuevo_seguimiento(self, observacion, tarea, usuario):

@@ -5,7 +5,6 @@ from django.db.models.functions import Concat, Extract
 from django.db.models.functions import Upper
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView
-from django.contrib.auth.models import User
 
 from braces.views import JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
 
@@ -692,3 +691,54 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
         tres.extend(uno)
         tres.extend(dos)
         return tres
+
+
+class VentasProductoAnoMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin,
+                           InformeVentasConAnoMixin,
+                           FechaActualizacionMovimientoVentasMixin, TemplateView):
+    template_name = 'indicadores/venta/ventaxproductoxanoxmes.html'
+
+    def post_ajax(self, request, *args, **kwargs):
+        context = {}
+        usuario = self.request.user
+        ultima_actualizacion = self.get_ultima_actualizacion()
+        if ultima_actualizacion:
+            context["fecha_actualizacion"] = ultima_actualizacion
+
+        ano = self.request.POST.getlist('anos[]')
+        mes = self.request.POST.getlist('meses[]')
+
+        if usuario.has_perm('biable.reporte_ventas_todos_vendedores'):
+            qs = self.consulta(ano, mes)
+            lista = list(qs)
+            for i in lista:
+                i["venta_neta"] = int(i["venta_neta"])
+                i["cantidad_neta"] = int(i["cantidad_neta"])
+            context["lista"] = lista
+        return self.render_json_response(context)
+
+    def consulta(self, ano, mes):
+        qFinal = MovimientoVentaBiable.objects.values(
+            'year',
+            'month',
+            'item_biable__descripcion',
+            'item_biable__descripcion_dos',
+            'item_biable__categoria_mercadeo',
+            'item_biable__categoria_mercadeo_dos',
+            'item_biable__categoria_mercadeo_tres',
+            'item_biable__serie',
+            'item_biable__id_item',
+            'vendedor__linea_ventas__nombre',
+            'factura__cliente__nombre'
+        ).annotate(
+            vendedor=Upper(Case(
+                When(vendedor__colaborador__isnull=True, then=F('vendedor__nombre')),
+                default=Concat('vendedor__colaborador__usuario__user__first_name', Value(' '),
+                               'vendedor__colaborador__usuario__user__last_name'),
+                output_field=CharField(),
+            )),
+            venta_neta=Sum('venta_neto'),
+            cantidad_neta=Sum('cantidad'),
+        ).filter(year__in=ano, month__in=mes)
+        print(qFinal)
+        return qFinal

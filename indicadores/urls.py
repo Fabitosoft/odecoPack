@@ -11,8 +11,8 @@ from .views import (
     VentasVendedorMes,
     VentasVendedorConsola,
     CarteraVencimientos,
-    TrabajoCotizacionVentaVendedorAnoMes
-)
+    TrabajoCotizacionVentaVendedorAnoMes,
+    VentasProductoAnoMes)
 
 urlpatterns = [
     url(r'^ventxvend/', VentasVendedor.as_view(), name='ventasxvendedor'),
@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^ventxlineaxano/', VentasLineaAno.as_view(), name='ventasxlineaxano'),
     url(r'^ventxlineaxanoxmes/', VentasLineaAnoMes.as_view(), name='ventasxlineaxanoxmes'),
     url(r'^ventxvendxmes/', VentasVendedorMes.as_view(), name='ventasxvendedorxmes'),
+    url(r'^ventxproduxmesxano/', VentasProductoAnoMes.as_view(), name='ventasxproductoxanoxmes'),
     url(r'^consola_ventas/', VentasVendedorConsola.as_view(), name='consolaventas'),
     url(r'^cartera_vencimientos/', CarteraVencimientos.as_view(), name='cartera_vencimientos'),
     url(r'^cotizacion_venta_vendedorxanoxmes/', TrabajoCotizacionVentaVendedorAnoMes.as_view(), name='cotizacion_venta_vendedorxanoxmes'),

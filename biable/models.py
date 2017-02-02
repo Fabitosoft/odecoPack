@@ -129,6 +129,7 @@ class MovimientoVentaBiable(models.Model):
             ('reporte_ventas_7', 'R Vent Lin Año Mes'),
             ('reporte_ventas_8', 'R Vent Mes'),
             ('reporte_ventas_9', 'R Vent Vend Mes'),
+            ('reporte_ventas_10', 'R Vent Pro Año Mes'),
             ('reporte_ventas_todos_vendedores', 'R Vent Vend Todos'),
         )
 

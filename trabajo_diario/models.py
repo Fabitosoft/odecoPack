@@ -12,7 +12,9 @@ from biable.models import FacturasBiable
 
 # Create your models here.
 
-class TrabajoDiario(TimeStampedModel):
+class TrabajoDiario(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
     usuario = models.ForeignKey(User)
     nro_tareas = models.PositiveIntegerField(default=0)
     nro_tareas_sin_atender = models.PositiveIntegerField(default=0)
