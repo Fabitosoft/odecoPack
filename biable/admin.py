@@ -126,7 +126,7 @@ class CarteraAdmin(admin.ModelAdmin):
 class PaisAdmin(admin.ModelAdmin):
     list_display = ('nombre',)
     search_fields = ('nombre',)
-    readonly_fields = ('nombre',)
+    readonly_fields = ('nombre','pais_id')
 
 
 class DepartamentoAdmin(admin.ModelAdmin):
@@ -134,7 +134,7 @@ class DepartamentoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'pais',)
     list_filter = ('pais',)
     search_fields = ('nombre', 'pais__nombre',)
-    readonly_fields = ('nombre', 'pais',)
+    readonly_fields = ('nombre', 'pais','departamento_id')
 
 
 class CiudadAdmin(admin.ModelAdmin):
@@ -144,7 +144,7 @@ class CiudadAdmin(admin.ModelAdmin):
     search_fields = ('nombre', 'departamento__nombre', 'ciudad_intranet__nombre')
     list_editable = ('ciudad_intranet',)
     raw_id_fields = ('ciudad_intranet',)
-    readonly_fields = ('nombre', 'departamento', 'ciudad_intranet')
+    readonly_fields = ('nombre', 'departamento', 'ciudad_intranet','ciudad_id')
 
 
 
