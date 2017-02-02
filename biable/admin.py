@@ -124,20 +124,15 @@ class CarteraAdmin(admin.ModelAdmin):
 
 
 class PaisAdmin(admin.ModelAdmin):
-    list_select_related = ('pais_intranet',)
-    list_display = ('nombre', 'pais_intranet')
-    search_fields = ('pais_intranet__nombre',)
-    list_editable = ('pais_intranet',)
-    raw_id_fields = ('pais_intranet',)
+    list_display = ('nombre',)
+    search_fields = ('nombre',)
 
 
 class DepartamentoAdmin(admin.ModelAdmin):
-    list_select_related = ('pais', 'departamento_intranet')
-    list_display = ('nombre', 'pais', 'departamento_intranet')
-    list_filter = ('pais', 'departamento_intranet__nombre')
+    list_select_related = ('pais',)
+    list_display = ('nombre', 'pais',)
+    list_filter = ('pais',)
     search_fields = ('nombre', 'pais__nombre',)
-    list_editable = ('departamento_intranet',)
-    raw_id_fields = ('departamento_intranet',)
 
 
 class CiudadAdmin(admin.ModelAdmin):
