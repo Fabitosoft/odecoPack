@@ -50,9 +50,27 @@ class ItemsBiableAdmin(ImportExportModelAdmin):
         'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
         'unidad_medida_inventario', 'id_procedencia')
 
-    search_fields = ('id_item', 'id_referencia', 'descripcion', 'descripcion_dos')
+    search_fields = (
+        'id_item',
+        'id_referencia',
+        'descripcion',
+        'descripcion_dos',
+        'serie',
+        'linea',
+        'categoria_mercadeo',
+        'categoria_mercadeo_dos',
+        'categoria_mercadeo_tres',
+    )
 
-    list_filter = ('activo', 'id_procedencia')
+    list_filter = (
+        'activo',
+        'id_procedencia',
+        'serie',
+        'linea',
+        'categoria_mercadeo',
+        'categoria_mercadeo_dos',
+        'categoria_mercadeo_tres',
+    )
 
 
 class VendedorBiableAdmin(admin.ModelAdmin):
