@@ -161,7 +161,6 @@ class MovimientoVentaBiable(models.Model):
     vendedor = models.ForeignKey(VendedorBiable, null=True)
     id_terc_fa = models.CharField(max_length=20)
     cliente = models.CharField(max_length=200)
-    proyecto = models.CharField(max_length=10)
     tipo_documento = models.CharField(max_length=3, null=True, blank=True)
     nro_documento = models.CharField(max_length=10, null=True, blank=True)
     factura = models.ForeignKey('FacturasBiable', null=True, blank=True, related_name='mis_movimientos_venta')
@@ -242,6 +241,7 @@ class FacturasBiable(TimeStampedModel):
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4)
     imp_netos = models.DecimalField(max_digits=18, decimal_places=4)
     venta_neto = models.DecimalField(max_digits=18, decimal_places=4)
+    proyecto = models.CharField(max_length=60, null=True, blank=True)
 
     def __str__(self):
         return "%s-%s" % (self.tipo_documento, self.nro_documento)
