@@ -6,12 +6,15 @@ from model_utils.models import TimeStampedModel
 
 from usuarios.models import UserExtended, Colaborador
 
+from geografia_colombia.models import Pais, Ciudad, Departamento
+
 
 # Create your models here.
 
 class PaisBiable(models.Model):
     pais_id = models.PositiveIntegerField(primary_key=True)
     nombre = models.CharField(max_length=120)
+    pais_intranet = models.ForeignKey(Pais, null=True, blank=True)
 
     class Meta:
         verbose_name = 'País'
@@ -25,6 +28,7 @@ class DepartamentoBiable(models.Model):
     departamento_id = models.PositiveIntegerField(primary_key=True)
     nombre = models.CharField(max_length=120)
     pais = models.ForeignKey(PaisBiable)
+    departamento_intranet = models.ForeignKey(Departamento, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Departamento'
@@ -38,6 +42,7 @@ class CiudadBiable(models.Model):
     ciudad_id = models.PositiveIntegerField(primary_key=True)
     nombre = models.CharField(max_length=120)
     departamento = models.ForeignKey(DepartamentoBiable)
+    ciudad_intranet = models.ForeignKey(Ciudad, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Ciudad'

@@ -123,22 +123,34 @@ class CarteraAdmin(admin.ModelAdmin):
     list_filter = ('tipo_documento', 'esta_vencido')
 
 
+class PaisAdmin(admin.ModelAdmin):
+    list_select_related = ('pais_intranet',)
+    list_display = ('nombre', 'pais_intranet')
+    search_fields = ('pais_intranet__nombre',)
+    list_editable = ('pais_intranet',)
+    raw_id_fields = ('pais_intranet',)
+
+
 class DepartamentoAdmin(admin.ModelAdmin):
-    list_select_related = ('pais',)
-    list_display = ('nombre', 'pais')
-    list_filter = ('pais',)
-    search_fields = ('nombre', 'pais__nombre')
+    list_select_related = ('pais', 'departamento_intranet')
+    list_display = ('nombre', 'pais', 'departamento_intranet')
+    list_filter = ('pais', 'departamento_intranet__nombre')
+    search_fields = ('nombre', 'pais__nombre',)
+    list_editable = ('departamento_intranet',)
+    raw_id_fields = ('departamento_intranet',)
 
 
 class CiudadAdmin(admin.ModelAdmin):
-    list_select_related = ('departamento',)
-    list_display = ('nombre', 'departamento')
+    list_select_related = ('departamento', 'ciudad_intranet')
+    list_display = ('nombre', 'departamento', 'ciudad_intranet')
     list_filter = ('departamento', 'departamento__pais')
-    search_fields = ('nombre', 'departamento__nombre')
+    search_fields = ('nombre', 'departamento__nombre', 'ciudad_intranet__nombre')
+    list_editable = ('ciudad_intranet',)
+    raw_id_fields = ('ciudad_intranet',)
 
 
 admin.site.register(DepartamentoBiable, DepartamentoAdmin)
-admin.site.register(PaisBiable)
+admin.site.register(PaisBiable, PaisAdmin)
 admin.site.register(CiudadBiable, CiudadAdmin)
 admin.site.register(Cliente, ClienteBiableAdmin)
 admin.site.register(VendedorBiable, VendedorBiableAdmin)
