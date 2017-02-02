@@ -16,7 +16,7 @@ class Pais(models.Model):
 
 class Departamento(models.Model):
     nombre = models.CharField(max_length=120)
-    pais = models.ForeignKey(Pais, related_name='mis_departamentos', null=True)
+    pais = models.ForeignKey(Pais, related_name='mis_departamentos')
 
     def __str__(self):
         return self.nombre
