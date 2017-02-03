@@ -675,15 +675,16 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
                                'vendedor__colaborador__usuario__user__last_name'),
                 output_field=CharField(),
             )),
-            ano_consulta=F('year'),
-            mes_consulta=F('month'),
-            dia_consulta=F('day'),
+            ano_consulta=Extract('fecha_documento', 'year'),
+            mes_consulta=Extract('fecha_documento', 'month'),
+            dia_consulta=Extract('fecha_documento', 'day'),
+            dia_semana_consulta=Extract('fecha_documento', 'week_day'),
             nro_cotizaciones=Value(0, output_field=IntegerField()),
             nro_ventas=Count('id'),
             total_cotizaciones=Value(0, output_field=IntegerField()),
             descuentos_cotizaciones=Value(0, output_field=IntegerField()),
             facturacion=Sum('venta_neto'),
-        ).filter(month__in=mes, year__in=ano)
+        ).filter(fecha_documento__month__in=mes, fecha_documento__year__in=ano)
 
         uno = list(qsCotizacion)
         dos = list(qsFacturacion)

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin import DateFieldListFilter
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
@@ -10,7 +11,10 @@ from biable.models import (
     ItemsBiable,
     Cartera,
     MovimientoVentaBiable,
-    DepartamentoBiable, PaisBiable, CiudadBiable)
+    DepartamentoBiable,
+    PaisBiable,
+    CiudadBiable
+)
 
 
 # Register your models here.
@@ -97,8 +101,16 @@ class ClienteBiableAdmin(admin.ModelAdmin):
 
 class FacturasBiableAdmin(admin.ModelAdmin):
     list_select_related = ['cliente', 'vendedor']
-    list_filter = ('tipo_documento', 'year', 'month', 'day', 'vendedor')
-    search_fields = ('nro_documento', 'tipo_documento', 'cliente__nombre')
+    list_filter = (
+        'tipo_documento',
+        'vendedor',
+        ('fecha_documento', DateFieldListFilter)
+    )
+    search_fields = (
+        'nro_documento',
+        'tipo_documento',
+        'cliente__nombre'
+    )
     list_display = (
         'nro_documento',
         'tipo_documento',
@@ -109,9 +121,6 @@ class FacturasBiableAdmin(admin.ModelAdmin):
         'fecha_documento'
     )
     readonly_fields = (
-        'year',
-        'month',
-        'day',
         'tipo_documento',
         'nro_documento',
         'cliente',

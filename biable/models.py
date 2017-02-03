@@ -228,9 +228,7 @@ class Cartera(models.Model):
 class FacturasBiable(TimeStampedModel):
     ciudad_biable = models.ForeignKey(CiudadBiable, null=True, blank=True, on_delete=models.PROTECT)
     fecha_documento = models.DateField(null=True, blank=True)
-    year = models.PositiveIntegerField(verbose_name='Año')
-    month = models.PositiveIntegerField(verbose_name='Mes')
-    day = models.PositiveIntegerField(verbose_name='Día')
+    direccion_despacho = models.CharField(max_length=400, null=True, blank=True)
     tipo_documento = models.CharField(max_length=3, null=True, blank=True)
     nro_documento = models.CharField(max_length=10, null=True, blank=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True)

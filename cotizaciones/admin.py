@@ -11,8 +11,7 @@ class ListaPrecioInline(admin.TabularInline):
     def user_email(self, instance):
         return instance.item
 
-    fields = \
-        (
+    fields =(
             'get_nombre_item',
             "cantidad",
             "forma_pago",
@@ -49,8 +48,7 @@ class RemisionInline(admin.TabularInline):
 class TareasInline(admin.TabularInline):
     model = TareaCotizacion
 
-    fields = \
-        (
+    fields =(
             'nombre',
             "descripcion",
             "fecha_inicial",
@@ -90,8 +88,19 @@ class CotizacionAdmin(admin.ModelAdmin):
         RemisionInline,
         TareasInline,
     ]
-    raw_id_fields = ('ciudad_despacho','cliente_biable')
-    search_fields = ('pais', 'ciudad', 'razon_social', 'estado', 'nro_cotizacion','cliente_biable__nombre','cliente_biable__nit')
+    raw_id_fields = (
+        'ciudad_despacho',
+        'cliente_biable'
+    )
+    search_fields = (
+        'pais',
+        'ciudad',
+        'razon_social',
+        'estado',
+        'nro_cotizacion',
+        'cliente_biable__nombre',
+        'cliente_biable__nit'
+    )
 
 
 admin.site.register(Cotizacion, CotizacionAdmin)
