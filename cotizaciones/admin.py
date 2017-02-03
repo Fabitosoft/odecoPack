@@ -80,17 +80,18 @@ class CotizacionAdmin(admin.ModelAdmin):
         'ciudad_despacho',
         'ciudad',
         'pais',
+        'cliente_biable',
     )
     readonly_fields = ('total',)
-    list_editable = ('ciudad_despacho',)
+    list_editable = ('ciudad_despacho','cliente_biable',)
     list_filter = ('estado',)
     inlines = [
         ListaPrecioInline,
         RemisionInline,
         TareasInline,
     ]
-    raw_id_fields = ('ciudad_despacho',)
-    search_fields = ('pais', 'ciudad', 'razon_social', 'estado', 'nro_cotizacion')
+    raw_id_fields = ('ciudad_despacho','cliente_biable')
+    search_fields = ('pais', 'ciudad', 'razon_social', 'estado', 'nro_cotizacion','cliente_biable__nombre','cliente_biable__nit')
 
 
 admin.site.register(Cotizacion, CotizacionAdmin)
