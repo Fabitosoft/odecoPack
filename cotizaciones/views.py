@@ -426,14 +426,17 @@ class CotizacionEmailView(View):
             return redirect(reverse('cotizaciones:cotizador'))
 
 
-class TareaListView(ListView):
+class TareaListView(SelectRelatedMixin, ListView):
     model = TareaCotizacion
+    select_related = ['cotizacion', 'cotizacion__usuario']
     template_name = 'cotizaciones/tarea_list.html'
 
     def get_queryset(self):
         query = self.request.GET.get("buscado")
         user = self.request.user
 
+        qs = super().get_queryset()
+
         full_permisos = user.has_perm('cotizaciones.full_cotizacion')
         if full_permisos:
             user = None
@@ -441,20 +444,22 @@ class TareaListView(ListView):
         if not query:
             query = ""
 
-        qs = self.model.objects.filter(
+        qs = qs.filter(
             Q(esta_finalizada=False) &
             Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
         ).distinct().order_by('fecha_final')
         return qs
 
 
-class RemisionListView(ListView):
+class RemisionListView(SelectRelatedMixin,ListView):
     model = RemisionCotizacion
+    select_related = ['cotizacion', 'cotizacion__usuario']
     template_name = 'cotizaciones/remision_list.html'
 
     def get_queryset(self):
         query = self.request.GET.get("buscado")
         user = self.request.user
+        qs = super().get_queryset()
 
         full_permisos = user.has_perm('cotizaciones.full_cotizacion')
         if full_permisos:
@@ -463,7 +468,7 @@ class RemisionListView(ListView):
         if not query:
             query = ""
 
-        qs = self.model.objects.filter(
+        qs = qs.filter(
             Q(entregado=False) &
             Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
         ).distinct().order_by('fecha_prometida_entrega')
