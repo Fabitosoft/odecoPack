@@ -96,6 +96,7 @@ class Cotizacion(TimeStampedModel):
             ('gestion_cotizaciones', 'Gestionar Cotizaciones'),
             # ('hacer_cotizacion', 'Hacer Cotización'),
         )
+        ordering = ['-fecha_envio']
 
     def get_absolute_url(self):
         return reverse("cotizaciones:detalle_cotizacion", kwargs={"pk": self.pk})
