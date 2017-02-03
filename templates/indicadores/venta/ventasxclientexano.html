@@ -81,7 +81,7 @@
                         sort: {order: 'asc'}
                     },
                     fields: [
-                        {name: 'cliente', caption: 'Cliente'},
+                        {name: 'cliente__nombre', caption: 'Cliente'},
                         {name: 'year', caption: 'Año'},
                         {name: 'tipo', caption: 'Tipo'},
                         {
@@ -139,7 +139,7 @@
                             }
                         }
                     ],
-                    rows: ['tipo','cliente'],
+                    rows: ['tipo','cliente__nombre'],
                     columns: ['year'],
                     data: ['v_neto']
                 };

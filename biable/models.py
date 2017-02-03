@@ -168,12 +168,6 @@ class VendedorBiable(models.Model):
 
 
 class MovimientoVentaBiable(models.Model):  # Detalle factura
-    year = models.PositiveIntegerField()  # QUITAR
-    month = models.PositiveIntegerField()  # QUITAR
-    day = models.PositiveIntegerField()  # QUITAR
-    vendedor = models.ForeignKey(VendedorBiable, null=True)  # QUITAR
-    id_terc_fa = models.CharField(max_length=20)  # QUITAR
-    cliente = models.CharField(max_length=200)  # QUITAR
     tipo_documento = models.CharField(max_length=3, null=True, blank=True)
     nro_documento = models.CharField(max_length=10, null=True, blank=True)
     factura = models.ForeignKey('FacturasBiable', null=True, blank=True, related_name='mis_movimientos_venta')

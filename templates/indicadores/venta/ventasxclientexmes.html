@@ -69,10 +69,9 @@
                         collapsed: true
                     },
                     fields: [
-                        {name: 'year', caption: 'Año'},
                         {name: 'tipo', caption: 'Tipo'},
                         {name: 'month', caption: 'Mes'},
-                        {name: 'cliente', caption: 'Vendedor'},
+                        {name: 'cliente__nombre', caption: 'Cliente'},
                         {
                             name: 'v_bruta', caption: 'Valor Bruto',
                             dataSettings: {
@@ -128,7 +127,7 @@
                             }
                         }
                     ],
-                    rows: ['tipo','cliente'],
+                    rows: ['tipo','cliente__nombre'],
                     columns: ['month'],
                     data: ['v_neto']
                 };

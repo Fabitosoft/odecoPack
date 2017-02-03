@@ -34,9 +34,8 @@ class InformeVentasConLineaMixin(object):
 class InformeVentasConAnoMixin(object):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ano_fin = MovimientoVentaBiable.objects.all().aggregate(Max('year'))['year__max']
-        ano_ini = MovimientoVentaBiable.objects.all().aggregate(Min('year'))['year__min']
-
+        ano_fin = FacturasBiable.objects.latest('fecha_documento').fecha_documento.year
+        ano_ini = FacturasBiable.objects.earliest('fecha_documento').fecha_documento.year
         ano_fin = ano_fin + 1
         context['anos_list'] = list(range(ano_ini, ano_fin))
         return context
@@ -51,11 +50,10 @@ class FechaActualizacionMovimientoVentasMixin(object):
         return None
 
 
-class VentasVendedor(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin,
+class VentasVendedor(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin,
                      InformeVentasConAnoMixin,
                      FechaActualizacionMovimientoVentasMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxvendedor.html'
-    select_related = [u"vendedor"]
 
     # def get_context_data(self, **kwargs):
     #     # accounts_list = VtigerCrmentity.objects.using('biable').values('crmid').filter(smownerid__user_name='alalopros',
@@ -93,8 +91,7 @@ class VentasVendedor(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, 
 
     def consulta(self, ano, mes):
         current_user = self.request.user
-        qsFinal = None
-        qs = MovimientoVentaBiable.objects.all().values('vendedor__nombre').annotate(
+        qs = FacturasBiable.objects.all().values('vendedor__nombre').annotate(
             # vendedor_nombre=F('vendedor__nombre'),
             vendedor_nombre=Case(
                 When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
@@ -114,8 +111,8 @@ class VentasVendedor(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, 
             usuario = get_object_or_404(Colaborador, usuario__user=current_user)
             qsFinal = qs.filter(
                 (
-                    Q(year__in=list(map(lambda x: int(x), ano))) &
-                    Q(month__in=list(map(lambda x: int(x), mes)))
+                    Q(fecha_documento__year__in=list(map(lambda x: int(x), ano))) &
+                    Q(fecha_documento__month__in=list(map(lambda x: int(x), mes)))
                 ) &
                 (
                     Q(vendedor__colaborador__in=usuario.subalternos.all()) |
@@ -124,17 +121,16 @@ class VentasVendedor(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, 
             ).distinct()
         else:
             qsFinal = qs.filter(
-                Q(year__in=list(map(lambda x: int(x), ano))) &
-                Q(month__in=list(map(lambda x: int(x), mes)))).order_by('-vendedor__activo', 'day')
+                Q(fecha_documento__year__in=list(map(lambda x: int(x), ano))) &
+                Q(fecha_documento__month__in=list(map(lambda x: int(x), mes)))).order_by('-vendedor__activo', 'day')
         return qsFinal.order_by('-vendedor__activo')
 
 
-class VentasVendedorConsola(LoginRequiredMixin, SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin,
+class VentasVendedorConsola(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin,
                             InformeVentasConAnoMixin,
                             FechaActualizacionMovimientoVentasMixin,
                             TemplateView):
     template_name = 'indicadores/venta/consolaxventasxvendedor.html'
-    select_related = [u"vendedor"]
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
@@ -154,34 +150,35 @@ class VentasVendedorConsola(LoginRequiredMixin, SelectRelatedMixin, JSONResponse
 
     def consulta(self, ano, mes):
         current_user = self.request.user
-        qsFinal = None
-        qs = MovimientoVentaBiable.objects.all().values('day').annotate(
+        qs = FacturasBiable.objects.all().values('fecha_documento').annotate(
             vendedor_nombre=Case(
                 When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
                 default=F('vendedor__nombre'),
                 output_field=CharField(),
             ),
-            cliente=F('cliente'),
+            cliente=F('cliente__nombre'),
             documento=Concat('tipo_documento', Value('-'), 'nro_documento'),
             tipo_documento=F('tipo_documento'),
             v_neto=Sum('venta_neto'),
             linea=F('vendedor__linea_ventas__nombre'),
+            day=Extract('fecha_documento', 'day')
         )
         if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
             usuario = get_object_or_404(Colaborador, usuario__user=current_user)
             qsFinal = qs.filter(
-                Q(year__in=list(map(lambda x: int(x), ano))) &
-                Q(month__in=list(map(lambda x: int(x), mes))) &
+                Q(fecha_documento__year__in=list(map(lambda x: int(x), ano))) &
+                Q(fecha_documento__month__in=list(map(lambda x: int(x), mes))) &
                 (
                     Q(vendedor__colaborador__in=usuario.subalternos.all())
                     | Q(vendedor__colaborador=usuario)
                     | Q(vendedor__activo=False)
                 )
-            ).distinct().order_by('-vendedor__activo', 'day')
+            ).distinct().order_by('-vendedor__activo', 'fecha_documento')
         else:
             qsFinal = qs.filter(
-                Q(year__in=list(map(lambda x: int(x), ano))) &
-                Q(month__in=list(map(lambda x: int(x), mes)))).order_by('-vendedor__activo', 'day')
+                Q(fecha_documento__year__in=list(map(lambda x: int(x), ano))) &
+                Q(fecha_documento__month__in=list(map(lambda x: int(x), mes)))).order_by('-vendedor__activo',
+                                                                                         'fecha_documento')
         return qsFinal
 
 
@@ -209,13 +206,13 @@ class VentasClientes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, I
 
         pareto = []
         sum = 0
-        for cli in qs.values('id_terc_fa').annotate(fac=Sum('venta_neto')).order_by('-fac').all():
+        for cli in qs.values('cliente__nit').annotate(fac=Sum('venta_neto')).order_by('-fac').all():
             sum += (int(cli['fac']) / total_fact) * 100
             if sum <= 80:
-                pareto.append(cli['id_terc_fa'])
+                pareto.append(cli['cliente__nit'])
 
         qs = qs.annotate(tipo=Case(
-            When(id_terc_fa__in=pareto,
+            When(cliente__nit__in=pareto,
                  then=Value('Pareto')),
             default=Value('Otros'),
             output_field=CharField(),
@@ -232,7 +229,7 @@ class VentasClientes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, I
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        qs = MovimientoVentaBiable.objects.all().values('cliente').annotate(
+        qs = FacturasBiable.objects.all().values('cliente__nombre').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -240,8 +237,8 @@ class VentasClientes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, I
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100)
         ).filter(
-            year__in=list(map(lambda x: int(x), ano)),
-            month__in=list(map(lambda x: int(x), mes))
+            fecha_documento__year__in=list(map(lambda x: int(x), ano)),
+            fecha_documento__month__in=list(map(lambda x: int(x), mes))
         )
         return qs
 
@@ -270,13 +267,13 @@ class VentasClientesAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin
 
         pareto = []
         sum = 0
-        for cli in qs.values('id_terc_fa').annotate(fac=Sum('venta_neto')).filter(year=max_year).order_by('-fac').all():
+        for cli in qs.values('cliente__nit').annotate(fac=Sum('venta_neto')).filter(year=max_year).order_by('-fac').all():
             sum += (int(cli['fac']) / total_fact) * 100
             if sum <= 80:
-                pareto.append(cli['id_terc_fa'])
+                pareto.append(cli['cliente__nit'])
 
         qs = qs.annotate(tipo=Case(
-            When(id_terc_fa__in=pareto,
+            When(cliente__nit__in=pareto,
                  then=Value('Pareto')),
             default=Value('Otros'),
             output_field=CharField(),
@@ -293,16 +290,17 @@ class VentasClientesAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        qs = MovimientoVentaBiable.objects.all().values('cliente', 'year').annotate(
+        qs = FacturasBiable.objects.all().values('cliente__nombre').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
+            year = Extract('fecha_documento', 'year')
         ).filter(
-            year__in=list(map(lambda x: int(x), ano)),
-            month__in=list(map(lambda x: int(x), mes))
+            fecha_documento__year__in=list(map(lambda x: int(x), ano)),
+            fecha_documento__month__in=list(map(lambda x: int(x), mes))
         )
         return qs
 
@@ -336,14 +334,15 @@ class VentasMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, Inform
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = MovimientoVentaBiable.objects.values('month').annotate(
+        qs = FacturasBiable.objects.values('fecha_documento').annotate(
+            mes=Extract('fecha_documento', 'month'),
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100)
-        ).filter(year=ano).order_by('month')
+        ).filter(fecha_documento__year=ano).order_by('fecha_documento')
         return qs
 
 
@@ -378,24 +377,24 @@ class VentasLineaAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, I
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        qs = MovimientoVentaBiable.objects.all().values('year').annotate(
+        qs = FacturasBiable.objects.all().values('vendedor__linea_ventas_id').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
+            year=Extract('fecha_documento', 'month'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
-            year__in=list(map(lambda x: int(x), ano)),
-            month__in=list(map(lambda x: int(x), mes))
+            fecha_documento__year__in=list(map(lambda x: int(x), ano)),
+            fecha_documento__month__in=list(map(lambda x: int(x), mes))
         ).order_by('-v_bruta')
         return qs
 
 
-class VentasVendedorMes(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
+class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAnoMixin,
                         FechaActualizacionMovimientoVentasMixin, InformeVentasConLineaMixin, TemplateView):
     template_name = 'indicadores/venta/ventasxvendedorxmes.html'
-    select_related = [u"vendedor"]
 
     def post_ajax(self, request, *args, **kwargs):
         context = {}
@@ -422,12 +421,13 @@ class VentasVendedorMes(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = MovimientoVentaBiable.objects.all().values('month').annotate(
+        qs = FacturasBiable.objects.all().values('vendedor_id').annotate(
             vendedor_nombre=Case(
                 When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
                 default=F('vendedor__nombre'),
                 output_field=CharField(),
             ),
+            month=Extract('fecha_documento', 'month'),
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -435,8 +435,8 @@ class VentasVendedorMes(SelectRelatedMixin, JSONResponseMixin, AjaxResponseMixin
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
-            year__in=list(map(lambda x: int(x), ano))
-        ).order_by('month')
+            fecha_documento__year__in=list(map(lambda x: int(x), ano))
+        ).order_by('fecha_documento')
         return qs
 
 
@@ -469,15 +469,17 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = MovimientoVentaBiable.objects.all().values('year', 'month').annotate(
+        qs = FacturasBiable.objects.all().values('vendedor__linea_ventas_id').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
+            year=Extract('fecha_documento', 'year'),
+            month=Extract('fecha_documento', 'month'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
-            year__in=list(map(lambda x: int(x), ano))
+            fecha_documento__year__in=list(map(lambda x: int(x), ano))
         ).order_by('month')
         return qs
 
@@ -504,13 +506,13 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAno
 
         pareto = []
         sum = 0
-        for cli in qs.values('id_terc_fa').annotate(fac=Sum('venta_neto')).order_by('-fac').all():
+        for cli in qs.values('cliente__nit').annotate(fac=Sum('venta_neto')).order_by('-fac').all():
             sum += (int(cli['fac']) / total_fact) * 100
             if sum <= 80:
-                pareto.append(cli['id_terc_fa'])
+                pareto.append(cli['cliente__nit'])
 
         qs = qs.annotate(tipo=Case(
-            When(id_terc_fa__in=pareto,
+            When(cliente__nit__in=pareto,
                  then=Value('Pareto')),
             default=Value('Otros'),
             output_field=CharField(),
@@ -528,16 +530,16 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAno
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = MovimientoVentaBiable.objects.all().values('month', 'id_terc_fa').annotate(
-            cliente=F('cliente'),
+        qs = FacturasBiable.objects.all().values('cliente__nombre').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
             Costo=Sum('costo_total'),
+            month=Extract('fecha_documento', 'month'),
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
-            year__in=list(map(lambda x: int(x), ano))
+            fecha_documento__year__in=list(map(lambda x: int(x), ano))
         )
         return qs
 
@@ -720,8 +722,6 @@ class VentasProductoAnoMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMi
 
     def consulta(self, ano, mes):
         qFinal = MovimientoVentaBiable.objects.values(
-            'year',
-            'month',
             'item_biable__descripcion',
             'item_biable__descripcion_dos',
             'item_biable__categoria_mercadeo',
@@ -729,17 +729,18 @@ class VentasProductoAnoMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMi
             'item_biable__categoria_mercadeo_tres',
             'item_biable__serie',
             'item_biable__id_item',
-            'vendedor__linea_ventas__nombre',
+            'factura__vendedor__linea_ventas__nombre',
             'factura__cliente__nombre'
         ).annotate(
+            year=Extract('factura__fecha_documento', 'year'),
+            month=Extract('factura__fecha_documento', 'month'),
             vendedor=Upper(Case(
-                When(vendedor__colaborador__isnull=True, then=F('vendedor__nombre')),
-                default=Concat('vendedor__colaborador__usuario__user__first_name', Value(' '),
-                               'vendedor__colaborador__usuario__user__last_name'),
+                When(factura__vendedor__colaborador__isnull=True, then=F('factura__vendedor__nombre')),
+                default=Concat('factura__vendedor__colaborador__usuario__user__first_name', Value(' '),
+                               'factura__vendedor__colaborador__usuario__user__last_name'),
                 output_field=CharField(),
             )),
             venta_neta=Sum('venta_neto'),
             cantidad_neta=Sum('cantidad'),
-        ).filter(year__in=ano, month__in=mes)
-        print(qFinal)
+        ).filter(factura__fecha_documento__year__in=ano, month__in=mes)
         return qFinal
