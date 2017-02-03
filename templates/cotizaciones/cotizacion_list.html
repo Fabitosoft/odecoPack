@@ -90,17 +90,21 @@
                 <td>
                     {{ cotizacion.fecha_envio|naturaltime|capfirst }}
                 </td>
-                <td>
-                    {% for remision in cotizacion.mis_remisiones.all %}
-                        {% if remision.factura_biable %}
-                            <a href="{{ remision.factura_biable.get_absolute_url }}" target="popup"
-                               onclick="window.open('{{ remision.factura_biable.get_absolute_url }}','popup','width=600,height=600'); return false;">
-                                {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
-                            </a>
-                        {% endif %}
-                        -
-                    {% endfor %}
-                </td>
+                {% with remisiones_list=cotizacion.mis_remisiones.all %}
+                    {% if remisiones_list %}
+                        <td>
+                            {% for remision in remisiones_list %}
+                                {% if remision.factura_biable %}
+                                    <a href="{{ remision.factura_biable.get_absolute_url }}" target="popup"
+                                       onclick="window.open('{{ remision.factura_biable.get_absolute_url }}','popup','width=600,height=600'); return false;">
+                                        {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                                    </a>
+                                {% endif %}
+                                -
+                            {% endfor %}
+                        </td>
+                    {% endif %}
+                {% endwith %}
             </tr>
         {% empty %}
             <li>Ninguna Cotización</li>

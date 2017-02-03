@@ -480,16 +480,28 @@ class CotizacionesListView(ListView):
         current_user = self.request.user
         qsFinal = None
 
-        qs = Cotizacion.estados.activo().exclude(estado='INI')
+        qs = Cotizacion.estados.activo().select_related('usuario').prefetch_related(
+            'mis_remisiones',
+            'mis_remisiones__factura_biable'
+        ).exclude(estado='INI')
 
         if self.kwargs.get("tipo") == '2':
-            qs = Cotizacion.estados.completado()
+            qs = Cotizacion.estados.completado().select_related('usuario').prefetch_related(
+                'mis_remisiones',
+                'mis_remisiones__factura_biable'
+            )
 
         if self.kwargs.get("tipo") == '3':
-            qs = Cotizacion.estados.rechazado()
+            qs = Cotizacion.estados.rechazado().select_related('usuario').prefetch_related(
+                'mis_remisiones',
+                'mis_remisiones__factura_biable'
+            )
 
         if query:
-            qs = Cotizacion.objects.all()
+            qs = Cotizacion.objects.all().select_related('usuario').prefetch_related(
+                'mis_remisiones',
+                'mis_remisiones__factura_biable'
+            )
             qs = qs.filter(
                 Q(nombres_contacto__icontains=query) |
                 Q(nro_cotizacion__icontains=query) |
@@ -598,10 +610,10 @@ class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
                 item.descuento = descuento
                 item.total = (item.precio * item.cantidad) - descuento
                 item.save()
-                total_linea = round(item.total,2)
-                descuento_linea = round(item.descuento,2)
-                descuento_cotizacion = round(item.cotizacion.descuento,2)
-                total_cotizacion = round(item.cotizacion.total,2)
+                total_linea = round(item.total, 2)
+                descuento_linea = round(item.descuento, 2)
+                descuento_cotizacion = round(item.cotizacion.descuento, 2)
+                total_cotizacion = round(item.cotizacion.total, 2)
             else:
                 error_porcentaje = True
                 error_mensaje = "Error en el porcentaje aplicado a %s, debe de ser un número igual o mayor a 1" % (
