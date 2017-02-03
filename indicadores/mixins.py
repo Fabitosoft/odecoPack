@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.db.models import Sum, Count
 from django.utils import timezone
 
-from biable.models import VendedorBiable, MovimientoVentaBiable
+from biable.models import VendedorBiable, FacturasBiable
 from cotizaciones.models import Cotizacion
 from usuarios.models import Colaborador
 
@@ -127,7 +127,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         facturacion_cotizaciones_dia = 0
         cantidad_cotizaciones_dia = 0
 
-        qsVentasMes = MovimientoVentaBiable.objects.select_related(
+        qsVentasMes = FacturasBiable.objects.select_related(
             'vendedor__colaborador__usuario__user'
         ).values(
             'vendedor__colaborador__usuario__user'
@@ -135,8 +135,8 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             fact_neta=Sum('venta_neto'),
             cantidad=Count('nro_documento', 'tipo_documento')
         ).filter(
-            year=year,
-            month=month
+            fecha_documento__year=year,
+            fecha_documento__month=month
         )
 
         if vendedor_subalterno:
@@ -152,7 +152,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             facturacion_ventas_mes = float(qsVentasMes[0]['fact_neta'])
             cantidad_venta_mes = float(qsVentasMes[0]['cantidad'])
 
-        qsVentasDia = qsVentasMes.filter(day=day)
+        qsVentasDia = qsVentasMes.filter(fecha_documento__day=day)
 
         if qsVentasDia.exists():
             facturacion_ventas_dia = float(qsVentasDia[0]['fact_neta'])
