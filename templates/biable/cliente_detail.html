@@ -6,7 +6,7 @@
         <small>{{ object.nombre|title }} </small>
     </h1>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <h3>Información General</h3>
             <hr>
             <p>
@@ -32,7 +32,8 @@
                     </ul>
                 {% endif %}
             </div>
-
+        </div>
+        <div class="col-md-12">
             {% with cotizaciones_list=object.mis_cotizaciones.all %}
                 {% if cotizaciones_list %}
                     <h3>Mis Cotizaciones</h3>
@@ -138,15 +139,19 @@
 
                 {% endif %}
             {% endwith %}
-
-            {% with compras_list=object.mis_compras.all %}
+        </div>
+        <div class="col-md-12">
+            {% with compras_list=object.mis_compras.all|slice:":20" %}
                 {% if compras_list %}
-                    <h3>Mis Compras</h3>
+                    <h3>Mis Ultimas 20 Compras</h3>
                     <table class="table table-bordered table-striped">
                         <thead>
                         <tr>
                             <th>
                                 Nro.
+                            </th>
+                            <th>
+                                Fecha
                             </th>
                             <th>
                                 Departamento
@@ -184,6 +189,9 @@
                             <tr>
                                 <td>
                                     <a href="{{ compra.get_absolute_url }}">{{ compra.tipo_documento }}-{{ compra.nro_documento }}</a>
+                                </td>
+                                <td>
+                                    {{ compra.fecha_documento }}
                                 </td>
                                 <td>
                                     {{ compra.ciudad_biable.ciudad_intranet.departamento.nombre }}
