@@ -13,8 +13,8 @@ from biable.models import (
     MovimientoVentaBiable,
     DepartamentoBiable,
     PaisBiable,
-    CiudadBiable
-)
+    CiudadBiable,
+    GrupoCliente)
 
 
 # Register your models here.
@@ -89,17 +89,47 @@ class VendedorBiableAdmin(admin.ModelAdmin):
 
 
 class ClienteBiableAdmin(admin.ModelAdmin):
-    list_display = ('nit', 'nombre')
+    list_select_related = ('grupo',)
+    list_display = ('nit', 'nombre', 'fecha_creacion', 'grupo')
 
     search_fields = [
         'nit',
         'nombre',
     ]
 
-    readonly_fields = ('nit', 'nombre',)
+    readonly_fields = ('nit', 'nombre', 'fecha_creacion')
+
+
+class MovimientoVentaBiableInLine(admin.TabularInline):
+    fields = (
+        'item_biable',
+        'precio_uni',
+        'cantidad',
+        'venta_bruta',
+        'dscto_netos',
+        'costo_total',
+        'rentabilidad',
+        'imp_netos',
+        'venta_neto'
+    )
+    readonly_fields = (
+        'item_biable',
+        'precio_uni',
+        'cantidad',
+        'venta_bruta',
+        'dscto_netos',
+        'costo_total',
+        'rentabilidad',
+        'imp_netos',
+        'venta_neto'
+    )
+    model = MovimientoVentaBiable
+    can_delete = False
+    extra = 0
 
 
 class FacturasBiableAdmin(admin.ModelAdmin):
+    inlines = [MovimientoVentaBiableInLine, ]
     list_select_related = ['cliente', 'vendedor']
     list_filter = (
         'tipo_documento',
@@ -132,7 +162,9 @@ class FacturasBiableAdmin(admin.ModelAdmin):
         'venta_neto',
         'ciudad_biable',
         'proyecto',
-        'fecha_documento'
+        'fecha_documento',
+        'vendedor',
+        'direccion_despacho',
     )
 
 
@@ -167,6 +199,24 @@ class CiudadAdmin(admin.ModelAdmin):
     readonly_fields = ('nombre', 'departamento', 'ciudad_intranet', 'ciudad_id')
 
 
+class ClienteInLine(admin.TabularInline):
+    fields = (
+        'nombre',
+        'nit',
+    )
+    readonly_fields = (
+        'nombre',
+        'nit',
+    )
+    model = Cliente
+    can_delete = False
+    extra = 0
+
+
+class GrupoClienteAdmin(admin.ModelAdmin):
+    inlines = [ClienteInLine, ]
+
+
 admin.site.register(DepartamentoBiable, DepartamentoAdmin)
 admin.site.register(PaisBiable, PaisAdmin)
 admin.site.register(CiudadBiable, CiudadAdmin)
@@ -176,4 +226,4 @@ admin.site.register(LineaVendedorBiable)
 admin.site.register(FacturasBiable, FacturasBiableAdmin)
 admin.site.register(ItemsBiable, ItemsBiableAdmin)
 admin.site.register(Cartera, CarteraAdmin)
-admin.site.register(MovimientoVentaBiable)
+admin.site.register(GrupoCliente, GrupoClienteAdmin)

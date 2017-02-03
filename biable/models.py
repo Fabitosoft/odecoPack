@@ -11,6 +11,17 @@ from geografia_colombia.models import Pais, Ciudad, Departamento
 
 # Create your models here.
 
+class GrupoCliente(models.Model):
+    nombre = models.CharField(max_length=120)
+
+    class Meta:
+        verbose_name = 'Grupo Cliente'
+        verbose_name_plural = 'I-0.2 Grupos Cliente'
+
+    def __str__(self):
+        return self.nombre
+
+
 class PaisBiable(models.Model):
     pais_id = models.PositiveIntegerField(primary_key=True)
     nombre = models.CharField(max_length=120)
@@ -83,9 +94,11 @@ class ItemsBiable(models.Model):
         return self.descripcion
 
 
-class Cliente(TimeStampedModel):
+class Cliente(models.Model):
     nit = models.CharField(max_length=20, primary_key=True)
     nombre = models.CharField(max_length=120)
+    grupo = models.ForeignKey(GrupoCliente, null=True, blank=True, related_name='mis_empresas')
+    fecha_creacion = models.DateField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Cliente'
@@ -154,13 +167,13 @@ class VendedorBiable(models.Model):
         return self.nombre
 
 
-class MovimientoVentaBiable(models.Model):
-    year = models.PositiveIntegerField()
-    month = models.PositiveIntegerField()
-    day = models.PositiveIntegerField()
-    vendedor = models.ForeignKey(VendedorBiable, null=True)
-    id_terc_fa = models.CharField(max_length=20)
-    cliente = models.CharField(max_length=200)
+class MovimientoVentaBiable(models.Model):  # Detalle factura
+    year = models.PositiveIntegerField()  # QUITAR
+    month = models.PositiveIntegerField()  # QUITAR
+    day = models.PositiveIntegerField()  # QUITAR
+    vendedor = models.ForeignKey(VendedorBiable, null=True)  # QUITAR
+    id_terc_fa = models.CharField(max_length=20)  # QUITAR
+    cliente = models.CharField(max_length=200)  # QUITAR
     tipo_documento = models.CharField(max_length=3, null=True, blank=True)
     nro_documento = models.CharField(max_length=10, null=True, blank=True)
     factura = models.ForeignKey('FacturasBiable', null=True, blank=True, related_name='mis_movimientos_venta')
@@ -222,7 +235,7 @@ class Cartera(models.Model):
             ('ver_carteras_todos', 'R Cart. Vcto Todos'),
         )
         verbose_name = 'Cartera'
-        verbose_name_plural = 'T-0.3 Carteras'
+        verbose_name_plural = 'T-0.2 Carteras'
 
 
 class FacturasBiable(TimeStampedModel):
