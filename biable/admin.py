@@ -99,7 +99,15 @@ class FacturasBiableAdmin(admin.ModelAdmin):
     list_select_related = ['cliente', 'vendedor']
     list_filter = ('tipo_documento', 'year', 'month', 'day', 'vendedor')
     search_fields = ('nro_documento', 'tipo_documento', 'cliente__nombre')
-    list_display = ('nro_documento', 'tipo_documento', 'cliente', 'vendedor')
+    list_display = (
+        'nro_documento',
+        'tipo_documento',
+        'cliente',
+        'vendedor',
+        'ciudad_biable',
+        'proyecto',
+        'fecha_documento'
+    )
     readonly_fields = (
         'year',
         'month',
@@ -112,7 +120,10 @@ class FacturasBiableAdmin(admin.ModelAdmin):
         'costo_total',
         'rentabilidad',
         'imp_netos',
-        'venta_neto'
+        'venta_neto',
+        'ciudad_biable',
+        'proyecto',
+        'fecha_documento'
     )
 
 
@@ -126,7 +137,7 @@ class CarteraAdmin(admin.ModelAdmin):
 class PaisAdmin(admin.ModelAdmin):
     list_display = ('nombre',)
     search_fields = ('nombre',)
-    readonly_fields = ('nombre','pais_id')
+    readonly_fields = ('nombre', 'pais_id')
 
 
 class DepartamentoAdmin(admin.ModelAdmin):
@@ -134,7 +145,7 @@ class DepartamentoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'pais',)
     list_filter = ('pais',)
     search_fields = ('nombre', 'pais__nombre',)
-    readonly_fields = ('nombre', 'pais','departamento_id')
+    readonly_fields = ('nombre', 'pais', 'departamento_id')
 
 
 class CiudadAdmin(admin.ModelAdmin):
@@ -144,8 +155,7 @@ class CiudadAdmin(admin.ModelAdmin):
     search_fields = ('nombre', 'departamento__nombre', 'ciudad_intranet__nombre')
     list_editable = ('ciudad_intranet',)
     raw_id_fields = ('ciudad_intranet',)
-    readonly_fields = ('nombre', 'departamento', 'ciudad_intranet','ciudad_id')
-
+    readonly_fields = ('nombre', 'departamento', 'ciudad_intranet', 'ciudad_id')
 
 
 admin.site.register(DepartamentoBiable, DepartamentoAdmin)
