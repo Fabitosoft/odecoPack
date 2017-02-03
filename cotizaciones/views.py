@@ -25,7 +25,7 @@ from django.contrib import messages
 import mistune
 from weasyprint import HTML
 
-from braces.views import SelectRelatedMixin, PrefetchRelatedMixin
+from braces.views import SelectRelatedMixin
 
 from listasprecios.forms import ProductoBusqueda
 from biable.models import Colaborador

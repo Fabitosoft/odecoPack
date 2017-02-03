@@ -10,7 +10,19 @@
                 <span class="label">Cliente:</span> {{ object.cliente|title }}
             </p>
             <p>
+                <span class="label">Fecha:</span> {{ object.fecha_documento }}
+            </p>
+            <p>
                 <span class="label">Vendedor:</span> {{ object.vendedor.nombre|title }}
+            </p>
+            <p>
+                <span class="label">Ciudad:</span> {{ object.ciudad_biable.ciudad_intranet.nombre }}
+            </p>
+            <p>
+                <span class="label">Departamento:</span> {{ object.ciudad_biable.ciudad_intranet.departamento.nombre }}
+            </p>
+            <p>
+                <span class="label">Dirección de Envío:</span> {{ object.direccion_despacho }}
             </p>
             <p>
                 <span class="label">Facturación Bruta:</span> {{ object.venta_bruta|floatformat:2 }}
@@ -27,98 +39,101 @@
                 </p>
             {% endif %}
             <p>
-                <span class="label">Impuesto Netos:</span> {{ object.imp_netos|floatformat:2 }}
-            </p>
-            <p>
                 <span class="label">Valor Neto:</span> {{ object.venta_neto|floatformat:2 }}
             </p>
         </div>
     </div>
 
+    {% with mis_movimientos_list=object.mis_movimientos_venta.all %}
+        {% if mis_movimientos_list %}
+            <h2>Items Relacionados</h2>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>
+                        ID cguno
+                    </th>
+                    <th>
+                        Referencia
+                    </th>
+                    <th>
+                        Descripción
+                    </th>
+                    <th>
+                        Precio Unitario
+                    </th>
+                    <th>
+                        Cantidad
+                    </th>
+                    <th>
+                        Venta Bruta
+                    </th>
+                    <th>
+                        Descuentos Netos
+                    </th>
+                    <th>
+                        Impuestos Netos
+                    </th>
+                    <th>
+                        Venta Neta
+                    </th>
+                    {% if perms.biable.ver_info_admon_ventas %}
+                        <th>
+                            Costo Total
+                        </th>
+                        <th>
+                            Rentabilidad
+                        </th>
+                    {% endif %}
+                </tr>
 
-    <h2>Items Relacionados</h2>
-    <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <th>
-                ID cguno
-            </th>
-            <th>
-                Referencia
-            </th>
-            <th>
-                Descripción
-            </th>
-            <th>
-                Precio Unitario
-            </th>
-            <th>
-                Cantidad
-            </th>
-            <th>
-                Venta Bruta
-            </th>
-            <th>
-                Descuentos Netos
-            </th>
-            <th>
-                Impuestos Netos
-            </th>
-            <th>
-                Venta Neta
-            </th>
-            {% if perms.biable.ver_info_admon_ventas %}
-                <th>
-                    Costo Total
-                </th>
-                <th>
-                    Rentabilidad
-                </th>
-            {% endif %}
-        </tr>
+                </thead>
+                <tbody>
 
-        </thead>
-        <tbody>
-        {% for item in object.mis_movimientos_venta.all %}
-            <tr>
-                <td>
-                    {{ item.item_biable.id_item }}
-                </td>
-                <td>
-                    {{ item.item_biable.id_referencia }}
-                </td>
-                <td>
-                    {{ item.item_biable.descripcion }}
-                </td>
-                <td>
-                    {{ item.precio_uni|floatformat:2 }}
-                </td>
-                <td>
-                    {{ item.cantidad|floatformat }}
-                </td>
-                <td>
-                    {{ item.venta_bruta|floatformat:2 }}
-                </td>
-                <td>
-                    {{ item.dscto_netos|floatformat:2 }}
-                </td>
-                <td>
-                    {{ item.imp_netos|floatformat:2 }}
-                </td>
-                <td>
-                    {{ item.venta_neto|floatformat:2 }}
-                </td>
-                {% if perms.biable.ver_info_admon_ventas %}
-                    <td>
-                        {{ item.costo_total|floatformat:2 }}
-                    </td>
-                    <td>
-                        {{ item.rentabilidad|floatformat:2 }}
-                    </td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                {% for item in mis_movimientos_list %}
+                    <tr>
+                        <td>
+                            {{ item.item_biable.id_item }}
+                        </td>
+                        <td>
+                            {{ item.item_biable.id_referencia }}
+                        </td>
+                        <td>
+                            {{ item.item_biable.descripcion }}
+                        </td>
+                        <td>
+                            {{ item.precio_uni|floatformat:2 }}
+                        </td>
+                        <td>
+                            {{ item.cantidad|floatformat }}
+                        </td>
+                        <td>
+                            {{ item.venta_bruta|floatformat:2 }}
+                        </td>
+                        <td>
+                            {{ item.dscto_netos|floatformat:2 }}
+                        </td>
+                        <td>
+                            {{ item.imp_netos|floatformat:2 }}
+                        </td>
+                        <td>
+                            {{ item.venta_neto|floatformat:2 }}
+                        </td>
+                        {% if perms.biable.ver_info_admon_ventas %}
+                            <td>
+                                {{ item.costo_total|floatformat:2 }}
+                            </td>
+                            <td>
+                                {{ item.rentabilidad|floatformat:2 }}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            Problemas al cargar archivos, por favor informar al administrador del sistema
+        {% endif %}
+    {% endwith %}
 
 {% endblock %}
