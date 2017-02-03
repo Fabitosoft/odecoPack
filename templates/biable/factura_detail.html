@@ -7,7 +7,7 @@
             <h3>Información Factura</h3>
             <hr>
             <p>
-                <span class="label">Cliente:</span> {{ object.cliente|title }}
+                <span class="label">Cliente:</span> <a href="{{ object.cliente.get_absolute_url }}"> {{ object.cliente|title }} </a>
             </p>
             <p>
                 <span class="label">Fecha:</span> {{ object.fecha_documento }}

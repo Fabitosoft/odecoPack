@@ -100,6 +100,9 @@ class Cliente(models.Model):
     grupo = models.ForeignKey(GrupoCliente, null=True, blank=True, related_name='mis_empresas')
     fecha_creacion = models.DateField(null=True, blank=True)
 
+    def get_absolute_url(self):
+        return reverse("biable:detalle_cliente", kwargs={"pk": self.nit})
+
     class Meta:
         verbose_name = 'Cliente'
         verbose_name_plural = 'C-1.1 Clientes'
@@ -238,7 +241,7 @@ class FacturasBiable(TimeStampedModel):
     direccion_despacho = models.CharField(max_length=400, null=True, blank=True)
     tipo_documento = models.CharField(max_length=3, null=True, blank=True)
     nro_documento = models.CharField(max_length=10, null=True, blank=True)
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, related_name='mis_compras')
     vendedor = models.ForeignKey(VendedorBiable, null=True)
     venta_bruta = models.DecimalField(max_digits=18, decimal_places=4)
     dscto_netos = models.DecimalField(max_digits=18, decimal_places=4)
