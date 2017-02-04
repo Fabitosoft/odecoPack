@@ -19,6 +19,15 @@ class FacturaDetailView(SelectRelatedMixin, PrefetchRelatedMixin, DetailView):
     prefetch_related = ['mis_movimientos_venta__item_biable']
 
 
-class ClienteDetailView(DetailView):
+class ClienteDetailView(PrefetchRelatedMixin, DetailView):
     model = Cliente
     template_name = 'biable/cliente_detail.html'
+    prefetch_related = [
+        'mis_compras__vendedor',
+        'mis_cotizaciones__usuario',
+        'mis_cotizaciones__mis_remisiones',
+        'mis_cotizaciones__mis_remisiones__factura_biable',
+        'grupo__mis_empresas',
+        'mis_despachos__ciudad',
+        'mis_despachos__ciudad__departamento',
+    ]

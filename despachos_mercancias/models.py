@@ -86,7 +86,7 @@ class EnvioTransportadoraTCC(TimeStampedModel):
     fecha_entrega = models.DateField(null=True, blank=True)
     nro_factura_transportadora = models.PositiveIntegerField(null=True, blank=True)
     nro_tracking = models.CharField(max_length=60)
-    cliente = models.ForeignKey(Cliente, null=True, blank=True)
+    cliente = models.ForeignKey(Cliente, null=True, blank=True, related_name='mis_despachos')
     cliente_alternativo = models.CharField(max_length=60, null=True, blank=True)
     tipo = models.CharField(max_length=2, choices=TIPO_ENVIO, default='PQ')
     nro_tracking_boom = models.CharField(max_length=60, blank=True, null=True)
@@ -106,6 +106,7 @@ class EnvioTransportadoraTCC(TimeStampedModel):
         permissions = (
             ('ver_segui_envio_tcc', 'Seg. Envios TCC'),
         )
+        ordering=['-fecha_envio']
 
     def get_numero_dias_entrega(self):
         if self.fecha_entrega:
