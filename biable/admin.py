@@ -14,7 +14,7 @@ from biable.models import (
     DepartamentoBiable,
     PaisBiable,
     CiudadBiable,
-    GrupoCliente)
+    GrupoCliente, SucursalBiable)
 
 
 # Register your models here.
@@ -110,7 +110,8 @@ class MovimientoVentaBiableInLine(admin.TabularInline):
         'costo_total',
         'rentabilidad',
         'imp_netos',
-        'venta_neto'
+        'venta_neto',
+        'proyecto'
     )
     readonly_fields = (
         'item_biable',
@@ -121,7 +122,8 @@ class MovimientoVentaBiableInLine(admin.TabularInline):
         'costo_total',
         'rentabilidad',
         'imp_netos',
-        'venta_neto'
+        'venta_neto',
+        'proyecto'
     )
     model = MovimientoVentaBiable
     can_delete = False
@@ -215,7 +217,39 @@ class GrupoClienteAdmin(admin.ModelAdmin):
     inlines = [ClienteInLine, ]
 
 
+class SucursalBiableAdmin(admin.ModelAdmin):
+    list_display = (
+        'nro_sucursal',
+        'cliente',
+        'nombre_establecimiento',
+        'cupo_credito',
+        'condicion_pago',
+        'activo',
+        'vendedor_biable',
+        'vendedor_real'
+    )
+
+    readonly_fields = (
+        'nro_sucursal',
+        'cliente',
+        'nombre_establecimiento',
+        'cupo_credito',
+        'condicion_pago',
+        'activo',
+        'vendedor_biable',
+        'fecha_creacion',
+        'direccion'
+    )
+
+    search_fields = (
+        'vendedor_biable__nombre',
+        'vendedor_real__nombre',
+        'cliente__nombre'
+    )
+
+
 admin.site.register(DepartamentoBiable, DepartamentoAdmin)
+admin.site.register(SucursalBiable, SucursalBiableAdmin)
 admin.site.register(PaisBiable, PaisAdmin)
 admin.site.register(CiudadBiable, CiudadAdmin)
 admin.site.register(Cliente, ClienteBiableAdmin)

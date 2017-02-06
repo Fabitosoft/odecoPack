@@ -164,7 +164,7 @@ class VendedorBiable(models.Model):
 
     class Meta:
         verbose_name = 'Vendedor'
-        verbose_name_plural = 'C-1.2 Vendedores'
+        verbose_name_plural = 'C-1.3 Vendedores'
 
     def __str__(self):
         return self.nombre
@@ -279,5 +279,10 @@ class SucursalBiable(models.Model):
     vendedor_biable = models.ForeignKey(VendedorBiable, null=True, blank=True, related_name='mis_clientes_biable')
     vendedor_real = models.ForeignKey(VendedorBiable, null=True, blank=True, related_name='mis_clientes_reales')
 
+    def __str__(self):
+        return '%s - %s' % (self.cliente, self.nro_sucursal)
+
     class Meta:
         unique_together = ('nro_sucursal', 'cliente')
+        verbose_name = 'Sucursal Cliente'
+        verbose_name_plural = 'C-1.2 Sucursales Cliente'
