@@ -70,24 +70,6 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                         tarea_envio.trabajo_diario = trabajo_diario
                         tarea_envio.save()
 
-                    qsCartera = Cartera.objects.select_related('factura', 'factura__tarea').filter(
-                        esta_vencido=True,
-                        vendedor__in=vendedores_biable).distinct().order_by(
-                        "-dias_vencido")
-                    for cartera in qsCartera.all():
-                        factura = cartera.factura
-                        if factura:
-                            try:
-                                tarea_cartera = factura.tarea
-                                tarea_cartera.estado = 0
-                            except TareaCartera.DoesNotExist:
-                                tarea_cartera = TareaCartera()
-                                tarea_cartera.factura = factura
-                            tarea_cartera.descripcion = "%s vencida por %s dia(s)" % (
-                                tarea_cartera.get_descripcion_tarea(), cartera.dias_vencido)
-                            tarea_cartera.trabajo_diario = trabajo_diario
-                            tarea_cartera.save()
-
                     qsCotizacion = Cotizacion.estados.activo().select_related('tarea').filter(
                         created__date__lt=fecha_hoy,
                         usuario=usuario).order_by(
@@ -102,6 +84,24 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                         tarea_cotizacion.descripcion = tarea_cotizacion.get_descripcion_tarea()
                         tarea_cotizacion.trabajo_diario = trabajo_diario
                         tarea_cotizacion.save()
+
+                        qsCartera = Cartera.objects.select_related('factura', 'factura__tarea').filter(
+                            esta_vencido=True,
+                            vendedor__in=vendedores_biable).distinct().order_by(
+                            "-dias_vencido")
+                        for cartera in qsCartera.all():
+                            factura = cartera.factura
+                            if factura:
+                                try:
+                                    tarea_cartera = factura.tarea
+                                    tarea_cartera.estado = 0
+                                except TareaCartera.DoesNotExist:
+                                    tarea_cartera = TareaCartera()
+                                    tarea_cartera.factura = factura
+                                tarea_cartera.descripcion = "%s vencida por %s dia(s)" % (
+                                    tarea_cartera.get_descripcion_tarea(), cartera.dias_vencido)
+                                tarea_cartera.trabajo_diario = trabajo_diario
+                                tarea_cartera.save()
 
                 trabajo_diario.set_actualizar_seguimiento_trabajo()
 

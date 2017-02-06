@@ -183,6 +183,7 @@ class MovimientoVentaBiable(models.Model):  # Detalle factura
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4)
     imp_netos = models.DecimalField(max_digits=18, decimal_places=4)
     venta_neto = models.DecimalField(max_digits=18, decimal_places=4)
+    proyecto = models.CharField(max_length=60, null=True, blank=True)
 
     class Meta:
         permissions = (
@@ -249,7 +250,7 @@ class FacturasBiable(TimeStampedModel):
     rentabilidad = models.DecimalField(max_digits=18, decimal_places=4)
     imp_netos = models.DecimalField(max_digits=18, decimal_places=4)
     venta_neto = models.DecimalField(max_digits=18, decimal_places=4)
-    proyecto = models.CharField(max_length=60, null=True, blank=True)
+    sucursal = models.ForeignKey('SucursalBiable', null=True, blank=True, related_name='mis_facturas')
 
     def __str__(self):
         return "%s-%s" % (self.tipo_documento, self.nro_documento)
@@ -263,3 +264,20 @@ class FacturasBiable(TimeStampedModel):
         )
         verbose_name = 'Factura'
         verbose_name_plural = 'T-0.1 Facturas'
+        unique_together = ('tipo_documento', 'nro_documento')
+
+
+class SucursalBiable(models.Model):
+    nro_sucursal = models.PositiveIntegerField()
+    cliente = models.ForeignKey(Cliente, related_name='mis_sucursales')
+    nombre_establecimiento = models.CharField(max_length=200, null=True, blank=True)
+    cupo_credito = models.DecimalField(max_digits=10, decimal_places=0)
+    condicion_pago = models.PositiveIntegerField(null=True, blank=True)
+    activo = models.BooleanField()
+    fecha_creacion = models.DateField()
+    direccion = models.CharField(max_length=200)
+    vendedor_biable = models.ForeignKey(VendedorBiable, null=True, blank=True, related_name='mis_clientes_biable')
+    vendedor_real = models.ForeignKey(VendedorBiable, null=True, blank=True, related_name='mis_clientes_reales')
+
+    class Meta:
+        unique_together = ('nro_sucursal', 'cliente')

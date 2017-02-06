@@ -147,7 +147,6 @@ class FacturasBiableAdmin(admin.ModelAdmin):
         'cliente',
         'vendedor',
         'ciudad_biable',
-        'proyecto',
         'fecha_documento'
     )
     readonly_fields = (
@@ -161,7 +160,6 @@ class FacturasBiableAdmin(admin.ModelAdmin):
         'imp_netos',
         'venta_neto',
         'ciudad_biable',
-        'proyecto',
         'fecha_documento',
         'vendedor',
         'direccion_despacho',
