@@ -39,8 +39,6 @@ class DocumentoAdmin(admin.ModelAdmin):
         ImagenDocumentoInline,
     ]
 
-    ordering = ('tipo__nombre','nro',)
-
     def get_tipo_nomenclatura(self, obj):
         return obj.tipo.nomenclatura
     get_tipo_nomenclatura.short_description = 'Tipo'

@@ -96,7 +96,6 @@ class Cotizacion(TimeStampedModel):
             ('gestion_cotizaciones', 'Gestionar Cotizaciones'),
             # ('hacer_cotizacion', 'Hacer Cotización'),
         )
-        ordering = ['-fecha_envio']
 
     def get_absolute_url(self):
         return reverse("cotizaciones:detalle_cotizacion", kwargs={"pk": self.pk})
@@ -266,7 +265,5 @@ class ComentarioCotizacion(TimeStampedModel):
     usuario = models.ForeignKey(User, on_delete=models.PROTECT, related_name='comentarios_cotizaciones')
     cotizacion = models.ForeignKey(Cotizacion, null=True, blank=True, related_name="mis_comentarios")
 
-    class Meta:
-        ordering = ['-created']
 
 # endregion

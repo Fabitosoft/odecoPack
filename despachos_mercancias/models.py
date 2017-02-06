@@ -106,7 +106,6 @@ class EnvioTransportadoraTCC(TimeStampedModel):
         permissions = (
             ('ver_segui_envio_tcc', 'Seg. Envios TCC'),
         )
-        ordering=['-fecha_envio']
 
     def get_numero_dias_entrega(self):
         if self.fecha_entrega:

@@ -263,4 +263,3 @@ class FacturasBiable(TimeStampedModel):
         )
         verbose_name = 'Factura'
         verbose_name_plural = 'T-0.1 Facturas'
-        ordering = ['-fecha_documento']

@@ -54,7 +54,6 @@ class Seguimiento(TimeStampedModel):
 
     class Meta:
         abstract = True
-        ordering = ('-created',)
 
 
 class Tarea(TimeStampedModel):
