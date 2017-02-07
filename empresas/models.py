@@ -1,6 +1,6 @@
 from django.db import models
 
-from utils.models import TimeStampedModel
+from model_utils.models import TimeStampedModel
 
 
 # Create your models here.
@@ -23,3 +23,5 @@ class Industria(TimeStampedModel):
 
     def __str__(self):
         return self.nombre
+
+
