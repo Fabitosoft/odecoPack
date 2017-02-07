@@ -141,7 +141,8 @@ class FacturasBiableAdmin(admin.ModelAdmin):
     search_fields = (
         'nro_documento',
         'tipo_documento',
-        'cliente__nombre'
+        'cliente__nombre',
+        'cliente__nit',
     )
     list_display = (
         'nro_documento',
