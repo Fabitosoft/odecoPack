@@ -8,6 +8,8 @@ from usuarios.models import UserExtended, Colaborador
 
 from geografia_colombia.models import Pais, Ciudad, Departamento
 
+from empresas.models import Canal, Industria
+
 
 # Create your models here.
 
@@ -99,6 +101,10 @@ class Cliente(models.Model):
     nombre = models.CharField(max_length=120)
     grupo = models.ForeignKey(GrupoCliente, null=True, blank=True, related_name='mis_empresas')
     fecha_creacion = models.DateField(null=True, blank=True)
+    canal = models.ForeignKey(Canal, related_name='mis_empresas', null=True, blank=True)
+    clasificacion = models.CharField(max_length=1, null=True, blank=True)
+    industria = models.ForeignKey(Industria, related_name='mis_empresas', null=True, blank=True)
+    competencia = models.BooleanField(default=False)
 
     def get_absolute_url(self):
         return reverse("biable:detalle_cliente", kwargs={"pk": self.nit})
@@ -235,9 +241,11 @@ class Cartera(models.Model):
         verbose_name = 'Cartera'
         verbose_name_plural = 'T-0.2 Carteras'
 
+
 class FacturaBiableActivaManager(models.Manager):
     def get_queryset(self):
         return super(FacturaBiableActivaManager, self).get_queryset().filter(activa=True)
+
 
 class FacturasBiable(TimeStampedModel):
     ciudad_biable = models.ForeignKey(CiudadBiable, null=True, blank=True, on_delete=models.PROTECT)

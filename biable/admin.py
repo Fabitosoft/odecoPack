@@ -90,7 +90,7 @@ class VendedorBiableAdmin(admin.ModelAdmin):
 
 class ClienteBiableAdmin(admin.ModelAdmin):
     list_select_related = ('grupo',)
-    list_display = ('nit', 'nombre', 'fecha_creacion', 'grupo')
+    list_display = ('nit', 'nombre', 'fecha_creacion', 'grupo','canal')
 
     search_fields = [
         'nit',

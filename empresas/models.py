@@ -13,3 +13,13 @@ class Canal(TimeStampedModel):
 
     def __str__(self):
         return self.canal
+
+class Industria(TimeStampedModel):
+    nombre = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = "Industria"
+        verbose_name_plural = "Industrias"
+
+    def __str__(self):
+        return self.nombre
