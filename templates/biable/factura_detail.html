@@ -4,10 +4,11 @@
     <h1>Detalles Factura {{ object.tipo_documento }}-{{ object.nro_documento }} </h1>
     <div class="row">
         <div class="col-md-6">
-            <h3>Información Factura</h3>
+            <h3>Información Factura</h3> {% if not object.activa %}<span style="color: red">Anulada</span>{% endif %}
             <hr>
             <p>
-                <span class="label">Cliente:</span> <a href="{{ object.cliente.get_absolute_url }}"> {{ object.cliente|title }} </a>
+                <span class="label">Cliente:</span> <a
+                    href="{{ object.cliente.get_absolute_url }}"> {{ object.cliente|title }} </a>
             </p>
             <p>
                 <span class="label">Fecha:</span> {{ object.fecha_documento }}

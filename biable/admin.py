@@ -150,7 +150,7 @@ class FacturasBiableAdmin(admin.ModelAdmin):
         'vendedor',
         'ciudad_biable',
         'fecha_documento',
-        'anulada'
+        'activa'
     )
     readonly_fields = (
         'tipo_documento',
@@ -167,7 +167,7 @@ class FacturasBiableAdmin(admin.ModelAdmin):
         'vendedor',
         'direccion_despacho',
         'sucursal',
-        'anulada',
+        'activa',
     )
 
 

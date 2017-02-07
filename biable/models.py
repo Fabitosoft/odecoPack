@@ -251,7 +251,7 @@ class FacturasBiable(TimeStampedModel):
     imp_netos = models.DecimalField(max_digits=18, decimal_places=4)
     venta_neto = models.DecimalField(max_digits=18, decimal_places=4)
     sucursal = models.ForeignKey('SucursalBiable', null=True, blank=True, related_name='mis_facturas')
-    anulada = models.BooleanField(default=False)
+    activa = models.BooleanField(default=True)
 
     def __str__(self):
         return "%s-%s" % (self.tipo_documento, self.nro_documento)
