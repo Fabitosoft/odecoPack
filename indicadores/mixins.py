@@ -127,7 +127,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         facturacion_cotizaciones_dia = 0
         cantidad_cotizaciones_dia = 0
 
-        qsVentasMes = FacturasBiable.objects.select_related(
+        qsVentasMes = FacturasBiable.activas.select_related(
             'vendedor__colaborador__usuario__user'
         ).values(
             'vendedor__colaborador__usuario__user'

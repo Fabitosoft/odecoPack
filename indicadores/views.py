@@ -91,7 +91,7 @@ class VentasVendedor(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin,
 
     def consulta(self, ano, mes):
         current_user = self.request.user
-        qs = FacturasBiable.objects.all().values('vendedor__nombre').annotate(
+        qs = FacturasBiable.activas.all().values('vendedor__nombre').annotate(
             # vendedor_nombre=F('vendedor__nombre'),
             vendedor_nombre=Case(
                 When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
@@ -150,7 +150,7 @@ class VentasVendedorConsola(LoginRequiredMixin, JSONResponseMixin, AjaxResponseM
 
     def consulta(self, ano, mes):
         current_user = self.request.user
-        qs = FacturasBiable.objects.all().values('fecha_documento').annotate(
+        qs = FacturasBiable.activas.all().values('fecha_documento').annotate(
             vendedor_nombre=Case(
                 When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
                 default=F('vendedor__nombre'),
@@ -229,7 +229,7 @@ class VentasClientes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, I
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        qs = FacturasBiable.objects.all().values('cliente__nombre').annotate(
+        qs = FacturasBiable.activas.all().values('cliente__nombre').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -290,7 +290,7 @@ class VentasClientesAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        qs = FacturasBiable.objects.all().values('cliente__nombre').annotate(
+        qs = FacturasBiable.activas.all().values('cliente__nombre').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -334,7 +334,7 @@ class VentasMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, Inform
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = FacturasBiable.objects.values('fecha_documento').annotate(
+        qs = FacturasBiable.activas.values('fecha_documento').annotate(
             mes=Extract('fecha_documento', 'month'),
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
@@ -377,7 +377,7 @@ class VentasLineaAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, I
         return self.render_json_response(context)
 
     def consulta(self, ano, mes):
-        qs = FacturasBiable.objects.all().values('vendedor__linea_ventas_id').annotate(
+        qs = FacturasBiable.activas.all().values('vendedor__linea_ventas_id').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -421,7 +421,7 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = FacturasBiable.objects.all().values('vendedor_id').annotate(
+        qs = FacturasBiable.activas.all().values('vendedor_id').annotate(
             vendedor_nombre=Case(
                 When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
                 default=F('vendedor__nombre'),
@@ -469,7 +469,7 @@ class VentasLineaAnoMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = FacturasBiable.objects.all().values('vendedor__linea_ventas_id').annotate(
+        qs = FacturasBiable.activas.all().values('vendedor__linea_ventas_id').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -530,7 +530,7 @@ class VentasClienteMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAno
         return self.render_json_response(context)
 
     def consulta(self, ano):
-        qs = FacturasBiable.objects.all().values('cliente__nombre').annotate(
+        qs = FacturasBiable.activas.all().values('cliente__nombre').annotate(
             v_bruta=Sum('venta_bruta'),
             v_neto=Sum('venta_neto'),
             Descuentos=Sum('dscto_netos'),
@@ -670,7 +670,7 @@ class TrabajoCotizacionVentaVendedorAnoMes(LoginRequiredMixin, JSONResponseMixin
 
         ).filter(fecha_envio__month__in=mes, fecha_envio__year__in=ano).order_by('fecha_envio', 'dia_semana_consulta')
 
-        qsFacturacion = FacturasBiable.objects.values('vendedor__colaborador__usuario').annotate(
+        qsFacturacion = FacturasBiable.activas.values('vendedor__colaborador__usuario').annotate(
             vendedor=Upper(Case(
                 When(vendedor__colaborador__isnull=True, then=F('vendedor__nombre')),
                 default=Concat('vendedor__colaborador__usuario__user__first_name', Value(' '),
@@ -742,5 +742,5 @@ class VentasProductoAnoMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMi
             )),
             venta_neta=Sum('venta_neto'),
             cantidad_neta=Sum('cantidad'),
-        ).filter(factura__fecha_documento__year__in=ano, month__in=mes)
+        ).filter(factura__fecha_documento__year__in=ano, month__in=mes, factura__activa=True)
         return qFinal

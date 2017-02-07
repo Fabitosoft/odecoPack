@@ -235,6 +235,9 @@ class Cartera(models.Model):
         verbose_name = 'Cartera'
         verbose_name_plural = 'T-0.2 Carteras'
 
+class FacturaBiableActivaManager(models.Manager):
+    def get_queryset(self):
+        return super(FacturaBiableActivaManager, self).get_queryset().filter(activa=True)
 
 class FacturasBiable(TimeStampedModel):
     ciudad_biable = models.ForeignKey(CiudadBiable, null=True, blank=True, on_delete=models.PROTECT)
@@ -252,6 +255,9 @@ class FacturasBiable(TimeStampedModel):
     venta_neto = models.DecimalField(max_digits=18, decimal_places=4)
     sucursal = models.ForeignKey('SucursalBiable', null=True, blank=True, related_name='mis_facturas')
     activa = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    activas = FacturaBiableActivaManager()
 
     def __str__(self):
         return "%s-%s" % (self.tipo_documento, self.nro_documento)
