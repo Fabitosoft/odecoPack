@@ -132,7 +132,7 @@ class MovimientoVentaBiableInLine(admin.TabularInline):
 
 class FacturasBiableAdmin(admin.ModelAdmin):
     inlines = [MovimientoVentaBiableInLine, ]
-    list_select_related = ['cliente', 'vendedor']
+    list_select_related = ['cliente', 'vendedor','ciudad_biable']
     list_filter = (
         'tipo_documento',
         'vendedor',
@@ -222,6 +222,7 @@ class GrupoClienteAdmin(admin.ModelAdmin):
 
 
 class SucursalBiableAdmin(admin.ModelAdmin):
+    list_select_related = ['cliente','vendedor_biable']
     list_display = (
         'nro_sucursal',
         'cliente',

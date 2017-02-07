@@ -3,8 +3,6 @@ from django.core.files.images import get_image_dimensions
 from django.db import models
 from django.contrib.auth.models import User
 
-from empresas.models import Empresa
-
 
 # Create your models here.
 
@@ -47,14 +45,3 @@ class Colaborador(models.Model):
 
     def __str__(self):
         return self.usuario.user.get_full_name()
-
-
-class ClienteEmpresa(models.Model):
-    usuario = models.OneToOneField(UserExtended, on_delete=models.PROTECT, related_name="cliente_empresa")
-    empresa = models.OneToOneField(Empresa, related_name="perfil_cliente", null=True)
-
-    class Meta:
-        verbose_name_plural = "empresas"
-
-    def __str__(self):
-        return self.empresa.nombre

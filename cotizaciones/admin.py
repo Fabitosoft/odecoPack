@@ -69,6 +69,7 @@ class TareasInline(admin.TabularInline):
 
 
 class CotizacionAdmin(admin.ModelAdmin):
+    list_select_related = ['cliente_biable','ciudad_despacho','usuario','cliente_biable']
     list_display = (
         'nro_cotizacion',
         'estado',
