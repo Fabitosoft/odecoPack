@@ -507,7 +507,7 @@ class RemisionListView(SelectRelatedMixin, ListView):
         return qs
 
 
-class CotizacionesListView(ListView):
+class CotizacionesListView(SelectRelatedMixin, ListView):
     model = Cotizacion
     template_name = 'cotizaciones/cotizacion_list.html'
 
@@ -517,25 +517,33 @@ class CotizacionesListView(ListView):
         current_user = self.request.user
         qsFinal = None
 
-        qs = Cotizacion.estados.activo().select_related('usuario').prefetch_related(
-            'mis_remisiones',
-            'mis_remisiones__factura_biable'
-        ).exclude(estado='INI')
+        qs = Cotizacion.estados.activo().exclude(estado='INI')
 
         if self.kwargs.get("tipo") == '2':
-            qs = Cotizacion.estados.completado().select_related('usuario').prefetch_related(
-                'mis_remisiones',
-                'mis_remisiones__factura_biable'
-            )
+            qs = Cotizacion.estados.completado()
 
         if self.kwargs.get("tipo") == '3':
-            qs = Cotizacion.estados.rechazado().select_related('usuario').prefetch_related(
-                'mis_remisiones',
-                'mis_remisiones__factura_biable'
-            )
+            qs = Cotizacion.estados.rechazado()
+
+        qs = qs.select_related(
+            'usuario',
+            'cliente_biable',
+            'ciudad_despacho',
+            'ciudad_despacho__departamento',
+            'ciudad_despacho__departamento__pais'
+        ).prefetch_related(
+            'mis_remisiones',
+            'mis_remisiones__factura_biable'
+        )
 
         if query:
-            qs = Cotizacion.objects.all().select_related('usuario').prefetch_related(
+            qs = Cotizacion.objects.all().select_related(
+                'usuario',
+                'cliente_biable',
+                'ciudad_despacho',
+                'ciudad_despacho__departamento',
+                'ciudad_despacho__departamento__pais'
+            ).prefetch_related(
                 'mis_remisiones',
                 'mis_remisiones__factura_biable'
             )

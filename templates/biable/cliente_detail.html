@@ -34,7 +34,7 @@
             </div>
         </div>
 
-        {% with compras_list=object.mis_compras.all|slice:":20" cotizaciones_list=object.mis_cotizaciones.all|slice:":20" despachos_lista=object.mis_despachos.all|slice:":20" %}
+        {% with compras_list=object.mis_compras.all|dictsortreversed:"fecha_documento"|slice:":20" cotizaciones_list=object.mis_cotizaciones.all|dictsortreversed:"fecha_envio"|slice:":20" despachos_lista=object.mis_despachos.all|dictsortreversed:"fecha_envio"|slice:":20" %}
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#compras" aria-controls="compras" role="tab"

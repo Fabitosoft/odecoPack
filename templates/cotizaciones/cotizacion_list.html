@@ -58,10 +58,20 @@
                     <a href="{{ cotizacion.get_absolute_url }}">{{ cotizacion.nro_cotizacion }}</a>
                 </td>
                 <td>
-                    {{ cotizacion.razon_social }}
+                    {% if cotizacion.cliente_nuevo %}
+                        {{ cotizacion.razon_social }}
+                    {% else %}
+                        <a href="{{ cotizacion.cliente_biable.get_absolute_url }}"
+                           target="_blank">{{ cotizacion.cliente_biable.nombre }}</a>
+                    {% endif %}
                 </td>
                 <td>
-                    {{ cotizacion.ciudad }}
+                    {% if cotizacion.otra_ciudad %}
+                        {{ cotizacion.pais|title }} - {{ cotizacion.ciudad|title }}
+                    {% else %}
+                        {{ cotizacion.ciudad_despacho.nombre|title }} - {{ cotizacion.ciudad_despacho.departamento.nombre|title }} -
+                        {{ cotizacion.ciudad_despacho.departamento.pais.nombre|title }}
+                    {% endif %}
                 </td>
                 <td>
                     {{ cotizacion.get_estado_display }}

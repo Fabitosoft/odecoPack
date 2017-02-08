@@ -55,7 +55,13 @@
             <div class="row div_detalle">
                 <div class="col-xs-12 col-sm-6">
                     <h4>Razón Social:
-                        <small>{{ object.razon_social }}</small>
+                        <small>
+                            {% if object.cliente_nuevo %}
+                                {{ object.razon_social }}
+                            {% else %}
+                                <a href="{{ object.cliente_biable.get_absolute_url }}" target="_blank">{{ object.cliente_biable.nombre }}</a>
+                            {% endif %}
+                        </small>
                     </h4>
                     <h4>Nombre:
                         <small>{{ object.nombres_contacto }} {{ object.apellidos_contacto }}</small>
@@ -69,7 +75,14 @@
                         <small>{{ object.nro_contacto }}</small>
                     </h4>
                     <h4>Ubicación
-                        <small>{{ object.pais }} - {{ object.ciudad }}</small>
+                        <small>
+                            {% if object.otra_ciudad %}
+                                {{ object.pais }} - {{ object.ciudad }}
+                            {% else %}
+                                {{ object.ciudad_despacho.nombre }} - {{ object.ciudad_despacho.departamento.nombre }} -
+                                {{ object.ciudad_despacho.departamento.pais.nombre }}
+                            {% endif %}
+                        </small>
                     </h4>
                 </div>
             </div>
@@ -208,7 +221,8 @@
                 <td class="clear"></td>
                 <td colspan="5"> Descuento:</td>
                 <td> {{ object.descuento }} </td>
-            </tr>            <tr>
+            </tr>
+            <tr>
                 <td class="clear"></td>
                 <td colspan="6"> Total:</td>
                 <td> {{ object.total }} </td>
