@@ -69,13 +69,13 @@ class Cotizacion(TimeStampedModel):
         ('FIN', 'Entragada Totalmente'),
     )
     estado = models.CharField(max_length=10, choices=ESTADOS, default='INI')
-    nro_contacto = models.CharField(blank=True, max_length=30)  # validators should be a list
-    email = models.EmailField(max_length=150, blank=True)
-    nombres_contacto = models.CharField(max_length=120, blank=True)
-    pais = models.CharField(max_length=120, blank=True)
-    ciudad = models.CharField(max_length=120, blank=True)
-    apellidos_contacto = models.CharField(max_length=120, blank=True)
-    razon_social = models.CharField(max_length=120, blank=True)
+    nro_contacto = models.CharField(null=True, blank=True, max_length=30)  # validators should be a list
+    email = models.EmailField(max_length=150)
+    nombres_contacto = models.CharField(max_length=120)
+    pais = models.CharField(max_length=120, blank=True, null=True)
+    ciudad = models.CharField(max_length=120, blank=True, null=True)
+    apellidos_contacto = models.CharField(max_length=120)
+    razon_social = models.CharField(max_length=120, blank=True, null=True)
     nro_cotizacion = models.CharField(max_length=120)
     fecha_envio = models.DateTimeField(null=True, blank=True)
     total = models.DecimalField(max_digits=18, decimal_places=0, default=0)
@@ -86,6 +86,8 @@ class Cotizacion(TimeStampedModel):
     version = models.PositiveIntegerField(default=1)
     ciudad_despacho = models.ForeignKey(Ciudad, null=True, blank=True)
     cliente_biable = models.ForeignKey(ClienteBiable, null=True, blank=True, related_name='mis_cotizaciones')
+    cliente_nuevo = models.BooleanField(default=False)
+    otra_ciudad = models.BooleanField(default=False)
 
     estados = CotizacionesEstadosManager()
     objects = models.Manager()
@@ -264,6 +266,5 @@ class ComentarioCotizacion(TimeStampedModel):
     comentario = models.TextField(max_length=300)
     usuario = models.ForeignKey(User, on_delete=models.PROTECT, related_name='comentarios_cotizaciones')
     cotizacion = models.ForeignKey(Cotizacion, null=True, blank=True, related_name="mis_comentarios")
-
 
 # endregion

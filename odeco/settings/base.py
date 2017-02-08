@@ -5,6 +5,7 @@
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
 
+
 def str_to_bool(s):
     if s == 'True':
         return True
@@ -12,6 +13,7 @@ def str_to_bool(s):
         return False
     else:
         raise ValueError
+
 
 ########## DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
@@ -103,6 +105,8 @@ ROOT_URLCONF = '%s.urls' % SITE_NAME
 ########## APP CONFIGURATION
 DJANGO_APPS = (
     # Default Django apps:
+    'dal',
+    'dal_select2',
     'django.contrib.admin',
     'registration',
     'django.contrib.auth',
@@ -136,7 +140,7 @@ MY_APPS = (
     'despachos_mercancias',
     'geografia_colombia',
     'contactos',
-    #'crm',
+    # 'crm',
 )
 
 THIRD_PART_APPS = (
@@ -183,10 +187,10 @@ STATICFILES_DIRS = [
 ########## END STATIC FILE CONFIGURATION
 
 
-#Crispy FORM TAGs SETTINGS
+# Crispy FORM TAGs SETTINGS
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
-#DJANGO REGISTRATION REDUX SETTINGS
+# DJANGO REGISTRATION REDUX SETTINGS
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_AUTO_LOGIN = True
 LOGIN_REDIRECT_URL = '/'

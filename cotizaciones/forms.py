@@ -2,9 +2,10 @@ from crispy_forms.bootstrap import StrictButton, PrependedText, FormActions, Fie
 from crispy_forms.layout import Submit, Layout, Div, Field, Button, HTML
 from django import forms
 from django.forms import ModelForm
+from django.urls import reverse
 
 from crispy_forms.helper import FormHelper
-from django.urls import reverse
+from dal import autocomplete
 
 from .models import (
     Cotizacion,
@@ -13,6 +14,8 @@ from .models import (
     ItemCotizacion,
     ComentarioCotizacion
 )
+from geografia_colombia.models import Ciudad
+from biable.models import Cliente
 
 
 class BusquedaCotiForm(forms.Form):
@@ -73,8 +76,19 @@ class CotizacionForm(ModelForm):
     nro_contacto = forms.CharField(label="Número de Contacto")
     nombres_contacto = forms.CharField(label="Nombres")
     apellidos_contacto = forms.CharField(label="Apellidos")
-    razon_social = forms.CharField(label="Razón Social")
+    razon_social = forms.CharField(label="Razón Social", required=False)
     observaciones = forms.Textarea()
+    ciudad_despacho = forms.ModelChoiceField(
+        queryset=Ciudad.objects.select_related('departamento', 'departamento__pais').all(),
+        widget=autocomplete.ModelSelect2(url='geografia:ciudad-autocomplete'),
+        required=False
+    )
+    cliente_biable = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        widget=autocomplete.ModelSelect2(url='biable:cliente-autocomplete'),
+        required=False,
+        label='Cliente CGuno'
+    )
 
     class Meta:
         model = Cotizacion
@@ -90,15 +104,27 @@ class CotizacionForm(ModelForm):
         self.helper.layout = Layout(
             Div(
                 Field('razon_social'),
-                Field('nro_contacto')
+                Field('cliente_biable'),
+            ),
+            Div(
+                Field('cliente_nuevo')
             ),
             Div(
                 Field('pais'),
-                Field('ciudad')
+                Field('ciudad'),
+            ),
+            Div(
+                Field('ciudad_despacho'),
+            ),
+            Div(
+                Field('otra_ciudad')
             ),
             Div(
                 Field('nombres_contacto'),
                 Field('apellidos_contacto')
+            ),
+            Div(
+                Field('nro_contacto'),
             ),
             PrependedText('email', '@', placeholder="Correo Electrónico"),
             HTML('<hr/>'),

@@ -11,13 +11,13 @@ class ListaPrecioInline(admin.TabularInline):
     def user_email(self, instance):
         return instance.item
 
-    fields =(
-            'get_nombre_item',
-            "cantidad",
-            "forma_pago",
-            "precio",
-            "total",
-        )
+    fields = (
+        'get_nombre_item',
+        "cantidad",
+        "forma_pago",
+        "precio",
+        "total",
+    )
 
     extra = 0
     readonly_fields = \
@@ -48,13 +48,13 @@ class RemisionInline(admin.TabularInline):
 class TareasInline(admin.TabularInline):
     model = TareaCotizacion
 
-    fields =(
-            'nombre',
-            "descripcion",
-            "fecha_inicial",
-            "fecha_final",
-            "esta_finalizada",
-        )
+    fields = (
+        'nombre',
+        "descripcion",
+        "fecha_inicial",
+        "fecha_final",
+        "esta_finalizada",
+    )
 
     extra = 0
     # readonly_fields = \
@@ -69,7 +69,14 @@ class TareasInline(admin.TabularInline):
 
 
 class CotizacionAdmin(admin.ModelAdmin):
-    list_select_related = ['cliente_biable','ciudad_despacho','usuario','cliente_biable']
+    list_select_related = [
+        'cliente_biable',
+        'ciudad_despacho',
+        'usuario',
+        'cliente_biable',
+        'ciudad_despacho__departamento',
+        'ciudad_despacho__departamento__pais'
+    ]
     list_display = (
         'nro_cotizacion',
         'estado',
@@ -80,18 +87,21 @@ class CotizacionAdmin(admin.ModelAdmin):
         'ciudad',
         'pais',
         'cliente_biable',
+        'cliente_nuevo',
+        'otra_ciudad'
     )
     readonly_fields = ('total',)
-    list_editable = ('ciudad_despacho','cliente_biable',)
-    list_filter = ('estado',)
+    list_editable = ('cliente_biable',)
+    raw_id_fields = ('cliente_biable', 'ciudad_despacho')
+    list_filter = ('estado', 'cliente_nuevo', 'otra_ciudad')
     inlines = [
         ListaPrecioInline,
         RemisionInline,
         TareasInline,
     ]
     raw_id_fields = (
-        'ciudad_despacho',
-        'cliente_biable'
+        'cliente_biable',
+        'ciudad_despacho'
     )
     search_fields = (
         'pais',

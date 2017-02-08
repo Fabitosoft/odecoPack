@@ -132,7 +132,20 @@
     <p>
         Apreciado(a) {{ object.nombres_contacto|title }} mi nombre es
         {{ object.usuario.get_full_name|title }}, de <strong>ODECOPACK S.A.S</strong>,
-        quien realizó la cotización para <strong>{{ object.razon_social|title }}</strong>.
+        quien realizó la cotización para
+        <strong>
+            {% if object.cliente_biable %}
+                {{ object.cliente_biable.nombre }}
+            {% else %}
+                {{ object.razon_social|title }}
+            {% endif %}
+        </strong> en
+        {% if object.ciudad_despacho %}
+            {{ object.ciudad_despacho|title }}
+        {% else %}
+            {{ object.ciudad }} - {{ object.pais }}
+        {% endif %}
+        .
     </p>
 
     <p>

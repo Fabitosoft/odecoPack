@@ -1,4 +1,6 @@
 from braces.views import PrefetchRelatedMixin, SelectRelatedMixin
+from dal import autocomplete
+from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic.detail import DetailView
 
@@ -31,3 +33,20 @@ class ClienteDetailView(PrefetchRelatedMixin, DetailView):
         'mis_despachos__ciudad',
         'mis_despachos__ciudad__departamento',
     ]
+
+
+class ClienteAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return Cliente.objects.none()
+
+        qs = Cliente.objects.all()
+
+        if self.q:
+            qs = qs.filter(
+                Q(nombre__icontains=self.q) |
+                Q(nit__istartswith=self.q)
+            )
+
+        return qs

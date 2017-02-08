@@ -1,6 +1,7 @@
 {% extends "cotizaciones/base_cotizacion.html" %}
 {% load funciones_especiales %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block titulo_pagina %}
     Cotizador {% if cotizacion_edit %}Editando {{ cotizacion_edit }}{% endif %}
@@ -183,6 +184,7 @@
                     </div>
                     <div class="col-md-3">
                         <h3>Datos Cotización</h3>
+                        <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
                         {% crispy cotizacion_form %}
                         <hr/>
                         <form method="POST">
@@ -193,6 +195,7 @@
                 {% else %}
                     <div>
                         <h3>Datos Cotización</h3>
+                        <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
                         {% crispy cotizacion_form %}
                     </div>
                 {% endif %}
@@ -261,5 +264,32 @@
             return parts.join(",");
         }
 
+        if (!$('#id_cliente_nuevo').is(':checked')) {
+            $("#div_id_razon_social").toggle(this.checked);
+            $("#div_id_cliente_biable").toggle(!this.checked);
+        } else {
+            $("#div_id_razon_social").toggle(!this.checked);
+            $("#div_id_cliente_biable").toggle(this.checked);
+        }
+        if (!$('#id_otra_ciudad').is(':checked')) {
+            $("#div_id_pais").toggle(this.checked);
+            $("#div_id_ciudad").toggle(this.checked);
+            $("#div_id_ciudad_despacho").toggle(!this.checked);
+        } else {
+            $("#div_id_pais").toggle(!this.checked);
+            $("#div_id_ciudad").toggle(!this.checked);
+            $("#div_id_ciudad_despacho").toggle(this.checked);
+        }
+
+        $("#id_cliente_nuevo").change(function () {
+            $("#div_id_razon_social").toggle(this.checked);
+            $("#div_id_cliente_biable").toggle(!this.checked);
+        });
+
+        $("#id_otra_ciudad").change(function () {
+            $("#div_id_pais").toggle(this.checked);
+            $("#div_id_ciudad").toggle(this.checked);
+            $("#div_id_ciudad_despacho").toggle(!this.checked);
+        });
     {% endblock %}
 </script>

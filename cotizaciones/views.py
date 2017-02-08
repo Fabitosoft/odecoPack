@@ -22,13 +22,15 @@ from django.forms import inlineformset_factory
 from django.utils import timezone
 from django.contrib import messages
 
+from braces.views import LoginRequiredMixin
+
 import mistune
 from weasyprint import HTML
 
 from braces.views import SelectRelatedMixin
 
 from listasprecios.forms import ProductoBusqueda
-from biable.models import Colaborador
+from biable.models import Colaborador, Cliente
 from .models import (
     ItemCotizacion,
     Cotizacion,
@@ -51,6 +53,8 @@ from .forms import (
     ItemCotizacionOtrosForm,
     ComentarioCotizacionForm
 )
+
+from geografia_colombia.models import Ciudad
 
 
 class CotizacionDetailView(SelectRelatedMixin, DetailView):
@@ -349,6 +353,8 @@ class CotizacionEmailView(View):
         pk = kwargs['pk']
         obj = Cotizacion.objects.get(pk=pk)
 
+        print(self.request.POST)
+
         if obj.items.all().count() > 0:
             connection = get_connection(host=settings.EMAIL_HOST_ODECO,
                                         port=settings.EMAIL_PORT_ODECO,
@@ -365,19 +371,45 @@ class CotizacionEmailView(View):
                 obj.email = self.request.POST.get('email')
                 obj.nro_contacto = self.request.POST.get('nro_contacto')
                 obj.observaciones = markdown(self.request.POST.get('observaciones'))
-                obj.ciudad = self.request.POST.get('ciudad')
-                obj.pais = self.request.POST.get('pais')
                 obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
                 obj.fecha_envio = timezone.now()
                 obj.estado = "ENV"
-                obj.save()
 
             esta_en_edicion = obj.en_edicion
             if obj.en_edicion:
                 obj.en_edicion = False
                 obj.fecha_envio = timezone.now()
                 obj.version += 1
-                obj.save()
+
+            es_cliente_nuevo = bool(self.request.POST.get('cliente_nuevo'))
+            obj.cliente_nuevo = es_cliente_nuevo
+            es_otra_ciudad = bool(self.request.POST.get('otra_ciudad'))
+            obj.otra_ciudad = es_otra_ciudad
+
+            if not es_otra_ciudad:
+                id_ciudad = int(self.request.POST.get('ciudad_despacho'))
+                ciudad_despacho = Ciudad.objects.select_related(
+                    'departamento',
+                    'departamento__pais'
+                ).get(pk=id_ciudad)
+                obj.ciudad_despacho = ciudad_despacho
+                obj.ciudad = None
+                obj.pais = None
+            else:
+                obj.ciudad = self.request.POST.get('ciudad')
+                obj.pais = self.request.POST.get('pais')
+                obj.ciudad_despacho = None
+
+            if not es_cliente_nuevo:
+                nit_cliente = self.request.POST.get('cliente_biable')
+                cliente_biable = Cliente.objects.get(nit=nit_cliente)
+                obj.cliente_biable = cliente_biable
+                obj.razon_social = None
+            else:
+                obj.razon_social = self.request.POST.get('razon_social')
+                obj.cliente_biable = None
+
+            obj.save()
 
             from_email = "ODECOPACK / COMPONENTES <%s>" % (settings.EMAIL_HOST_USER_ODECO)
             to = obj.email
@@ -451,7 +483,7 @@ class TareaListView(SelectRelatedMixin, ListView):
         return qs
 
 
-class RemisionListView(SelectRelatedMixin,ListView):
+class RemisionListView(SelectRelatedMixin, ListView):
     model = RemisionCotizacion
     select_related = ['cotizacion', 'cotizacion__usuario']
     template_name = 'cotizaciones/remision_list.html'
@@ -749,12 +781,40 @@ class CotizacionFormView(FormView):
             cotizacion.apellidos_contacto = self.request.POST.get('apellidos_contacto')
             cotizacion.email = self.request.POST.get('email')
             cotizacion.nro_contacto = self.request.POST.get('nro_contacto')
-            cotizacion.ciudad = self.request.POST.get('ciudad')
-            cotizacion.pais = self.request.POST.get('pais')
+
+            es_cliente_nuevo = bool(self.request.POST.get('cliente_nuevo'))
+            cotizacion.cliente_nuevo = es_cliente_nuevo
+            es_otra_ciudad = bool(self.request.POST.get('otra_ciudad'))
+            cotizacion.otra_ciudad = es_otra_ciudad
+
             cotizacion.fecha_envio = timezone.now()
             cotizacion.estado = "INI"
             cotizacion.save()
             cotizacion.nro_cotizacion = "%s - %s" % ('CB', cotizacion.id)
+
+            if not es_otra_ciudad:
+                id_ciudad = int(self.request.POST.get('ciudad_despacho'))
+                ciudad_despacho = Ciudad.objects.select_related(
+                    'departamento',
+                    'departamento__pais'
+                ).get(pk=id_ciudad)
+                cotizacion.ciudad_despacho = ciudad_despacho
+                cotizacion.ciudad = None
+                cotizacion.pais = None
+            else:
+                cotizacion.ciudad = self.request.POST.get('ciudad')
+                cotizacion.pais = self.request.POST.get('pais')
+                cotizacion.ciudad_despacho = None
+
+            if not es_cliente_nuevo:
+                nit_cliente = self.request.POST.get('cliente_biable')
+                cliente_biable = Cliente.objects.get(nit=nit_cliente)
+                cotizacion.cliente_biable = cliente_biable
+                cotizacion.razon_social = None
+            else:
+                cotizacion.razon_social = self.request.POST.get('razon_social')
+                cotizacion.cliente_biable = None
+
             cotizacion.save()
 
         if self.request.POST.get('descartar') and cotizacion:
@@ -841,7 +901,7 @@ class CotizadorTemplateView(TemplateView):
         return context
 
 
-class CotizadorView(View):
+class CotizadorView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = CotizadorTemplateView.as_view()
         return view(request, *args, **kwargs)
