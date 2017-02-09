@@ -226,7 +226,7 @@ post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 class RemisionCotizacion(TimeStampedModel):
     tipo_remision = models.CharField(max_length=2, choices=(('RM', 'RM'), ('RY', 'RY')), default='RM')
     nro_remision = models.PositiveIntegerField()
-    factura_biable = models.ForeignKey(FacturasBiable, null=True, blank=True)
+    factura_biable = models.ForeignKey(FacturasBiable, null=True, blank=True, related_name='mis_remisiones')
     fecha_prometida_entrega = models.DateField()
     entregado = models.BooleanField(default=False)
     cotizacion = models.ForeignKey(Cotizacion, related_name="mis_remisiones")

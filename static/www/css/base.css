@@ -53,6 +53,9 @@ main {
 .intranet .div_detalle {
   padding-left: 1em;
 }
+.fa-times-circle {
+  color: #f00;
+}
 .fa-exclamation-triangle {
   color: #f00;
 }

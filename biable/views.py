@@ -18,7 +18,9 @@ class FacturaDetailView(SelectRelatedMixin, PrefetchRelatedMixin, DetailView):
         'ciudad_biable__ciudad_intranet',
         'ciudad_biable__ciudad_intranet__departamento'
     ]
-    prefetch_related = ['mis_movimientos_venta__item_biable']
+    prefetch_related = [
+        'mis_movimientos_venta__item_biable'
+    ]
 
 
 class ClienteDetailView(PrefetchRelatedMixin, DetailView):
