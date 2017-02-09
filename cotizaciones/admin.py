@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin import DateFieldListFilter
 
 from .models import Cotizacion, ItemCotizacion, RemisionCotizacion, TareaCotizacion
 
@@ -93,7 +94,12 @@ class CotizacionAdmin(admin.ModelAdmin):
     readonly_fields = ('total',)
     list_editable = ('cliente_biable',)
     raw_id_fields = ('cliente_biable', 'ciudad_despacho')
-    list_filter = ('estado', 'cliente_nuevo', 'otra_ciudad')
+    list_filter = (
+        'estado',
+        'cliente_nuevo',
+        'otra_ciudad',
+        ('fecha_envio', DateFieldListFilter)
+    )
     inlines = [
         ListaPrecioInline,
         RemisionInline,
