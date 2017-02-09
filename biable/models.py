@@ -105,6 +105,10 @@ class Cliente(models.Model):
     clasificacion = models.CharField(max_length=1, null=True, blank=True)
     industria = models.ForeignKey(Industria, related_name='mis_empresas', null=True, blank=True)
     competencia = models.BooleanField(default=False)
+    potencial_compra = models.DecimalField(max_digits=10, decimal_places=0, default=0,
+                                           verbose_name='Potencial de Compra')
+    potencial_compra_fecha_actualizacion = models.DateField(verbose_name='Fecha último Cambio Potencial Compra',
+                                                            null=True, blank=True)
 
     def get_absolute_url(self):
         return reverse("biable:detalle_cliente", kwargs={"pk": self.nit})

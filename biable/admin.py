@@ -92,6 +92,30 @@ class ClienteBiableAdmin(admin.ModelAdmin):
     list_select_related = ('grupo',)
     list_display = ('nit', 'nombre', 'fecha_creacion', 'grupo','canal')
 
+    fieldsets = (
+        ('Informacion Biable', {
+            'classes': ('form-control',),
+            'fields':
+                (
+                    'nit',
+                    'nombre',
+                    'fecha_creacion'
+                )
+        }),
+        ('Información Intranet', {
+            'classes': ('form-control',),
+            'fields':
+                (
+                    'grupo',
+                    'canal',
+                    'clasificacion',
+                    'industria',
+                    'competencia',
+                    ('potencial_compra','potencial_compra_fecha_actualizacion')
+                )
+        })
+    )
+
     search_fields = [
         'nit',
         'nombre',
