@@ -119,6 +119,10 @@ class ClienteBiableAdmin(admin.ModelAdmin):
     search_fields = [
         'nit',
         'nombre',
+        'grupo__nombre'
+    ]
+    list_filter = [
+        'grupo__nombre'
     ]
 
     readonly_fields = ('nit', 'nombre', 'fecha_creacion')
