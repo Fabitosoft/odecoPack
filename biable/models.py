@@ -14,7 +14,7 @@ from empresas.models import Canal, Industria
 # Create your models here.
 
 class GrupoCliente(models.Model):
-    nombre = models.CharField(max_length=120)
+    nombre = models.CharField(max_length=120, unique=True)
 
     class Meta:
         verbose_name = 'Grupo Cliente'
