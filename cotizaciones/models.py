@@ -88,6 +88,7 @@ class Cotizacion(TimeStampedModel):
     cliente_biable = models.ForeignKey(ClienteBiable, null=True, blank=True, related_name='mis_cotizaciones')
     cliente_nuevo = models.BooleanField(default=False)
     otra_ciudad = models.BooleanField(default=False)
+    sucursal_sub_empresa = models.CharField(max_length=120, blank=True, null=True, verbose_name='Empresa o Sucursal')
 
     estados = CotizacionesEstadosManager()
     objects = models.Manager()

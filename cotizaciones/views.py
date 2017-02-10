@@ -409,6 +409,7 @@ class CotizacionEmailView(View):
                 obj.razon_social = self.request.POST.get('razon_social')
                 obj.cliente_biable = None
 
+            obj.sucursal_sub_empresa = self.request.POST.get('sucursal_sub_empresa')
             obj.save()
 
             from_email = "ODECOPACK / COMPONENTES <%s>" % (settings.EMAIL_HOST_USER_ODECO)
@@ -797,6 +798,7 @@ class CotizacionFormView(FormView):
 
             cotizacion.fecha_envio = timezone.now()
             cotizacion.estado = "INI"
+            cotizacion.sucursal_sub_empresa = self.request.POST.get('sucursal_sub_empresa')
             cotizacion.save()
             cotizacion.nro_cotizacion = "%s - %s" % ('CB', cotizacion.id)
 

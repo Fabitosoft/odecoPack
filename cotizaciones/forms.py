@@ -107,6 +107,9 @@ class CotizacionForm(ModelForm):
                 Field('cliente_biable'),
             ),
             Div(
+                Field('sucursal_sub_empresa'),
+            ),
+            Div(
                 Field('cliente_nuevo')
             ),
             Div(
