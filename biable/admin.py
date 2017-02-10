@@ -259,8 +259,11 @@ class SucursalBiableAdmin(admin.ModelAdmin):
         'condicion_pago',
         'activo',
         'vendedor_biable',
-        'vendedor_real'
+        'vendedor_real',
+        'nombre_establecimiento_intranet'
     )
+
+    list_editable = ('nombre_establecimiento_intranet',)
 
     readonly_fields = (
         'nro_sucursal',
@@ -277,7 +280,8 @@ class SucursalBiableAdmin(admin.ModelAdmin):
     search_fields = (
         'vendedor_biable__nombre',
         'vendedor_real__nombre',
-        'cliente__nombre'
+        'cliente__nombre',
+        'nombre_establecimiento_intranet'
     )
 
 

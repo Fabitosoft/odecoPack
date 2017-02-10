@@ -290,6 +290,7 @@ class SucursalBiable(models.Model):
     nro_sucursal = models.PositiveIntegerField()
     cliente = models.ForeignKey(Cliente, related_name='mis_sucursales')
     nombre_establecimiento = models.CharField(max_length=200, null=True, blank=True)
+    nombre_establecimiento_intranet = models.CharField(max_length=200, null=True, blank=True)
     cupo_credito = models.DecimalField(max_digits=10, decimal_places=0)
     condicion_pago = models.PositiveIntegerField(null=True, blank=True)
     activo = models.BooleanField()
