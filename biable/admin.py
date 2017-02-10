@@ -253,6 +253,7 @@ class SucursalBiableAdmin(admin.ModelAdmin):
     list_select_related = ['cliente','vendedor_biable']
     list_display = (
         'nro_sucursal',
+        'direccion',
         'cliente',
         'nombre_establecimiento',
         'cupo_credito',
