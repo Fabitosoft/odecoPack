@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Clientes</h1>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Nombre
+            </th>
+            <th>
+                Nit
+            </th>
+            <th>
+                Grupo
+            </th>
+            <th>
+                En el mercado?
+            </th>
+            <th>
+                Industria
+            </th>
+            <th>
+                Competencia
+            </th>
+            <th>
+                Clasificacion
+            </th>
+            <th>
+                Canal
+            </th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for cliente in clientes %}
+            <tr>
+                <td>
+                    <a href="{{ cliente.get_absolute_url }}">{{ cliente.nombre }}</a>
+                </td>
+                <td>
+                    {{ cliente.nit }}
+                </td>
+                <td>
+                    {% if cliente.grupo %}
+                        {{ cliente.grupo }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if cliente.cerro %}
+                        Cerro
+                    {% else %}
+                        Activo
+                    {% endif %}
+                </td>
+                <td>
+                    {% if cliente.industria %}
+                        {{ cliente.industria.nombre }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if cliente.competencia %}
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if cliente.clasificacion %}
+                        {{ cliente.clasificacion }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if cliente.canal %}
+                        {{ cliente.canal.canal }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    {% if is_paginated %}
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -111,6 +111,7 @@ class ClienteBiableAdmin(admin.ModelAdmin):
                     'clasificacion',
                     'industria',
                     'competencia',
+                    'cerro',
                     ('potencial_compra','potencial_compra_fecha_actualizacion')
                 )
         })

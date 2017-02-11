@@ -13,10 +13,42 @@
                 <span class="label">Nit:</span> {{ object.nit }}
             </p>
             <p>
-                <span class="label">Fecha Creación:</span> {{ object.fecha_creacion }}
+                <span class="label">Fecha Creación: </span> {{ object.fecha_creacion }}
             </p>
-            <div>
-                {% if object.grupo %}
+            {% if object.competencia %}
+                <p>
+                    <span class="label">Competencia: </span> <i class="fa fa-check-circle" aria-hidden="true"></i>
+                </p>
+            {% endif %}
+            {% if object.cerro %}
+                <p>
+                    <span class="label">Esta Cerrado: </span>
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+
+                </p>
+            {% endif %}
+            {% if object.industria %}
+                <p>
+                    <span class="label">Indústria: </span>
+                    {{ object.industria.nombre }}
+                </p>
+            {% endif %}
+            {% if object.clasificacion %}
+                <p>
+                    <span class="label">Clasificación: </span>
+                    {{ object.clasificacion }}
+                </p>
+            {% endif %}
+            {% if object.canal %}
+                <p>
+                    <span class="label">Canal: </span>
+                    {{ object.canal.canal }}
+                </p>
+            {% endif %}
+
+
+            {% if object.grupo %}
+                <div>
                     <p>
                         <span class="label">Empresas Grupo:</span>{{ object.grupo }}
                     </p>
@@ -30,8 +62,9 @@
                             {% endif %}
                         {% endfor %}
                     </ul>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
+
         </div>
 
         {% with compras_list=object.mis_compras.all|dictsortreversed:"fecha_documento"|slice:":20" cotizaciones_list=object.mis_cotizaciones.all|dictsortreversed:"fecha_envio"|slice:":20" despachos_lista=object.mis_despachos.all|dictsortreversed:"fecha_envio"|slice:":20" %}
