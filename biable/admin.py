@@ -257,12 +257,12 @@ class SucursalBiableAdmin(admin.ModelAdmin):
         'direccion',
         'cliente',
         'nombre_establecimiento',
+        'nombre_establecimiento_intranet',
         'cupo_credito',
         'condicion_pago',
         'activo',
         'vendedor_biable',
-        'vendedor_real',
-        'nombre_establecimiento_intranet'
+        'vendedor_real'
     )
 
     list_editable = ('nombre_establecimiento_intranet',)

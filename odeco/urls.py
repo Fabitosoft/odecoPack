@@ -52,6 +52,7 @@ urlpatterns = [
     url(r'^despacho_mercancia/', include('despachos_mercancias.urls', namespace="despacho_mercancia")),
     url(r'^biable/', include('biable.urls', namespace="biable")),
     url(r'^geografia/', include('geografia_colombia.urls', namespace="geografia")),
+    url(r'^contactos/', include('contactos.urls', namespace="contactos")),
 ]
 
 if settings.DEBUG:

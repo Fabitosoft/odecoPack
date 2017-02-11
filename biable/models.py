@@ -301,7 +301,11 @@ class SucursalBiable(models.Model):
     vendedor_real = models.ForeignKey(VendedorBiable, null=True, blank=True, related_name='mis_clientes_reales')
 
     def __str__(self):
-        return '%s - %s' % (self.cliente, self.nro_sucursal)
+        if self.nombre_establecimiento_intranet:
+            nombre = self.nombre_establecimiento_intranet
+        else:
+            nombre = self.direccion
+        return '%s - %s' % (self.cliente, nombre)
 
     class Meta:
         unique_together = ('nro_sucursal', 'cliente')

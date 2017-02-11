@@ -5,8 +5,8 @@ from .models import ContactoEmpresa
 
 # Register your models here.
 class ContactoEmpresaAdmin(admin.ModelAdmin):
-    list_select_related = ('cliente', 'ciudad', 'creado_por')
-    raw_id_fields = ('cliente', 'ciudad')
+    list_select_related = ('sucursal', 'creado_por')
+    raw_id_fields = ('sucursal',)
     list_display = (
         'nombres',
         'apellidos',
@@ -14,9 +14,7 @@ class ContactoEmpresaAdmin(admin.ModelAdmin):
         'correo_electronico_alternativo',
         'nro_telefonico',
         'nro_telefonico_alternativo',
-        'cliente',
-        'ciudad',
-        'ciudad_alternativa',
+        'sucursal',
         'creado_por'
     )
 

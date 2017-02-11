@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Actualizar Contacto para
+        <small>{{ cliente_nombre|title }} </small>
+    </h1>
+    <form action="" method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Actualizar"/>
+    </form>
+{% endblock %}

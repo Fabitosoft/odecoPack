@@ -55,24 +55,14 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class ClienteBiableListView(SelectRelatedMixin, ListView):
+class ClienteBiableListView(SelectRelatedMixin,ListView):
     model = Cliente
     template_name = 'biable/cliente_list.html'
     context_object_name = 'clientes'
     paginate_by = 15
-    select_related = ['canal','grupo','industria']
+    select_related = ['canal', 'grupo', 'industria']
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.annotate(
-            num_compras=Count('mis_compras'),
-            num_cotizaciones=Count('mis_cotizaciones'),
-            num_despachos=Count('mis_despachos'),
-            num_contactos=Count('mis_contactos')
-        ).exclude(nit='').filter(
-            Q(num_compras__gt=0) |
-            Q(num_cotizaciones__gt=0) |
-            Q(num_contactos__gt=0) |
-            Q(num_despachos__gt=0)
-        ).order_by('nombre').distinct()
+        qs = qs.exclude(nit='').order_by('nombre').distinct()
         return qs
