@@ -1,4 +1,4 @@
-from braces.views import PrefetchRelatedMixin, SelectRelatedMixin
+from braces.views import PrefetchRelatedMixin, SelectRelatedMixin, LoginRequiredMixin
 from dal import autocomplete
 from django.db.models import Q, Count
 from django.shortcuts import render
@@ -55,7 +55,7 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class ClienteBiableListView(SelectRelatedMixin,ListView):
+class ClienteBiableListView(LoginRequiredMixin, SelectRelatedMixin, ListView):
     model = Cliente
     template_name = 'biable/cliente_list.html'
     context_object_name = 'clientes'

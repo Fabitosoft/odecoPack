@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.edit import CreateView, UpdateView
 
+from braces.views import SelectRelatedMixin
+
 from .models import ContactoEmpresa
 from .forms import ContactoEmpresaForm
 from biable.models import Cliente
@@ -28,8 +30,9 @@ class ContactosEmpresaCreateView(CreateView):
         form.fields['sucursal'].queryset = self.cliente.mis_sucursales
         return form
 
-class ContactosEmpresaUpdateView(UpdateView):
+class ContactosEmpresaUpdateView(SelectRelatedMixin,UpdateView):
     model = ContactoEmpresa
+    select_related = ['sucursal','sucursal__cliente']
     template_name = 'biable/contacto_empresa_update.html'
     form_class = ContactoEmpresaForm
     cliente = None

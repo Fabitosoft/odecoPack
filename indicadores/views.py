@@ -1,5 +1,4 @@
 import json
-from braces.views import SelectRelatedMixin
 from django.db.models import Case, CharField, Sum, Max, Min, Count, When, F, Q, Value, IntegerField
 from django.db.models.functions import Concat, Extract
 from django.db.models.functions import Upper

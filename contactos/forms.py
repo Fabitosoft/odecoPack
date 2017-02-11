@@ -13,7 +13,7 @@ class ContactoEmpresaForm(ModelForm):
 
     class Meta:
         model = ContactoEmpresa
-        exclude = ('retirado', 'creado_por')
+        exclude = ('creado_por',)
 
     def __init__(self, *args, **kwargs):
         super(ContactoEmpresaForm, self).__init__(*args, **kwargs)
