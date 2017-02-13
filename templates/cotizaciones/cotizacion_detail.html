@@ -233,42 +233,44 @@
     </div>
 
     <div class="row">
-        <h2>Seguimientos</h2>
         {% with seguimientos=object.tarea_cotizacion.seguimientos.all %}
-            <ul>
-                {% for seguimiento in seguimientos %}
-                    <li>
-                        <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }}
-                        -
-                        <small> {{ seguimiento.created }}</small>
-                    </li>
-                {% endfor %}
-            </ul>
+            {% if seguimientos %}
+                <h2>Seguimientos</h2>
+                <ul>
+                    {% for seguimiento in seguimientos %}
+                        <li>
+                            <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }}
+                            -
+                            <small> {{ seguimiento.created }}</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% endwith %}
-        <h2>Comentarios</h2>
-        {% if object.mis_comentarios.all %}
-            <div class="col-xs-12">
-                <div class="page-header">
-                    <h1>
-                        Comentarios<span class="badge">{{ object.mis_comentarios.count }}</span>
-                    </h1>
+        {% with comentarios_list=object.mis_comentarios.all %}
+            {% if comentarios_list %}
+                <div class="col-xs-12">
+                    <div class="page-header">
+                        <h1>
+                            Comentarios<span class="badge">{{ object.mis_comentarios.count }}</span>
+                        </h1>
+                    </div>
+
+                    {% for comentario in comentarios_list %}
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong>{{ object.usuario.get_full_name }}</strong> <span
+                                    class="text-muted">{{ comentario.created|timesince }}</span>
+                            </div>
+                            <div class="panel-body">
+                                {{ comentario.comentario }}
+                            </div><!-- /panel-body -->
+                        </div><!-- /panel panel-default -->
+                    {% endfor %}
+
                 </div>
-
-
-                {% for comentario in object.mis_comentarios.all %}
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <strong>{{ object.usuario.get_full_name }}</strong> <span
-                                class="text-muted">{{ comentario.created|timesince }}</span>
-                        </div>
-                        <div class="panel-body">
-                            {{ comentario.comentario }}
-                        </div><!-- /panel-body -->
-                    </div><!-- /panel panel-default -->
-                {% endfor %}
-
-            </div>
-        {% endif %}
+            {% endif %}
+        {% endwith %}
         {% crispy comentario_form %}
         {% if object.estado == 'PRO' %}
             <div class="col-md-6">
