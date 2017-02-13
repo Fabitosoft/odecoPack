@@ -1,4 +1,6 @@
 import json
+
+from braces.views import AjaxResponseMixin
 from braces.views import (
     JSONResponseMixin,
     PrefetchRelatedMixin,
@@ -34,7 +36,7 @@ class FacturaDetailView(SelectRelatedMixin, PrefetchRelatedMixin, DetailView):
     ]
 
 
-class ClienteDetailView(PrefetchRelatedMixin, JSONResponseMixin, DetailView):
+class ClienteDetailView(PrefetchRelatedMixin, JSONResponseMixin, AjaxResponseMixin, DetailView):
     model = Cliente
     template_name = 'biable/cliente_detail.html'
     prefetch_related = [
@@ -47,12 +49,12 @@ class ClienteDetailView(PrefetchRelatedMixin, JSONResponseMixin, DetailView):
         'mis_despachos__ciudad__departamento',
     ]
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
+    def post_ajax(self, request, *args, **kwargs):
+        nit = request.POST.get('nit')
+        cliente = Cliente.objects.get(nit=nit)
+        context = {}
         fecha_hoy = timezone.now().date()
         year_ini = fecha_hoy.year - 2
-
         qs = MovimientoVentaBiable.objects.values(
             'item_biable__descripcion',
             'item_biable__categoria_mercadeo',
@@ -70,21 +72,19 @@ class ClienteDetailView(PrefetchRelatedMixin, JSONResponseMixin, DetailView):
             venta_neta=Sum('venta_neto'),
             cantidad_neta=Sum('cantidad'),
             factura_venta=Concat('factura__tipo_documento', Value('-'), 'factura__nro_documento'),
-            nombre_producto=Concat('item_biable__descripcion', Value(' ('), 'item_biable__id_item', Value(')'),output_field=CharField()),
+            nombre_producto=Concat('item_biable__descripcion', Value(' ('), 'item_biable__id_item', Value(')'),
+                                   output_field=CharField()),
             linea=F('factura__vendedor__linea_ventas__nombre')
         ).filter(
-            factura__cliente=self.object,
+            factura__cliente=cliente,
             factura__fecha_documento__year__gte=year_ini
         ).order_by('factura__fecha_documento')
         lista = list(qs)
         for i in lista:
             i["venta_neta"] = int(i["venta_neta"])
             i["cantidad_neta"] = int(i["cantidad_neta"])
-
-        context['ventasxproductos'] = json.dumps(lista,
-                                                 cls=self.json_encoder_class,
-                                                 **self.get_json_dumps_kwargs()).encode('utf-8')
-        return context
+        context['ventasxproductos'] = lista
+        return self.render_json_response(context)
 
 
 class ClienteAutocomplete(autocomplete.Select2QuerySetView):
