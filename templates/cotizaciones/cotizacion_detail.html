@@ -59,7 +59,8 @@
                             {% if object.cliente_nuevo %}
                                 {{ object.razon_social }}
                             {% else %}
-                                <a href="{{ object.cliente_biable.get_absolute_url }}" target="_blank">{{ object.cliente_biable.nombre }}</a>
+                                <a href="{{ object.cliente_biable.get_absolute_url }}"
+                                   target="_blank">{{ object.cliente_biable.nombre }}</a>
                             {% endif %}
                         </small>
                     </h4>
@@ -232,6 +233,19 @@
     </div>
 
     <div class="row">
+        <h2>Seguimientos</h2>
+        {% with seguimientos=object.tarea_cotizacion.seguimientos.all %}
+            <ul>
+                {% for seguimiento in seguimientos %}
+                    <li>
+                        <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }}
+                        -
+                        <small> {{ seguimiento.created }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endwith %}
+        <h2>Comentarios</h2>
         {% if object.mis_comentarios.all %}
             <div class="col-xs-12">
                 <div class="page-header">

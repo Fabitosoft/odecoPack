@@ -81,7 +81,7 @@ class Tarea(TimeStampedModel):
 
 # region Tarea Cotizacion
 class TareaCotizacion(Tarea):
-    cotizacion = models.OneToOneField(Cotizacion, related_name='tarea', null=True, blank=True,
+    cotizacion = models.OneToOneField(Cotizacion, related_name='tarea_cotizacion', null=True, blank=True,
                                       on_delete=models.SET_NULL)
     trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.PROTECT, related_name='tareas_cotizacion',
                                        null=True)
