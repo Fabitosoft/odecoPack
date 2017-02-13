@@ -14,6 +14,9 @@
                     Nombre
                 </th>
                 <th>
+                    Subempresa
+                </th>
+                <th>
                     Cargo
                 </th>
                 <th>
@@ -45,6 +48,11 @@
                 <tr>
                     <td>
                         {{ contacto.nombres }} {{ contacto.apellidos }}
+                    </td>
+                    <td>
+                        {% if contacto.subempresa %}
+                            {{ contacto.subempresa }}
+                        {% endif %}
                     </td>
                     <td>
                         {{ contacto.cargo }}

@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import ContactoEmpresa
-from biable.models import SucursalBiable
+
 
 
 class ContactoEmpresaForm(ModelForm):

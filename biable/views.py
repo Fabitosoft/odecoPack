@@ -6,6 +6,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from .models import FacturasBiable, Cliente
+from .forms import ContactoEmpresaBuscador
 
 
 # Create your views here.
@@ -63,6 +64,22 @@ class ClienteBiableListView(LoginRequiredMixin, SelectRelatedMixin, ListView):
     select_related = ['canal', 'grupo', 'industria']
 
     def get_queryset(self):
+        q = self.request.GET.get('busqueda')
         qs = super().get_queryset()
-        qs = qs.exclude(nit='').order_by('nombre').distinct()
+
+        if q:
+            qs = qs.exclude(nit='').order_by('nombre').distinct()
+            qs = qs.filter(
+                Q(nombre__icontains=q) |
+                Q(grupo__nombre__icontains=q) |
+                Q(nit__icontains=q)
+            )
+        else:
+            qs = qs.none()
+
         return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_busqueda'] = ContactoEmpresaBuscador(self.request.GET or None)
+        return context
