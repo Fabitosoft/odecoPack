@@ -62,7 +62,7 @@ class ClienteDetailView(
         cliente = Cliente.objects.get(nit=nit)
         context = {}
         fecha_hoy = timezone.now().date()
-        year_ini = fecha_hoy.year - 2
+        year_ini = fecha_hoy.year - 3
         qs = MovimientoVentaBiable.objects.values(
             'item_biable__descripcion',
             'item_biable__categoria_mercadeo',
