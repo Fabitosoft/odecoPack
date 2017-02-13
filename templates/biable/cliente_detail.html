@@ -90,6 +90,12 @@
                                                            data-toggle="tab">Contactos</a></li>
                             {% endif %}
 
+                            {% if ventasxproductos %}
+                                <li role="presentation"><a href="#ventasxproductos" aria-controls="ventasxproductos"
+                                                           role="tab"
+                                                           data-toggle="tab">Ventas por Productos</a></li>
+                            {% endif %}
+
                         </ul>
                         <!-- Tab panes -->
                         <div class="tab-content">
@@ -347,10 +353,88 @@
                                     </div>
                                 </div>
                             {% endif %}
+                            {% if ventasxproductos %}
+                                <div role="tabpanel" class="tab-pane" id="ventasxproductos">
+                                    <div id="tabla_pv"></div>
+                                </div>
+                            {% endif %}
                         </div>
                     {% endwith %}
                 {% endwith %}
             {% endwith %}
         {% endwith %}
     </div>
+{% endblock %}
+
+<script>
+    {% block script %}
+        {#        $('#hora_actualizacion').text("("+'{{ fecha_actualizacion }}'+")");#}
+        var obj = JSON.parse('{{ ventasxproductos | escapejs }}')
+        // pivot grid options
+        $('#tabla_pv').empty()
+        $('#tabla_pv').append('<div id =\'pgrid\'></div>')
+        var config = {
+            dataSource: obj,
+            dataHeadersLocation: 'columns',
+            canMoveFields: true,
+            theme: 'orange',
+            toolbar: {
+                visible: true
+            },
+            subTotal: {
+                visible: true,
+                collapsed: true
+            },
+            fields: [
+                {name: 'linea', caption: 'Línea Ventas'},
+                {name: 'factura_venta', caption: 'Factura'},
+                {name: 'year', caption: 'Año'},
+                {name: 'month', caption: 'Mes'},
+                {name: 'day', caption: 'Día'},
+                {name: 'nombre_producto', caption: 'Producto'},
+                {name: 'item_biable__categoria_mercadeo', caption: 'Categoría 1'},
+                {name: 'item_biable__categoria_mercadeo_dos', caption: 'Categoría 2'},
+                {name: 'vendedor', caption: 'Vendedor'},
+                {
+                    name: 'venta_neta', caption: 'Venta Neta',
+                    dataSettings: {
+                        aggregateFunc: 'sum',
+                        formatFunc: function (value) {
+                            return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                        }
+                    }
+                },
+                {
+                    name: 'cantidad_neta', caption: 'Cantidad Neta',
+                    dataSettings: {
+                        aggregateFunc: 'sum',
+                        formatFunc: function (value) {
+                            return value ? Number(value).formatMoney(0, ',', '.') : '';
+                        }
+                    }
+                }
+            ],
+            rows: [
+                'item_biable__categoria_mercadeo',
+                'item_biable__categoria_mercadeo_dos',
+                'day',
+                'nombre_producto',
+                'factura_venta'
+            ],
+            columns: ['year', 'month'],
+            data: ['venta_neta']
+        };
+
+        new orb.pgridwidget(config).render(document.getElementById('pgrid'));
+    {% endblock %}
+</script>
+
+{% block javascrip_external_sources %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/orb/1.0.9/orb.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orb/1.0.9/orb.min.css">
 {% endblock %}
