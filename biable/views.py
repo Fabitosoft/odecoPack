@@ -1,11 +1,12 @@
 import json
 
-from braces.views import AjaxResponseMixin
+from braces.views import PermissionRequiredMixin
 from braces.views import (
     JSONResponseMixin,
     PrefetchRelatedMixin,
     SelectRelatedMixin,
-    LoginRequiredMixin
+    LoginRequiredMixin,
+    AjaxResponseMixin
 )
 from dal import autocomplete
 from django.db.models import F
@@ -36,7 +37,14 @@ class FacturaDetailView(SelectRelatedMixin, PrefetchRelatedMixin, DetailView):
     ]
 
 
-class ClienteDetailView(PrefetchRelatedMixin, JSONResponseMixin, AjaxResponseMixin, DetailView):
+class ClienteDetailView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    PrefetchRelatedMixin,
+    JSONResponseMixin,
+    AjaxResponseMixin,
+    DetailView):
+    permission_required = "biable.ver_clientes"
     model = Cliente
     template_name = 'biable/cliente_detail.html'
     prefetch_related = [
@@ -104,12 +112,13 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class ClienteBiableListView(LoginRequiredMixin, SelectRelatedMixin, ListView):
+class ClienteBiableListView(PermissionRequiredMixin, LoginRequiredMixin, SelectRelatedMixin, ListView):
     model = Cliente
     template_name = 'biable/cliente_list.html'
     context_object_name = 'clientes'
     paginate_by = 15
     select_related = ['canal', 'grupo', 'industria']
+    permission_required = "biable.ver_clientes"
 
     def get_queryset(self):
         q = self.request.GET.get('busqueda')
