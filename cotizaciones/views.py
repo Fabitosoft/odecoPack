@@ -625,16 +625,22 @@ class CambiarDiaEntregaView(SingleObjectMixin, View):
     model = ItemCotizacion
 
     def get(self, request, *args, **kwargs):
-        delete = False
         item_id = request.GET.get("item")
         item = ItemCotizacion.objects.get(id=item_id)
-        dias = Decimal(request.GET.get("dias"))
-
-        item.dias_entrega = dias
-        item.save()
+        error_cantidad = False
+        actual_item_error = ""
+        try:
+            dias = Decimal(request.GET.get("dias"))
+            item.dias_entrega = dias
+            item.save()
+        except InvalidOperation as e:
+            error_cantidad = True
+            actual_item_error = item.get_nombre_item()
 
         data = {
-            "dias": item.dias_entrega
+            "dias": item.dias_entrega,
+            "error_cantidad": error_cantidad,
+            "actual_item_error": actual_item_error
         }
         return JsonResponse(data)
 

@@ -237,7 +237,10 @@
                 dias: dias
             };
             $.get("{% url 'cotizaciones:cambiar_dias_item_cotizacion' %}", data, function (data) {
-
+                console.log(data)
+                if (data.error_cantidad) {
+                    alert("Digitar correctamente los días de entrega para " +data.actual_item_error)
+                }
             });
         });
         $(".item-desc").change(function () {
