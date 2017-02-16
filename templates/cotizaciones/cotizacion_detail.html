@@ -90,7 +90,7 @@
                     {% if object.observaciones %}
                         <h4>Observación
                             <small>
-                                {{ object.observaciones }}
+                                {{ object.observaciones|safe }}
                             </small>
                         </h4>
                     {% endif %}
