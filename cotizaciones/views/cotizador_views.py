@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import CreateView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 
-from braces.views import SelectRelatedMixin
+from braces.views import SelectRelatedMixin, LoginRequiredMixin
 
 from ..models import ItemCotizacion
 from ..mixins import EnviarCotizacionMixin, CotizacionesActualesMixin, ListaPreciosMixin
@@ -27,7 +27,7 @@ from productos.models import (
 from ..models import Cotizacion
 
 
-class CotizadorView(View):
+class CotizadorView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         usuario = self.request.user
         nueva_cotizacion = self.request.GET.get('nueva_cotizacion')
