@@ -89,20 +89,57 @@ class CotizacionForm(ModelForm):
         required=False,
         label='Cliente CGuno'
     )
+    id = forms.IntegerField(required=False)
+
+    def clean(self):
+        cleaned_data = super(CotizacionForm, self).clean()
+        razon_social = cleaned_data.get("razon_social")
+        cliente_biable = cleaned_data.get("cliente_biable")
+        ciudad_despacho = cleaned_data.get("ciudad_despacho")
+        ciudad = cleaned_data.get("ciudad")
+
+        if (not razon_social and not cliente_biable):
+            # Only do something if both fields are valid so far.
+            raise forms.ValidationError(
+                "Debe tener o razón social o un cliente CGuno."
+                " No puede estar vacios los dos campos"
+            )
+
+        if (not ciudad_despacho and not ciudad):
+            # Only do something if both fields are valid so far.
+            raise forms.ValidationError(
+                "Debe tener o ciudad alterna o ciudad."
+                " No puede estar vacios los dos campos"
+            )
 
     class Meta:
         model = Cotizacion
-        exclude = ['estado', 'total', 'usuario']
+        fields = [
+            'id',
+            'razon_social',
+            'cliente_biable',
+            'sucursal_sub_empresa',
+            'cliente_nuevo',
+            'pais',
+            'ciudad',
+            'otra_ciudad',
+            'ciudad_despacho',
+            'nombres_contacto',
+            'apellidos_contacto',
+            'nro_contacto',
+            'email',
+            'observaciones',
+        ]
 
     def __init__(self, *args, **kwargs):
         super(CotizacionForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_id = 'id-cotizacionForm'
         self.helper.form_method = "post"
-
         self.helper.form_class = 'form-inline'
         self.helper.layout = Layout(
             Div(
+                Field('id'),
                 Field('razon_social'),
                 Field('cliente_biable'),
             ),
@@ -135,26 +172,38 @@ class CotizacionForm(ModelForm):
             HTML('<hr/>')
 
         )
-        crear = Div(
-            FormActions(
-                Submit('crear', 'Crear Cotización'),
-            )
-        )
-        enviar = Div(
-            FormActions(
-                Submit('enviar', 'Enviar Cotización')
-            )
-        )
-
-        if not self.instance.pk:
-            self.helper.layout.fields.append(crear)
-        else:
-            self.helper.layout.fields.append(enviar)
-            self.helper.form_method = "post"
-            self.helper.form_action = reverse('cotizaciones:enviar', kwargs={'pk': self.instance.pk})
-
         self.helper.all().wrap(Field, css_class="form-control")
         # self.helper.filter_by_widget(forms.CharField).wrap(Field, css_class="form-control")
+
+
+class CotizacionCrearForm(CotizacionForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        crear = Div(
+            FormActions(
+                Submit('formCrea', 'Crear Cotización'),
+            )
+        )
+        self.helper.layout.fields.append(crear)
+        self.helper.form_method = "post"
+        self.helper.form_action = reverse('cotizaciones:cotizador')
+
+
+class CotizacionEnviarForm(CotizacionForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        enviar = Div(
+            FormActions(
+                Submit('formEnvia', 'Enviar Cotización'),
+            ),
+            HTML('<hr/>'),
+            FormActions(
+                Submit('formEnvia', 'Descartar', css_class="btn btn-danger")
+            ),
+        )
+        self.helper.layout.fields.append(enviar)
+        self.helper.form_method = "post"
+        self.helper.form_action = reverse('cotizaciones:cotizador')
 
 
 class ComentarioCotizacionForm(ModelForm):

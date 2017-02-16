@@ -4,10 +4,12 @@
 {% load static %}
 
 {% block titulo_pagina %}
-    Cotizador {% if cotizacion_edit %}Editando {{ cotizacion_edit }}{% endif %}
+    Cotizador {% if actual_cotizacion %}{{ actual_cotizacion.nro_cotizacion }}{% endif %}
 {% endblock %}
 
 {% block content_page %}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    {% crispy form %}
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -19,22 +21,60 @@
             {% endfor %}
         </ul>
     {% endif %}
+
+    <form style='display:inline; ' action="{% url 'cotizaciones:cotizador' %}" method="post">
+        {% csrf_token %}
+        <button name="nueva_cotizacion" value="nueva" class="btn btn-danger" class="btn btn-primary" type="submit">
+            <i class="fa fa-plus fa-2x" aria-hidden="true"></i>
+        </button>
+    </form>
+
+    {% with cotizaciones_activas_list=cotizaciones_activas.all %}
+        {% if cotizaciones_activas_list %}
+            {% for cotizacion in cotizaciones_activas_list %}
+                <form style='display:inline; ' action="{% url 'cotizaciones:cotizador' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id_a_editar" value="{{ cotizacion.id }}"/>
+                    <button {% if actual_cotizacion.id|floatformat == cotizacion.id|floatformat %}class="btn btn-danger"
+                            {% else %}class="btn btn-primary"{% endif %}
+                            type="submit">{{ cotizacion }}</button>
+                </form>
+            {% endfor %}
+            <hr/>
+        {% endif %}
+    {% endwith %}
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation"><a href="#cotizacion" aria-controls="cotizacion" role="tab"
-                                   data-toggle="tab">{% if cotizacion_id %}Detalle Cotización{% else %} Crear
-            Cotización {% endif %}</a></li>
-        <li role="presentation" class="active"><a href="#lista_precios" aria-controls="lista_precios" role="tab"
-                                                  data-toggle="tab">Lista de Precios</a></li>
+        {% if tab == "NUEVA" %}
+            <li role="presentation" class="active"><a href="#nueva_cotizacion"
+                                                      aria-controls="nueva_cotizacion"
+                                                      role="tab"
+                                                      data-toggle="tab">Nueva
+                Cotizacion</a></li>
+        {% endif %}
+        {% if actual_cotizacion %}
+            <li role="presentation" {% if tab == "COTIZACION" %} class="active"{% endif %}><a href="#cotizacion"
+                                                                                              aria-controls="cotizacion"
+                                                                                              role="tab"
+                                                                                              data-toggle="tab">
+
+                Detalle Cotización</a></li>
+        {% endif %}
+        <li role="presentation" {% if tab == "LISTA_PRECIOS" %} class="active"{% endif %}><a href="#lista_precios"
+                                                                                             aria-controls="lista_precios"
+                                                                                             role="tab"
+                                                                                             data-toggle="tab">Lista
+            de Precios</a></li>
 
     </ul>
+
     <!-- Tab panes -->
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="lista_precios">
+        <div role="tabpanel" class="tab-pane {% if tab == "LISTA_PRECIOS" %}active{% endif %}" id="lista_precios">
             <div class="row">
                 <div class="col-md-12">
                     <div class="row">
-                        {% crispy formu %}
+{#                        {% crispy busqueda_producto_form %}#}
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
@@ -56,9 +96,9 @@
                                     <td>{{ pro.cantidad_empaque }} </td>
                                     <td>{{ pro.unidad_medida.nombre|title }} </td>
                                     <td> {{ precio }} </td>
-                                    {% if cotizacion_id %}
+                                    {% if actual_cotizacion %}
                                         <td>
-                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=1 %}">
+                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=actual_cotizacion.id tipo=1 %}">
                                                 +
                                             </a>
                                         </td>
@@ -73,9 +113,9 @@
                                     <td></td>
                                     <td>{{ pro.unidad_medida|title }} </td>
                                     <td> {{ precio }} </td>
-                                    {% if cotizacion_id %}
+                                    {% if actual_cotizacion %}
                                         <td>
-                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=2 %}">
+                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=actual_cotizacion.id tipo=2 %}">
                                                 +
                                             </a>
                                         </td>
@@ -90,9 +130,9 @@
                                     <td> {{ banda.longitud }} </td>
                                     <td>Metro</td>
                                     <td> {{ precio }} </td>
-                                    {% if cotizacion_id %}
+                                    {% if actual_cotizacion %}
                                         <td>
-                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_form.instance.id tipo=3 %}">
+                                            <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=actual_cotizacion.id tipo=3 %}">
                                                 +
                                             </a>
                                         </td>
@@ -105,9 +145,10 @@
                 </div>
             </div>
         </div>
-        <div role="tabpanel" class="tab-pane" id="cotizacion">
-            <div class="row">
-                {% if cotizacion_id %}
+        {% if actual_cotizacion %}
+            <div role="tabpanel" class="tab-pane {% if tab == "COTIZACION" %}active{% endif %}" id="cotizacion">
+                <div class="row">
+
                     <div class="col-md-9">
                         <table class="table table-bordered table-striped">
                             <thead>
@@ -124,38 +165,43 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for item in items_cotizacion %}
-                                <tr id="item-{{ item.id }}">
-                                    <td>
-                                        {{ item.get_referencia_item }}
-                                    </td>
-                                    <td>
-                                        {{ item.get_nombre_item|title }}
-                                    </td>
-                                    <td>
-                                        <input type='hidden' name='item' value='{{ item.id }}'/>
-                                        <input class="item-qty" style="width: 60px" step=any
-                                               value="{{ item.cantidad|floatformat:2 }}"/>
-                                    </td>
-                                    <td>
-                                        {{ item.get_unidad_item }}
-                                    </td>
-                                    <td>{{ item.precio }}</td>
-                                    <td>
-                                        <input type='hidden' name='item' value='{{ item.id }}'/>
-                                        <input class="item-desc" style="width: 60px" step=any
-                                               value="{{ item.porcentaje_descuento|floatformat:2 }}"/>
-                                    </td>
-                                    <td class="descuento">{{ item.descuento }}</td>
-                                    <td class="total">{{ item.total }}</td>
-                                    <td>
-                                        <input type='hidden' name='item' value='{{ item.id }}'/>
-                                        <input type="number" pattern="[0-9]" class="item-ent" style="width: 60px"
-                                               min="0" step="1"
-                                               value="{{ item.dias_entrega }}"/>
-                                    </td>
-                                </tr>
-                            {% endfor %}
+                            {% with item_coti_list=actual_cotizacion.items.all %}
+                                {% if item_coti_list %}
+                                    {% for item in item_coti_list %}
+                                        <tr id="item-{{ item.id }}">
+                                            <td>
+                                                {{ item.get_referencia_item }}
+                                            </td>
+                                            <td>
+                                                {{ item.get_nombre_item|title }}
+                                            </td>
+                                            <td>
+                                                <input type='hidden' name='item' value='{{ item.id }}'/>
+                                                <input class="item-qty" style="width: 60px" step=any
+                                                       value="{{ item.cantidad|floatformat:2 }}"/>
+                                            </td>
+                                            <td>
+                                                {{ item.get_unidad_item }}
+                                            </td>
+                                            <td>{{ item.precio }}</td>
+                                            <td>
+                                                <input type='hidden' name='item' value='{{ item.id }}'/>
+                                                <input class="item-desc" style="width: 60px" step=any
+                                                       value="{{ item.porcentaje_descuento|floatformat:2 }}"/>
+                                            </td>
+                                            <td class="descuento">{{ item.descuento }}</td>
+                                            <td class="total">{{ item.total }}</td>
+                                            <td>
+                                                <input type='hidden' name='item' value='{{ item.id }}'/>
+                                                <input type="number" pattern="[0-9]" class="item-ent"
+                                                       style="width: 60px"
+                                                       min="0" step="1"
+                                                       value="{{ item.dias_entrega }}"/>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
                             </tbody>
                             <tfoot>
                             <tr>
@@ -163,7 +209,7 @@
                                     Descuentos:
                                 </td>
                                 <td id="coti_val_descuento">
-                                    {{ cotizacion_descuento }}
+                                    {{ actual_cotizacion.descuento }}
                                 </td>
                             </tr>
                             <tr>
@@ -171,7 +217,7 @@
                                     Total:
                                 </td>
                                 <td id="coti_val_total">
-                                    {{ cotizacion_total }}
+                                    {{ actual_cotizacion.total }}
                                 </td>
                             </tr>
                             </tfoot>
@@ -179,28 +225,29 @@
                         <div>
                             <h3>Adicionar Item Fuera de Lista</h3>
                             <hr>
-                            {% crispy forma_item_otro %}
+{#                            {% crispy forma_item_otro %}#}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <h3>Datos Cotización</h3>
                         <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
-                        {% crispy cotizacion_form %}
-                        <hr/>
-                        <form method="POST">
-                            {% csrf_token %}
-                            <input name="descartar" class="btn btn-primary" type="submit" value="Descartar"/>
-                        </form>
+{#                        {% crispy cotizacion_form %}#}
                     </div>
-                {% else %}
-                    <div>
-                        <h3>Datos Cotización</h3>
-                        <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
-                        {% crispy cotizacion_form %}
-                    </div>
-                {% endif %}
+
+                </div>
             </div>
-        </div>
+        {% endif %}
+
+
+        {% if tab == "NUEVA" %}
+            <div role="tabpanel" class="tab-pane active" id="nueva_cotizacion">
+                <div class="col-md-3">
+                    <h3>Crear Nueva Cotización</h3>
+                    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+{#                    {% crispy cotizacion_nueva_form %}#}
+                </div>
+            </div>
+        {% endif %}
 
     </div>
 {% endblock %}
@@ -239,7 +286,7 @@
             $.get("{% url 'cotizaciones:cambiar_dias_item_cotizacion' %}", data, function (data) {
                 console.log(data)
                 if (data.error_cantidad) {
-                    alert("Digitar correctamente los días de entrega para " +data.actual_item_error)
+                    alert("Digitar correctamente los días de entrega para " + data.actual_item_error)
                 }
             });
         });

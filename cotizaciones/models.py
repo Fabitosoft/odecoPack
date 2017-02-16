@@ -89,6 +89,7 @@ class Cotizacion(TimeStampedModel):
     cliente_nuevo = models.BooleanField(default=False)
     otra_ciudad = models.BooleanField(default=False)
     sucursal_sub_empresa = models.CharField(max_length=120, blank=True, null=True, verbose_name='Empresa o Sucursal')
+    actualmente_cotizador = models.BooleanField(default=False, editable=False)
 
     estados = CotizacionesEstadosManager()
     objects = models.Manager()

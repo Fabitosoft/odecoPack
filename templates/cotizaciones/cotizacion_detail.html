@@ -13,10 +13,12 @@
 
 {% block content_page %}
     {% if not object.estado == 'FIN' and not object.estado == 'ELI' %}
-        <form method="post" action="{% url 'cotizaciones:enviar' pk=object.pk %}">
+        <form method="post" action="{% url 'cotizaciones:enviar' %}">
             {% csrf_token %}
+            <input type="hidden" name="id" value="{{ object.id }}"/>
             <small>
-                <button type="submit"><i class="fa fa-envelope" aria-hidden="true"></i> Reenviar Email</button>
+                <button type="submit" name="enviar"><i class="fa fa-envelope" aria-hidden="true"></i> Reenviar Email
+                </button>
             </small>
         </form>
 

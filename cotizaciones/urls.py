@@ -23,16 +23,16 @@ urlpatterns = [
     url(r'^cambiar_dias/$', CambiarDiaEntregaView.as_view(), name='cambiar_dias_item_cotizacion'),
     url(r'^cambiar_descuento/$', CambiarPorcentajeDescuentoView.as_view(), name='cambiar_descuento_item_cotizacion'),
     url(r'^detalle/(?P<pk>[0-9]+)$', CotizacionView.as_view(), name='detalle_cotizacion'),
-    url(r'^enviar/(?P<pk>[0-9]+)$', CotizacionEmailView.as_view(), name='enviar'),
+    url(r'^enviar/$', CotizacionEmailView.as_view(), name='enviar'),
     url(r'^list/$', CotizacionesListView.as_view(), name='listar_cotizaciones'),
     url(r'^list/(?P<tipo>[0-3]+)$', CotizacionesListView.as_view(), name='listar_cotizaciones'),
     url(r'^tareas/list/$', TareaListView.as_view(), name='listar_tareas'),
     url(r'^remisiones/list/$', RemisionListView.as_view(), name='listar_remisiones'),
     url(r'^buscar/$', CotizacionesListView.as_view(), name='buscar_cotizacion'),
-    url(r'^cotizador/', CotizadorView.as_view(), name='cotizador'),
     url(r'^editar_cotizacion/', EditarCotizacion.as_view(), name='editar_cotizacion'),
     url(r'^comentar/', ComentarCotizacionView.as_view(), name='comentar'),
     url(r'^add_otro/', AddItemOtro.as_view(), name='add_item_otro_cotizacion'),
     url(r'^prueba/', EmailPrueba.as_view(), name='prueba'),
+    url(r'^cotizador/', CotizadorView.as_view(), name='cotizador'),
 
 ]
