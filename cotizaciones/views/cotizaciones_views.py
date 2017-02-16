@@ -23,7 +23,7 @@ from weasyprint import HTML
 
 from braces.views import SelectRelatedMixin
 
-from biable.models import Colaborador, Cliente
+from biable.models import Colaborador
 from ..models import (
     Cotizacion,
     RemisionCotizacion,
@@ -39,8 +39,6 @@ from ..forms import (
     ComentarioCotizacionForm
 )
 from ..mixins import EnviarCotizacionMixin
-
-from geografia_colombia.models import Ciudad
 
 
 class CotizacionDetailView(SelectRelatedMixin, DetailView):
@@ -431,6 +429,7 @@ class CotizacionesListView(SelectRelatedMixin, ListView):
             )
             qs = qs.filter(
                 Q(nombres_contacto__icontains=query) |
+                Q(cliente_biable__nombre__icontains=query) |
                 Q(nro_cotizacion__icontains=query) |
                 Q(ciudad__icontains=query) |
                 Q(razon_social__icontains=query) |

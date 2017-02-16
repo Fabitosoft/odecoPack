@@ -1,36 +1,30 @@
 from decimal import Decimal, InvalidOperation
 
-from django.contrib import messages
 from django.utils import timezone
-from django.db.models import F
+from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.views import View
-from django.views.generic import CreateView
-from django.views.generic import FormView
-from django.views.generic import UpdateView
-from django.views.generic.detail import SingleObjectMixin, DetailView
+from django.views.generic import CreateView, UpdateView
+from django.views.generic.detail import SingleObjectMixin
+
+from braces.views import SelectRelatedMixin
 
 from ..models import ItemCotizacion
 from ..mixins import EnviarCotizacionMixin, CotizacionesActualesMixin, ListaPreciosMixin
 
-from bandas.models import Banda
 from ..forms import (
-    CotizacionForm,
     CotizacionCrearForm,
-    CotizacionEnviarForm,
-    ItemCotizacionOtrosForm
+    CotizacionEnviarForm
 )
 
 from productos.models import (
-    Producto,
-    ArticuloCatalogo
+    Producto
 )
 
-from listasprecios.forms import ProductoBusqueda
-from ..models import FormaPago, Cotizacion
+from ..models import Cotizacion
 
 
 class CotizadorView(View):
@@ -71,11 +65,18 @@ class CotizadorView(View):
         return view(request, *args, **kwargs)
 
 
-class CotizacionUpdateView(EnviarCotizacionMixin, ListaPreciosMixin, CotizacionesActualesMixin, UpdateView):
+class CotizacionUpdateView(
+    SelectRelatedMixin,
+    EnviarCotizacionMixin,
+    ListaPreciosMixin,
+    CotizacionesActualesMixin,
+    UpdateView
+):
     template_name = 'cotizaciones/cotizador/cotizador.html'
     model = Cotizacion
     form_class = CotizacionEnviarForm
     context_object_name = 'cotizacion_actual'
+    select_related = ['cliente_biable', ]
 
     def form_valid(self, form):
         if not form.instance.items.exists():
@@ -88,6 +89,7 @@ class CotizacionUpdateView(EnviarCotizacionMixin, ListaPreciosMixin, Cotizacione
         if form.instance.en_edicion:
             form.instance.version += 1
         form.instance.en_edicion = False
+        form.instance.fecha_envio = timezone.now()
         form.save()
         self.enviar_cotizacion(self.object, self.request.user)
         return super().form_valid(form)
