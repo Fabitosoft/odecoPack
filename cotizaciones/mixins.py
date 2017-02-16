@@ -1,15 +1,11 @@
 from io import BytesIO
 
 from django.db.models import Q
-from django.utils import timezone
 from django.core.mail import get_connection
-from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
-from django.shortcuts import redirect
 from django.template.loader import get_template, render_to_string
 from django.template import Context
 from django.conf import settings
-from django.contrib import messages
 from weasyprint import HTML
 
 from bandas.models import Banda
@@ -19,7 +15,7 @@ from productos.models import (
     ArticuloCatalogo
 )
 
-from .forms import CotizacionCrearForm, CotizacionEnviarForm, ItemCotizacionOtrosForm
+from .forms import ItemCotizacionOtrosForm
 from listasprecios.forms import ProductoBusqueda
 from .models import Cotizacion
 

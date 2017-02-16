@@ -79,7 +79,6 @@ class CotizacionUpdateView(EnviarCotizacionMixin, ListaPreciosMixin, Cotizacione
 
     def form_valid(self, form):
         if not form.instance.items.exists():
-            print('entro aqui')
             mensaje = "No se puede enviar una cotización sin items"
             messages.add_message(self.request, messages.ERROR, mensaje)
             return redirect('cotizaciones:cotizador')

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
-from django.template.loader import get_template, render_to_string
+from django.template.loader import get_template
 from django.urls import reverse
 from django.db.models import Q
 from django.template import Context
@@ -247,7 +247,6 @@ class CotizacionView(View):
 
 class EmailPrueba(View):
     def get(self, request, *args, **kwargs):
-        print("Entro a enviar correo prueba")
         connection = get_connection(host=settings.EMAIL_HOST_ODECO,
                                     port=settings.EMAIL_PORT_ODECO,
                                     username=settings.EMAIL_HOST_USER_ODECO,
