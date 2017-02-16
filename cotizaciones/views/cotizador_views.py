@@ -1,4 +1,6 @@
 from decimal import Decimal, InvalidOperation
+
+from django.contrib import messages
 from django.utils import timezone
 from django.db.models import F
 from django.http import JsonResponse
@@ -6,11 +8,13 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 from django.views import View
+from django.views.generic import CreateView
 from django.views.generic import FormView
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import UpdateView
+from django.views.generic.detail import SingleObjectMixin, DetailView
 
 from ..models import ItemCotizacion
-from ..mixins import EnviarCotizacionMixin
+from ..mixins import EnviarCotizacionMixin, CotizacionesActualesMixin, ListaPreciosMixin
 
 from bandas.models import Banda
 from ..forms import (
@@ -29,187 +33,104 @@ from listasprecios.forms import ProductoBusqueda
 from ..models import FormaPago, Cotizacion
 
 
-class CotizadorView(FormView):
-    template_name = 'cotizaciones/cotizador.html'
-
-    def get_lista_precios(self, context):
-        query = self.request.GET.get("buscar")
-        if query:
-            qs_bandas = Banda.activos.componentes().filter(
-                Q(referencia__icontains=query) |
-                Q(descripcion_estandar__icontains=query) |
-                Q(descripcion_comercial__icontains=query)
-            ).distinct()
-
-            qs_componentes = Producto.activos.componentes().select_related("unidad_medida").filter(
-                Q(referencia__icontains=query) |
-                Q(descripcion_estandar__icontains=query) |
-                Q(descripcion_comercial__icontains=query)
-            ).distinct().order_by('-modified')
-
-            qs_articulos_catalogo = ArticuloCatalogo.objects.filter(
-                Q(activo=True) &
-                (
-                    Q(referencia__icontains=query) |
-                    Q(nombre__icontains=query) |
-                    Q(categoria__icontains=query)
-                )
-            ).distinct()
-
-            context['object_list_componentes'] = qs_componentes
-            context['object_list_articulos_catalogo'] = qs_articulos_catalogo
-            context['object_list_bandas'] = qs_bandas
-            context['tab'] = "LISTA_PRECIOS"
-
-    def get_forma_pago(self, context):
-        if self.request.GET.get("tipo"):
-            context['formas_pago_porcentaje'] = FormaPago.objects.filter(
-                id=self.request.GET.get("tipo")).first().porcentaje
-        else:
-            if FormaPago.objects.all():
-                context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje
-            else:
-                context['formas_pago_porcentaje'] = 0
-
-    def post(self, request, *args, **kwargs):
-
-        print(self.request.POST)
+class CotizadorView(View):
+    def get(self, request, *args, **kwargs):
         usuario = self.request.user
-
-        id_a_editar = self.request.POST.get('id_a_editar')
-        if id_a_editar:
-            Cotizacion.objects.filter(actualmente_cotizador=True, usuario=usuario).update(actualmente_cotizador=False)
-            cotizacion_actual = Cotizacion.objects.get(id=id_a_editar)
-            cotizacion_actual.en_edicion = True
-            cotizacion_actual.actualmente_cotizador = True
-            cotizacion_actual.save()
-
-        if self.request.POST.get('nueva_cotizacion'):
-            self.form_class = CotizacionCrearForm
+        nueva_cotizacion = self.request.GET.get('nueva_cotizacion')
+        if nueva_cotizacion:
             Cotizacion.objects.filter(actualmente_cotizador=True, usuario=usuario).update(
                 actualmente_cotizador=False)
-
-        if self.request.POST.get('formCrea'):
-            self.form_class = CotizacionCrearForm
-
-        if self.request.POST.get('formEnvia'):
-            self.form_class = CotizacionEnviarForm
-
-        #
-        # print("inicio vista")
-        # print(self.request.POST)
-        # crear = self.request.POST.get('crear')
-        # descartar = self.request.POST.get('descartar')
-        #
-        # if crear:
-        #     formulario = CotizacionCrearForm(self.request.POST)
-        #     if formulario.is_valid():
-        #         cotizacion = formulario.instance
-        #         cotizacion.usuario = self.request.user
-        #         cotizacion.fecha_envio = timezone.now()
-        #
-        #         if not cotizacion.otra_ciudad:
-        #             cotizacion.ciudad = None
-        #             cotizacion.pais = None
-        #         else:
-        #             cotizacion.ciudad_despacho = None
-        #
-        #         if not cotizacion.cliente_nuevo:
-        #             cotizacion.razon_social = None
-        #         else:
-        #             cotizacion.cliente_biable = None
-        #
-        #         cotizacion.save()
-        #         cotizacion = Cotizacion.objects.get(id=cotizacion.id)
-        #         cotizacion.actualmente_cotizador = True
-        #         cotizacion.nro_cotizacion = "%s - %s" % ('CB', cotizacion.id)
-        #
-        #         cotizacion.estado = "INI"
-        #         cotizacion.save()
-        #     else:
-        #         print("entro es invalido")
-        #
-        # if descartar:
-        #     cotizacion = Cotizacion.objects.get(id=self.request.POST.get('id'))
-        #     if cotizacion.en_edicion:
-        #         cotizacion.en_edicion = False
-        #         cotizacion.save()
-        #     else:
-        #         cotizacion.delete()
-        #     return redirect('cotizaciones:cotizador')
-
-        return super().post(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        usuario = self.request.user
-
-        cotizacion_actual = Cotizacion.objects.filter(actualmente_cotizador=True, usuario=usuario).first()
-        if cotizacion_actual:
-            self.form_class = CotizacionEnviarForm
+            cotizacion_cotizador = None
         else:
-            self.form_class = CotizacionCrearForm
+            cotizacion_cotizador = Cotizacion.objects.only('pk').filter(actualmente_cotizador=True,
+                                                                        usuario=usuario).first()
 
-        context = super().get_context_data(**kwargs)
-        context["cotizaciones_activas"] = Cotizacion.objects.filter(
-            Q(usuario=usuario) &
-            (
-                Q(estado="INI") |
-                Q(en_edicion=True)
-            )
-        ).order_by('id')
-        # nueva_cotizacion = self.request.POST.get('nueva_cotizacion')
-        # print(self.request.POST)
-        # usuario = self.request.user
-        #
-        # self.obtener_cotizacion_actual(usuario, context)
-        #
-        #
-        # forma_pago_seleccionada = self.request.GET.get('tipo')
-        # context["forma_de_pago"] = forma_pago_seleccionada
-        #
-        # context['busqueda_producto_form'] = ProductoBusqueda(self.request.GET or None)
-        #
-        # self.get_lista_precios(context)
-        # self.get_forma_pago(context)
-        #
-        # # cotizacion = self.get_cotizacion_abierta()
-        #
-        # # if cotizacion:
-        # #     context["cotizacion_form"] = CotizacionEnviarForm(instance=cotizacion)
-        # #
-        # #     if cotizacion.en_edicion:
-        # #         context["cotizacion_edit"] = cotizacion.nro_cotizacion
-        # #
-        # #     context["forma_item_otro"] = ItemCotizacionOtrosForm(initial={'cotizacion_id': cotizacion.id})
-        # # else:
-        # #     context["cotizacion_form"] = CotizacionCrearForm(self.request.POST or None)
-        # if self.request.GET.get("buscar"):
-        #     context['tab'] = "LISTA_PRECIOS"
-        return context
+        if cotizacion_cotizador:
+            kwargs['pk'] = cotizacion_cotizador.pk
+            view = CotizacionUpdateView.as_view()
+        else:
+            view = CotizacionCreateView.as_view()
+        return view(request, *args, **kwargs)
 
-    def get_success_url(self):
-        return redirect('cotizaciones:cotizador')
-
-    def obtener_cotizacion_actual(self, usuario, context):
+    def post(self, request, *args, **kwargs):
         id_a_editar = self.request.POST.get('id_a_editar')
         if id_a_editar:
-            Cotizacion.objects.filter(actualmente_cotizador=True, usuario=usuario).update(actualmente_cotizador=False)
-            cotizacion_actual = Cotizacion.objects.get(id=id_a_editar)
-            cotizacion_actual.en_edicion = True
-            cotizacion_actual.actualmente_cotizador = True
-            cotizacion_actual.save()
-        else:
-            cotizacion_actual = Cotizacion.objects.filter(actualmente_cotizador=True, usuario=usuario).first()
-        if cotizacion_actual:
-            context["actual_cotizacion"] = cotizacion_actual
-            context['tab'] = "COTIZACION"
-            context['cotizacion_form'] = CotizacionEnviarForm(instance=cotizacion_actual)
-            context["forma_item_otro"] = ItemCotizacionOtrosForm(initial={'cotizacion_id': cotizacion_actual.id})
-        else:
-            context['cotizacion_nueva_form'] = CotizacionCrearForm(None)
-            context['tab'] = "NUEVA"
+            view = CambiarCotizacionActualView.as_view()
 
-        return cotizacion_actual
+        form_enviar_descartar = self.request.POST.get('formEnvia')
+        if form_enviar_descartar:
+            kwargs['pk'] = self.request.POST.get('id')
+            if form_enviar_descartar == 'Enviar Cotización':
+                view = CotizacionUpdateView.as_view()
+            else:
+                view = DescartarCotizacionActualView.as_view()
+
+        form_crear = self.request.POST.get('formCrea')
+        if form_crear:
+            view = CotizacionCreateView.as_view()
+        return view(request, *args, **kwargs)
+
+
+class CotizacionUpdateView(EnviarCotizacionMixin, ListaPreciosMixin, CotizacionesActualesMixin, UpdateView):
+    template_name = 'cotizaciones/cotizador/cotizador.html'
+    model = Cotizacion
+    form_class = CotizacionEnviarForm
+    context_object_name = 'cotizacion_actual'
+
+    def form_valid(self, form):
+        if not form.instance.items.exists():
+            print('entro aqui')
+            mensaje = "No se puede enviar una cotización sin items"
+            messages.add_message(self.request, messages.ERROR, mensaje)
+            return redirect('cotizaciones:cotizador')
+        if form.instance.estado == "INI":
+            form.instance.estado = "ENV"
+        form.instance.actualmente_cotizador = False
+        if form.instance.en_edicion:
+            form.instance.version += 1
+        form.instance.en_edicion = False
+        form.save()
+        self.enviar_cotizacion(self.object, self.request.user)
+        return super().form_valid(form)
+
+
+class CotizacionCreateView(ListaPreciosMixin, CotizacionesActualesMixin, CreateView):
+    model = Cotizacion
+    form_class = CotizacionCrearForm
+    template_name = 'cotizaciones/cotizador/cotizador.html'
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        form.instance.actualmente_cotizador = True
+        form.instance.estado = "INI"
+        form.instance.en_edicion = False
+        cotizacion = form.save()
+        cotizacion.nro_cotizacion = "%s - %s" % ('CB', cotizacion.id)
+        cotizacion.save()
+        return redirect('cotizaciones:cotizador')
+
+
+class CambiarCotizacionActualView(View):
+    def post(self, request, *args, **kwargs):
+        usuario = self.request.user
+        id_a_editar = self.request.POST.get('id_a_editar')
+        Cotizacion.objects.filter(actualmente_cotizador=True, usuario=usuario).update(actualmente_cotizador=False)
+        cotizacion_actual = Cotizacion.objects.get(id=id_a_editar)
+        cotizacion_actual.actualmente_cotizador = True
+        cotizacion_actual.save()
+        return redirect('cotizaciones:cotizador')
+
+
+class DescartarCotizacionActualView(View):
+    def post(self, request, *args, **kwargs):
+        cotizacion = Cotizacion.objects.get(id=self.request.POST.get('id'))
+        if cotizacion.en_edicion:
+            cotizacion.en_edicion = False
+            cotizacion.actualmente_cotizador = False
+            cotizacion.save()
+        else:
+            cotizacion.delete()
+        return redirect('cotizaciones:cotizador')
 
 
 class AddItemCantidad(SingleObjectMixin, View):

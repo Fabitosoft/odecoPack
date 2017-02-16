@@ -1,0 +1,23 @@
+{% if cotizaciones_activas_list %}
+    <form style='display:inline; ' action="{% url 'cotizaciones:cotizador' %}" method="get">
+        <button name="nueva_cotizacion" value="nueva" class="btn" class="btn btn-primary" type="submit">
+            <i class="fa fa-plus fa-2x" aria-hidden="true"></i>
+        </button>
+    </form>
+    {% for cotizacion in cotizaciones_activas_list %}
+        <form style='display:inline; ' action="{% url 'cotizaciones:cotizador' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="id_a_editar" value="{{ cotizacion.id }}"/>
+            <button {% if cotizacion_actual.id|floatformat == cotizacion.id|floatformat %}class="btn btn-danger cotizacion_seleccionada_sombra"
+                    {% else %}class="btn btn-primary"{% endif %}
+                    type="submit">{{ cotizacion.nro_cotizacion }}
+                {% if cotizacion.cliente_biable %}
+                    {{ cotizacion.cliente_biable.nombre|truncatechars:7 }}
+                {% else %}
+                    {{ cotizacion.razon_social|truncatechars:7 }}
+                {% endif %}
+            </button>
+        </form>
+    {% endfor %}
+    <hr/>
+{% endif %}

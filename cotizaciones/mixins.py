@@ -1,5 +1,6 @@
 from io import BytesIO
 
+from django.db.models import Q
 from django.utils import timezone
 from django.core.mail import get_connection
 from django.contrib.auth.models import User
@@ -11,39 +12,22 @@ from django.conf import settings
 from django.contrib import messages
 from weasyprint import HTML
 
-from .forms import CotizacionCrearForm, CotizacionEnviarForm
+from bandas.models import Banda
+from .models import FormaPago
+from productos.models import (
+    Producto,
+    ArticuloCatalogo
+)
+
+from .forms import CotizacionCrearForm, CotizacionEnviarForm, ItemCotizacionOtrosForm
+from listasprecios.forms import ProductoBusqueda
 from .models import Cotizacion
 
 from biable.models import Colaborador
 
 
 class EnviarCotizacionMixin(object):
-    tipo = None
-
-    def post(self, request, *args, **kwargs):
-        print("inicio mixin")
-        id_cotizacion = self.request.POST.get('id')
-
-        if self.tipo == "Enviar" and id_cotizacion:
-            cotizacion = Cotizacion.objects.get(id=id_cotizacion)
-            formulario = CotizacionEnviarForm(self.request.POST, instance=cotizacion)
-            cotizacion = self.procesar_formulario(formulario)
-            if cotizacion:
-                if cotizacion.estado == "INI":
-                    cotizacion.estado = "ENV"
-                if not cotizacion.items.exists():
-                    mensaje = "No se puede enviar una cotización sin items"
-                    messages.add_message(self.request, messages.ERROR, mensaje)
-                    return redirect('cotizaciones:cotizador')
-                self.enviar(cotizacion)
-
-        if self.tipo == "Reenviar":
-            cotizacion = Cotizacion.objects.get(id=id_cotizacion)
-            self.enviar(cotizacion)
-        print("en post mixin")
-        return super().post(request, *args, **kwargs)
-
-    def enviar(self, cotizacion):
+    def enviar_cotizacion(self, cotizacion, user):
         connection = get_connection(host=settings.EMAIL_HOST_ODECO,
                                     port=settings.EMAIL_PORT_ODECO,
                                     username=settings.EMAIL_HOST_USER_ODECO,
@@ -62,8 +46,6 @@ class EnviarCotizacionMixin(object):
             'object': cotizacion,
         }
 
-        user = User.objects.get(username=self.request.user)
-
         try:
             colaborador = Colaborador.objects.get(usuario__user=user)
         except Colaborador.DoesNotExist:
@@ -75,7 +57,7 @@ class EnviarCotizacionMixin(object):
                 ctx['avatar'] = url_avatar
 
         nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (cotizacion.id)
-        if version_cotizacion:
+        if version_cotizacion > 1:
             ctx['version'] = cotizacion.version
             nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (
                 cotizacion.id, cotizacion.version)
@@ -95,35 +77,67 @@ class EnviarCotizacionMixin(object):
         output.close()
         cotizacion.save()
 
-    def procesar_formulario(self, formulario):
-        cotizacion = None
-        if formulario.is_valid():
-            print(formulario.ciudad_despacho)
-            print("entro es valido")
-            cotizacion = formulario.instance
-            cotizacion.usuario = self.request.user
-            es_cliente_nuevo = cotizacion.cliente_nuevo
-            es_otra_ciudad = cotizacion.otra_ciudad
-            cotizacion.fecha_envio = timezone.now()
 
-            if not es_otra_ciudad:
-                cotizacion.ciudad = None
-                cotizacion.pais = None
-            else:
-                cotizacion.ciudad_despacho = None
+class CotizacionesActualesMixin(object):
+    def get_context_data(self, **kwargs):
+        usuario = self.request.user
+        context = super().get_context_data(**kwargs)
+        context["cotizaciones_activas"] = Cotizacion.objects.filter(
+            Q(usuario=usuario) &
+            (
+                Q(estado="INI") |
+                Q(en_edicion=True)
+            )
+        ).order_by('id')
+        return context
 
-            if not es_cliente_nuevo:
-                cotizacion.razon_social = None
-            else:
-                cotizacion.cliente_biable = None
 
-            cotizacion.save()
-            cotizacion = Cotizacion.objects.get(id=cotizacion.id)
+class ListaPreciosMixin(object):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['busqueda_producto_form'] = ProductoBusqueda(self.request.GET or None)
+        if self.object:
+            context["forma_item_otro"] = ItemCotizacionOtrosForm(initial={'cotizacion_id': self.object.id})
+        self.get_lista_precios(context)
+        return context
 
-            if cotizacion.en_edicion:
-                cotizacion.en_edicion = False
-                cotizacion.version += 1
-            cotizacion.nro_cotizacion = "%s - %s" % ('CB', cotizacion.id)
+    def get_lista_precios(self, context):
+        query = self.request.GET.get("buscar")
+        if query:
+            context['tab'] = "LP"
+            qs_bandas = Banda.activos.componentes().filter(
+                Q(referencia__icontains=query) |
+                Q(descripcion_estandar__icontains=query) |
+                Q(descripcion_comercial__icontains=query)
+            ).distinct()
+
+            qs_componentes = Producto.activos.componentes().select_related("unidad_medida").filter(
+                Q(referencia__icontains=query) |
+                Q(descripcion_estandar__icontains=query) |
+                Q(descripcion_comercial__icontains=query)
+            ).distinct().order_by('-modified')
+
+            qs_articulos_catalogo = ArticuloCatalogo.objects.filter(
+                Q(activo=True) &
+                (
+                    Q(referencia__icontains=query) |
+                    Q(nombre__icontains=query) |
+                    Q(categoria__icontains=query)
+                )
+            ).distinct()
+
+            context['object_list_componentes'] = qs_componentes
+            context['object_list_articulos_catalogo'] = qs_articulos_catalogo
+            context['object_list_bandas'] = qs_bandas
+            context["forma_de_pago"] = self.request.GET.get('tipo')
+            self.get_forma_porcentaje_pago(context)
+
+    def get_forma_porcentaje_pago(self, context):
+        if self.request.GET.get("tipo"):
+            context['formas_pago_porcentaje'] = FormaPago.objects.filter(
+                id=self.request.GET.get("tipo")).first().porcentaje
         else:
-            print("entro es invalido")
-        return cotizacion
+            if FormaPago.objects.all():
+                context['formas_pago_porcentaje'] = FormaPago.objects.first().porcentaje
+            else:
+                context['formas_pago_porcentaje'] = 0

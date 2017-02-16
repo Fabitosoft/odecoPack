@@ -89,7 +89,7 @@ class CotizacionForm(ModelForm):
         required=False,
         label='Cliente CGuno'
     )
-    id = forms.IntegerField(required=False)
+    id = forms.IntegerField(required=False, widget=forms.HiddenInput)
 
     def clean(self):
         cleaned_data = super(CotizacionForm, self).clean()

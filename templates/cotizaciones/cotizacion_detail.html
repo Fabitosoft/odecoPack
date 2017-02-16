@@ -87,6 +87,13 @@
                             {% endif %}
                         </small>
                     </h4>
+                    {% if object.observaciones %}
+                        <h4>Observación
+                            <small>
+                                {{ object.observaciones }}
+                            </small>
+                        </h4>
+                    {% endif %}
                 </div>
             </div>
         </div>

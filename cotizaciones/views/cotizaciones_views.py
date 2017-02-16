@@ -213,9 +213,12 @@ class CotizacionRemisionView(SingleObjectMixin, SelectRelatedMixin, FormView):
 
 class EditarCotizacion(View):
     def post(self, request, *args, **kwargs):
+        usuario = self.request.user
         coti_id = request.POST.get('editar')
         cotizacion = get_object_or_404(Cotizacion, pk=coti_id)
         cotizacion.en_edicion = True
+        Cotizacion.objects.filter(actualmente_cotizador=True, usuario=usuario).update(actualmente_cotizador=False)
+        cotizacion.actualmente_cotizador = True
         cotizacion.save()
         return redirect(reverse('cotizaciones:cotizador'))
 

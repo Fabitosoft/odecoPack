@@ -1,0 +1,74 @@
+<div class="col-md-9">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <td>Referencia</td>
+            <td>Nombre</td>
+            <td>Cantidad</td>
+            <td>Uni. Medida</td>
+            <td>Precio</td>
+            <td>Porcentaje Descuento %</td>
+            <td>Descuento $</td>
+            <td>Total</td>
+            <td>Días Ent.</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% with item_coti_list=cotizacion_actual.items.all %}
+            {% if item_coti_list %}
+                {% for item in item_coti_list %}
+                    <tr id="item-{{ item.id }}">
+                        <td>
+                            {{ item.get_referencia_item }}
+                        </td>
+                        <td>
+                            {{ item.get_nombre_item|title }}
+                        </td>
+                        <td>
+                            <input type='hidden' name='item' value='{{ item.id }}'/>
+                            <input class="item-qty" style="width: 60px" step=any
+                                   value="{{ item.cantidad|floatformat:2 }}"/>
+                        </td>
+                        <td>
+                            {{ item.get_unidad_item }}
+                        </td>
+                        <td>{{ item.precio }}</td>
+                        <td>
+                            <input type='hidden' name='item' value='{{ item.id }}'/>
+                            <input class="item-desc" style="width: 60px" step=any
+                                   value="{{ item.porcentaje_descuento|floatformat:2 }}"/>
+                        </td>
+                        <td class="descuento">{{ item.descuento }}</td>
+                        <td class="total">{{ item.total }}</td>
+                        <td>
+                            <input type='hidden' name='item' value='{{ item.id }}'/>
+                            <input type="number" pattern="[0-9]" class="item-ent"
+                                   style="width: 60px"
+                                   min="0" step="1"
+                                   value="{{ item.dias_entrega }}"/>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td>
+                Descuentos:
+            </td>
+            <td id="coti_val_descuento">
+                {{ cotizacion_actual.descuento }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Total:
+            </td>
+            <td id="coti_val_total">
+                {{ cotizacion_actual.total }}
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+</div>
