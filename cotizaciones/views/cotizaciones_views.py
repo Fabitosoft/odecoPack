@@ -335,7 +335,11 @@ class EmailPrueba(View):
 
 
 class CotizacionEmailView(EnviarCotizacionMixin, View):
-    tipo = "Reenviar"
+    def post(self, request, *args, **kwargs):
+        id = self.request.POST.get('id')
+        cotizacion_actual = Cotizacion.objects.get(id=id)
+        self.enviar_cotizacion(cotizacion_actual, self.request.user)
+        return redirect(cotizacion_actual)
 
 
 class TareaListView(SelectRelatedMixin, ListView):
