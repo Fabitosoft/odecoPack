@@ -39,8 +39,6 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
         usuario = self.request.user
         fecha_hoy = timezone.now().date()
 
-        print('entro aqui')
-
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
             try:
                 print('entro a existe')
@@ -58,12 +56,12 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                 vendedores_biable = VendedorBiable.objects.filter(colaborador__usuario__user=usuario).distinct()
 
                 if vendedores_biable.exists():
-                    qsEnvios = EnvioTransportadoraTCC.pendientes.select_related('tarea').filter(
+                    qsEnvios = EnvioTransportadoraTCC.pendientes.select_related('tarea_diaria_envio_tcc').filter(
                         facturas__vendedor__in=vendedores_biable
                     ).distinct()
                     for envio in qsEnvios:
                         try:
-                            tarea_envio = envio.tarea
+                            tarea_envio = envio.tarea_diaria_envio_tcc
                             tarea_envio.estado = 0
                         except TareaEnvioTCC.DoesNotExist:
                             tarea_envio = TareaEnvioTCC()
@@ -72,12 +70,12 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                         tarea_envio.trabajo_diario = trabajo_diario
                         tarea_envio.save()
 
-                    qsCotizacion = Cotizacion.estados.activo().select_related('tarea').filter(
+                    qsCotizacion = Cotizacion.estados.activo().select_related('tarea_diaria_cotizacion').filter(
                         created__date__lt=fecha_hoy,
                         usuario=usuario).order_by('-total')
                     for cotizacion in qsCotizacion:
                         try:
-                            tarea_cotizacion = cotizacion.tarea
+                            tarea_cotizacion = cotizacion.tarea_diaria_cotizacion
                             tarea_cotizacion.estado = 0
                         except TareaCotizacion.DoesNotExist:
                             tarea_cotizacion = TareaCotizacion()
@@ -86,7 +84,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                         tarea_cotizacion.trabajo_diario = trabajo_diario
                         tarea_cotizacion.save()
 
-                    qsCartera = Cartera.objects.select_related('factura', 'factura__tarea').filter(
+                    qsCartera = Cartera.objects.select_related('factura', 'factura__tarea_diaria_cartera').filter(
                         esta_vencido=True,
                         vendedor__in=vendedores_biable).distinct().order_by(
                         "-dias_vencido")
@@ -94,7 +92,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
                         factura = cartera.factura
                         if factura:
                             try:
-                                tarea_cartera = factura.tarea
+                                tarea_cartera = factura.tarea_diaria_cartera
                                 tarea_cartera.estado = 0
                             except TareaCartera.DoesNotExist:
                                 tarea_cartera = TareaCartera()

@@ -81,7 +81,7 @@ class Tarea(TimeStampedModel):
 
 # region Tarea Cotizacion
 class TareaCotizacion(Tarea):
-    cotizacion = models.OneToOneField(Cotizacion, related_name='tarea_cotizacion', null=True, blank=True,
+    cotizacion = models.OneToOneField(Cotizacion, related_name='tarea_diaria_cotizacion', null=True, blank=True,
                                       on_delete=models.SET_NULL)
     trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.PROTECT, related_name='tareas_cotizacion',
                                        null=True)
@@ -115,7 +115,7 @@ class SeguimientoCotizacion(Seguimiento):
 
 # region EnvioTCC
 class TareaEnvioTCC(Tarea):
-    envio = models.OneToOneField(EnvioTransportadoraTCC, related_name='tarea', null=True, blank=True,
+    envio = models.OneToOneField(EnvioTransportadoraTCC, related_name='tarea_diaria_envio_tcc', null=True, blank=True,
                                  on_delete=models.SET_NULL)
     trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.PROTECT, related_name='tareas_envios_tcc',
                                        null=True)
@@ -141,7 +141,7 @@ class SeguimientoEnvioTCC(Seguimiento):
 
 # region TareaCartera
 class TareaCartera(Tarea):
-    factura = models.OneToOneField(FacturasBiable, related_name='tarea', null=True, blank=True,
+    factura = models.OneToOneField(FacturasBiable, related_name='tarea_diaria_cartera', null=True, blank=True,
                                    on_delete=models.SET_NULL)
     trabajo_diario = models.ForeignKey(TrabajoDiario, on_delete=models.PROTECT, related_name='tareas_cartera',
                                        null=True)

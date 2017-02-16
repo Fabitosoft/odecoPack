@@ -16,14 +16,14 @@
     {% for cartera in carteras %}
         <tr>
             <td>
-                {% if cartera.factura.tarea.estado == 0 %}
+                {% if cartera.factura.tarea_diaria_cartera.estado == 0 %}
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 {% else %}
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
                 {% endif %}
             </td>
             <td>
-                <a href="{{ cartera.factura.tarea.get_absolute_url }}">{{ cartera.factura.tarea.descripcion }}</a>
+                <a href="{{ cartera.factura.tarea_diaria_cartera.get_absolute_url }}">{{ cartera.factura.tarea_diaria_cartera.descripcion }}</a>
             </td>
 
             <td>
