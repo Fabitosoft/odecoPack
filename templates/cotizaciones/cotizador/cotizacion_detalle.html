@@ -1,3 +1,4 @@
+{% load l10n %}
 <div class="col-md-9">
     <table class="table table-bordered table-striped">
         <thead>
@@ -17,7 +18,7 @@
         {% with item_coti_list=cotizacion_actual.items.all %}
             {% if item_coti_list %}
                 {% for item in item_coti_list %}
-                    <tr id="item-{{ item.id }}">
+                    <tr {% localize off %}id="item-{{ item.id }}"{% endlocalize %}>
                         <td>
                             {{ item.get_referencia_item }}
                         </td>
@@ -25,7 +26,9 @@
                             {{ item.get_nombre_item|title }}
                         </td>
                         <td>
-                            <input type='hidden' name='item' value='{{ item.id }}'/>
+                            {% localize off %}
+                                <input type='hidden' name='item' value='{{ item.id }}'/>
+                            {% endlocalize %}
                             <input class="item-qty" style="width: 60px" step=any
                                    value="{{ item.cantidad|floatformat:2 }}"/>
                         </td>

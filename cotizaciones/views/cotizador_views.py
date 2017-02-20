@@ -144,11 +144,13 @@ class AddItemCantidad(SingleObjectMixin, View):
         item_id = request.GET.get("item")
         item = ItemCotizacion.objects.get(id=item_id)
         try:
+            print("entro aqui 0")
             qty = Decimal(request.GET.get("qty"))
             if qty <= 0:
                 delete = True
                 item.delete()
             else:
+                print("entro aqui 1")
                 item.cantidad = qty
                 descuento = (item.precio * qty) * (item.porcentaje_descuento / 100)
                 item.descuento = descuento
@@ -157,6 +159,7 @@ class AddItemCantidad(SingleObjectMixin, View):
             total_linea = round(item.total, 2)
             total_cotizacion = round(item.cotizacion.total, 2)
         except InvalidOperation as e:
+            print("entro aqui 2")
             error_cantidad = True
             actual_item_error = item.get_nombre_item()
             total_linea = "ERROR CANTIDAD"
