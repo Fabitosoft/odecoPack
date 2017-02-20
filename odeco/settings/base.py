@@ -140,6 +140,7 @@ MY_APPS = (
     'despachos_mercancias',
     'geografia_colombia',
     'contactos',
+    'reportes_ventas',
     # 'crm',
 )
 
