@@ -89,7 +89,6 @@
                 qty: qty
             };
             $.get("{% url 'cotizaciones:add_qty_item_cotizacion' %}", data, function (data) {
-                console.log(data)
                 if (data.error_cantidad) {
                     alert("Digitar correctamente la cantidad para " + data.actual_item_error)
                 }
@@ -99,7 +98,6 @@
                     $("#item-" + item).fadeOut();
                 }
                 else {
-                    console.log("entro")
                     $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
                     $("#item-" + item).find('.descuento').html(numberWithCommas(data.descuento))
                 }
@@ -113,7 +111,6 @@
                 dias: dias
             };
             $.get("{% url 'cotizaciones:cambiar_dias_item_cotizacion' %}", data, function (data) {
-                console.log(data)
                 if (data.error_cantidad) {
                     alert("Digitar correctamente los días de entrega para " + data.actual_item_error)
                 }
