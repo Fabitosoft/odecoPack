@@ -11,7 +11,7 @@
 
     <form method="post" action="{% url 'cotizaciones:editar_cotizacion' %}">
         {% csrf_token %}
-        {% if not cotizacion.en_edicion %}
+        {% if not cotizacion.en_edicion and cotizacion.usuario == request.user %}
             <p>
                 <small>
                     <button name="editar" value="{{ cotizacion.pk }}" type="submit"><i class="fa fa-pencil"
@@ -45,7 +45,8 @@
             </h4>
             <h4>Vendedor:
                 <small>{{ cotizacion.usuario.get_full_name }}</small>
-            </h4>{% crispy asignar_vendedor_form %}
+            </h4>
+            {% crispy asignar_vendedor_form %}
         </div>
         <h2>Información Cliente</h2>
         <div class="row div_detalle">

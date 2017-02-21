@@ -66,7 +66,8 @@ class ClienteDetailView(
         qs = MovimientoVentaBiable.objects.values(
             'item_biable__descripcion',
             'item_biable__categoria_mercadeo',
-            'item_biable__categoria_mercadeo_dos'
+            'item_biable__categoria_mercadeo_dos',
+            'item_biable__id_referencia'
         ).annotate(
             year=Extract('factura__fecha_documento', 'year'),
             month=Extract('factura__fecha_documento', 'month'),
