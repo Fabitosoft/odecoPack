@@ -1,0 +1,35 @@
+{% extends 'cotizaciones/base_cotizacion.html' %}
+{% load crispy_forms_tags %}
+{% block titulo_pagina %}
+    Cotizacion {{ cotizacion.nro_cotizacion }}
+    {% if not cotizacion.estado == 'FIN' and not cotizacion.estado == 'ELI' %}
+        {% if cotizacion.en_edicion %}
+            <small> En Edicion</small>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block content_page %}
+    {% include 'cotizaciones/cotizacion/cabecera.html' %}
+    {% include 'cotizaciones/cotizacion/detalle.html' %}
+    {% include 'cotizaciones/cotizacion/seguimientos.html' %}
+    {% include 'cotizaciones/cotizacion/comentarios.html' %}
+    {% crispy comentario_form %}
+    <div class="row">
+        {% if cotizacion.estado == 'PRO' %}
+            <div class="col-md-6">
+                <h2>Remisiones</h2>
+                <hr/>
+                {% crispy remisiones helper_remision %}
+            </div>
+        {% endif %}
+
+        {% if cotizacion.estado == 'PRO' or cotizacion.estado == 'ENV' or cotizacion.estado == 'REC' %}
+            <div class="col-md-6">
+                <h2>Tareas</h2>
+                <hr/>
+                {% crispy tareas helper_tarea %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,34 +1,20 @@
-from io import BytesIO
-
-from django.core.mail import get_connection
-from django.contrib.auth.models import User
-from django.core.mail import EmailMultiAlternatives
-from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
-from django.template.loader import get_template
 from django.urls import reverse
 from django.db.models import Q
-from django.template import Context
-from django.conf import settings
 from django.views import View
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import UpdateView
 from django.views.generic.list import ListView
-from django.views.generic import DetailView, FormView
 from django.forms import inlineformset_factory
-from django.utils import timezone
 from django.contrib import messages
 
-import mistune
-from weasyprint import HTML
+from braces.views import SelectRelatedMixin, LoginRequiredMixin
 
-from braces.views import SelectRelatedMixin
-
-from biable.models import Colaborador
+from usuarios.mixins import UsuariosMixin
 from ..models import (
     Cotizacion,
     RemisionCotizacion,
     TareaCotizacion,
-    ComentarioCotizacion)
+)
 
 from ..forms import (
     BusquedaCotiForm,
@@ -36,177 +22,9 @@ from ..forms import (
     RemisionCotizacionFormHelper,
     TareaCotizacionForm,
     TareaCotizacionFormHelper,
-    ComentarioCotizacionForm
-)
+    ComentarioCotizacionForm,
+    CambiarResponsableCotizacionForm)
 from ..mixins import EnviarCotizacionMixin
-
-
-class CotizacionDetailView(SelectRelatedMixin, DetailView):
-    model = Cotizacion
-    select_related = (
-        'usuario',
-        'usuario__user_extendido',
-        'usuario__user_extendido__colaborador'
-    )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        RemisionFormSet = inlineformset_factory(
-            parent_model=Cotizacion,
-            model=RemisionCotizacion,
-            fields=(
-                'tipo_remision',
-                'nro_remision',
-                'fecha_prometida_entrega',
-                'entregado',
-            ),
-            form=RemisionCotizacionForm,
-            can_delete=True,
-            can_order=True,
-            extra=1
-        )
-
-        TareaFormSet = inlineformset_factory(
-            parent_model=Cotizacion,
-            model=TareaCotizacion,
-            fields=('nombre',
-                    'descripcion',
-                    'fecha_inicial',
-                    'fecha_final',
-                    'esta_finalizada'
-                    ),
-            form=TareaCotizacionForm,
-            can_delete=True,
-            can_order=True,
-            extra=1
-        )
-
-        remision_formset = RemisionFormSet(instance=self.get_object())
-        tarea_formset = TareaFormSet(instance=self.get_object())
-
-        context["tareas"] = tarea_formset
-        helper_tarea = TareaCotizacionFormHelper()
-        context["helper_tarea"] = helper_tarea
-
-        context["remisiones"] = remision_formset
-        helper_remision = RemisionCotizacionFormHelper()
-        context["helper_remision"] = helper_remision
-
-        context["comentario_form"] = ComentarioCotizacionForm(initial={"cotizacion": self.get_object()})
-        return context
-
-    def get(self, request, *args, **kwargs):
-        if self.get_object().en_edicion:
-            return redirect(reverse('cotizaciones:cotizador'))
-        return super().get(request, *args, **kwargs)
-
-
-class CotizacionRemisionView(SingleObjectMixin, SelectRelatedMixin, FormView):
-    template_name = "cotizaciones/cotizacion_detail.html"
-    form_class = RemisionCotizacionForm
-    model = Cotizacion
-    select_related = (
-        'usuario',
-        'usuario__user_extendido',
-        'usuario__user_extendido__colaborador'
-    )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        RemisionFormSet = inlineformset_factory(
-            parent_model=Cotizacion,
-            model=RemisionCotizacion,
-            fields=(
-                'tipo_remision',
-                'nro_remision',
-                'fecha_prometida_entrega',
-                'entregado',
-            ),
-            form=RemisionCotizacionForm,
-            can_delete=True,
-            can_order=True,
-            extra=1
-        )
-
-        TareaFormSet = inlineformset_factory(
-            parent_model=Cotizacion,
-            model=TareaCotizacion,
-            fields=('nombre',
-                    'descripcion',
-                    'fecha_inicial',
-                    'fecha_final',
-                    'esta_finalizada'
-                    ),
-            form=TareaCotizacionForm,
-            can_delete=True,
-            can_order=True,
-            extra=1
-        )
-
-        if self.request.method == "POST":
-            cotizacion = self.get_object()
-
-            es_cambiar_tareas = self.request.POST.get('cambiar_tareas')
-            es_cambiar_remision = self.request.POST.get('cambiar_remision')
-            es_rechazada = self.request.POST.get('rechazar')
-            es_aceptada = self.request.POST.get('aceptada')
-            es_completada = self.request.POST.get('completada')
-            es_recibida = self.request.POST.get('recibida')
-
-            if es_rechazada:
-                cotizacion.estado = 'ELI'
-                cotizacion.save()
-
-            if es_aceptada:
-                cotizacion.estado = 'PRO'
-                cotizacion.save()
-
-            if es_completada:
-                cotizacion.estado = 'FIN'
-                if cotizacion.mis_remisiones.count() > 0:
-                    cotizacion.save()
-                else:
-                    mensaje = "No es posible terminar la cotización %s sin relacionar ninguna remisión" % (
-                        cotizacion.nro_cotizacion)
-                    messages.add_message(self.request, messages.ERROR, mensaje)
-
-            if es_recibida:
-                cotizacion.estado = 'REC'
-                cotizacion.save()
-
-            remision_formset = RemisionFormSet(instance=cotizacion)
-            tarea_formset = TareaFormSet(instance=cotizacion)
-            if es_cambiar_tareas:
-                tarea_formset = TareaFormSet(self.request.POST, instance=cotizacion)
-                if tarea_formset.is_valid():
-                    tarea_formset.save()
-                    tarea_formset = TareaFormSet(instance=cotizacion)
-
-            if es_cambiar_remision:
-                remision_formset = RemisionFormSet(self.request.POST, instance=cotizacion)
-                if remision_formset.is_valid():
-                    if remision_formset.is_valid():
-                        remision_formset.save()
-                        remision_formset = RemisionFormSet(instance=cotizacion)
-
-        context["object"] = self.get_object()
-
-        context["tareas"] = tarea_formset
-        helper_tarea = TareaCotizacionFormHelper()
-        context["helper_tarea"] = helper_tarea
-
-        context["remisiones"] = remision_formset
-        helper_remision = RemisionCotizacionFormHelper()
-        context["helper_remision"] = helper_remision
-
-        context["comentario_form"] = ComentarioCotizacionForm(initial={"cotizacion": self.get_object()})
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseForbidden()
-        self.object = self.get_object()
-        return super().post(request, *args, **kwargs)
 
 
 class EditarCotizacion(View):
@@ -219,119 +37,6 @@ class EditarCotizacion(View):
         cotizacion.actualmente_cotizador = True
         cotizacion.save()
         return redirect(reverse('cotizaciones:cotizador'))
-
-
-class ComentarCotizacionView(View):
-    def post(self, request, *args, **kwargs):
-        cotizacion = Cotizacion.objects.get(pk=request.POST.get('cotizacion'))
-        comentario = ComentarioCotizacion(
-            usuario=self.request.user,
-            comentario=request.POST.get('comentario'),
-            cotizacion=cotizacion
-        )
-        comentario.save()
-        return redirect(cotizacion)
-
-
-class CotizacionView(View):
-    def get(self, request, *args, **kwargs):
-        view = CotizacionDetailView.as_view()
-        return view(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        view = CotizacionRemisionView.as_view()
-        return view(request, *args, **kwargs)
-
-
-class EmailPrueba(View):
-    def get(self, request, *args, **kwargs):
-        connection = get_connection(host=settings.EMAIL_HOST_ODECO,
-                                    port=settings.EMAIL_PORT_ODECO,
-                                    username=settings.EMAIL_HOST_USER_ODECO,
-                                    password=settings.EMAIL_HOST_PASSWORD_ODECO,
-                                    use_tls=settings.EMAIL_USE_TLS_ODECO
-                                    )
-
-        obj = Cotizacion.objects.first()
-
-        markdown = mistune.Markdown()
-        if obj.estado == "INI":
-            obj.razon_social = self.request.POST.get('razon_social')
-            obj.nombres_contacto = self.request.POST.get('nombres_contacto')
-            obj.apellidos_contacto = self.request.POST.get('apellidos_contacto')
-            obj.email = self.request.POST.get('email')
-            obj.nro_contacto = self.request.POST.get('nro_contacto')
-            obj.observaciones = markdown(self.request.POST.get('observaciones'))
-            obj.ciudad = self.request.POST.get('ciudad')
-            obj.pais = self.request.POST.get('pais')
-            obj.nro_cotizacion = "%s - %s" % ('CB', obj.id)
-            obj.fecha_envio = timezone.now()
-            obj.estado = "ENV"
-            obj.save()
-
-        esta_en_edicion = obj.en_edicion
-        if obj.en_edicion:
-            obj.en_edicion = False
-            obj.fecha_envio = timezone.now()
-            obj.version += 1
-            obj.save()
-
-        from_email = "ODECOPACK / COMPONENTES <%s>" % (settings.EMAIL_HOST_USER_ODECO)
-        # to = obj.email
-        to = "fabio.garcia.sanchez@gmail.com"
-        subject = "Ignorara Correo de Prueba Fabio"
-        if esta_en_edicion:
-            subject = "%s, version %s" % (subject, obj.version)
-
-        ctx = {
-            'object': obj,
-        }
-
-        user = User.objects.get(username=request.user)
-
-        try:
-            colaborador = Colaborador.objects.get(usuario__user=user)
-        except Colaborador.DoesNotExist:
-            colaborador = None
-
-        if colaborador:
-            if colaborador.foto_perfil:
-                url_avatar = colaborador.foto_perfil.url
-                ctx['avatar'] = url_avatar
-
-        nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s.pdf" % (obj.id)
-        if esta_en_edicion:
-            ctx['version'] = obj.version
-            nombre_archivo_cotizacion = "Cotizacion Odecopack - CB %s ver %s.pdf" % (obj.id, obj.version)
-
-        hora = int(timezone.localtime(timezone.now()).hour)
-        if hora > 6 and hora < 12:
-            tiempo_saludo = "Buenos días"
-        elif hora > 11 and hora < 18:
-            tiempo_saludo = "Buenas tardes"
-        else:
-            tiempo_saludo = "Buenas noches"
-
-        saludo = "%s, mi nombre es %s" % (tiempo_saludo, colaborador.usuario.user.get_full_name())
-
-        text_content = "%s.<br>%s %s.<br>%s." % (
-            saludo,
-            "Adjunto, en pdf, envío la cotización solicitada con número CB ",
-            obj.id,
-            "Yo y Odecopack, le deseamos un felíz día. Gracias por preferirnos"
-        )
-
-        html_content = get_template('cotizaciones/emails/cotizacion.html').render(Context(ctx))
-
-        output = BytesIO()
-        HTML(string=html_content).write_pdf(target=output)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
-                                     connection=connection)
-        msg.content_subtype = "html"
-        msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
-        msg.send()
-        output.close()
-        return redirect(obj)
 
 
 class CotizacionEmailView(EnviarCotizacionMixin, View):
@@ -391,7 +96,7 @@ class RemisionListView(SelectRelatedMixin, ListView):
         return qs
 
 
-class CotizacionesListView(SelectRelatedMixin, ListView):
+class CotizacionesListView(UsuariosMixin, SelectRelatedMixin, ListView):
     model = Cotizacion
     template_name = 'cotizaciones/cotizacion_list.html'
 
@@ -448,11 +153,10 @@ class CotizacionesListView(SelectRelatedMixin, ListView):
             )
 
         if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
-            usuario = get_object_or_404(Colaborador, usuario__user=current_user)
-            users = usuario.subalternos.all().values('usuario__user')
+            subalternos = self.get_sub_alternos(current_user)
             qsFinal = qs.filter(
                 Q(usuario=current_user) |
-                Q(usuario__in=users)
+                Q(usuario__in=subalternos)
             ).distinct().order_by('-id').distinct()
         else:
             qsFinal = qs.order_by('-id').distinct()
@@ -462,3 +166,171 @@ class CotizacionesListView(SelectRelatedMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["form_busqueda"] = BusquedaCotiForm(self.request.GET or None)
         return context
+
+
+class CotizacionView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        view = CotizacionDetailView.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.request.POST.get('form_estado'):
+            view = CotizacionCambiarEstadoView.as_view()
+        if self.request.POST.get('form_comentar'):
+            view = CotizacionComentarView.as_view()
+        if self.request.POST.get('form_remision'):
+            view = CotizacionRemisionView.as_view()
+        if self.request.POST.get('form_tareas'):
+            view = CotizacionTareaView.as_view()
+        if self.request.POST.get('asignar_vendedor'):
+            view = CotizacionAsignarVendedorView.as_view()
+        return view(request, *args, **kwargs)
+
+
+class FormSetsCotizacionMixin(object):
+    def get_formset_remision(self):
+        RemisionFormSet = inlineformset_factory(
+            parent_model=Cotizacion,
+            model=RemisionCotizacion,
+            fields=(
+                'tipo_remision',
+                'nro_remision',
+                'fecha_prometida_entrega',
+                'entregado',
+            ),
+            form=RemisionCotizacionForm,
+            can_delete=True,
+            can_order=True,
+            extra=1
+        )
+        return RemisionFormSet(self.request.POST or None, instance=self.object)
+
+    def get_formset_tareas(self):
+        TareaFormSet = inlineformset_factory(
+            parent_model=Cotizacion,
+            model=TareaCotizacion,
+            fields=('nombre',
+                    'descripcion',
+                    'fecha_inicial',
+                    'fecha_final',
+                    'esta_finalizada'
+                    ),
+            form=TareaCotizacionForm,
+            can_delete=True,
+            can_order=True,
+            extra=1
+        )
+        return TareaFormSet(self.request.POST or None, instance=self.object)
+
+
+class CotizacionDetailView(UsuariosMixin, SelectRelatedMixin, FormSetsCotizacionMixin, UpdateView):
+    template_name = 'cotizaciones/cotizacion/cotizacion_detalle.html'
+    select_related = [
+        'cliente_biable',
+        'ciudad_despacho',
+        'ciudad_despacho',
+        'ciudad_despacho__departamento',
+        'ciudad_despacho__departamento__pais',
+        'tarea_diaria_cotizacion'
+    ]
+    model = Cotizacion
+    context_object_name = 'cotizacion'
+    fields = '__all__'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        usuario = self.request.user
+        if not usuario.is_superuser:
+            subalternos = self.get_sub_alternos(usuario)
+            qs = qs.filter(
+                Q(usuario=usuario) |
+                Q(usuario__in=subalternos)
+            )
+        return qs
+
+    def get_success_url(self):
+        return redirect('cotizaciones:detalle_cotizacion2', {'pk': self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        initial = {"cotizacion": self.object, "usuario": self.request.user}
+        context["comentario_form"] = ComentarioCotizacionForm(initial=initial)
+
+        remision_formset = self.get_formset_remision()
+        tarea_formset = self.get_formset_tareas()
+
+        context["tareas"] = tarea_formset
+        context["asignar_vendedor_form"] = CambiarResponsableCotizacionForm(instance=self.object)
+        helper_tarea = TareaCotizacionFormHelper()
+        context["helper_tarea"] = helper_tarea
+
+        context["remisiones"] = remision_formset
+        helper_remision = RemisionCotizacionFormHelper()
+        context["helper_remision"] = helper_remision
+
+        return context
+
+
+class CotizacionCambiarEstadoView(CotizacionDetailView):
+    def post(self, request, *args, **kwargs):
+        cambiar_estado = self.request.POST.get('form_estado')
+        cotizacion = self.get_object()
+        if cambiar_estado:
+            self.cambiar_estado(cambiar_estado, cotizacion)
+        return redirect(cotizacion)
+
+    def cambiar_estado(self, cambiar_estado, cotizacion):
+        if cambiar_estado == "Rechazar":
+            cotizacion.estado = 'ELI'
+            cotizacion.save()
+
+        if cambiar_estado == "Aceptada":
+            cotizacion.estado = 'PRO'
+            cotizacion.save()
+
+        if cambiar_estado == "Completada":
+            cotizacion.estado = 'FIN'
+            if cotizacion.mis_remisiones.count() > 0:
+                cotizacion.save()
+            else:
+                mensaje = "No es posible terminar la cotización %s sin relacionar ninguna remisión" % (
+                    cotizacion.nro_cotizacion)
+                messages.add_message(self.request, messages.ERROR, mensaje)
+
+        if cambiar_estado == "Recibida":
+            cotizacion.estado = 'REC'
+            cotizacion.save()
+
+
+class CotizacionComentarView(CotizacionDetailView):
+    def post(self, request, *args, **kwargs):
+        formulario = ComentarioCotizacionForm(self.request.POST)
+        formulario.save()
+        cotizacion = self.get_object()
+        return redirect(cotizacion)
+
+
+class CotizacionRemisionView(CotizacionDetailView):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        remision_formset = self.get_formset_remision()
+        if remision_formset.is_valid():
+            remision_formset.save()
+        return redirect(self.object, self.request.POST)
+
+
+class CotizacionTareaView(CotizacionDetailView):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        tarea_formset = self.get_formset_tareas()
+        if tarea_formset.is_valid():
+            tarea_formset.save()
+        return redirect(self.object, self.request.POST)
+
+
+class CotizacionAsignarVendedorView(CotizacionDetailView):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = CambiarResponsableCotizacionForm(self.request.POST, instance=self.object)
+        form.save()
+        return redirect('cotizaciones:listar_cotizaciones')

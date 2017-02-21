@@ -1,0 +1,14 @@
+{% with seguimientos=cotizacion.tarea_diaria_cotizacion.seguimientos.all %}
+    {% if seguimientos %}
+        <h2>Seguimientos</h2>
+        <ul>
+            {% for seguimiento in seguimientos %}
+                <li>
+                    <i class="fa fa-comments" aria-hidden="true"></i> {{ seguimiento.observacion }}
+                    -
+                    <small> {{ seguimiento.created }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}

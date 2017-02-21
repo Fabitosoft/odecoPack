@@ -1,6 +1,7 @@
 from crispy_forms.bootstrap import StrictButton, PrependedText, FormActions, FieldWithButtons
 from crispy_forms.layout import Submit, Layout, Div, Field, Button, HTML
 from django import forms
+from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.urls import reverse
 
@@ -15,7 +16,7 @@ from .models import (
     ComentarioCotizacion
 )
 from geografia_colombia.models import Ciudad
-from biable.models import Cliente
+from biable.models import Cliente, VendedorBiable
 
 
 class BusquedaCotiForm(forms.Form):
@@ -31,6 +32,58 @@ class BusquedaCotiForm(forms.Form):
         self.helper.form_class = 'form-inline'
         self.helper.layout = Layout(
             FieldWithButtons('buscado', Submit('buscar', 'Buscar'))
+        )
+
+
+class CambiarResponsableCotizacionForm(ModelForm):
+    usuario = forms.ModelChoiceField(
+        queryset=User.objects.filter(
+            user_extendido__colaborador__mi_vendedor_biable__activo=True,
+        )
+    )
+
+    class Meta:
+        model = Cotizacion
+        fields = ['usuario']
+
+    def __init__(self, *args, **kwargs):
+        super(CambiarResponsableCotizacionForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-busqueda'
+        self.helper.form_method = "post"
+
+        self.helper.form_class = 'form-inline'
+        self.helper.layout = Layout(
+            Button('cancelar', 'Cambiar Responsable', data_toggle="modal", data_target="#myModal",
+                   css_class="btn btn-primary btn-lg"),
+            Div(
+                Div(
+                    Div(
+                        Div(
+                            Button('cancelar', 'x', data_dismiss="modal", aria_label="Close", css_class="close"),
+                            HTML('<h4 class="modal-title" id="myModalLabel">Cambiar Responsable</h4>'),
+                            css_class="modal-header"
+                        ),
+                        Div(
+                            Field('id'),
+                            Field('usuario'),
+                            css_class="modal-body"
+                        ),
+                        Div(
+                            Submit('asignar_vendedor', 'Asignar', css_class="btn btn-primary"),
+                            Button('cancelar', 'Cancelar', data_dismiss="modal", css_class="btn btn-default"),
+                            css_class="modal-footer"
+                        ), css_class="modal-content"
+                    ),
+                    role="document",
+                    css_class="modal-dialog"
+                ),
+                css_class="modal fade",
+                id="myModal",
+                tabindex="-1",
+                role="dialog",
+                aria_labelledby="myModalLabel"
+            )
         )
 
 
@@ -209,24 +262,24 @@ class CotizacionEnviarForm(CotizacionForm):
 class ComentarioCotizacionForm(ModelForm):
     class Meta:
         model = ComentarioCotizacion
-        fields = ('comentario', 'cotizacion',)
+        fields = ('comentario', 'cotizacion', 'usuario')
 
     def __init__(self, *args, **kwargs):
         super(ComentarioCotizacionForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_id = 'id-comentario'
         self.helper.form_method = "POST"
-        self.helper.form_action = reverse('cotizaciones:comentar')
 
         self.helper.layout = Layout(
             Field('cotizacion', type="hidden"),
+            Field('usuario', type="hidden"),
             Div(
                 Field('comentario'),
                 css_class="col-xs-12"
             ),
             Div(
                 FormActions(
-                    Submit('comentar', 'Publicar Comentario'),
+                    Submit('form_comentar', 'Publicar Comentario'),
                 )
             )
         )
@@ -285,7 +338,7 @@ class RemisionCotizacionFormHelper(FormHelper):
             ),
             HTML("<br/>")
         )
-        self.add_input(Submit("cambiar_remision", "Guardar"))
+        self.add_input(Submit("form_remision", "Guardar"))
 
 
 class TareaCotizacionFormHelper(FormHelper):
@@ -315,4 +368,4 @@ class TareaCotizacionFormHelper(FormHelper):
             ),
             HTML("<br/>")
         )
-        self.add_input(Submit("cambiar_tareas", "Guardar"))
+        self.add_input(Submit("form_tareas", "Guardar"))

@@ -1,0 +1,113 @@
+{% load crispy_forms_tags %}
+{% if not cotizacion.estado == 'FIN' and not cotizacion.estado == 'ELI' %}
+    <form method="post" action="{% url 'cotizaciones:enviar' %}">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ cotizacion.id }}"/>
+        <small>
+            <button type="submit" name="enviar"><i class="fa fa-envelope" aria-hidden="true"></i> Reenviar Email
+            </button>
+        </small>
+    </form>
+
+    <form method="post" action="{% url 'cotizaciones:editar_cotizacion' %}">
+        {% csrf_token %}
+        {% if not cotizacion.en_edicion %}
+            <p>
+                <small>
+                    <button name="editar" value="{{ cotizacion.pk }}" type="submit"><i class="fa fa-pencil"
+                                                                                       aria-hidden="true"></i>
+                        Editar
+                    </button>
+                </small>
+            </p>
+        {% endif %}
+    </form>
+{% endif %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<div class="row">
+    <div class="col-xs-12 col-sm-8 col-md-9">
+        <div class="div_detalle">
+            </h4>
+            <h4>Fecha Envio:
+                <small>{{ cotizacion.fecha_envio }}</small>
+            </h4>
+            <h4>Estado:
+                <small>{{ cotizacion.get_estado_display }}</small>
+            </h4>
+            <h4>Nro Version:
+                <small>{{ cotizacion.version }}</small>
+            </h4>
+            <h4>Vendedor:
+                <small>{{ cotizacion.usuario.get_full_name }}</small>
+            </h4>
+        </div>
+        <h2>Información Cliente</h2>
+        <div class="row div_detalle">
+            <div class="col-xs-12 col-sm-6">
+                <h4>Razón Social:
+                    <small>
+                        {% if cotizacion.cliente_nuevo %}
+                            {{ cotizacion.razon_social }}
+                        {% else %}
+                            <a href="{{ cotizacion.cliente_biable.get_absolute_url }}"
+                               target="_blank">{{ cotizacion.cliente_biable.nombre }}</a>
+                        {% endif %}
+                    </small>
+                </h4>
+                <h4>Nombre:
+                    <small>{{ cotizacion.nombres_contacto }} {{ cotizacion.apellidos_contacto }}</small>
+                </h4>
+                <h4>Correo Electrónico:
+                    <small>{{ cotizacion.email }}</small>
+                </h4>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <h4>Número de Contacto:
+                    <small>{{ cotizacion.nro_contacto }}</small>
+                </h4>
+                <h4>Ubicación
+                    <small>
+                        {% if cotizacion.otra_ciudad %}
+                            {{ cotizacion.pais }} - {{ cotizacion.ciudad }}
+                        {% else %}
+                            {{ cotizacion.ciudad_despacho.nombre }} -
+                            {{ cotizacion.ciudad_despacho.departamento.nombre }} -
+                            {{ cotizacion.ciudad_despacho.departamento.pais.nombre }}
+                        {% endif %}
+                    </small>
+                </h4>
+                {% if cotizacion.observaciones %}
+                    <h4>Observación
+                        <small>
+                            {{ cotizacion.observaciones|safe }}
+                        </small>
+                    </h4>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-4 col-md-3">
+        {% crispy asignar_vendedor_form %}
+        <form method="post">
+            {% csrf_token %}
+            {% if not cotizacion.estado == 'FIN' and not cotizacion.estado == 'ELI' %}
+                <input class="btn btn-primary" name="form_estado" value="Rechazar" type="submit"/>
+            {% endif %}
+            {% if cotizacion.estado == 'ENV' %}
+                <input class="btn btn-primary" name="form_estado" value="Recibida" type="submit"/>
+            {% endif %}
+            {% if cotizacion.estado == 'REC' %}
+                <input class="btn btn-primary" name="form_estado" value="Aceptada" type="submit"/>
+            {% endif %}
+            {% if cotizacion.estado == 'PRO' %}
+                <input class="btn btn-primary" name="form_estado" value="Completada" type="submit"/>
+            {% endif %}
+        </form>
+    </div>
+</div>

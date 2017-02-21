@@ -1,0 +1,116 @@
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>
+            Rentable
+        </th>
+        <th>
+            Referencia
+        </th>
+        <th>
+            Nombre
+        </th>
+        <th>
+            Cant.
+        </th>
+        <th>
+            Uni. Emp
+        </th>
+        <th>
+            Pre. Uni.
+        </th>
+        <th>
+            Descuento
+        </th>
+        <th>
+            Total
+        </th>
+        <th>
+            Forma de Pago
+        </th>
+        {% if perms.cotizaciones.full_cotizacion %}
+            <th>
+                Costo Base
+            </th>
+            <th>
+                Costo Total
+            </th>
+            <th>
+                Rent.
+            </th>
+            <th>
+                Mrg Rent.
+            </th>
+        {% endif %}
+        <th>
+            Tiem. Entrega
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in cotizacion.items.all %}
+        <tr>
+            <td>
+                {% if item.get_margen_rentabilidad_actual < 0 %}
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                {% else %}
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                {% endif %}
+            </td>
+            <td>
+                {{ item.get_referencia_item }}
+            </td>
+            <td>
+                {{ item.get_nombre_item }}
+            </td>
+            <td>
+                {{ item.cantidad|floatformat:2 }}
+            </td>
+            <td>
+                {{ item.get_unidad_item }}
+            </td>
+            <td>
+                {{ item.precio }}
+            </td>
+            <td>
+                {{ item.descuento }}
+            </td>
+            <td>
+                {{ item.total }}
+            </td>
+            <td>
+                {{ item.forma_pago }}
+            </td>
+            {% if perms.cotizaciones.full_cotizacion %}
+                <td>
+                    {{ item.get_costo_cop_actual_unidad }}
+                </td>
+                <td>
+                    {{ item.get_costo_cop_actual_total }}
+                </td>
+                <td>
+                    {{ item.get_rentabilidad_actual_total }}
+                </td>
+                <td>
+                    {{ item.get_margen_rentabilidad_actual }} %
+                </td>
+            {% endif %}
+            <th>
+                {{ item.get_tiempo_entrega_prometido }}
+            </th>
+        </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+    <tr>
+        <td class="clear"></td>
+        <td colspan="5"> Descuento:</td>
+        <td> {{ cotizacion.descuento }} </td>
+    </tr>
+    <tr>
+        <td class="clear"></td>
+        <td colspan="6"> Total:</td>
+        <td> {{ cotizacion.total }} </td>
+    </tr>
+    </tfoot>
+</table>

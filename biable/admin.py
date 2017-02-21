@@ -90,7 +90,7 @@ class VendedorBiableAdmin(admin.ModelAdmin):
 
 class ClienteBiableAdmin(admin.ModelAdmin):
     list_select_related = ('grupo',)
-    list_display = ('nit', 'nombre', 'fecha_creacion', 'grupo','canal')
+    list_display = ('nit', 'nombre', 'fecha_creacion', 'grupo', 'canal')
 
     fieldsets = (
         ('Informacion Biable', {
@@ -112,7 +112,7 @@ class ClienteBiableAdmin(admin.ModelAdmin):
                     'industria',
                     'competencia',
                     'cerro',
-                    ('potencial_compra','potencial_compra_fecha_actualizacion')
+                    ('potencial_compra', 'potencial_compra_fecha_actualizacion')
                 )
         })
     )
@@ -161,7 +161,7 @@ class MovimientoVentaBiableInLine(admin.TabularInline):
 
 class FacturasBiableAdmin(admin.ModelAdmin):
     inlines = [MovimientoVentaBiableInLine, ]
-    list_select_related = ['cliente', 'vendedor','ciudad_biable']
+    list_select_related = ['cliente', 'vendedor', 'ciudad_biable']
     list_filter = (
         'tipo_documento',
         'vendedor',
@@ -251,7 +251,7 @@ class GrupoClienteAdmin(admin.ModelAdmin):
 
 
 class SucursalBiableAdmin(admin.ModelAdmin):
-    list_select_related = ['cliente','vendedor_biable']
+    list_select_related = ['cliente', 'vendedor_biable']
     list_display = (
         'nro_sucursal',
         'direccion',
@@ -285,6 +285,13 @@ class SucursalBiableAdmin(admin.ModelAdmin):
         'cliente__nombre',
         'nombre_establecimiento_intranet'
     )
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj is not None:
+            qs1 = VendedorBiable.objects.filter(activo=True)
+            form.base_fields['vendedor_real'].queryset = qs1
+        return form
 
 
 admin.site.register(DepartamentoBiable, DepartamentoAdmin)

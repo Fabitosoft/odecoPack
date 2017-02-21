@@ -4,17 +4,16 @@ from .views import (
     AddItem,
     AddItemOtro,
     AddItemCantidad,
-    CotizacionView,
     CotizacionesListView,
     CambiarDiaEntregaView,
     TareaListView,
     RemisionListView,
     CotizacionEmailView,
     CotizadorView,
-    ComentarCotizacionView,
     EditarCotizacion,
-    EmailPrueba,
-    CambiarPorcentajeDescuentoView)
+    CambiarPorcentajeDescuentoView,
+    CotizacionView
+)
 
 urlpatterns = [
     url(r'^add/(?P<item_id>[0-9]+)/(?P<precio>[0-9]+)/(?P<forma_pago>[0-9]+)/(?P<cot_id>[0-9]+)/(?P<tipo>[0-9]+)$',
@@ -30,9 +29,7 @@ urlpatterns = [
     url(r'^remisiones/list/$', RemisionListView.as_view(), name='listar_remisiones'),
     url(r'^buscar/$', CotizacionesListView.as_view(), name='buscar_cotizacion'),
     url(r'^editar_cotizacion/', EditarCotizacion.as_view(), name='editar_cotizacion'),
-    url(r'^comentar/', ComentarCotizacionView.as_view(), name='comentar'),
     url(r'^add_otro/', AddItemOtro.as_view(), name='add_item_otro_cotizacion'),
-    url(r'^prueba/', EmailPrueba.as_view(), name='prueba'),
     url(r'^cotizador/', CotizadorView.as_view(), name='cotizador'),
 
 ]
