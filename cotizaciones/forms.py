@@ -55,7 +55,7 @@ class CambiarResponsableCotizacionForm(ModelForm):
         self.helper.form_class = 'form-inline'
         self.helper.layout = Layout(
             Button('cancelar', 'Cambiar Responsable', data_toggle="modal", data_target="#myModal",
-                   css_class="btn btn-primary btn-lg"),
+                   css_class="btn btn-primary"),
             Div(
                 Div(
                     Div(

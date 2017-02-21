@@ -45,7 +45,7 @@
             </h4>
             <h4>Vendedor:
                 <small>{{ cotizacion.usuario.get_full_name }}</small>
-            </h4>
+            </h4>{% crispy asignar_vendedor_form %}
         </div>
         <h2>Información Cliente</h2>
         <div class="row div_detalle">
@@ -93,7 +93,6 @@
         </div>
     </div>
     <div class="col-xs-12 col-sm-4 col-md-3">
-        {% crispy asignar_vendedor_form %}
         <form method="post">
             {% csrf_token %}
             {% if not cotizacion.estado == 'FIN' and not cotizacion.estado == 'ELI' %}
