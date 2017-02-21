@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from model_utils.models import TimeStampedModel, SoftDeletableModel
 
-from biable.models import SucursalBiable
+from biable.models import SucursalBiable, Cliente
 from geografia_colombia.models import Ciudad
 
 
@@ -20,7 +20,8 @@ class ContactoEmpresa(TimeStampedModel):
     nro_telefonico = models.CharField(max_length=120, null=True, blank=True)
     nro_telefonico_alternativo = models.CharField(max_length=120, null=True, blank=True)
     nro_telefonico_alternativo_dos = models.CharField(max_length=120, null=True, blank=True)
-    sucursal = models.ForeignKey(SucursalBiable, blank=True, null=True, related_name='mis_contactos')
+    sucursal = models.ForeignKey(SucursalBiable, null=True, blank=True, related_name='mis_contactos')
+    cliente = models.ForeignKey(Cliente, null=True, blank=True, related_name='mis_contactos')
     creado_por = models.ForeignKey(User, related_name='mis_contactos', null=True, blank=True)
     retirado = models.BooleanField(default=False)
     cargo = models.CharField(max_length=120, blank=True, null=True)

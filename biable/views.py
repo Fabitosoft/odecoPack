@@ -57,6 +57,12 @@ class ClienteDetailView(
         'mis_despachos__ciudad__departamento',
     ]
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        qs = self.object.mis_contactos.filter(sucursal__isnull=True).all()
+        context['contactos_sin_sucursal'] = qs
+        return context
+
     def post_ajax(self, request, *args, **kwargs):
         nit = request.POST.get('nit')
         cliente = Cliente.objects.get(nit=nit)
