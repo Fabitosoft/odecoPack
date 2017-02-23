@@ -17,6 +17,8 @@ class HistoricoVenta(models.Model):
     ciudad = models.ForeignKey(CiudadBiable, null=True, blank=True)
     dia = models.IntegerField(null=True, blank=True)
     mes = models.IntegerField(null=True, blank=True)
+    semana = models.IntegerField(null=True, blank=True)
+    dia_semana = models.IntegerField(null=True, blank=True)
     t_3_venta_neta = models.DecimalField(decimal_places=0, max_digits=10, default=0)
     t_2_venta_neta = models.DecimalField(decimal_places=0, max_digits=10, default=0)
     t_1_venta_neta = models.DecimalField(decimal_places=0, max_digits=10, default=0)
