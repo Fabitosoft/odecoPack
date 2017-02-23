@@ -4,12 +4,25 @@
 
     <table>
         <thead>
+        <th>CERO</th>
+        <th>UNO</th>
+        <th>2017</th>
+        <th>2016</th>
+        <th>2015</th>
+        <th>2014</th>
+        <th>2017 Acum</th>
+        <th>2016 Acum</th>
+        <th>2015 Acum</th>
+        <th>2014 Acum</th>
         </thead>
         <tbody>
         {% for factura in facturacion %}
             <tr>
                 <td>
-                    {{ factura.cliente_id }}
+                    {{ factura.vendedor__linea_ventas__nombre }}
+                </td>
+                <td>
+                    {{ factura.cliente__nombre }}
                 </td>
                 <td>
                     {{ factura.fact_t }}
@@ -22,6 +35,18 @@
                 </td>
                 <td>
                     {{ factura.fact_t_3 }}
+                </td>
+                <td>
+                    {{ factura.fact_t_acum }}
+                </td>
+                <td>
+                    {{ factura.fact_t_1_acum }}
+                </td>
+                <td>
+                    {{ factura.fact_t_2_acum }}
+                </td>
+                <td>
+                    {{ factura.fact_t_3_acum }}
                 </td>
             </tr>
         {% endfor %}

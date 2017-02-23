@@ -2,7 +2,7 @@ from django.db.models import Case, Sum, Value, When, DecimalField
 from django.db.models import Q
 from django.views.generic import TemplateView
 
-from biable.models import FacturasBiable
+from .models import HistoricoVenta
 
 
 # Create your views here.
@@ -10,46 +10,20 @@ class VistaPrueba(TemplateView):
     template_name = 'reportes_ventas/base_reporte_ventas.html'
 
     def get_context_data(self, **kwargs):
-        print("entro a la vista")
-
-        ano_entrada = 2017
-        ano_1 = ano_entrada - 1
-        ano_2 = ano_entrada - 2
-        ano_3 = ano_entrada - 3
-
-        qs = FacturasBiable.objects.values(
-            'cliente_id'
+        qs = HistoricoVenta.objects.values(
+            'cliente__nombre',
+            'vendedor__linea_ventas__nombre'
         ).annotate(
-            fact_t=Case(
-                When(fecha_documento__year=ano_entrada,
-                     then=Sum('venta_neto')),
-                default=Value(0),
-                output_field=DecimalField(),
-            ),
-            fact_t_1=Case(
-                When(fecha_documento__year=ano_1,
-                     then=Sum('venta_neto')),
-                default=Value(0),
-                output_field=DecimalField(),
-            ),
-            fact_t_2=Case(
-                When(fecha_documento__year=ano_2,
-                     then=Sum('venta_neto')),
-                default=Value(0),
-                output_field=DecimalField(),
-            ),
-            fact_t_3=Case(
-                When(fecha_documento__year=ano_3,
-                     then=Sum('venta_neto')),
-                default=Value(0),
-                output_field=DecimalField(),
-            ),
-        ).filter(
-            Q(fecha_documento__year__gte=ano_3) &
-            Q(fecha_documento__year__lte=ano_entrada) &
-            Q(activa=True)
-        )
-
+            # creci=(Sum('t_1_venta_neta')-Sum('t_venta_neta'))/(Sum('t_1_venta_neta')),
+            fact_t=Sum('t_venta_neta'),
+            fact_t_1=Sum('t_1_venta_neta'),
+            fact_t_2=Sum('t_2_venta_neta'),
+            fact_t_3=Sum('t_3_venta_neta'),
+            fact_t_acum=Sum('t_venta_neta_acum'),
+            fact_t_1_acum=Sum('t_1_venta_neta_acum'),
+            fact_t_2_acum=Sum('t_2_venta_neta_acum'),
+            fact_t_3_acum=Sum('t_3_venta_neta_acum'),
+        ).order_by('vendedor__linea_ventas__nombre')
         context = super().get_context_data(**kwargs)
         context['facturacion'] = qs
 
