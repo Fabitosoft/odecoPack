@@ -265,7 +265,7 @@ class SucursalBiableAdmin(admin.ModelAdmin):
         'vendedor_real'
     )
 
-    list_editable = ('nombre_establecimiento_intranet',)
+    list_editable = ('nombre_establecimiento_intranet','vendedor_real')
 
     readonly_fields = (
         'nro_sucursal',
