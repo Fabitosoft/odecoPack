@@ -210,12 +210,14 @@ class VentasClientes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin, I
             if sum <= 80:
                 pareto.append(cli['cliente__nit'])
 
-        qs = qs.annotate(tipo=Case(
-            When(cliente__nit__in=pareto,
-                 then=Value('Pareto')),
-            default=Value('Otros'),
-            output_field=CharField(),
-        )).order_by('-v_neto')
+        qs = qs.annotate(
+            tipo=Case(
+                When(cliente__nit__in=pareto,
+                     then=Value('Pareto')),
+                default=Value('Otros'),
+                output_field=CharField(),
+            )
+        ).order_by('-v_neto')
 
         lista = list(qs)
         for i in lista:
@@ -266,7 +268,8 @@ class VentasClientesAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin
 
         pareto = []
         sum = 0
-        for cli in qs.values('cliente__nit').annotate(fac=Sum('venta_neto')).filter(year=max_year).order_by('-fac').all():
+        for cli in qs.values('cliente__nit').annotate(fac=Sum('venta_neto')).filter(year=max_year).order_by(
+                '-fac').all():
             sum += (int(cli['fac']) / total_fact) * 100
             if sum <= 80:
                 pareto.append(cli['cliente__nit'])
@@ -296,7 +299,7 @@ class VentasClientesAno(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMixin
             Costo=Sum('costo_total'),
             renta=Sum('rentabilidad'),
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
-            year = Extract('fecha_documento', 'year')
+            year=Extract('fecha_documento', 'year')
         ).filter(
             fecha_documento__year__in=list(map(lambda x: int(x), ano)),
             fecha_documento__month__in=list(map(lambda x: int(x), mes))

@@ -48,6 +48,7 @@ urlpatterns = [
     url(r'^cotizaciones/', include('cotizaciones.urls', namespace="cotizaciones")),
     url(r'^bandas/', include('bandas.urls', namespace="bandas")),
     url(r'^indicadores/', include('indicadores.urls', namespace="indicadores")),
+    url(r'^reportes_ventas/', include('reportes_ventas.urls', namespace="reportes_ventas")),
     url(r'^trabajo_diario/', include('trabajo_diario.urls', namespace="trabajo_diario")),
     url(r'^despacho_mercancia/', include('despachos_mercancias.urls', namespace="despacho_mercancia")),
     url(r'^biable/', include('biable.urls', namespace="biable")),
