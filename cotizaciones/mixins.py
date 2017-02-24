@@ -19,7 +19,7 @@ from .forms import ItemCotizacionOtrosForm
 from listasprecios.forms import ProductoBusqueda
 from .models import Cotizacion
 
-from biable.models import Colaborador
+from biable.models import Colaborador, SucursalBiable
 
 
 class EnviarCotizacionMixin(object):
@@ -46,6 +46,23 @@ class EnviarCotizacionMixin(object):
             colaborador = Colaborador.objects.get(usuario__user=user)
         except Colaborador.DoesNotExist:
             colaborador = None
+
+        if not cotizacion.cliente_nuevo:
+            colaboradores = SucursalBiable.objects.values('vendedor_real__colaborador_id').filter(
+                cliente_id=cotizacion.cliente_biable_id, vendedor_real__isnull=False
+            ).distinct()
+            print("entro 2")
+            print(colaboradores)
+            if colaboradores.exists():
+                if colaboradores.count() == 1:
+                    colaborador = Colaborador.objects.get(pk=colaboradores.first()['vendedor_real__colaborador_id'])
+                    print(colaborador)
+                    print(colaborador.usuario.user)
+                    cotizacion.usuario = colaborador.usuario.user
+
+                    cotizacion.save()
+            else:
+                colaborador = Colaborador.objects.get(usuario__user=user)
 
         if colaborador:
             if colaborador.foto_perfil:

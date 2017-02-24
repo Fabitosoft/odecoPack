@@ -102,6 +102,7 @@ class CotizacionCreateView(ListaPreciosMixin, CotizacionesActualesMixin, CreateV
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
+        form.instance.creado_por = self.request.user
         form.instance.actualmente_cotizador = True
         form.instance.estado = "INI"
         form.instance.en_edicion = False

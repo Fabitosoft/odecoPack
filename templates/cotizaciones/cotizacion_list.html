@@ -47,7 +47,10 @@
                 Total
             </th>
             <th>
-                Usuario
+                Vendedor
+            </th>
+            <th>
+                Creador
             </th>
         </tr>
         </thead>
@@ -96,6 +99,9 @@
                 </td>
                 <td>
                     {{ cotizacion.usuario }}
+                </td>
+                <td>
+                    {{ cotizacion.creado_por }}
                 </td>
                 <td>
                     {{ cotizacion.fecha_envio|naturaltime|capfirst }}
