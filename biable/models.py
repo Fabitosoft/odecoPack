@@ -9,7 +9,6 @@ from usuarios.models import UserExtended, Colaborador
 from geografia_colombia.models import Pais, Ciudad, Departamento
 
 from empresas.models import Canal, Industria
-from listasprecios.models import FormaPago
 
 
 # Create your models here.
@@ -100,9 +99,10 @@ class ItemsBiable(models.Model):
 class Cliente(models.Model):
     nit = models.CharField(max_length=20, primary_key=True)
     nombre = models.CharField(max_length=120)
+    forma_pago = models.CharField(max_length=120, null=True, blank=True, verbose_name="Forma Pago CGUno")
     grupo = models.ForeignKey(GrupoCliente, null=True, blank=True, related_name='mis_empresas')
     fecha_creacion = models.DateField(null=True, blank=True)
-    forma_pago = models.ForeignKey(FormaPago, related_name='mis_empresas', null=True, blank=True)
+    canal = models.ForeignKey(Canal, related_name='mis_empresas', null=True, blank=True)
     clasificacion = models.CharField(max_length=1, null=True, blank=True)
     industria = models.ForeignKey(Industria, related_name='mis_empresas', null=True, blank=True)
     competencia = models.BooleanField(default=False)

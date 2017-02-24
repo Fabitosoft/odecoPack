@@ -29,7 +29,7 @@ class ClienteDetailEditForm(forms.ModelForm):
         fields = [
             'potencial_compra',
             'cerro',
-            'forma_pago',
+            'canal',
             'competencia',
             'industria'
         ]
@@ -53,7 +53,7 @@ class ClienteDetailEditForm(forms.ModelForm):
                     ),
                     Div(
                         Field('potencial_compra'),
-                        Field('forma_pago'),
+                        Field('canal'),
                         Field('industria'),
                         css_class="col-md-12"
                     ), css_class="row"

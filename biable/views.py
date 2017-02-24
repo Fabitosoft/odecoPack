@@ -49,7 +49,7 @@ class ClienteDetailView(
     UpdateView):
     permission_required = "biable.ver_clientes"
     form_class = ClienteDetailEditForm
-    select_related = ['forma_pago', 'forma_pago__canal', 'industria']
+    select_related = ['canal', 'industria']
     model = Cliente
     template_name = 'biable/cliente_detail.html'
     prefetch_related = [

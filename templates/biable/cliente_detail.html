@@ -83,10 +83,10 @@
                                 {{ object.clasificacion }}
                             </p>
                         {% endif %}
-                        {% if object.forma_pago %}
+                        {% if object.canal %}
                             <p>
-                                <span class="label">Forma de Pago: </span>
-                                {{ object.forma_pago.canal }} {{ object.forma_pago.forma }}
+                                <span class="label">Canal: </span>
+                                {{ object.canal.canal }}
                             </p>
                         {% endif %}
                         {% if object.potencial_compra %}

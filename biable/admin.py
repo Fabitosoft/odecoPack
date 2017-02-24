@@ -90,7 +90,7 @@ class VendedorBiableAdmin(admin.ModelAdmin):
 
 class ClienteBiableAdmin(admin.ModelAdmin):
     list_select_related = ('grupo',)
-    list_display = ('nit', 'nombre', 'fecha_creacion', 'grupo', 'forma_pago')
+    list_display = ('nit', 'nombre', 'fecha_creacion', 'grupo', 'canal', 'forma_pago')
 
     fieldsets = (
         ('Informacion Biable', {
@@ -108,7 +108,7 @@ class ClienteBiableAdmin(admin.ModelAdmin):
                 (
                     'grupo',
                     'cliente_nuevo_nit',
-                    'forma_pago',
+                    'canal',
                     'clasificacion',
                     'industria',
                     'competencia',
@@ -127,7 +127,7 @@ class ClienteBiableAdmin(admin.ModelAdmin):
         'grupo__nombre'
     ]
 
-    readonly_fields = ('nit', 'nombre', 'fecha_creacion')
+    readonly_fields = ('nit', 'nombre', 'fecha_creacion', 'forma_pago')
 
     raw_id_fields = ['cliente_nuevo_nit', ]
 
