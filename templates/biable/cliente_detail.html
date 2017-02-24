@@ -20,6 +20,21 @@
                     <span class="label">Competencia: </span> <i class="fa fa-check-circle" aria-hidden="true"></i>
                 </p>
             {% endif %}
+            <p>
+                <span class="label">Vendedor Asignado: </span>
+            <ol>
+                {% for sucursal in object.mis_sucursales.all %}
+                    <li>
+                        {{ sucursal.vendedor_real|title }} -
+                        {% if nombre_establecimiento_intranet %}
+                            {{ sucursal.nombre_establecimiento_intranet }}
+                        {% else %}
+                            {{ sucursal.direccion }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ol>
+            </p>
             {% if object.cerro %}
                 <p>
                     <span class="label">Esta Cerrado: </span>
