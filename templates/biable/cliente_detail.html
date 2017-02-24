@@ -2,90 +2,96 @@
 {% load humanize %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <h1>Detalles Cliente
-        <small>{{ object.nombre|title }} </small>
-    </h1>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Información General</h3>
-            <hr>
-            <p>
-                <span class="label">Nit:</span> {{ object.nit }}
-            </p>
-            <p>
-                <span class="label">Fecha Creación: </span> {{ object.fecha_creacion }}
-            </p>
-            {% if object.competencia %}
+    {% with sucursales_lista=object.mis_sucursales.all %}
+        <h1>Detalles Cliente
+            <small>{{ object.nombre|title }} </small>
+        </h1>
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Información General</h3>
+                <hr>
                 <p>
-                    <span class="label">Competencia: </span> <i class="fa fa-check-circle" aria-hidden="true"></i>
+                    <span class="label">Nit:</span> {{ object.nit }}
                 </p>
-            {% endif %}
-            <p>
-                <span class="label">Vendedor Asignado: </span>
-            <ol>
-                {% for sucursal in object.mis_sucursales.all %}
-                    <li>
-                        {{ sucursal.vendedor_real|title }} -
-                        {% if nombre_establecimiento_intranet %}
-                            {{ sucursal.nombre_establecimiento_intranet }}
-                        {% else %}
-                            {{ sucursal.direccion }}
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ol>
-            </p>
-            {% if object.cerro %}
                 <p>
-                    <span class="label">Esta Cerrado: </span>
-                    <i class="fa fa-check-circle" aria-hidden="true"></i>
-
+                    <span class="label">Fecha Creación: </span> {{ object.fecha_creacion }}
                 </p>
-            {% endif %}
-            {% if object.industria %}
-                <p>
-                    <span class="label">Indústria: </span>
-                    {{ object.industria.nombre }}
-                </p>
-            {% endif %}
-            {% if object.clasificacion %}
-                <p>
-                    <span class="label">Clasificación: </span>
-                    {{ object.clasificacion }}
-                </p>
-            {% endif %}
-            {% if object.canal %}
-                <p>
-                    <span class="label">Canal: </span>
-                    {{ object.canal.canal }}
-                </p>
-            {% endif %}
-
-
-            {% if object.grupo %}
-                <div>
+                {% if object.competencia %}
                     <p>
-                        <span class="label">Empresas Grupo:</span>{{ object.grupo }}
+                        <span class="label">Competencia: </span> <i class="fa fa-check-circle" aria-hidden="true"></i>
                     </p>
-                    <ul>
-                        {% for empresa in object.grupo.mis_empresas.all %}
-                            {% if empresa.nit != object.nit %}
-                                <li>
-                                    <a href="{{ empresa.get_absolute_url }}">{{ empresa.nombre }}
-                                        - {{ empresa.nit }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
+                {% endif %}
 
-        </div>
+                <span class="label">Vendedor Asignado: </span>
+                <ol>
+                    {% for sucursal in sucursales_lista %}
+                        {% with vendedor_real=sucursal.vendedor_real %}
+                            <li>
+                                {% if vendedor_real %}
+                                    {{ sucursal.vendedor_real|title }} -
+                                {% else %}
+                                    <span style="color: red">SIN VENDEDOR ASIGNADO - </span>
+                                {% endif %}
+                                {% if nombre_establecimiento_intranet %}
+                                    {{ sucursal.nombre_establecimiento_intranet }}
+                                {% else %}
+                                    {{ sucursal.direccion }}
+                                {% endif %}
+                            </li>
+                        {% endwith %}
+                    {% endfor %}
+                </ol>
+                {% if object.cerro %}
+                    <p>
+                        <span class="label">Esta Cerrado: </span>
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
 
-        {% with compras_list=object.mis_compras.all|dictsortreversed:"fecha_documento"|slice:":20" %}
-            {% with cotizaciones_list=object.mis_cotizaciones.all|dictsortreversed:"fecha_envio"|slice:":20" %}
-                {% with despachos_lista=object.mis_despachos.all|dictsortreversed:"fecha_envio"|slice:":20" %}
-                    {% with sucursales_lista=object.mis_sucursales.all %}
+                    </p>
+                {% endif %}
+                {% if object.industria %}
+                    <p>
+                        <span class="label">Indústria: </span>
+                        {{ object.industria.nombre }}
+                    </p>
+                {% endif %}
+                {% if object.clasificacion %}
+                    <p>
+                        <span class="label">Clasificación: </span>
+                        {{ object.clasificacion }}
+                    </p>
+                {% endif %}
+                {% if object.canal %}
+                    <p>
+                        <span class="label">Canal: </span>
+                        {{ object.canal.canal }}
+                    </p>
+                {% endif %}
+
+
+                {% if object.grupo %}
+                    <div>
+                        <p>
+                            <span class="label">Empresas Grupo:</span>{{ object.grupo }}
+                        </p>
+                        <ul>
+                            {% for empresa in object.grupo.mis_empresas.all %}
+                                {% if empresa.nit != object.nit %}
+                                    <li>
+                                        <a href="{{ empresa.get_absolute_url }}">{{ empresa.nombre }}
+                                            - {{ empresa.nit }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+            </div>
+
+            {% with compras_list=object.mis_compras.all|dictsortreversed:"fecha_documento"|slice:":20" %}
+                {% with cotizaciones_list=object.mis_cotizaciones.all|dictsortreversed:"fecha_envio"|slice:":20" %}
+                    {% with despachos_lista=object.mis_despachos.all|dictsortreversed:"fecha_envio"|slice:":20" %}
+
                         <!-- Nav tabs -->
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" class="active"><a href="#compras" aria-controls="compras" role="tab"
@@ -100,7 +106,7 @@
                                                            data-toggle="tab">Ultimos 20 Despachos</a></li>
                             {% endif %}
 
-                            {% if sucursales_lista %}
+                            {% if sin_contactos == True %}
                                 <li role="presentation"><a href="#contactos" aria-controls="contactos" role="tab"
                                                            data-toggle="tab">Contactos</a></li>
                             {% endif %}
@@ -351,7 +357,7 @@
                                     </div>
                                 </div>
                             {% endif %}
-                            {% if sucursales_lista %}
+                            {% if sin_contactos == True %}
                                 <div role="tabpanel" class="tab-pane" id="contactos">
                                     <div class="row">
                                         <div class="col-md-12" style="padding: 2em">
@@ -405,8 +411,8 @@
                     {% endwith %}
                 {% endwith %}
             {% endwith %}
-        {% endwith %}
-    </div>
+        </div>
+    {% endwith %}
 {% endblock %}
 
 <script>

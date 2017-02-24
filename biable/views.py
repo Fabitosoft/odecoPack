@@ -34,7 +34,7 @@ class FacturaDetailView(SelectRelatedMixin, PrefetchRelatedMixin, DetailView):
         'ciudad_biable__ciudad_intranet__departamento'
     ]
     prefetch_related = [
-        'mis_movimientos_venta__item_biable'
+        'mis_movimientos_venta__item_biable',
     ]
 
 
@@ -51,17 +51,25 @@ class ClienteDetailView(
     prefetch_related = [
         'mis_compras__vendedor',
         'mis_cotizaciones__usuario',
+        'mis_cotizaciones__ciudad_despacho',
+        'mis_cotizaciones__ciudad_despacho__departamento',
+        'mis_cotizaciones__ciudad_despacho__departamento__pais',
         'mis_cotizaciones__mis_remisiones',
         'mis_cotizaciones__mis_remisiones__factura_biable',
         'grupo__mis_empresas',
         'mis_despachos__ciudad',
         'mis_despachos__ciudad__departamento',
+        'mis_compras__ciudad_biable__ciudad_intranet',
+        'mis_compras__ciudad_biable__ciudad_intranet__departamento'
     ]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         qs = self.object.mis_contactos.filter(sucursal__isnull=True).all()
         context['contactos_sin_sucursal'] = qs
+        si_contactos = self.object.mis_sucursales.filter(
+            vendedor_real__colaborador__usuario__user=self.request.user).exists()
+        context['sin_contactos'] = si_contactos
         return context
 
     def post_ajax(self, request, *args, **kwargs):
