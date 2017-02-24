@@ -18,6 +18,11 @@
                         <p>
                             <span class="label">Fecha Creación: </span> {{ object.fecha_creacion }}
                         </p>
+                        {% if object.forma_pago %}
+                            <p>
+                                <span class="label">Forma Pago CGUno: </span> {{ object.forma_pago }}
+                            </p>
+                        {% endif %}
                         {% if object.competencia %}
                             <p>
                                 <span class="label">Competencia: </span> <i class="fa fa-check-circle"

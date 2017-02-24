@@ -29,6 +29,9 @@
                 Clasificacion
             </th>
             <th>
+                Forma Pago
+            </th>
+            <th>
                 Canal
             </th>
         </tr>
@@ -72,7 +75,12 @@
                 </td>
                 <td>
                     {% if cliente.forma_pago %}
-                        {{ cliente.forma_pago.canal }} {{ cliente.forma_pago.forma }}
+                        {{ cliente.forma_pago }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if cliente.canal %}
+                        {{ cliente.canal.canal }}
                     {% endif %}
                 </td>
             </tr>

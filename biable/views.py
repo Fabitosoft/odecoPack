@@ -137,7 +137,7 @@ class ClienteBiableListView(PermissionRequiredMixin, LoginRequiredMixin, SelectR
     template_name = 'biable/cliente_list.html'
     context_object_name = 'clientes'
     paginate_by = 15
-    select_related = ['forma_pago', 'grupo', 'industria']
+    select_related = ['canal', 'grupo', 'industria']
     permission_required = "biable.ver_clientes"
     tipo = "todos"
 
