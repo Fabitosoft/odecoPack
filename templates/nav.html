@@ -92,7 +92,14 @@
                     <li><a href="{% url 'despacho_mercancia:envio-reporte' %}">Envios TCC</a></li>
                 {% endif %}
                 {% if perms.biable.ver_clientes %}
-                    <li><a href="{% url 'biable:clientes-lista' %}">Clientes</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">Clientes<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url 'biable:clientes-lista' %}">Clientes Listado</a></li>
+                            <li><a href="{% url 'biable:clientes-lista-mis-clientes' %}">Mis Clientes</a></li>
+                        </ul>
+                    </li>
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">

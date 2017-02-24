@@ -11,6 +11,7 @@ from braces.views import (
 from dal import autocomplete
 from django.db.models import F
 from django.db.models import Func
+from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Q, Case, Value, When, Sum, CharField
 from django.db.models.functions import Concat, Extract, Upper
@@ -126,10 +127,15 @@ class ClienteBiableListView(PermissionRequiredMixin, LoginRequiredMixin, SelectR
     paginate_by = 15
     select_related = ['canal', 'grupo', 'industria']
     permission_required = "biable.ver_clientes"
+    tipo = "todos"
 
     def get_queryset(self):
         q = self.request.GET.get('busqueda')
         qs = super().get_queryset()
+        if self.tipo == "por_vendedor":
+            qs = qs.filter(
+                mis_sucursales__vendedor_real__colaborador__usuario__user=self.request.user
+            ).order_by('nombre')
 
         if q:
             qs = qs.exclude(nit='').order_by('nombre').distinct()
@@ -139,11 +145,20 @@ class ClienteBiableListView(PermissionRequiredMixin, LoginRequiredMixin, SelectR
                 Q(nit__icontains=q)
             )
         else:
-            qs = qs.none()
-
+            if self.tipo == "todos":
+                qs = qs.none()
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_busqueda'] = ContactoEmpresaBuscador(self.request.GET or None)
+        return context
+
+
+class ClienteBiablePorVendedorView(ClienteBiableListView):
+    tipo = "por_vendedor"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_busqueda'].helper.form_action = reverse('biable:clientes-lista-mis-clientes')
         return context

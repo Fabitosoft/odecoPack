@@ -6,7 +6,7 @@ from django.urls import reverse
 
 
 class ContactoEmpresaBuscador(forms.Form):
-    busqueda = forms.CharField(max_length=120)
+    busqueda = forms.CharField(max_length=120, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ContactoEmpresaBuscador, self).__init__(*args, **kwargs)
