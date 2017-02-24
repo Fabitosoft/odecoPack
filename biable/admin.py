@@ -107,6 +107,7 @@ class ClienteBiableAdmin(admin.ModelAdmin):
             'fields':
                 (
                     'grupo',
+                    'cliente_nuevo_nit',
                     'canal',
                     'clasificacion',
                     'industria',
@@ -127,6 +128,8 @@ class ClienteBiableAdmin(admin.ModelAdmin):
     ]
 
     readonly_fields = ('nit', 'nombre', 'fecha_creacion')
+
+    raw_id_fields = ['cliente_nuevo_nit',]
 
 
 class MovimientoVentaBiableInLine(admin.TabularInline):

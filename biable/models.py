@@ -110,6 +110,7 @@ class Cliente(models.Model):
                                            verbose_name='Potencial de Compra')
     potencial_compra_fecha_actualizacion = models.DateField(verbose_name='Fecha último Cambio Potencial Compra',
                                                             null=True, blank=True)
+    cliente_nuevo_nit = models.ForeignKey('self', null=True, blank=True, related_name='cliente_viejo_nit')
 
     def get_absolute_url(self):
         return reverse("biable:detalle_cliente", kwargs={"pk": self.nit})
