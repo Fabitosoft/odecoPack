@@ -15,11 +15,12 @@ from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Q, Case, Value, When, Sum, CharField
 from django.db.models.functions import Concat, Extract, Upper
+from django.views.generic import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from .models import FacturasBiable, Cliente, MovimientoVentaBiable
-from .forms import ContactoEmpresaBuscador
+from .forms import ContactoEmpresaBuscador, ClienteDetailEditForm
 
 
 # Create your views here.
@@ -41,11 +42,14 @@ class FacturaDetailView(SelectRelatedMixin, PrefetchRelatedMixin, DetailView):
 class ClienteDetailView(
     LoginRequiredMixin,
     PermissionRequiredMixin,
+    SelectRelatedMixin,
     PrefetchRelatedMixin,
     JSONResponseMixin,
     AjaxResponseMixin,
-    DetailView):
+    UpdateView):
     permission_required = "biable.ver_clientes"
+    form_class = ClienteDetailEditForm
+    select_related = ['forma_pago', 'forma_pago__canal', 'industria']
     model = Cliente
     template_name = 'biable/cliente_detail.html'
     prefetch_related = [
@@ -69,7 +73,7 @@ class ClienteDetailView(
         context['contactos_sin_sucursal'] = qs
         si_contactos = self.object.mis_sucursales.filter(
             vendedor_real__colaborador__usuario__user=self.request.user).exists()
-        context['sin_contactos'] = si_contactos
+        context['es_vendedor_cliente'] = si_contactos
         return context
 
     def post_ajax(self, request, *args, **kwargs):
@@ -133,7 +137,7 @@ class ClienteBiableListView(PermissionRequiredMixin, LoginRequiredMixin, SelectR
     template_name = 'biable/cliente_list.html'
     context_object_name = 'clientes'
     paginate_by = 15
-    select_related = ['canal', 'grupo', 'industria']
+    select_related = ['forma_pago', 'grupo', 'industria']
     permission_required = "biable.ver_clientes"
     tipo = "todos"
 
@@ -143,7 +147,7 @@ class ClienteBiableListView(PermissionRequiredMixin, LoginRequiredMixin, SelectR
         if self.tipo == "por_vendedor":
             qs = qs.filter(
                 mis_sucursales__vendedor_real__colaborador__usuario__user=self.request.user
-            ).order_by('nombre')
+            ).order_by('nombre').distinct()
 
         if q:
             qs = qs.exclude(nit='').order_by('nombre').distinct()

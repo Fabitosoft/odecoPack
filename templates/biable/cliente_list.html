@@ -71,8 +71,8 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if cliente.canal %}
-                        {{ cliente.canal.canal }}
+                    {% if cliente.forma_pago %}
+                        {{ cliente.forma_pago.canal }} {{ cliente.forma_pago.forma }}
                     {% endif %}
                 </td>
             </tr>
