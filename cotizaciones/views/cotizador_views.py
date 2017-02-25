@@ -92,6 +92,9 @@ class CotizacionUpdateView(
         form.instance.fecha_envio = timezone.now()
         form.save()
         self.enviar_cotizacion(self.object, self.request.user)
+
+        if self.object.usuario != self.request.user:
+            return redirect('cotizaciones:listar_cotizaciones')
         return super().form_valid(form)
 
 
