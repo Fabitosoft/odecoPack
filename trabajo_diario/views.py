@@ -106,7 +106,7 @@ class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
 
             context['carteras'] = trabajo_diario.tareas_cartera
             context['envios_tcc'] = trabajo_diario.tareas_envios_tcc
-            context['cotizaciones'] = trabajo_diario.tareas_cotizacion
+            context['cotizaciones'] = trabajo_diario.tareas_cotizacion.order_by("-cotizacion__total")
             context["porcentaje_tareas_atendidas"] = trabajo_diario.porcentaje_atendido
 
         if not usuario.has_perm('biable.reporte_ventas_todos_vendedores'):

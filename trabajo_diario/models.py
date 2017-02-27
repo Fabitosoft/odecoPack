@@ -93,10 +93,17 @@ class TareaCotizacion(Tarea):
         nro_tareas = self.cotizacion.mis_tareas.filter(esta_finalizada=False).aggregate(Count('id'))['id__count']
         nro_seguimiento_remisiones = self.cotizacion.mis_remisiones.filter(entregado=False).aggregate(Count('id'))[
             'id__count']
+
+        cliente = self.cotizacion.cliente_biable
+        if cliente:
+            nombre_cliente = cliente.nombre
+        else:
+            nombre_cliente = self.cotizacion.razon_social
+
         descripcion = "Cotizacion %s %s para %s con un valor de %s." % (
             self.cotizacion.nro_cotizacion,
             self.cotizacion.get_estado_display(),
-            self.cotizacion.razon_social,
+            nombre_cliente,
             self.cotizacion.total
         )
         if nro_tareas:
