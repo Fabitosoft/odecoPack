@@ -126,6 +126,18 @@ class TrabajoDiaView(TaxasCambioMixin, IndicadorMesMixin, LoginRequiredMixin, Te
             ).distinct()
             context['trabajo_diario_subalternos'] = trabajo_diario_subalternos
 
+            context['clientes_con_cotizaciones_para_asignar_vendedor'] = Cotizacion.objects.select_related(
+                'cliente_biable',
+                'usuario',
+                'creado_por'
+            ).filter(
+                Q(cliente_biable__mis_sucursales__vendedor_real__colaborador__usuario__user__isnull=True) &
+                Q(cliente_biable__isnull=False) &
+                ~Q(estado="ELI") &
+                ~Q(estado="FIN") &
+                Q(usuario__in=subalternos)
+            ).distinct()
+
         context['cotizaciones_creadas_otros_asignadas'] = Cotizacion.objects.select_related(
             'cliente_biable',
             'usuario',

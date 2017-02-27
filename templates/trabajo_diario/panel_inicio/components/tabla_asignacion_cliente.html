@@ -1,0 +1,49 @@
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>
+            Cotizacion
+        </th>
+        <th>
+            Cliente
+        </th>
+        <th>
+            Estado
+        </th>
+        <th>
+            Usuario Actual
+        </th>
+        <th>
+            Creado Por
+        </th>
+        <th>
+            Fecha Envío
+        </th>
+    </tr>
+
+    </thead>
+    <tbody>
+    {% for cotizacion in lista_cotizaciones_asignacion %}
+        <tr>
+            <td>
+                <a href="{{ cotizacion.get_absolute_url }}"> {{ cotizacion.nro_cotizacion }}</a>
+            </td>
+            <td>
+                <a href="{{ cotizacion.cliente_biable.get_absolute_url }}">{{ cotizacion.cliente_biable.nombre }}</a>
+            </td>
+            <td>
+                {{ cotizacion.get_estado_display }}
+            </td>
+            <td>
+                {{ cotizacion.usuario.get_full_name }}
+            </td>
+            <td>
+                {{ cotizacion.creado_por.get_full_name }}
+            </td>
+            <td>
+                {{ cotizacion.fecha_envio }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
