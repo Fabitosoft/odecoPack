@@ -1,0 +1,89 @@
+<h1>Trabajo del Día
+    <small>{{ porcentaje_tareas_atendidas|floatformat:1 }}% realizado</small>
+</h1>
+<hr/>
+<div class="col-md-9">
+    <div class="row">
+        {% with lista_cartera=carteras.all %}
+            {% if lista_cartera %}
+                <div class="col-md-6">
+                    {% include 'trabajo_diario/panel_inicio/components/tabla_seguimiento_cartera.html' with carteras=lista_cartera %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% with lista_cotizaciones=cotizaciones.all %}
+            {% if lista_cotizaciones %}
+                <div class="col-md-6">
+                    {% include 'trabajo_diario/panel_inicio/components/tabla_seguimiento_cotizaciones.html' with cotizaciones_pendientes=lista_cotizaciones %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% with lista_envios_tcc=envios_tcc.all %}
+            {% if lista_envios_tcc %}
+                <div class="col-md-6">
+                    {% include 'trabajo_diario/panel_inicio/components/tabla_seguimiento_envios_TCC.html' with envios_pendientes=lista_envios_tcc %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% with lista_trabajo_diario_subalternos=trabajo_diario_subalternos.all %}
+            {% if lista_trabajo_diario_subalternos %}
+                <div class="col-xs-12">
+                    <h2>Trabajo Diario Colaboradores</h2>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>
+                                Colaborador
+                            </th>
+                            <th>
+                                Nro Tareas
+                            </th>
+                            <th>
+                                Nro Tareas sin Atender
+                            </th>
+                            <th>
+                                Nro Tareas Atendidas
+                            </th>
+                            <th>
+                                Porcentaje Atendido
+                            </th>
+                        </tr>
+
+                        </thead>
+                        <tbody>
+                        {% for subalterno in lista_trabajo_diario_subalternos %}
+                            <tr>
+                                <td>
+                                    {{ subalterno.usuario.get_full_name }}
+                                </td>
+                                <td>
+                                    {{ subalterno.nro_tareas }}
+                                </td>
+                                <td>
+                                    {{ subalterno.nro_tareas_sin_atender }}
+                                </td>
+                                <td>
+                                    {{ subalterno.nro_tareas_atendidas }}
+                                </td>
+                                <td>
+                                    {{ subalterno.porcentaje_atendido }}
+                                </td>
+                                <td>
+                                    <a href="{{ subalterno.get_absolute_url }}">Ver</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+    </div>
+</div>
+<div class="col-md-3">
+    {% for indicador in indicadores_venta %}
+        {% include 'indicadores/indicadores_barra.html' with indicadores=indicador %}
+    {% endfor %}
+</div>

@@ -1,0 +1,187 @@
+{% with coti_otros_sin_asignar_list=cotizaciones_creadas_otros_sin_asignar.all %}
+    {% with coti_otros_asignadas_list=cotizaciones_creadas_otros_asignadas.all %}
+        {% with coti_otros_para_asignar_list=cotizaciones_para_asignar.all %}
+            {% if coti_otros_sin_asignar_list or coti_otros_asignadas_list or coti_otros_para_asignar_list %}
+                <h1>Asignaciones de Cotizaciones</h1>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if coti_otros_sin_asignar_list %}
+                            <div class="col-xs-12">
+                                <h2>Pedir Asignarme</h2>
+                                <p>Listado de Cotizaciones de mis clientes realizados por otro vendedor que debo pedír
+                                    se me
+                                    asigne</p>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            Cotizacion
+                                        </th>
+                                        <th>
+                                            Cliente
+                                        </th>
+                                        <th>
+                                            Estado
+                                        </th>
+                                        <th>
+                                            Usuario Actual
+                                        </th>
+                                        <th>
+                                            Creado Por
+                                        </th>
+                                        <th>
+                                            Fecha Envío
+                                        </th>
+                                    </tr>
+
+                                    </thead>
+                                    <tbody>
+                                    {% for cotizacion in coti_otros_sin_asignar_list %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ cotizacion.get_absolute_url }}"> {{ cotizacion.nro_cotizacion }}</a>
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.cliente_biable.nombre }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.get_estado_display }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.usuario.get_full_name }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.creado_por.get_full_name }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.fecha_envio }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if coti_otros_asignadas_list %}
+                            <div class="col-xs-12">
+                                <h2>Asignadas por otros Recientemente</h2>
+                                <p>Listado de Cotizaciones creadas por otro vendedor que se me han asignado para hacer
+                                    seguimiento</p>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            Cotizacion
+                                        </th>
+                                        <th>
+                                            Cliente
+                                        </th>
+                                        <th>
+                                            Estado
+                                        </th>
+                                        <th>
+                                            Usuario Actual
+                                        </th>
+                                        <th>
+                                            Creado Por
+                                        </th>
+                                        <th>
+                                            Fecha Envío
+                                        </th>
+                                    </tr>
+
+                                    </thead>
+                                    <tbody>
+                                    {% for cotizacion in coti_otros_asignadas_list %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ cotizacion.get_absolute_url }}"> {{ cotizacion.nro_cotizacion }}</a>
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.cliente_biable.nombre }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.get_estado_display }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.usuario.get_full_name }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.creado_por.get_full_name }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.fecha_envio }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if coti_otros_para_asignar_list %}
+                            <div class="col-xs-12">
+                                <h2>Para Asignar</h2>
+                                <p>Listado de Cotizaciones que he realizado y debo de asignar al vendedor
+                                    correspondiente</p>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            Cotizacion
+                                        </th>
+                                        <th>
+                                            Cliente
+                                        </th>
+                                        <th>
+                                            Estado
+                                        </th>
+                                        <th>
+                                            Usuario Actual
+                                        </th>
+                                        <th>
+                                            Creado Por
+                                        </th>
+                                        <th>
+                                            Fecha Envío
+                                        </th>
+                                    </tr>
+
+                                    </thead>
+                                    <tbody>
+                                    {% for cotizacion in coti_otros_para_asignar_list %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ cotizacion.get_absolute_url }}"> {{ cotizacion.nro_cotizacion }}</a>
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.cliente_biable.nombre }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.get_estado_display }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.usuario.get_full_name }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.creado_por.get_full_name }}
+                                            </td>
+                                            <td>
+                                                {{ cotizacion.fecha_envio }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endwith %}
+{% endwith %}

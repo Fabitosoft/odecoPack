@@ -5,14 +5,14 @@
     </h1>
 
     {% if object.tareas_cotizacion.all %}
-        {% include 'trabajo_diario/components/trabajo_diario_por_vendedor_lista.html' with lista_tareas=object.tareas_cotizacion tipo='Seguimiento Cotizaciones' %}
+        {% include 'trabajo_diario/panel_inicio/components/trabajo_diario_por_vendedor_lista.html' with lista_tareas=object.tareas_cotizacion tipo='Seguimiento Cotizaciones' %}
     {% endif %}
 
     {% if object.tareas_cartera.all %}
-        {% include 'trabajo_diario/components/trabajo_diario_por_vendedor_lista.html' with lista_tareas=object.tareas_cartera tipo='Seguimiento Cartera' %}
+        {% include 'trabajo_diario/panel_inicio/components/trabajo_diario_por_vendedor_lista.html' with lista_tareas=object.tareas_cartera tipo='Seguimiento Cartera' %}
     {% endif %}
 
     {% if object.tareas_envios_tcc.all %}
-        {% include 'trabajo_diario/components/trabajo_diario_por_vendedor_lista.html' with lista_tareas=object.tareas_envios_tcc tipo='Seguimiento Envios TCC' %}
+        {% include 'trabajo_diario/panel_inicio/components/trabajo_diario_por_vendedor_lista.html' with lista_tareas=object.tareas_envios_tcc tipo='Seguimiento Envios TCC' %}
     {% endif %}
 {% endblock %}

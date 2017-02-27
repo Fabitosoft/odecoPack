@@ -93,7 +93,7 @@ class ClienteDetailView(
                     Q(item_biable__descripcion__icontains=query) |
                     Q(item_biable__id_item__icontains=query)
                 )
-            ).order_by('-factura__fecha_documento')[:10]
+            ).order_by('-factura__fecha_documento').distinct()[:10]
             context['historico_precios_producto_ventas'] = qsP
 
             qsC = ItemCotizacion.objects.all().select_related(
@@ -115,7 +115,7 @@ class ClienteDetailView(
                     Q(p_n_lista_descripcion__icontains=query) |
                     Q(p_n_lista_referencia__icontains=query)
                 )
-            ).order_by('-cotizacion__fecha_envio')[:10]
+            ).order_by('-cotizacion__fecha_envio').distinct()[:10]
             context['historico_precios_producto_cotizaciones'] = qsC
 
         return context
