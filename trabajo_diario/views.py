@@ -13,6 +13,7 @@ from django.views.generic.detail import DetailView
 from cotizaciones.models import (
     Cotizacion)
 from biable.models import Cartera, VendedorBiable
+from importaciones.mixins import TaxasCambioMixin
 from .forms import SeguimientoTareaForm
 from usuarios.models import Colaborador
 from .models import (
@@ -31,7 +32,7 @@ from indicadores.mixins import IndicadorMesMixin
 # Create your views here.
 
 # region Trabajo Diario
-class TrabajoDiaView(IndicadorMesMixin, LoginRequiredMixin, TemplateView):
+class TrabajoDiaView(TaxasCambioMixin, IndicadorMesMixin, LoginRequiredMixin, TemplateView):
     template_name = 'trabajo_diario/trabajo_dia.html'
 
     def get_context_data(self, **kwargs):

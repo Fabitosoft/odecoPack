@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 
 class Moneda(models.Model):
@@ -8,6 +9,9 @@ class Moneda(models.Model):
 
     class Meta:
         verbose_name_plural = "1. Monedas"
+        permissions = (
+            ('ver_tasas_actuales', 'Ver Tasas en Intranet'),
+        )
 
     def __str__(self):
         return '%s' % self.nombre

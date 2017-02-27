@@ -1,6 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
     {% if perms.trabajo_diario.ver_trabajo_diario %}
+        {% if monedas_lista %}
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Tasas de Cambio Actuales</div>
+                        <div class="panel-body">
+                            <ul>
+                                {% for moneda in monedas_lista %}
+                                    <li>
+                                        {{ moneda.nombre }} - {{ moneda.cambio|floatformat }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         <h1>Trabajo del Día
             <small>{{ porcentaje_tareas_atendidas|floatformat:1 }}% realizado</small>
         </h1>
