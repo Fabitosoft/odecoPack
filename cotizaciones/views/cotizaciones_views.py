@@ -237,19 +237,8 @@ class CotizacionDetailView(UsuariosMixin, SelectRelatedMixin, FormSetsCotizacion
     context_object_name = 'cotizacion'
     fields = '__all__'
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        usuario = self.request.user
-        if not usuario.is_superuser:
-            subalternos = self.get_sub_alternos(usuario)
-            qs = qs.filter(
-                Q(usuario=usuario) |
-                Q(usuario__in=subalternos)
-            )
-        return qs
-
     def get_success_url(self):
-        return redirect('cotizaciones:detalle_cotizacion2', {'pk': self.object.pk})
+        return redirect('cotizaciones:detalle_cotizacion', {'pk': self.object.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -268,6 +257,14 @@ class CotizacionDetailView(UsuariosMixin, SelectRelatedMixin, FormSetsCotizacion
         helper_remision = RemisionCotizacionFormHelper()
         context["helper_remision"] = helper_remision
 
+        context["puede_modificar"] = False
+        usuario = self.request.user
+        if not usuario.is_superuser:
+            subalternos = self.get_sub_alternos(usuario)
+            if self.object.usuario in subalternos or self.object.usuario == usuario:
+                context["puede_modificar"] = True
+        else:
+            context["puede_modificar"] = True
         return context
 
 

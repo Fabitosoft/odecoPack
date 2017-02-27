@@ -76,49 +76,47 @@ class ClienteDetailView(
             vendedor_real__colaborador__usuario__user=self.request.user).exists()
         context['es_vendedor_cliente'] = si_sucursales
         context['tab'] = "custom"
+        context['form_busqueda_historico_precios'] = ClienteProductoBusquedaForm(self.request.GET or None)
+        query = self.request.GET.get('buscar')
+        if query:
+            context['tab'] = "BHP"
+            qsP = MovimientoVentaBiable.objects.select_related(
+                'factura',
+                'item_biable',
+                'factura__sucursal',
+                'factura__vendedor',
+                'factura__cliente'
+            ).all().filter(
+                Q(factura__cliente=self.object) &
+                (
+                    Q(item_biable__id_referencia__icontains=query) |
+                    Q(item_biable__descripcion__icontains=query) |
+                    Q(item_biable__id_item__icontains=query)
+                )
+            ).order_by('-factura__fecha_documento')[:10]
+            context['historico_precios_producto_ventas'] = qsP
 
-        if si_sucursales:
-            context['form_busqueda_historico_precios'] = ClienteProductoBusquedaForm(self.request.GET or None)
-            query = self.request.GET.get('buscar')
-            if query:
-                context['tab'] = "BHP"
-                qsP = MovimientoVentaBiable.objects.select_related(
-                    'factura',
-                    'item_biable',
-                    'factura__sucursal',
-                    'factura__vendedor',
-                    'factura__cliente'
-                ).all().filter(
-                    Q(factura__cliente=self.object) &
-                    (
-                        Q(item_biable__id_referencia__icontains=query) |
-                        Q(item_biable__descripcion__icontains=query) |
-                        Q(item_biable__id_item__icontains=query)
-                    )
-                ).order_by('-factura__fecha_documento')[:10]
-                context['historico_precios_producto_ventas'] = qsP
-
-                qsC = ItemCotizacion.objects.all().select_related(
-                    'cotizacion',
-                    'item',
-                    'banda',
-                    'articulo_catalogo'
-                ).filter(
-                    Q(cotizacion__cliente_biable=self.object) &
-                    (
-                        Q(item__descripcion_estandar__icontains=query) |
-                        Q(item__descripcion_comercial__icontains=query) |
-                        Q(item__referencia__icontains=query) |
-                        Q(banda__descripcion_estandar__icontains=query) |
-                        Q(banda__descripcion_comercial__icontains=query) |
-                        Q(banda__referencia__icontains=query) |
-                        Q(articulo_catalogo__referencia__icontains=query) |
-                        Q(articulo_catalogo__nombre__icontains=query) |
-                        Q(p_n_lista_descripcion__icontains=query) |
-                        Q(p_n_lista_referencia__icontains=query)
-                    )
-                ).order_by('-cotizacion__fecha_envio')[:10]
-                context['historico_precios_producto_cotizaciones'] = qsC
+            qsC = ItemCotizacion.objects.all().select_related(
+                'cotizacion',
+                'item',
+                'banda',
+                'articulo_catalogo'
+            ).filter(
+                Q(cotizacion__cliente_biable=self.object) &
+                (
+                    Q(item__descripcion_estandar__icontains=query) |
+                    Q(item__descripcion_comercial__icontains=query) |
+                    Q(item__referencia__icontains=query) |
+                    Q(banda__descripcion_estandar__icontains=query) |
+                    Q(banda__descripcion_comercial__icontains=query) |
+                    Q(banda__referencia__icontains=query) |
+                    Q(articulo_catalogo__referencia__icontains=query) |
+                    Q(articulo_catalogo__nombre__icontains=query) |
+                    Q(p_n_lista_descripcion__icontains=query) |
+                    Q(p_n_lista_referencia__icontains=query)
+                )
+            ).order_by('-cotizacion__fecha_envio')[:10]
+            context['historico_precios_producto_cotizaciones'] = qsC
 
         return context
 

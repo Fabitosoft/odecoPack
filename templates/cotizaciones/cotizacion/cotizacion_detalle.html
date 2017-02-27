@@ -15,22 +15,24 @@
     {% include 'cotizaciones/cotizacion/seguimientos.html' %}
     {% include 'cotizaciones/cotizacion/comentarios.html' %}
     {% include 'cotizaciones/cotizacion/remisiones.html' %}
-    {% crispy comentario_form %}
-    <div class="row">
-        {% if cotizacion.estado == 'PRO' %}
-            <div class="col-md-6">
-                <h2>Remisiones</h2>
-                <hr/>
-                {% crispy remisiones helper_remision %}
-            </div>
-        {% endif %}
+    {% if puede_modificar == True %}
+        {% crispy comentario_form %}
+        <div class="row">
+            {% if cotizacion.estado == 'PRO' %}
+                <div class="col-md-6">
+                    <h2>Remisiones</h2>
+                    <hr/>
+                    {% crispy remisiones helper_remision %}
+                </div>
+            {% endif %}
 
-        {% if cotizacion.estado == 'PRO' or cotizacion.estado == 'ENV' or cotizacion.estado == 'REC' %}
-            <div class="col-md-6">
-                <h2>Tareas</h2>
-                <hr/>
-                {% crispy tareas helper_tarea %}
-            </div>
-        {% endif %}
-    </div>
+            {% if cotizacion.estado == 'PRO' or cotizacion.estado == 'ENV' or cotizacion.estado == 'REC' %}
+                <div class="col-md-6">
+                    <h2>Tareas</h2>
+                    <hr/>
+                    {% crispy tareas helper_tarea %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}

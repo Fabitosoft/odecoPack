@@ -148,11 +148,7 @@
                                     {{ item.get_nombre_item }}
                                 </td>
                                 <td>
-                                    {% if es_vendedor_cliente == True %}
-                                        <a href="{{ item.cotizacion.get_absolute_url }}">{{ item.cotizacion.nro_cotizacion }}</a>
-                                    {% else %}
-                                        {{ item.cotizacion.nro_cotizacion }}
-                                    {% endif %}
+                                    <a href="{{ item.cotizacion.get_absolute_url }}">{{ item.cotizacion.nro_cotizacion }}</a>
                                 </td>
                                 <td>
                                     {{ item.cotizacion.usuario }}

@@ -1,27 +1,29 @@
 {% load crispy_forms_tags %}
-{% if not cotizacion.estado == 'FIN' and not cotizacion.estado == 'ELI' %}
-    <form method="post" action="{% url 'cotizaciones:enviar' %}">
-        {% csrf_token %}
-        <input type="hidden" name="id" value="{{ cotizacion.id }}"/>
-        <small>
-            <button type="submit" name="enviar"><i class="fa fa-envelope" aria-hidden="true"></i> Reenviar Email
-            </button>
-        </small>
-    </form>
+{% if puede_modificar == True %}
+    {% if not cotizacion.estado == 'FIN' and not cotizacion.estado == 'ELI' %}
+        <form method="post" action="{% url 'cotizaciones:enviar' %}">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ cotizacion.id }}"/>
+            <small>
+                <button type="submit" name="enviar"><i class="fa fa-envelope" aria-hidden="true"></i> Reenviar Email
+                </button>
+            </small>
+        </form>
 
-    <form method="post" action="{% url 'cotizaciones:editar_cotizacion' %}">
-        {% csrf_token %}
-        {% if not cotizacion.en_edicion and cotizacion.usuario == request.user %}
-            <p>
-                <small>
-                    <button name="editar" value="{{ cotizacion.pk }}" type="submit"><i class="fa fa-pencil"
-                                                                                       aria-hidden="true"></i>
-                        Editar
-                    </button>
-                </small>
-            </p>
-        {% endif %}
-    </form>
+        <form method="post" action="{% url 'cotizaciones:editar_cotizacion' %}">
+            {% csrf_token %}
+            {% if not cotizacion.en_edicion %}
+                <p>
+                    <small>
+                        <button name="editar" value="{{ cotizacion.pk }}" type="submit"><i class="fa fa-pencil"
+                                                                                           aria-hidden="true"></i>
+                            Editar
+                        </button>
+                    </small>
+                </p>
+            {% endif %}
+        </form>
+    {% endif %}
 {% endif %}
 {% if messages %}
     <ul class="messages">
@@ -46,7 +48,9 @@
             <h4>Vendedor:
                 <small>{{ cotizacion.usuario.get_full_name }}</small>
             </h4>
-            {% crispy asignar_vendedor_form %}
+            {% if puede_modificar == True %}
+                {% crispy asignar_vendedor_form %}
+            {% endif %}
         </div>
         <h2>Información Cliente</h2>
         <div class="row div_detalle">
@@ -93,21 +97,23 @@
             </div>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-4 col-md-3">
-        <form method="post">
-            {% csrf_token %}
-            {% if not cotizacion.estado == 'FIN' and not cotizacion.estado == 'ELI' %}
-                <input class="btn btn-primary" name="form_estado" value="Rechazar" type="submit"/>
-            {% endif %}
-            {% if cotizacion.estado == 'ENV' %}
-                <input class="btn btn-primary" name="form_estado" value="Recibida" type="submit"/>
-            {% endif %}
-            {% if cotizacion.estado == 'REC' %}
-                <input class="btn btn-primary" name="form_estado" value="Aceptada" type="submit"/>
-            {% endif %}
-            {% if cotizacion.estado == 'PRO' %}
-                <input class="btn btn-primary" name="form_estado" value="Completada" type="submit"/>
-            {% endif %}
-        </form>
-    </div>
+    {% if puede_modificar == True %}
+        <div class="col-xs-12 col-sm-4 col-md-3">
+            <form method="post">
+                {% csrf_token %}
+                {% if not cotizacion.estado == 'FIN' and not cotizacion.estado == 'ELI' %}
+                    <input class="btn btn-primary" name="form_estado" value="Rechazar" type="submit"/>
+                {% endif %}
+                {% if cotizacion.estado == 'ENV' %}
+                    <input class="btn btn-primary" name="form_estado" value="Recibida" type="submit"/>
+                {% endif %}
+                {% if cotizacion.estado == 'REC' %}
+                    <input class="btn btn-primary" name="form_estado" value="Aceptada" type="submit"/>
+                {% endif %}
+                {% if cotizacion.estado == 'PRO' %}
+                    <input class="btn btn-primary" name="form_estado" value="Completada" type="submit"/>
+                {% endif %}
+            </form>
+        </div>
+    {% endif %}
 </div>
