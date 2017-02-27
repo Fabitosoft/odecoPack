@@ -46,12 +46,13 @@
                                                            role="tab"
                                                            data-toggle="tab">Actualizar Información</a></li>
                             {% endif %}
-                            {% if es_vendedor_cliente == True %}
-                                <li role="presentation" {% if tab == "BHP" %} class="active" {% endif %}><a href="#historico_precios"
-                                                           aria-controls="historico_precios"
-                                                           role="tab"
-                                                           data-toggle="tab">Histórico Precios</a></li>
-                            {% endif %}
+
+                            <li role="presentation" {% if tab == "BHP" %} class="active" {% endif %}><a
+                                    href="#historico_precios"
+                                    aria-controls="historico_precios"
+                                    role="tab"
+                                    data-toggle="tab">Histórico Precios</a></li>
+
 
                         </ul>
                         <!-- Tab panes -->
@@ -117,14 +118,15 @@
                                         {% crispy form %}
                                     </div>
                                 </div>
-                                <div role="tabpanel" class="tab-pane {% if tab == "BHP" %} active {% endif %}" id="historico_precios">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            {% include 'biable/clientes/cliente_detail_partes/historico_precios.html' %}
-                                        </div>
+                            {% endif %}
+                            <div role="tabpanel" class="tab-pane {% if tab == "BHP" %} active {% endif %}"
+                                 id="historico_precios">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% include 'biable/clientes/cliente_detail_partes/historico_precios.html' %}
                                     </div>
                                 </div>
-                            {% endif %}
+                            </div>
 
                             <div role="tabpanel" class="tab-pane" id="ventasxproductos">
                                 <form method="get" id="form_consulta">
