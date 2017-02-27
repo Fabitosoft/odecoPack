@@ -19,8 +19,9 @@ from django.views.generic import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from cotizaciones.models import ItemCotizacion
 from .models import FacturasBiable, Cliente, MovimientoVentaBiable
-from .forms import ContactoEmpresaBuscador, ClienteDetailEditForm
+from .forms import ContactoEmpresaBuscador, ClienteDetailEditForm, ClienteProductoBusquedaForm
 
 
 # Create your views here.
@@ -51,7 +52,7 @@ class ClienteDetailView(
     form_class = ClienteDetailEditForm
     select_related = ['canal', 'industria']
     model = Cliente
-    template_name = 'biable/cliente_detail.html'
+    template_name = 'biable/clientes/cliente_detail.html'
     prefetch_related = [
         'mis_compras__vendedor',
         'mis_cotizaciones__usuario',
@@ -71,9 +72,54 @@ class ClienteDetailView(
         context = super().get_context_data(**kwargs)
         qs = self.object.mis_contactos.filter(sucursal__isnull=True).all()
         context['contactos_sin_sucursal'] = qs
-        si_contactos = self.object.mis_sucursales.filter(
+        si_sucursales = self.object.mis_sucursales.filter(
             vendedor_real__colaborador__usuario__user=self.request.user).exists()
-        context['es_vendedor_cliente'] = si_contactos
+        context['es_vendedor_cliente'] = si_sucursales
+        context['tab'] = "custom"
+
+        if si_sucursales:
+            context['form_busqueda_historico_precios'] = ClienteProductoBusquedaForm(self.request.GET or None)
+            query = self.request.GET.get('buscar')
+            if query:
+                context['tab'] = "BHP"
+                qsP = MovimientoVentaBiable.objects.select_related(
+                    'factura',
+                    'item_biable',
+                    'factura__sucursal',
+                    'factura__vendedor',
+                    'factura__cliente'
+                ).all().filter(
+                    Q(factura__cliente=self.object) &
+                    (
+                        Q(item_biable__id_referencia__icontains=query) |
+                        Q(item_biable__descripcion__icontains=query) |
+                        Q(item_biable__id_item__icontains=query)
+                    )
+                ).order_by('-factura__fecha_documento')[:10]
+                context['historico_precios_producto_ventas'] = qsP
+
+                qsC = ItemCotizacion.objects.all().select_related(
+                    'cotizacion',
+                    'item',
+                    'banda',
+                    'articulo_catalogo'
+                ).filter(
+                    Q(cotizacion__cliente_biable=self.object) &
+                    (
+                        Q(item__descripcion_estandar__icontains=query) |
+                        Q(item__descripcion_comercial__icontains=query) |
+                        Q(item__referencia__icontains=query) |
+                        Q(banda__descripcion_estandar__icontains=query) |
+                        Q(banda__descripcion_comercial__icontains=query) |
+                        Q(banda__referencia__icontains=query) |
+                        Q(articulo_catalogo__referencia__icontains=query) |
+                        Q(articulo_catalogo__nombre__icontains=query) |
+                        Q(p_n_lista_descripcion__icontains=query) |
+                        Q(p_n_lista_referencia__icontains=query)
+                    )
+                ).order_by('-cotizacion__fecha_envio')[:10]
+                context['historico_precios_producto_cotizaciones'] = qsC
+
         return context
 
     def post_ajax(self, request, *args, **kwargs):
@@ -134,7 +180,7 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
 
 class ClienteBiableListView(PermissionRequiredMixin, LoginRequiredMixin, SelectRelatedMixin, ListView):
     model = Cliente
-    template_name = 'biable/cliente_list.html'
+    template_name = 'biable/clientes/cliente_list.html'
     context_object_name = 'clientes'
     paginate_by = 15
     select_related = ['canal', 'grupo', 'industria']

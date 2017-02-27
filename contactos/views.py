@@ -12,7 +12,7 @@ from biable.models import Cliente
 
 class ContactosEmpresaCreateView(CreateView):
     model = ContactoEmpresa
-    template_name = 'biable/contacto_empresa_create.html'
+    template_name = 'biable/clientes/contacto_empresa_create.html'
     form_class = ContactoEmpresaCreateForm
     cliente = None
 
@@ -41,7 +41,7 @@ class ContactosEmpresaCreateView(CreateView):
 class ContactosEmpresaUpdateView(SelectRelatedMixin, UpdateView):
     model = ContactoEmpresa
     select_related = ['sucursal', 'sucursal__cliente']
-    template_name = 'biable/contacto_empresa_update.html'
+    template_name = 'biable/clientes/contacto_empresa_update.html'
     form_class = ContactoEmpresaForm
 
     def get_context_data(self, **kwargs):

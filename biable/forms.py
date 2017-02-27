@@ -7,6 +7,24 @@ from django.urls import reverse
 from .models import Cliente
 
 
+class ClienteProductoBusquedaForm(forms.Form):
+    buscar = forms.CharField(max_length=100, required=False, label="Referencia")
+
+    def __init__(self, *args, **kwargs):
+        super(ClienteProductoBusquedaForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-busqueda'
+        self.helper.form_method = "GET"
+        self.helper.form_action = ""
+
+        self.helper.layout = Layout(
+            Div(
+                FieldWithButtons('buscar', Submit('accion', 'Buscar')),
+                css_class="col-sm-5"
+            )
+        )
+
+
 class ContactoEmpresaBuscador(forms.Form):
     busqueda = forms.CharField(max_length=120, required=False)
 

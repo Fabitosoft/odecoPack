@@ -1,0 +1,184 @@
+{% load crispy_forms_tags %}
+<div style="margin: 1rem">
+    {% crispy form_busqueda_historico_precios %}
+</div>
+<div class="row">
+    {% with hpmv_list=historico_precios_producto_ventas.all hpmc_list=historico_precios_producto_cotizaciones.all %}
+        <div>
+            {% if hpmv_list %}
+                <div class="col-md-12">
+                    <h3>Ventas</h3>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>
+                                Cliente
+                            </th>
+                            <th>
+                                Id CGuno
+                            </th>
+                            <th>
+                                Referencia
+                            </th>
+                            <th>
+                                Descripción
+                            </th>
+                            <th>
+                                Factura
+                            </th>
+                            <th>
+                                Sucursal o Dir. Despacho
+                            </th>
+                            <th>
+                                Vendedor
+                            </th>
+                            <th>
+                                Fecha Factura
+                            </th>
+                            <th>
+                                Precio
+                            </th>
+                            <th>
+                                Cantidad
+                            </th>
+                            <th>
+                                Valor Neto
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for movimiento_venta in hpmv_list %}
+                            <tr>
+                                <td>
+                                    {{ movimiento_venta.factura.cliente.nombre }}
+                                </td>
+                                <td>
+                                    {{ movimiento_venta.item_biable.id_item }}
+                                </td>
+                                <td>
+                                    {{ movimiento_venta.item_biable.id_referencia }}
+                                </td>
+                                <td>
+                                    {{ movimiento_venta.item_biable.descripcion }}
+                                </td>
+                                <td>
+                                    <a href="{{ movimiento_venta.factura.get_absolute_url }}"> {{ movimiento_venta.factura.tipo_documento }}-{{ movimiento_venta.factura.nro_documento }}</a>
+                                </td>
+                                <td>
+                                    {% if movimiento_venta.factura.sucursal.nombre_establecimiento_intranet %}
+                                        {{ movimiento_venta.factura.sucursal.nombre_establecimiento_intranet }}
+                                    {% else %}
+                                        {{ movimiento_venta.factura.sucursal.direccion }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ movimiento_venta.factura.vendedor }}
+                                </td>
+                                <td>
+                                    {{ movimiento_venta.factura.fecha_documento }}
+                                </td>
+                                <td>
+                                    {{ movimiento_venta.precio_uni|floatformat }}
+                                </td>
+                                <td>
+                                    {{ movimiento_venta.cantidad|floatformat }}
+                                </td>
+                                <td>
+                                    {{ movimiento_venta.venta_neto|floatformat }}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <li>Ninguna Cotización</li>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+            {% if hpmc_list %}
+                <div class="col-md-12">
+                    <h3>Cotizaciones</h3>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>
+                                Cliente
+                            </th>
+                            <th>
+                                Referencia
+                            </th>
+                            <th>
+                                Descripción
+                            </th>
+                            <th>
+                                Cotización
+                            </th>
+                            <th>
+                                Vendedor
+                            </th>
+                            <th>
+                                Creador
+                            </th>
+                            <th>
+                                Fecha Factura
+                            </th>
+                            <th>
+                                Forma de Pago
+                            </th>
+                            <th>
+                                Precio
+                            </th>
+                            <th>
+                                Cantidad
+                            </th>
+                            <th>
+                                Valor Neto
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in hpmc_list %}
+                            <tr>
+                                <td>
+                                    {{ item.cotizacion.cliente_biable.nombre }}
+                                </td>
+                                <td>
+                                    {{ item.get_referencia_item }}
+                                </td>
+                                <td>
+                                    {{ item.get_nombre_item }}
+                                </td>
+                                <td>
+                                    <a href="{{ item.cotizacion.get_absolute_url }}">{{ item.cotizacion.nro_cotizacion }}</a>
+                                </td>
+                                <td>
+                                    {{ item.cotizacion.usuario }}
+                                </td>
+                                <td>
+                                    {{ item.cotizacion.creado_por }}
+                                </td>
+                                <td>
+                                    {{ item.cotizacion.fecha_envio }}
+                                </td>
+                                <td>
+                                    {{ item.forma_pago }}
+                                </td>
+                                <td>
+                                    {{ item.precio|floatformat }}
+                                </td>
+                                <td>
+                                    {{ item.cantidad|floatformat }}
+                                </td>
+                                <td>
+                                    {{ item.total|floatformat }}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <li>Ninguna Cotización</li>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    {% endwith %}
+</div>

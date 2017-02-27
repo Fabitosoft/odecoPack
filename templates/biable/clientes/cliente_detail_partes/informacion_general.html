@@ -1,0 +1,95 @@
+<h3>Información General</h3>
+<hr>
+<div class="row">
+    <div class="col-md-4">
+        <p>
+            <span class="label">Nit:</span> {{ object.nit }}
+        </p>
+        <p>
+            <span class="label">Fecha Creación: </span> {{ object.fecha_creacion }}
+        </p>
+        {% if object.forma_pago %}
+            <p>
+                <span class="label">Forma Pago CGUno: </span> {{ object.forma_pago }}
+            </p>
+        {% endif %}
+        {% if object.competencia %}
+            <p>
+                <span class="label">Competencia: </span> <i class="fa fa-check-circle"
+                                                            aria-hidden="true"></i>
+            </p>
+        {% endif %}
+        {% if object.grupo %}
+            <div>
+                <p>
+                    <span class="label">Empresas Grupo:</span>{{ object.grupo }}
+                </p>
+                <ul>
+                    {% for empresa in object.grupo.mis_empresas.all %}
+                        {% if empresa.nit != object.nit %}
+                            <li>
+                                <a href="{{ empresa.get_absolute_url }}">{{ empresa.nombre }}
+                                    - {{ empresa.nit }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+    <div class="col-md-4">
+        <span class="label">Vendedor Asignado: </span>
+        <ol>
+            {% for sucursal in sucursales_lista %}
+                {% with vendedor_real=sucursal.vendedor_real %}
+                    <li>
+                        {% if vendedor_real %}
+                            {{ sucursal.vendedor_real|title }} -
+                        {% else %}
+                            <span style="color: red">SIN VENDEDOR ASIGNADO - </span>
+                        {% endif %}
+                        {% if nombre_establecimiento_intranet %}
+                            {{ sucursal.nombre_establecimiento_intranet }}
+                        {% else %}
+                            {{ sucursal.direccion }}
+                        {% endif %}
+                    </li>
+                {% endwith %}
+            {% endfor %}
+        </ol>
+    </div>
+    <div class="col-md-4">
+        {% if object.cerro %}
+            <p>
+                <span class="label">Esta Cerrado: </span>
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+
+            </p>
+        {% endif %}
+        {% if object.industria %}
+            <p>
+                <span class="label">Indústria: </span>
+                {{ object.industria.nombre }}
+            </p>
+        {% endif %}
+        {% if object.clasificacion %}
+            <p>
+                <span class="label">Clasificación: </span>
+                {{ object.clasificacion }}
+            </p>
+        {% endif %}
+        {% if object.canal %}
+            <p>
+                <span class="label">Canal: </span>
+                {{ object.canal.canal }}
+            </p>
+        {% endif %}
+        {% if object.potencial_compra %}
+            <p>
+                <span class="label">Potencial de Compra: </span>
+                {{ object.potencial_compra }}
+            </p>
+        {% endif %}
+    </div>
+</div>
+<hr>

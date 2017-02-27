@@ -1,0 +1,125 @@
+{% load humanize %}
+<div role="tabpanel" class="tab-pane" id="cotizaciones">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>
+                        Nro.
+                    </th>
+                    <th>
+                        Fecha Env.
+                    </th>
+                    <th>
+
+                    </th>
+                    <th>
+                        Razón S.
+                    </th>
+                    <th>
+                        Ciudad
+                    </th>
+                    <th>
+                        Vendedor
+                    </th>
+                    <th>
+                        Estado
+                    </th>
+                    <th>
+                        Versión
+                    </th>
+                    <th>
+                        Contacto
+                    </th>
+                    <th>
+                        Nro. Contacto
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                    <th>
+                        Facturas Relacionadas
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cotizacion in cotizaciones_list %}
+                    <tr>
+                        <td>
+                            <a href="{{ cotizacion.get_absolute_url }}">{{ cotizacion.nro_cotizacion }}</a>
+                        </td>
+                        <td>
+                            {{ cotizacion.fecha_envio }}
+                        </td>
+                        <td>
+                            {{ cotizacion.fecha_envio|naturaltime|capfirst }}
+                        </td>
+                        <td>
+                            {% if cotizacion.cliente_nuevo %}
+                                {{ cotizacion.razon_social }}
+                            {% else %}
+                                <a href="{{ cotizacion.cliente_biable.get_absolute_url }}"
+                                   target="_blank">{{ cotizacion.cliente_biable.nombre }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if cotizacion.otra_ciudad %}
+                                {{ cotizacion.pais|title }} -
+                                {{ cotizacion.ciudad|title }}
+                            {% else %}
+                                {{ cotizacion.ciudad_despacho.nombre|title }} -
+                                {{ cotizacion.ciudad_despacho.departamento.nombre|title }}
+                                -
+                                {{ cotizacion.ciudad_despacho.departamento.pais.nombre|title }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ cotizacion.usuario }}
+                        </td>
+                        <td>
+                            {{ cotizacion.get_estado_display }}
+                        </td>
+                        <td>
+                            {{ cotizacion.version }}
+                        </td>
+                        <td>
+                            {{ cotizacion.nombres_contacto }} {{ cotizacion.apellidos_contacto }}
+                        </td>
+                        <td>
+                            {{ cotizacion.nro_contacto }}
+                        </td>
+                        <td>
+                            {{ cotizacion.email }}
+                        </td>
+                        <td>
+                            {{ cotizacion.total }}
+                        </td>
+                        {% with remisiones_list=cotizacion.mis_remisiones.all %}
+                            {% if remisiones_list %}
+                                <td>
+                                    {% for remision in remisiones_list %}
+                                        {% if remision.factura_biable %}
+                                            <a href="{{ remision.factura_biable.get_absolute_url }}"
+                                               target="popup"
+                                               onclick="window.open('{{ remision.factura_biable.get_absolute_url }}','popup','width=600,height=600'); return false;">
+                                                {{ remision.factura_biable.tipo_documento }}-{{ remision.factura_biable.nro_documento }}
+                                            </a>
+                                        {% endif %}
+                                        -
+                                    {% endfor %}
+                                </td>
+                            {% endif %}
+                        {% endwith %}
+                    </tr>
+                {% empty %}
+                    <li>Ninguna Cotización</li>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

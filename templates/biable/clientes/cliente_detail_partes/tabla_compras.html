@@ -1,0 +1,92 @@
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>
+            Nro.
+        </th>
+        <th>
+            Estado
+        </th>
+        <th>
+            Fecha
+        </th>
+        <th>
+            Departamento
+        </th>
+        <th>
+            Ciudad
+        </th>
+        <th>
+            Dirección
+        </th>
+        <th>
+            Vendedor
+        </th>
+        <th>
+            Vlr. Bruto
+        </th>
+        <th>
+            Descuentos
+        </th>
+        {% if perms.biable.ver_info_admon_ventas %}
+            <th>
+                Costo
+            </th>
+            <th>
+                Rentabilidad
+            </th>
+        {% endif %}
+        <th>
+            Vlr. Neto
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for compra in compras_list %}
+        <tr>
+            <td>
+                <a href="{{ compra.get_absolute_url }}">{{ compra.tipo_documento }}-{{ compra.nro_documento }}</a>
+            </td>
+            <td>
+                {% if compra.activa %}
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                {% else %}
+                    <i class="fa fa-times-circle" aria-hidden="true"></i>
+                {% endif %}
+            </td>
+            <td>
+                {{ compra.fecha_documento }}
+            </td>
+            <td>
+                {{ compra.ciudad_biable.ciudad_intranet.departamento.nombre }}
+            </td>
+            <td>
+                {{ compra.ciudad_biable.ciudad_intranet.nombre }}
+            </td>
+            <td>
+                {{ compra.direccion_despacho }}
+            </td>
+            <td>
+                {{ compra.vendedor.nombre|title }}
+            </td>
+            <td>
+                {{ compra.venta_bruta|floatformat:2 }}
+            </td>
+            <td>
+                {{ compra.dscto_netos|floatformat:2 }}
+            </td>
+            {% if perms.biable.ver_info_admon_ventas %}
+                <td>
+                    {{ compra.costo_total|floatformat:2 }}
+                </td>
+                <td>
+                    {{ compra.rentabilidad|floatformat:2 }}
+                </td>
+            {% endif %}
+            <td>
+                {{ compra.venta_neto|floatformat:2 }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

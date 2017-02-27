@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% with sucursales_lista=object.mis_sucursales.all %}
+        <h1>Detalles Cliente
+            <small>{{ object.nombre|title }} </small>
+        </h1>
+        <div class="row">
+            <div class="col-md-12">
+                {% include 'biable/clientes/cliente_detail_partes/informacion_general.html' %}
+            </div>
+
+            {% with compras_list=object.mis_compras.all|dictsortreversed:"fecha_documento"|slice:":20" %}
+                {% with cotizaciones_list=object.mis_cotizaciones.all|dictsortreversed:"fecha_envio"|slice:":20" %}
+                    {% with despachos_lista=object.mis_despachos.all|dictsortreversed:"fecha_envio"|slice:":20" %}
+
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" {% if tab == "custom" %} class="active" {% endif %}><a
+                                    href="#compras" aria-controls="compras" role="tab"
+                                    data-toggle="tab">Ultimas 20 Compras</a></li>
+                            {% if cotizaciones_list %}
+                                <li role="presentation"><a href="#cotizaciones" aria-controls="cotizaciones" role="tab"
+                                                           data-toggle="tab">Ultimas 20 Cotizaciones</a></li>
+                            {% endif %}
+
+                            {% if despachos_lista %}
+                                <li role="presentation"><a href="#despachos" aria-controls="despachos" role="tab"
+                                                           data-toggle="tab">Ultimos 20 Despachos</a></li>
+                            {% endif %}
+
+                            {% if es_vendedor_cliente == True %}
+                                <li role="presentation"><a href="#contactos" aria-controls="contactos" role="tab"
+                                                           data-toggle="tab">Contactos</a></li>
+                            {% endif %}
+
+
+                            <li role="presentation"><a href="#ventasxproductos" aria-controls="ventasxproductos"
+                                                       role="tab"
+                                                       data-toggle="tab">Ventas por Productos</a></li>
+
+                            {% if es_vendedor_cliente == True %}
+                                <li role="presentation"><a href="#actualizar_informacion"
+                                                           aria-controls="actualizar_informacion"
+                                                           role="tab"
+                                                           data-toggle="tab">Actualizar Información</a></li>
+                            {% endif %}
+                            {% if es_vendedor_cliente == True %}
+                                <li role="presentation" {% if tab == "BHP" %} class="active" {% endif %}><a href="#historico_precios"
+                                                           aria-controls="historico_precios"
+                                                           role="tab"
+                                                           data-toggle="tab">Histórico Precios</a></li>
+                            {% endif %}
+
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane {% if tab == "custom" %} active {% endif %}"
+                                 id="compras">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% if compras_list %}
+                                            {% include 'biable/clientes/cliente_detail_partes/tabla_compras.html' %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% if cotizaciones_list %}
+                                {% include 'biable/clientes/cliente_detail_partes/tabla_cotizaciones.html' %}
+                            {% endif %}
+                            {% if despachos_lista %}
+                                <div role="tabpanel" class="tab-pane" id="despachos">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% include 'despachos_mercancias/components/enviosTCC_table.html' with lista_envio=despachos_lista %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if es_vendedor_cliente == True %}
+                                <div role="tabpanel" class="tab-pane"
+                                     id="contactos">
+                                    <div class="row">
+                                        <div class="col-md-12" style="padding: 2em">
+                                            <a href="{% url 'contactos:crear_contacto_empresa' nit=object.nit %}"><i
+                                                    class="fa fa-plus  fa-2x"
+                                                    aria-hidden="true">
+                                                Nuevo</i></a>
+                                        </div>
+                                        <div class="col-md-12">
+                                            {% for sucursal in sucursales_lista %}
+                                                {% with contactos_list=sucursal.mis_contactos.all %}
+                                                    {% if contactos_list %}
+                                                        <h2>{% if sucursal.nombre_establecimiento_intranet %}
+                                                            {{ sucursal.nombre_establecimiento_intranet }}
+                                                        {% else %}
+                                                            {{ sucursal.nombre_establecimiento }} -
+                                                            <small>({{ sucursal.direccion }})</small>
+                                                        {% endif %}
+                                                        </h2>
+                                                        {% include 'biable/clientes/cliente_detail_partes/contacto_empresa_tabla.html' %}
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% endfor %}
+                                            {% with contactos_list=contactos_sin_sucursal %}
+                                                {% if contactos_list %}
+                                                    <h2>Otras Sucursales</h2>
+                                                    {% include 'biable/clientes/cliente_detail_partes/contacto_empresa_tabla.html' %}
+                                                {% endif %}
+                                            {% endwith %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="actualizar_informacion">
+                                    <div style="margin: 3rem">
+                                        {% crispy form %}
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane {% if tab == "BHP" %} active {% endif %}" id="historico_precios">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% include 'biable/clientes/cliente_detail_partes/historico_precios.html' %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div role="tabpanel" class="tab-pane" id="ventasxproductos">
+                                <form method="get" id="form_consulta">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            {% block filtros %}
+
+                                            {% endblock %}
+                                            <div class="col-sx-12 col-sm-4 col-md-3">
+                                                <button type="submit" class="btn btn-primary">Consultar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div id="tabla_pv"></div>
+                            </div>
+                        </div>
+                    {% endwith %}
+                {% endwith %}
+            {% endwith %}
+        </div>
+    {% endwith %}
+{% endblock %}
+
+<script>
+    {% block script %}
+        $('#form_consulta').submit(function (e) {
+            e.preventDefault();
+            $.ajaxSetup({
+                headers: {"X-CSRFToken": getCookie("csrftoken")}
+            });
+            var data = {
+                'nit': {{ object.nit }}
+            };
+            $.post("{% url 'biable:detalle_cliente' pk=object.nit %}", data, function (data) {
+                // pivot grid options
+                // pivot grid options
+                $('#tabla_pv').empty()
+                $('#tabla_pv').append('<div id =\'pgrid\'></div>')
+                var config = {
+                    dataSource: data.ventasxproductos,
+                    dataHeadersLocation: 'columns',
+                    canMoveFields: true,
+                    theme: 'orange',
+                    toolbar: {
+                        visible: true
+                    },
+                    subTotal: {
+                        visible: true,
+                        collapsed: true
+                    },
+                    fields: [
+                        {name: 'linea', caption: 'Línea Ventas'},
+                        {name: 'factura_venta', caption: 'Factura'},
+                        {name: 'year', caption: 'Año'},
+                        {name: 'month', caption: 'Mes'},
+                        {name: 'day', caption: 'Día'},
+                        {name: 'nombre_producto', caption: 'Producto'},
+                        {name: 'item_biable__categoria_mercadeo', caption: 'Categoría 1'},
+                        {name: 'item_biable__categoria_mercadeo_dos', caption: 'Categoría 2'},
+                        {name: 'item_biable__id_referencia', caption: 'Referencia'},
+                        {name: 'vendedor', caption: 'Vendedor'},
+                        {
+                            name: 'venta_neta', caption: 'Venta Neta',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'cantidad_neta', caption: 'Cantidad Neta',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        }
+                    ],
+                    rows: [
+                        'item_biable__categoria_mercadeo',
+                        'item_biable__categoria_mercadeo_dos',
+                        'day',
+                        'nombre_producto',
+                        'factura_venta'
+                    ],
+                    columns: ['year', 'month'],
+                    data: ['venta_neta']
+                };
+
+                new orb.pgridwidget(config).render(document.getElementById('pgrid'));
+            });
+        });
+    {% endblock %}
+</script>
+
+{% block javascrip_external_sources %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/orb/1.0.9/orb.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orb/1.0.9/orb.min.css">
+{% endblock %}
