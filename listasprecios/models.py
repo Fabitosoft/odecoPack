@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from empresas.models import Canal
 from importaciones.models import Moneda
-from utils.models import TimeStampedModel
+from model_utils.models import TimeStampedModel
 
 class FormaPago(models.Model):
     canal = models.ForeignKey(Canal)

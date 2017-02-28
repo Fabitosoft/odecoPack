@@ -1,7 +1,7 @@
 from django.db import models
 
 from importaciones.models import Moneda
-from utils.models import TimeStampedModel
+from model_utils.models import TimeStampedModel
 from productos_categorias.models import CategoriaProducto
 
 

@@ -123,7 +123,6 @@ DJANGO_APPS = (
 # Apps specific for this project go here.
 MY_APPS = (
     'home',
-    'utils',
     'productos',
     'proveedores',
     'usuarios',

@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from proveedores.models import MargenProvedor
-from utils.models import TimeStampedModel
+from model_utils.models import TimeStampedModel
 from productos_categorias.models import CategoriaProducto, CategoriaDosCategoria, TipoProductoCategoría
 from productos_caracteristicas.models import (
     ColorProducto,

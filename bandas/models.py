@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
-from utils.models import TimeStampedModel
+from model_utils.models import TimeStampedModel
 from productos.models import Producto
 
 from productos_caracteristicas.models import (

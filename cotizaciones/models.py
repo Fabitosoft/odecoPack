@@ -8,7 +8,7 @@ from django.db.models.signals import post_save, post_delete
 from django.urls import reverse
 
 from bandas.models import Banda
-from utils.models import TimeStampedModel
+from model_utils.models import TimeStampedModel
 from productos.models import Producto, ArticuloCatalogo
 from listasprecios.models import FormaPago
 from biable.models import FacturasBiable, Cliente as ClienteBiable
