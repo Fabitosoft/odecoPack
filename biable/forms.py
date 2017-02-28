@@ -4,6 +4,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, HTML, Div, Field
 from django.urls import reverse
 
+from empresas.models import Industria
 from .models import Cliente
 
 
@@ -42,6 +43,8 @@ class ContactoEmpresaBuscador(forms.Form):
 
 
 class ClienteDetailEditForm(forms.ModelForm):
+    industria = forms.ModelChoiceField(queryset=Industria.objects.all().order_by('nombre'), required=False)
+
     class Meta:
         model = Cliente
         fields = [
