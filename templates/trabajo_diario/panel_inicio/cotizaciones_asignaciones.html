@@ -6,47 +6,48 @@
                     <h1>Asignaciones de Cotizaciones</h1>
                     <hr/>
                     <div class="row">
-                        <div class="col-md-6">
-                            {% if coti_otros_sin_asignar_list %}
+
+                        {% if coti_otros_sin_asignar_list %}
+                            <div class="col-md-6">
                                 <h2>Pedir Asignarme</h2>
                                 <p>Listado de Cotizaciones de mis clientes realizados por otro vendedor que debo
                                     pedír
                                     se me
                                     asigne</p>
                                 {% include 'trabajo_diario/panel_inicio/components/tabla_asignacion_cliente.html' with lista_cotizaciones_asignacion=coti_otros_sin_asignar_list %}
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            {% if coti_otros_asignadas_list %}
-                                <div class="col-xs-12">
-                                    <h2>Asignadas por otros Recientemente</h2>
-                                    <p>Listado de Cotizaciones creadas por otro vendedor que se me han asignado para
-                                        hacer
-                                        seguimiento</p>
-                                    {% include 'trabajo_diario/panel_inicio/components/tabla_asignacion_cliente.html' with lista_cotizaciones_asignacion=coti_otros_asignadas_list %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            {% if coti_otros_para_asignar_list %}
-                                <div class="col-xs-12">
-                                    <h2>Para Asignar</h2>
-                                    <p>Listado de Cotizaciones que he realizado y debo de asignar al vendedor
-                                        correspondiente</p>
-                                    {% include 'trabajo_diario/panel_inicio/components/tabla_asignacion_cliente.html' with lista_cotizaciones_asignacion=coti_otros_para_asignar_list %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            {% if coti_clientes_sin_vendedor %}
-                                <div class="col-xs-12">
-                                    <h2>Clientes para Asignar Vendedores</h2>
-                                    <p>Listado de Clientes con cotizaciones sin vendedores asignados</p>
-                                    {% include 'trabajo_diario/panel_inicio/components/tabla_asignacion_cliente.html' with lista_cotizaciones_asignacion=coti_clientes_sin_vendedor %}
-                                </div>
-                            {% endif %}
-                        </div>
+                            </div>
+                        {% endif %}
+
+                        {% if coti_otros_asignadas_list %}
+                            <div class="col-md-6">
+                                <h2>Asignadas por otros Recientemente</h2>
+                                <p>Listado de Cotizaciones creadas por otro vendedor que se me han asignado para
+                                    hacer
+                                    seguimiento</p>
+                                {% include 'trabajo_diario/panel_inicio/components/tabla_asignacion_cliente.html' with lista_cotizaciones_asignacion=coti_otros_asignadas_list %}
+                            </div>
+                        {% endif %}
+
+                        {% if coti_otros_para_asignar_list %}
+                            <div class="col-md-6">
+                                <h2>Para Asignar</h2>
+                                <p>Listado de Cotizaciones que he realizado y debo de asignar al vendedor
+                                    correspondiente</p>
+                                {% include 'trabajo_diario/panel_inicio/components/tabla_asignacion_cliente.html' with lista_cotizaciones_asignacion=coti_otros_para_asignar_list %}
+                            </div>
+                        {% endif %}
+
+
+                        {% if coti_clientes_sin_vendedor %}
+                            <div class="col-md-6">
+                                <h2>Clientes para Asignar Vendedores</h2>
+                                <p>Listado de Clientes con cotizaciones sin vendedores asignados</p>
+                                {% include 'trabajo_diario/panel_inicio/components/tabla_asignacion_cliente.html' with lista_cotizaciones_asignacion=coti_clientes_sin_vendedor %}
+                            </div>
+                            </div>
+                        {% endif %}
                     </div>
+
                 {% endif %}
             {% endwith %}
         {% endwith %}
