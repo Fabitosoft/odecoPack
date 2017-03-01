@@ -97,6 +97,7 @@ class Cliente(models.Model):
     industria = models.ForeignKey(Industria, related_name='mis_empresas', null=True, blank=True)
     competencia = models.BooleanField(default=False)
     cerro = models.BooleanField(default=False, verbose_name="Cerró")
+    no_vender = models.BooleanField(default=False, verbose_name="No Vender")
     potencial_compra = models.DecimalField(max_digits=10, decimal_places=0, default=0,
                                            verbose_name='Potencial de Compra')
     potencial_compra_fecha_actualizacion = models.DateField(verbose_name='Fecha último Cambio Potencial Compra',
