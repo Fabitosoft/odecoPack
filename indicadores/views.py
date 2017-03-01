@@ -155,6 +155,11 @@ class VentasVendedorConsola(LoginRequiredMixin, JSONResponseMixin, AjaxResponseM
                 default=F('vendedor__nombre'),
                 output_field=CharField(),
             ),
+            vendedor_nombre_real=Case(
+                When(vendedor__activo=False, then=Value('VENDEDORES INACTIVOS')),
+                default=F('vendedor__nombre'),
+                output_field=CharField(),
+            ),
             cliente=F('cliente__nombre'),
             documento=Concat('tipo_documento', Value('-'), 'nro_documento'),
             tipo_documento=F('tipo_documento'),
