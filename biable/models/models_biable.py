@@ -1,28 +1,18 @@
-from datetime import datetime
-
 from django.db import models
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
 
-from usuarios.models import UserExtended, Colaborador
+from usuarios.models import Colaborador
 
-from geografia_colombia.models import Pais, Ciudad, Departamento
+from geografia_colombia.models import Ciudad
 
 from empresas.models import Canal, Industria
 
+from .models_biable_intranet import GrupoCliente, LineaVendedorBiable
+from .managers import FacturaBiableActivaManager
+
 
 # Create your models here.
-
-class GrupoCliente(models.Model):
-    nombre = models.CharField(max_length=120, unique=True)
-
-    class Meta:
-        verbose_name = 'Grupo Cliente'
-        verbose_name_plural = 'I-0.2 Grupos Cliente'
-
-    def __str__(self):
-        return self.nombre
-
 
 class PaisBiable(models.Model):
     pais_id = models.PositiveIntegerField(primary_key=True)
@@ -127,49 +117,6 @@ class Cliente(models.Model):
         return self.nombre
 
 
-class ActualizacionManager(models.Manager):
-    def movimiento_ventas(self):
-        return self.filter(tipo='MOVIMIENTO_VENTAS')
-
-    def cartera_vencimiento(self):
-        return self.filter(tipo='CARTERA_VENCIMIENTO')
-
-
-class Actualizacion(models.Model):
-    tipo = models.CharField(max_length=100)
-    dia = models.PositiveIntegerField()
-    mes = models.PositiveIntegerField()
-    ano = models.PositiveIntegerField()
-    fecha = models.DateTimeField()
-
-    objects = models.Manager()
-    tipos = ActualizacionManager()
-
-    def __str__(self):
-        return '%s - %s' % (self.tipo, self.fecha)
-
-    def fecha_formateada(self):
-        fecha = '%s' % (self.fecha)
-        fecha_splited = fecha.split(sep=".", maxsplit=1)
-        fecha_splited = fecha_splited[0].split(" ")
-        formateada = 'Actualizado el %s a las %s' % (fecha_splited[0], fecha_splited[1])
-        return formateada
-
-    def get_ultima_cartera_vencimiento(self):
-        return self.tipos.cartera_vencimiento().latest('fecha')
-
-
-class LineaVendedorBiable(models.Model):
-    nombre = models.CharField(max_length=120)
-
-    class Meta:
-        verbose_name = 'Linea Vendedor CGUno'
-        verbose_name_plural = 'I-0.1 Lineas Vendedor CGUno'
-
-    def __str__(self):
-        return self.nombre
-
-
 class VendedorBiable(models.Model):
     id = models.PositiveIntegerField(primary_key=True, editable=False)
     nombre = models.CharField(max_length=200)
@@ -250,11 +197,6 @@ class Cartera(models.Model):
         )
         verbose_name = 'Cartera'
         verbose_name_plural = 'T-0.2 Carteras'
-
-
-class FacturaBiableActivaManager(models.Manager):
-    def get_queryset(self):
-        return super(FacturaBiableActivaManager, self).get_queryset().filter(activa=True)
 
 
 class FacturasBiable(TimeStampedModel):

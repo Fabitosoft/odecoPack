@@ -5,7 +5,8 @@ from crispy_forms.layout import Submit, Layout, HTML, Div, Field
 from django.urls import reverse
 
 from empresas.models import Industria
-from .models import Cliente
+from .models import Cliente, SeguimientoCliente
+from contactos.models import ContactoEmpresa
 
 
 class ClienteProductoBusquedaForm(forms.Form):
@@ -52,7 +53,7 @@ class ClienteDetailEditForm(forms.ModelForm):
             'cerro',
             'canal',
             'competencia',
-            'industria'
+            'industria',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -82,6 +83,77 @@ class ClienteDetailEditForm(forms.ModelForm):
                 HTML("<hr/>"),
                 FormActions(
                     Submit('guardar', 'Guardar'),
+                )
+            )
+        )
+
+
+class CrearSeguimientoClienteForm(forms.ModelForm):
+    cliente = forms.IntegerField()
+    contacto = forms.ModelChoiceField(queryset=None)
+    fecha_seguimiento = forms.DateTimeField(
+        widget=forms.TextInput(
+            attrs={'type': 'date'}
+        )
+    )
+    hora_inicial = forms.TimeField(
+        widget=forms.TextInput(
+            attrs={'type': 'time', 'min': "07:00", 'max': "18:00"}
+        )
+    )
+    hora_final = forms.TimeField(
+        widget=forms.TextInput(
+            attrs={'type': 'time', 'min': "07:00", 'max': "18:00"}
+        ), required=False
+    )
+
+    class Meta:
+        model = SeguimientoCliente
+        fields = [
+            'tipo',
+            'fecha_seguimiento',
+            'descripcion',
+            'asunto',
+            'hora_inicial',
+            'hora_final',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(CrearSeguimientoClienteForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-seguimiento_form'
+        self.helper.form_method = "POST"
+        self.fields['contacto'].queryset = ContactoEmpresa.objects.filter(cliente_id=self.initial.get('cliente'))
+
+        self.helper.form_class = 'form-inline'
+        self.helper.layout = Layout(
+            HTML("<h2>Crear Seguimiento Cliente</h2>"),
+            Div(
+                Div(
+                    Div(
+                        Field('cliente'),
+                    ),
+                    Div(
+                        Field('asunto'),
+                    ),
+                    Div(
+                        Field('contacto'),
+                    ),
+                    Div(
+                        Field('tipo'),
+                        Field('fecha_seguimiento'),
+                    ),
+                    Div(
+                        Field('hora_inicial'),
+                        Field('hora_final'),
+                    ),
+                    Div(
+                        Field('descripcion'),
+                    )
+                ),
+                HTML("<hr/>"),
+                FormActions(
+                    Submit('guardar_seguimiento', 'Guardar'),
                 )
             )
         )

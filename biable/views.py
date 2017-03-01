@@ -10,18 +10,23 @@ from braces.views import (
 )
 from dal import autocomplete
 from django.db.models import F
-from django.db.models import Func
 from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Q, Case, Value, When, Sum, CharField
 from django.db.models.functions import Concat, Extract, Upper
+from django.views import View
 from django.views.generic import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from cotizaciones.models import ItemCotizacion
 from .models import FacturasBiable, Cliente, MovimientoVentaBiable
-from .forms import ContactoEmpresaBuscador, ClienteDetailEditForm, ClienteProductoBusquedaForm
+from .forms import (
+    ContactoEmpresaBuscador,
+    ClienteDetailEditForm,
+    ClienteProductoBusquedaForm,
+    CrearSeguimientoClienteForm
+)
 
 
 # Create your views here.
@@ -69,56 +74,86 @@ class ClienteDetailView(
     ]
 
     def get_context_data(self, **kwargs):
+        usuario = self.request.user
         context = super().get_context_data(**kwargs)
         qs = self.object.mis_contactos.filter(sucursal__isnull=True).all()
         context['contactos_sin_sucursal'] = qs
-        si_sucursales = self.object.mis_sucursales.filter(
-            vendedor_real__colaborador__usuario__user=self.request.user).exists()
-        context['es_vendedor_cliente'] = si_sucursales
+
+        if usuario.is_superuser:
+            context['es_vendedor_cliente'] = True
+        else:
+            si_sucursales = self.object.mis_sucursales.filter(
+                vendedor_real__colaborador__usuario__user=usuario).exists()
+            context['es_vendedor_cliente'] = si_sucursales
+
         context['tab'] = "custom"
         context['form_busqueda_historico_precios'] = ClienteProductoBusquedaForm(self.request.GET or None)
+        # context['form_seguimiento_cliente'] = CrearSeguimientoClienteForm(
+        #     self.request.POST or None,
+        #     initial={'cliente': self.object.pk}
+        # )
         query = self.request.GET.get('buscar')
         if query:
-            context['tab'] = "BHP"
-            qsP = MovimientoVentaBiable.objects.select_related(
-                'factura',
-                'item_biable',
-                'factura__sucursal',
-                'factura__vendedor',
-                'factura__cliente'
-            ).all().filter(
-                Q(factura__cliente=self.object) &
-                (
-                    Q(item_biable__id_referencia__icontains=query) |
-                    Q(item_biable__descripcion__icontains=query) |
-                    Q(item_biable__id_item__icontains=query)
-                )
-            ).order_by('-factura__fecha_documento').distinct()[:10]
-            context['historico_precios_producto_ventas'] = qsP
-
-            qsC = ItemCotizacion.objects.all().select_related(
-                'cotizacion',
-                'item',
-                'banda',
-                'articulo_catalogo'
-            ).filter(
-                Q(cotizacion__cliente_biable=self.object) &
-                (
-                    Q(item__descripcion_estandar__icontains=query) |
-                    Q(item__descripcion_comercial__icontains=query) |
-                    Q(item__referencia__icontains=query) |
-                    Q(banda__descripcion_estandar__icontains=query) |
-                    Q(banda__descripcion_comercial__icontains=query) |
-                    Q(banda__referencia__icontains=query) |
-                    Q(articulo_catalogo__referencia__icontains=query) |
-                    Q(articulo_catalogo__nombre__icontains=query) |
-                    Q(p_n_lista_descripcion__icontains=query) |
-                    Q(p_n_lista_referencia__icontains=query)
-                )
-            ).order_by('-cotizacion__fecha_envio').distinct()[:10]
-            context['historico_precios_producto_cotizaciones'] = qsC
-
+            self.buscar_historia_precios(context, query)
         return context
+
+    # def post(self, request, *args, **kwargs):
+    #     if self.request.POST.get('guardar_seguimiento'):
+    #         print('entro post')
+    #         print('entro a guardar seguimiento')
+    #         formulario = CrearSeguimientoClienteForm(
+    #             self.request.POST
+    #         )
+    #         if formulario.is_valid():
+    #             print('fue valido')
+    #             print(formulario)
+    #             print(self.request.POST.get('cliente_id'))
+    #             formulario.save()
+    #         else:
+    #             print(self.request.POST)
+    #             print(formulario)
+    #             print(formulario.errors)
+    #     return super().post(request, *args, **kwargs)
+
+    def buscar_historia_precios(self, context, query):
+        context['tab'] = "BHP"
+        qsP = MovimientoVentaBiable.objects.select_related(
+            'factura',
+            'item_biable',
+            'factura__sucursal',
+            'factura__vendedor',
+            'factura__cliente'
+        ).all().filter(
+            Q(factura__cliente=self.object) &
+            (
+                Q(item_biable__id_referencia__icontains=query) |
+                Q(item_biable__descripcion__icontains=query) |
+                Q(item_biable__id_item__icontains=query)
+            )
+        ).order_by('-factura__fecha_documento').distinct()[:10]
+        context['historico_precios_producto_ventas'] = qsP
+
+        qsC = ItemCotizacion.objects.all().select_related(
+            'cotizacion',
+            'item',
+            'banda',
+            'articulo_catalogo'
+        ).filter(
+            Q(cotizacion__cliente_biable=self.object) &
+            (
+                Q(item__descripcion_estandar__icontains=query) |
+                Q(item__descripcion_comercial__icontains=query) |
+                Q(item__referencia__icontains=query) |
+                Q(banda__descripcion_estandar__icontains=query) |
+                Q(banda__descripcion_comercial__icontains=query) |
+                Q(banda__referencia__icontains=query) |
+                Q(articulo_catalogo__referencia__icontains=query) |
+                Q(articulo_catalogo__nombre__icontains=query) |
+                Q(p_n_lista_descripcion__icontains=query) |
+                Q(p_n_lista_referencia__icontains=query)
+            )
+        ).order_by('-cotizacion__fecha_envio').distinct()[:10]
+        context['historico_precios_producto_cotizaciones'] = qsC
 
     def post_ajax(self, request, *args, **kwargs):
         nit = request.POST.get('nit')

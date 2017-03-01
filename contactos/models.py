@@ -33,6 +33,9 @@ class ContactoEmpresa(TimeStampedModel):
     def get_absolute_url_update(self):
         return reverse('contactos:actualizar_contacto_empresa', kwargs={'pk': self.pk})
 
+    def __str__(self):
+        return "%s %s" % (self.nombres.title(), self.apellidos.title())
+
     class Meta:
         verbose_name_plural = 'Contactos Empresas'
         verbose_name = 'Contacto Empresa'

@@ -53,6 +53,12 @@
                                     role="tab"
                                     data-toggle="tab">Histórico Precios</a></li>
 
+{#                            <li role="presentation"><a#}
+{#                                    href="#seguimiento_cliente"#}
+{#                                    aria-controls="seguimiento_cliente"#}
+{#                                    role="tab"#}
+{#                                    data-toggle="tab">Seguimiento</a></li>#}
+
 
                         </ul>
                         <!-- Tab panes -->
@@ -143,6 +149,10 @@
                                 </form>
                                 <div id="tabla_pv"></div>
                             </div>
+
+{#                            <div role="tabpanel" class="tab-pane" id="seguimiento_cliente">#}
+{#                                {% crispy form_seguimiento_cliente %}#}
+{#                            </div>#}
                         </div>
                     {% endwith %}
                 {% endwith %}
