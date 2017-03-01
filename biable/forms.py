@@ -54,6 +54,7 @@ class ClienteDetailEditForm(forms.ModelForm):
             'canal',
             'competencia',
             'industria',
+            'no_vender',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -69,6 +70,9 @@ class ClienteDetailEditForm(forms.ModelForm):
                 Div(
                     Div(
                         Field('cerro'),
+                    ),
+                    Div(
+                        Field('no_vender'),
                     ),
                     Div(
                         Field('competencia'),
