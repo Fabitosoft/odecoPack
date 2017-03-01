@@ -150,7 +150,8 @@ class CotizacionesListView(UsuariosMixin, SelectRelatedMixin, ListView):
                 Q(items__banda__referencia__icontains=query) |
                 Q(items__articulo_catalogo__referencia__icontains=query) |
                 Q(items__articulo_catalogo__nombre__icontains=query)|
-                Q(usuario__icontains=query)
+                Q(usuario__username__icontains=query)|
+                Q(usuario__first_name=query)
             )
 
         if not current_user.has_perm('biable.reporte_ventas_todos_vendedores'):
