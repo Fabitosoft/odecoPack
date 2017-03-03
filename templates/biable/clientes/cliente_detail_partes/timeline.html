@@ -1,19 +1,20 @@
 <section id="cd-timeline">
     {% regroup mi_gestion_comercial.all|dictsortreversed:"created" by created|date:"Y" as seguimiento_por_ano_list %}
     {#{% regroup object.mi_seguimiento_comercial.all by created|date:"Y-m-d" as objects_by_day %}#}
-    <ul>
+    <ul style="list-style-type: none">
         {% for ano in seguimiento_por_ano_list %}
-            <li>{{ ano.grouper }}
-                <ul>
+            <li><h2>{{ ano.grouper }}</h2>
+                <ul style="list-style-type: none">
                     {% regroup ano.list by created|date:"M" as seguimiento_por_mes_list %}
                     {% for mes in seguimiento_por_mes_list %}
-                        <li>{{ mes.grouper }}
-                            <ul>
+                        <li><span class="badge" style="background-color: green">{{ mes.grouper }}</span>
+                            <ul style="list-style-type: none">
+                                <hr>
                                 {% regroup mes.list by created|date:"d" as seguimiento_por_dia_list %}
                                 {% for dia in seguimiento_por_dia_list %}
-                                    <li>{{ dia.grouper }}
+                                    <li><span class="badge" style="background-color: red">{{ dia.grouper }}</span>
                                         {% for seguimiento in dia.list %}
-                                            <div class="bubble">
+                                            <div class="bubble" style="margin-left: 3rem">
                                                 {% if seguimiento.contacto %}
                                                     {% include 'biable/clientes/cliente_detail_partes/timelime_tipo_seguimiento/contactos.html' %}
                                                 {% elif seguimiento.seguimiento_cotizacion %}
