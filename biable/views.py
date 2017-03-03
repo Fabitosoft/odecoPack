@@ -28,6 +28,8 @@ from .forms import (
     CrearSeguimientoClienteForm
 )
 
+from seguimientos.models import SeguimientoComercialCliente
+
 
 # Create your views here.
 
@@ -70,7 +72,7 @@ class ClienteDetailView(
         'mis_despachos__ciudad',
         'mis_despachos__ciudad__departamento',
         'mis_compras__ciudad_biable__ciudad_intranet',
-        'mis_compras__ciudad_biable__ciudad_intranet__departamento'
+        'mis_compras__ciudad_biable__ciudad_intranet__departamento',
     ]
 
     def get_context_data(self, **kwargs):
@@ -93,6 +95,28 @@ class ClienteDetailView(
         query = self.request.GET.get('buscar')
         if query:
             self.buscar_historia_precios(context, query)
+
+
+        qs_sc = SeguimientoComercialCliente.objects.select_related(
+            'cliente',
+            'creado_por',
+            'cotizacion',
+            'cotizacion__cliente_biable',
+            'comentario_cotizacion',
+            'seguimiento_cliente',
+            'seguimiento_cartera__tarea',
+            'seguimiento_cartera__tarea__factura',
+            'seguimiento_envio_tcc',
+            'seguimiento_envio_tcc__tarea',
+            'seguimiento_envio_tcc__tarea__envio',
+            'seguimiento_cotizacion',
+            'seguimiento_cotizacion__tarea',
+            'seguimiento_cotizacion__tarea__cotizacion',
+            'contacto',
+        ).filter(cliente=self.object)
+        print(qs_sc)
+        context['mi_gestion_comercial']=qs_sc
+
         return context
 
     def buscar_historia_precios(self, context, query):

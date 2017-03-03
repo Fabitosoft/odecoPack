@@ -1,5 +1,5 @@
 <section id="cd-timeline">
-    {% regroup object.mi_seguimiento_comercial.all|dictsortreversed:"created" by created|date:"Y" as seguimiento_por_ano_list %}
+    {% regroup mi_gestion_comercial.all|dictsortreversed:"created" by created|date:"Y" as seguimiento_por_ano_list %}
     {#{% regroup object.mi_seguimiento_comercial.all by created|date:"Y-m-d" as objects_by_day %}#}
     <ul>
         {% for ano in seguimiento_por_ano_list %}
