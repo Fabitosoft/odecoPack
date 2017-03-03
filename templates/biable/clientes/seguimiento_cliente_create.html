@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Crear Seguimiento para
+        <small>{{ cliente_nombre|title }} </small>
+    </h1>
+    {% crispy form %}
+{% endblock %}

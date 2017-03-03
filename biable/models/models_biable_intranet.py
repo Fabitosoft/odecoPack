@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 from model_utils.models import TimeStampedModel
@@ -53,9 +54,9 @@ class Actualizacion(models.Model):
 
 class SeguimientoCliente(TimeStampedModel):
     TIPO_CHOICES = (
-        ("LLAMADA", 'Llamada'),
-        ("VISITA", 'Visita'),
-        ("CORREO", 'Correo'),
+        ("Llamada", 'Llamada'),
+        ("Visita", 'Visita'),
+        ("Envío Correo", 'Envío Correo'),
     )
 
     cliente = models.ForeignKey('biable.Cliente', related_name='seguimientos')
@@ -66,3 +67,4 @@ class SeguimientoCliente(TimeStampedModel):
     fecha_seguimiento = models.DateField()
     hora_inicial = models.TimeField()
     hora_final = models.TimeField(null=True, blank=True)
+    creado_por = models.ForeignKey(User)

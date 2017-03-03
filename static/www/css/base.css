@@ -98,3 +98,38 @@ main {
   box-shadow: 0 8px 6px -6px #000;
   font-size: 20px;
 }
+.bubble {
+  position: relative;
+  padding: 0px;
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+  background: #fff;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  border: #d77f7f solid 2px;
+}
+.bubble:after {
+  content: '';
+  position: absolute;
+  border-style: solid;
+  border-width: 8px 10px 8px 0;
+  border-color: transparent #fff;
+  display: block;
+  width: 0;
+  z-index: 1;
+  left: -10px;
+  top: 12px;
+}
+.bubble:before {
+  content: '';
+  position: absolute;
+  border-style: solid;
+  border-width: 9px 11px 9px 0;
+  border-color: transparent #d77f7f;
+  display: block;
+  width: 0;
+  z-index: 0;
+  left: -13px;
+  top: 11px;
+}

@@ -117,3 +117,37 @@ main
   -moz-box-shadow 0 8px 6px -6px black
   box-shadow 0 8px 6px -6px black
   font-size 20px
+
+
+.bubble
+    position relative
+    padding 0px
+    padding-left 1rem
+    margin-bottom 1rem
+    background #FFFFFF
+    -webkit-border-radius 10px
+    -moz-border-radius 10px
+    border-radius 10px
+    border #D77F7F solid 2px
+    &:after
+        content ''
+        position absolute
+        border-style solid
+        border-width 8px 10px 8px 0
+        border-color transparent #FFFFFF
+        display block
+        width 0
+        z-index 1
+        left -10px
+        top 12px
+    &:before
+        content ''
+        position absolute
+        border-style solid
+        border-width 9px 11px 9px 0
+        border-color transparent #D77F7F
+        display block
+        width 0
+        z-index 0
+        left -13px
+        top 11px

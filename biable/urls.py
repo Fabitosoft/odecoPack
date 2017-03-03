@@ -5,7 +5,8 @@ from .views import (
     ClienteDetailView,
     ClienteAutocomplete,
     ClienteBiableListView,
-    ClienteBiablePorVendedorView
+    ClienteBiablePorVendedorView,
+    ClienteSeguimientoCreateView
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     url(r'^cliente-autocomplete/$', ClienteAutocomplete.as_view(), name='cliente-autocomplete'),
     url(r'^clientes-lista/$', ClienteBiableListView.as_view(), name='clientes-lista'),
     url(r'^mis-clientes-lista/$', ClienteBiablePorVendedorView.as_view(), name='clientes-lista-mis-clientes'),
+    url(r'^add_seguimiento_cliente/(?P<nit>[\w-]+)$', ClienteSeguimientoCreateView.as_view(), name='crear_seguimiento_cliente'),
 ]

@@ -10,17 +10,17 @@ from braces.views import (
 )
 from dal import autocomplete
 from django.db.models import F
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Q, Case, Value, When, Sum, CharField
 from django.db.models.functions import Concat, Extract, Upper
-from django.views import View
-from django.views.generic import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView, UpdateView
 
 from cotizaciones.models import ItemCotizacion
-from .models import FacturasBiable, Cliente, MovimientoVentaBiable
+from .models import FacturasBiable, Cliente, MovimientoVentaBiable, SeguimientoCliente
 from .forms import (
     ContactoEmpresaBuscador,
     ClienteDetailEditForm,
@@ -74,6 +74,7 @@ class ClienteDetailView(
     ]
 
     def get_context_data(self, **kwargs):
+        print('entro get context data')
         usuario = self.request.user
         context = super().get_context_data(**kwargs)
         qs = self.object.mis_contactos.filter(sucursal__isnull=True).all()
@@ -88,32 +89,11 @@ class ClienteDetailView(
 
         context['tab'] = "custom"
         context['form_busqueda_historico_precios'] = ClienteProductoBusquedaForm(self.request.GET or None)
-        # context['form_seguimiento_cliente'] = CrearSeguimientoClienteForm(
-        #     self.request.POST or None,
-        #     initial={'cliente': self.object.pk}
-        # )
+
         query = self.request.GET.get('buscar')
         if query:
             self.buscar_historia_precios(context, query)
         return context
-
-    # def post(self, request, *args, **kwargs):
-    #     if self.request.POST.get('guardar_seguimiento'):
-    #         print('entro post')
-    #         print('entro a guardar seguimiento')
-    #         formulario = CrearSeguimientoClienteForm(
-    #             self.request.POST
-    #         )
-    #         if formulario.is_valid():
-    #             print('fue valido')
-    #             print(formulario)
-    #             print(self.request.POST.get('cliente_id'))
-    #             formulario.save()
-    #         else:
-    #             print(self.request.POST)
-    #             print(formulario)
-    #             print(formulario.errors)
-    #     return super().post(request, *args, **kwargs)
 
     def buscar_historia_precios(self, context, query):
         context['tab'] = "BHP"
@@ -253,3 +233,30 @@ class ClienteBiablePorVendedorView(ClienteBiableListView):
         context = super().get_context_data(**kwargs)
         context['form_busqueda'].helper.form_action = reverse('biable:clientes-lista-mis-clientes')
         return context
+
+
+class ClienteSeguimientoCreateView(CreateView):
+    template_name = 'biable/clientes/seguimiento_cliente_create.html'
+    model = SeguimientoCliente
+    form_class = CrearSeguimientoClienteForm
+
+    def get_context_data(self, **kwargs):
+        nit = self.kwargs.get('nit')
+        self.cliente = get_object_or_404(Cliente, nit=nit)
+        context = super().get_context_data(**kwargs)
+        context['cliente_nombre'] = self.cliente.nombre
+        return context
+
+    def get_form(self, form_class=None):
+        nit = self.kwargs.get('nit')
+        self.cliente = get_object_or_404(Cliente, nit=nit)
+        form = super().get_form(form_class)
+        form.fields['contacto'].queryset = self.cliente.mis_contactos
+        return form
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.creado_por = self.request.user
+        self.object.cliente = self.cliente
+        self.object.save()
+        return redirect(self.cliente)

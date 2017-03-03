@@ -93,8 +93,6 @@ class ClienteDetailEditForm(forms.ModelForm):
 
 
 class CrearSeguimientoClienteForm(forms.ModelForm):
-    cliente = forms.IntegerField()
-    contacto = forms.ModelChoiceField(queryset=None)
     fecha_seguimiento = forms.DateTimeField(
         widget=forms.TextInput(
             attrs={'type': 'date'}
@@ -119,6 +117,7 @@ class CrearSeguimientoClienteForm(forms.ModelForm):
             'descripcion',
             'asunto',
             'hora_inicial',
+            'contacto',
             'hora_final',
         ]
 
@@ -127,16 +126,12 @@ class CrearSeguimientoClienteForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = 'id-seguimiento_form'
         self.helper.form_method = "POST"
-        self.fields['contacto'].queryset = ContactoEmpresa.objects.filter(cliente_id=self.initial.get('cliente'))
 
         self.helper.form_class = 'form-inline'
         self.helper.layout = Layout(
             HTML("<h2>Crear Seguimiento Cliente</h2>"),
             Div(
                 Div(
-                    Div(
-                        Field('cliente'),
-                    ),
                     Div(
                         Field('asunto'),
                     ),

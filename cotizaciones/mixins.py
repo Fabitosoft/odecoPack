@@ -9,6 +9,7 @@ from django.conf import settings
 from weasyprint import HTML
 
 from bandas.models import Banda
+from seguimientos.models import SeguimientoComercialCliente
 from .models import FormaPago
 from productos.models import (
     Producto,
@@ -89,6 +90,23 @@ class EnviarCotizacionMixin(object):
         msg.send()
         output.close()
         cotizacion.save()
+
+        if not cotizacion.cliente_nuevo:
+            seguimiento = SeguimientoComercialCliente()
+            seguimiento.cotizacion = cotizacion
+            seguimiento.creado_por = self.request.user
+            seguimiento.cliente = cotizacion.cliente_biable
+
+            observacion_adicional = "<p> Valor Cotización: " + str(cotizacion.total) + "</p>"
+            if cotizacion.descuento:
+                observacion_adicional += "<p> Descuento Cotización: " + str(cotizacion.descuento) + "</p>"
+
+            seguimiento.observacion_adicional = observacion_adicional
+            if version_cotizacion > 1:
+                seguimiento.tipo_accion = "Envío version " + str(version_cotizacion)
+            else:
+                seguimiento.tipo_accion = "Nueva"
+            seguimiento.save()
 
 
 class CotizacionesActualesMixin(object):

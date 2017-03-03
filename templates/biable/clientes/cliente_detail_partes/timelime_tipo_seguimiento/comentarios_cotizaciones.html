@@ -1,0 +1,12 @@
+<div style="padding: 0">
+    <h3><i class="fa fa-comments" style="color: black" aria-hidden="true"></i>
+        {{ seguimiento.tipo_accion }} en cotizacion {{ seguimiento.comentario_cotizacion.cotizacion.nro_cotizacion }},
+        en {{ seguimiento.cliente.nombre|title }}
+    </h3>
+    <small>{{ seguimiento.creado_por.get_full_name }}</small>
+    <br>
+    <small>{{ seguimiento.created }} | Hace {{ seguimiento.created|timesince }}</small>
+    {{ seguimiento.observacion_adicional|safe }}
+    Ver cotizacion: <a
+        href="{{ seguimiento.comentario_cotizacion.cotizacion.get_absolute_url }}">{{ seguimiento.comentario_cotizacion.cotizacion.nro_cotizacion }}</a>
+</div>

@@ -1,0 +1,44 @@
+<section id="cd-timeline">
+    {% regroup object.mi_seguimiento_comercial.all|dictsortreversed:"created" by created|date:"Y" as seguimiento_por_ano_list %}
+    {#{% regroup object.mi_seguimiento_comercial.all by created|date:"Y-m-d" as objects_by_day %}#}
+    <ul>
+        {% for ano in seguimiento_por_ano_list %}
+            <li>{{ ano.grouper }}
+                <ul>
+                    {% regroup ano.list by created|date:"M" as seguimiento_por_mes_list %}
+                    {% for mes in seguimiento_por_mes_list %}
+                        <li>{{ mes.grouper }}
+                            <ul>
+                                {% regroup mes.list by created|date:"d" as seguimiento_por_dia_list %}
+                                {% for dia in seguimiento_por_dia_list %}
+                                    <li>{{ dia.grouper }}
+                                        {% for seguimiento in dia.list %}
+                                            <div class="bubble">
+                                                {% if seguimiento.contacto %}
+                                                    {% include 'biable/clientes/cliente_detail_partes/timelime_tipo_seguimiento/contactos.html' %}
+                                                {% elif seguimiento.seguimiento_cotizacion %}
+                                                    {% include 'biable/clientes/cliente_detail_partes/timelime_tipo_seguimiento/seguimiento_tarea_cotizacion.html' %}
+                                                {% elif seguimiento.seguimiento_envio_tcc %}
+                                                    {% include 'biable/clientes/cliente_detail_partes/timelime_tipo_seguimiento/seguimiento_tarea_envio_tcc.html' %}
+                                                {% elif seguimiento.seguimiento_cartera %}
+                                                    {% include 'biable/clientes/cliente_detail_partes/timelime_tipo_seguimiento/seguimiento_tarea_cartera.html' %}
+                                                {% elif seguimiento.comentario_cotizacion %}
+                                                    {% include 'biable/clientes/cliente_detail_partes/timelime_tipo_seguimiento/comentarios_cotizaciones.html' %}
+                                                {% elif seguimiento.cotizacion %}
+                                                    {% include 'biable/clientes/cliente_detail_partes/timelime_tipo_seguimiento/cotizaciones.html' %}
+                                                {% elif seguimiento.seguimiento_cliente %}
+                                                    {% include 'biable/clientes/cliente_detail_partes/timelime_tipo_seguimiento/seguimiento_cliente.html' %}
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
+</section>

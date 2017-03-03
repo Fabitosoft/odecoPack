@@ -53,11 +53,11 @@
                                     role="tab"
                                     data-toggle="tab">Histórico Precios</a></li>
 
-{#                            <li role="presentation"><a#}
-{#                                    href="#seguimiento_cliente"#}
-{#                                    aria-controls="seguimiento_cliente"#}
-{#                                    role="tab"#}
-{#                                    data-toggle="tab">Seguimiento</a></li>#}
+                            <li role="presentation"><a
+                                    href="#seguimiento_cliente"
+                                    aria-controls="seguimiento_cliente"
+                                    role="tab"
+                                    data-toggle="tab">Seguimiento</a></li>
 
 
                         </ul>
@@ -150,9 +150,13 @@
                                 <div id="tabla_pv"></div>
                             </div>
 
-{#                            <div role="tabpanel" class="tab-pane" id="seguimiento_cliente">#}
-{#                                {% crispy form_seguimiento_cliente %}#}
-{#                            </div>#}
+                            <div role="tabpanel" class="tab-pane" id="seguimiento_cliente">
+                                <a href="{% url 'biable:crear_seguimiento_cliente' nit=object.nit %}"><i
+                                        class="fa fa-plus  fa-2x"
+                                        aria-hidden="true">
+                                    Nuevo</i></a>
+                                {% include 'biable/clientes/cliente_detail_partes/timeline.html' %}
+                            </div>
                         </div>
                     {% endwith %}
                 {% endwith %}
