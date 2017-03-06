@@ -114,7 +114,6 @@ class ClienteDetailView(
             'seguimiento_cotizacion__tarea__cotizacion',
             'contacto',
         ).filter(cliente=self.object).order_by('-created')[:150]
-        print(qs_sc)
         context['mi_gestion_comercial']=qs_sc
 
         return context

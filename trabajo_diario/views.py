@@ -42,14 +42,11 @@ class TrabajoDiaView(TaxasCambioMixin, IndicadorMesMixin, LoginRequiredMixin, Te
 
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
             try:
-                print('entro a existe')
                 trabajo_diario = TrabajoDiario.objects.get(created__date=fecha_hoy, usuario=usuario)
             except TrabajoDiario.DoesNotExist:
-                print('entro a no existe')
                 trabajo_diario = None
 
             if not trabajo_diario:
-                print('entro trabajo diario')
                 trabajo_diario = TrabajoDiario()
                 trabajo_diario.usuario = usuario
                 trabajo_diario.save()

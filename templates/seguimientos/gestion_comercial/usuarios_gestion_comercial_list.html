@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+    <ul>
+        {% for usuario in lista_usuarios.all %}
+            <li>
+                <a href="{% url 'seguimientos:usuarios_gestion_comercial' pk=usuario.pk %}">{{ usuario.get_full_name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

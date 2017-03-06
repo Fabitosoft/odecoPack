@@ -68,13 +68,9 @@ class Tarea(TimeStampedModel):
     class Meta:
         abstract = True
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__original_trabajo_diario = self.trabajo_diario
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.trabajo_diario.set_actualizar_seguimiento_trabajo()
 
 
 # endregion

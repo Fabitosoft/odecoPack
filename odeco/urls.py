@@ -54,6 +54,7 @@ urlpatterns = [
     url(r'^biable/', include('biable.urls', namespace="biable")),
     url(r'^geografia/', include('geografia_colombia.urls', namespace="geografia")),
     url(r'^contactos/', include('contactos.urls', namespace="contactos")),
+    url(r'^seguimientos/', include('seguimientos.urls', namespace="seguimientos")),
 ]
 
 if settings.DEBUG:
