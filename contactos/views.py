@@ -1,11 +1,13 @@
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 
 from braces.views import SelectRelatedMixin
 
 from .models import ContactoEmpresa
-from .forms import ContactoEmpresaForm, ContactoEmpresaCreateForm
-from biable.models import Cliente
+from .forms import ContactoEmpresaForm, ContactoEmpresaCreateForm, ContactoEmpresaBuscador
+from biable.models import Cliente, SucursalBiable
 
 
 # Create your views here.
@@ -57,3 +59,39 @@ class ContactosEmpresaUpdateView(SelectRelatedMixin, UpdateView):
     def form_valid(self, form):
         self.object = form.save()
         return redirect(self.object.cliente)
+
+
+class AgendaContactoListView(SelectRelatedMixin, ListView):
+    model = ContactoEmpresa
+    context_object_name = 'contactos_list'
+    template_name = 'contactos/contactos_list.html'
+    paginate_by = 50
+    select_related = ['cliente', 'creado_por', 'cliente__grupo']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_busqueda'] = ContactoEmpresaBuscador(self.request.GET or None)
+        return context
+
+    def get_queryset(self):
+        q = self.request.GET.get('busqueda')
+        usuario = self.request.user
+        qs = super().get_queryset()
+        if not usuario.is_superuser:
+            clientes = SucursalBiable.objects.values_list('cliente_id').filter(
+                vendedor_real__colaborador__usuario__user=usuario)
+            qs = qs.filter(
+                cliente_id__in=clientes
+            ).exclude(cliente__nit='')
+
+        if q:
+            qs = qs.filter(
+                Q(nombres__icontains=q) |
+                Q(apellidos__icontains=q) |
+                Q(cliente__grupo__nombre__icontains=q) |
+                Q(cliente__nit__icontains=q) |
+                Q(cliente__nombre__icontains=q)
+            )
+
+        qs = qs.distinct().order_by('nombres')
+        return qs

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Agenda Contactos</h1>
+    {% crispy form_busqueda %}
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>
+                Nombres
+            </th>
+            <th>
+                Apellidos
+            </th>
+            <th>
+                Empresa
+            </th>
+            <th>
+                Nit
+            </th>
+            <th>
+                Cargo
+            </th>
+            <th>
+                Grupo
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Email 2
+            </th>
+            <th>
+                Teléfono
+            </th>
+            <th>
+                Teléfono 2
+            </th>
+            <th>
+                Teléfono 3
+            </th>
+            <th>
+                Creado Por
+            </th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for contacto in contactos_list.all %}
+            <tr>
+                <td>
+                    {{ contacto.nombres|title }}
+                </td>
+                <td>
+                    {{ contacto.apellidos|title }}
+                </td>
+                <td>
+                    <a href="{{ contacto.cliente.get_absolute_url }}">{{ contacto.cliente.nombre|title }}</a>
+                </td>
+                <td>
+                    {{ contacto.cliente.nit }}
+                </td>
+                <td>
+                    {{ contacto.cargo|title }}
+                </td>
+                <td>
+                    {{ contacto.cliente.grupo.nombre|title }}
+                </td>
+                <td>
+                    {{ contacto.correo_electronico }}
+                </td>
+                <td>
+                    {{ contacto.correo_electronico_alternativo }}
+                </td>
+                <td>
+                    {{ contacto.nro_telefonico }}
+                </td>
+                <td>
+                    {{ contacto.nro_telefonico_alternativo }}
+                </td>
+                <td>
+                    {{ contacto.nro_telefonico_alternativo_dos }}
+                </td>
+                <td>
+                    {{ contacto.creado_por }}
+                </td>
+{#                <td>#}
+{#                    <a href="{{ contacto.get_absolute_url_update }}">Editar</a>#}
+{#                </td>#}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    {% if is_paginated %}
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+{% endblock %}
