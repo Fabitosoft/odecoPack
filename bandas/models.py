@@ -125,7 +125,6 @@ class Banda(TimeStampedModel):
                                                                      torneado=self.con_torneado_varilla).first()
         super().save()
 
-
     def get_costo_cop(self):
         modulos = self.ensamblado.select_related(
             'producto',
@@ -154,18 +153,11 @@ class Banda(TimeStampedModel):
 
     def get_precio_mano_obra(self):
         if self.costo_ensamblado:
-            self.costo_mano_obra =(self.costo_ensamblado.porcentaje/100)*self.get_precio_base()
+            self.costo_mano_obra = (self.costo_ensamblado.porcentaje / 100) * self.get_precio_base()
         return self.costo_mano_obra
 
     def get_precio_con_mano_obra(self):
         return self.get_precio_mano_obra() + self.get_precio_base()
-
-    # precio_banda = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    # precio_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    # costo_base_total = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    # rentabilidad = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    # costo_mano_obra = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    # endregion
 
     objects = models.Manager()
     activos = BandaActivosManager()
@@ -179,31 +171,6 @@ class Banda(TimeStampedModel):
     class Meta:
         verbose_name_plural = '3. Bandas'
         verbose_name = '3. Banda'
-
-    # def save(self):
-    #     modulos = self.ensamblado.all()
-    #     self.costo_ensamblado = CostoEnsambladoBlanda.objects.filter(aleta=self.con_aleta,
-    #                                                                  empujador=self.con_empujador,
-    #                                                                  torneado=self.con_torneado_varilla).first()
-    #     porcentaje_mano_obra = 0
-    #     if self.costo_ensamblado:
-    #         porcentaje_mano_obra = self.costo_ensamblado.porcentaje / 100
-    #
-    #     if modulos:
-    #         print('Entro a actualizar precio banda')
-    #         precio = modulos.aggregate(precio=Sum('precio_linea'))['precio']
-    #         self.precio_banda = precio
-    #         costo_base = modulos.aggregate(costo=Sum('costo_cop_linea'))['costo']
-    #         self.costo_base_total = costo_base
-    #     else:
-    #         self.costo_base_total = 0
-    #         self.precio_banda = 0
-    #         self.precio_total = 0
-    #
-    #     self.costo_mano_obra = self.costo_base_total * porcentaje_mano_obra
-    #     self.precio_total = self.precio_banda + self.costo_mano_obra
-    #     self.rentabilidad = self.precio_banda - self.costo_base_total
-    #     super().save()
 
     def get_absolute_url(self):
         return reverse("bandas:detalle_banda", kwargs={"pk": self.pk})

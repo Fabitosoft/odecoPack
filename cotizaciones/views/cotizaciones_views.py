@@ -116,6 +116,7 @@ class CotizacionesListView(UsuariosMixin, SelectRelatedMixin, ListView):
 
         qs = qs.select_related(
             'usuario',
+            'creado_por',
             'cliente_biable',
             'ciudad_despacho',
             'ciudad_despacho__departamento',

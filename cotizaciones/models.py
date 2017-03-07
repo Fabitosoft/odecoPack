@@ -2,13 +2,12 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.core.validators import RegexValidator
-from django.db.models import Q
-from django.db.models.signals import post_save, post_delete
 from django.urls import reverse
 
 from bandas.models import Banda
 from model_utils.models import TimeStampedModel
+
+from .managers import CotizacionesEstadosQuerySet
 from productos.models import Producto, ArticuloCatalogo
 from listasprecios.models import FormaPago
 from biable.models import FacturasBiable, Cliente as ClienteBiable
@@ -17,48 +16,6 @@ from geografia_colombia.models import Ciudad
 
 # Create your models here.
 # region Cotizaciones
-class CotizacionesEstadosQuerySet(models.QuerySet):
-    def activas(self):
-        return self.filter(
-            ~Q(estado='ELI') &
-            ~Q(estado='FIN')
-        )
-
-    def rechazadas(self):
-        return self.filter(
-            estado='ELI'
-        )
-
-    def completadas(self):
-        return self.filter(
-            estado='FIN'
-        )
-
-    def enviadas(self):
-        return self.filter(estado='ENV')
-
-
-class CotizacionesEstadosManager(models.Manager):
-    def get_queryset(self, **kwarg):
-        usuario = kwarg.get("usuario")
-        qs = CotizacionesEstadosQuerySet(self.model, using=self._db)
-        if usuario:
-            qs = qs.filter(usuario=usuario)
-        return qs
-
-    def enviado(self, **kwarg):
-        return self.get_queryset(**kwarg).enviadas()
-
-    def activo(self, **kwarg):
-        return self.get_queryset(**kwarg).activas()
-
-    def rechazado(self, **kwarg):
-        return self.get_queryset(**kwarg).rechazadas()
-
-    def completado(self, **kwarg):
-        return self.get_queryset(**kwarg).completadas()
-
-
 class Cotizacion(TimeStampedModel):
     ESTADOS = (
         ('INI', 'Iniciado'),
@@ -92,7 +49,7 @@ class Cotizacion(TimeStampedModel):
     sucursal_sub_empresa = models.CharField(max_length=120, blank=True, null=True, verbose_name='Empresa o Sucursal')
     actualmente_cotizador = models.BooleanField(default=False, editable=False)
 
-    estados = CotizacionesEstadosManager()
+    estados = CotizacionesEstadosQuerySet.as_manager()
     objects = models.Manager()
 
     class Meta:
@@ -213,14 +170,6 @@ class ItemCotizacion(TimeStampedModel):
         if self.dias_entrega == 1:
             return "%s dia" % self.dias_entrega
         return "%s dias" % self.dias_entrega
-
-
-def cotizacion_item_post_save_receiver(sender, instance, *args, **kwargs):
-    instance.cotizacion.update_total()
-
-
-post_save.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
-post_delete.connect(cotizacion_item_post_save_receiver, sender=ItemCotizacion)
 
 
 # endregion

@@ -1,8 +1,11 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from seguimientos.models import SeguimientoComercialCliente
-from .models import ComentarioCotizacion, Cotizacion
+from .models import (
+    ComentarioCotizacion,
+    ItemCotizacion
+)
 
 
 @receiver(post_save, sender=ComentarioCotizacion)
@@ -17,3 +20,8 @@ def crear_seguimiento_comercial_comentario_cotizacion(sender, instance, created,
         if created:
             seguimiento.tipo_accion = "Comentó"
         seguimiento.save()
+
+
+@receiver([post_save, post_delete], sender=ItemCotizacion)
+def cotizacion_item_post_save_receiver(sender, instance, *args, **kwargs):
+    instance.cotizacion.update_total()
