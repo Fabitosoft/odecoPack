@@ -117,5 +117,5 @@ class ContactoAutocomplete(autocomplete.Select2QuerySetView):
                     Q(apellidos__icontains=self.q)
                 )
         else:
-            qs = None
+            qs = qs.none()
         return qs
