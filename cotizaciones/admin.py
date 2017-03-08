@@ -74,6 +74,7 @@ class CotizacionAdmin(admin.ModelAdmin):
         'cliente_biable',
         'ciudad_despacho',
         'usuario',
+        'contacto',
         'cliente_biable',
         'ciudad_despacho__departamento',
         'ciudad_despacho__departamento__pais'
@@ -90,11 +91,12 @@ class CotizacionAdmin(admin.ModelAdmin):
         'cliente_biable',
         'cliente_nuevo',
         'otra_ciudad',
-        'sucursal_sub_empresa'
+        'sucursal_sub_empresa',
+        'contacto'
     )
     readonly_fields = ('total',)
-    list_editable = ('cliente_biable',)
-    raw_id_fields = ('cliente_biable', 'ciudad_despacho')
+    list_editable = ('cliente_biable', 'contacto')
+    raw_id_fields = ('cliente_biable', 'ciudad_despacho', 'contacto')
     list_filter = (
         'estado',
         'cliente_nuevo',
@@ -106,10 +108,6 @@ class CotizacionAdmin(admin.ModelAdmin):
         RemisionInline,
         TareasInline,
     ]
-    raw_id_fields = (
-        'cliente_biable',
-        'ciudad_despacho'
-    )
     search_fields = (
         'pais',
         'ciudad',
@@ -117,7 +115,9 @@ class CotizacionAdmin(admin.ModelAdmin):
         'estado',
         'nro_cotizacion',
         'cliente_biable__nombre',
-        'cliente_biable__nit'
+        'cliente_biable__nit',
+        'contacto__nombres',
+        'contacto__apellidos'
     )
 
 
