@@ -45,7 +45,14 @@
 
     {% endblock %}
 </div>
-{% include 'javascript.html' %}
+
+{% block jquery_version %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+{% endblock %}
+<script src="https://use.fontawesome.com/3ea6471209.js"></script>
+<script src='{% static "www/js/bootstrap.min.js" %}'></script>
+
 {% block javascrip_external_sources %}
 
 {% endblock %}
@@ -80,7 +87,9 @@
 
         {% block script %}
         {% endblock %}
+
     });
 </script>
+
 </body>
 </html>

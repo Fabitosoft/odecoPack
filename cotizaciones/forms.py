@@ -15,6 +15,8 @@ from .models import (
     ItemCotizacion,
     ComentarioCotizacion
 )
+
+from contactos.models import ContactoEmpresa
 from geografia_colombia.models import Ciudad
 from biable.models import Cliente, VendedorBiable
 
@@ -125,10 +127,11 @@ class ItemCotizacionOtrosForm(ModelForm):
 
 
 class CotizacionForm(ModelForm):
-    email = forms.EmailField(label="Correo Electrónico")
-    nro_contacto = forms.CharField(label="Número de Contacto")
-    nombres_contacto = forms.CharField(label="Nombres")
-    apellidos_contacto = forms.CharField(label="Apellidos")
+    email = forms.EmailField(label="Correo Electrónico", required=False)
+    nro_contacto = forms.CharField(label="Número de Contacto", required=False)
+    nombres_contacto = forms.CharField(label="Nombres", required=False)
+    apellidos_contacto = forms.CharField(label="Apellidos", required=False)
+    contacto_nuevo = forms.BooleanField(label="Contacto nuevo", required=False)
     razon_social = forms.CharField(label="Razón Social", required=False)
     observaciones = forms.Textarea()
     ciudad_despacho = forms.ModelChoiceField(
@@ -142,6 +145,13 @@ class CotizacionForm(ModelForm):
         required=False,
         label='Cliente CGuno'
     )
+    contacto = forms.ModelChoiceField(
+        queryset=ContactoEmpresa.objects.all(),
+        widget=autocomplete.ModelSelect2(url='contactos:contactos-autocomplete', forward=['cliente_biable']),
+        required=False,
+        label='Contacto'
+    )
+
     id = forms.IntegerField(required=False, widget=forms.HiddenInput)
 
     def clean(self):
@@ -150,6 +160,12 @@ class CotizacionForm(ModelForm):
         cliente_biable = cleaned_data.get("cliente_biable")
         ciudad_despacho = cleaned_data.get("ciudad_despacho")
         ciudad = cleaned_data.get("ciudad")
+
+        contacto = cleaned_data.get("contacto")
+        email = cleaned_data.get("email")
+        nombres_contacto = cleaned_data.get("nombres_contacto")
+        apellidos_contacto = cleaned_data.get("apellidos_contacto")
+        nro_contacto = cleaned_data.get("nro_contacto")
 
         if (not razon_social and not cliente_biable):
             # Only do something if both fields are valid so far.
@@ -163,6 +179,12 @@ class CotizacionForm(ModelForm):
             raise forms.ValidationError(
                 "Debe tener o ciudad alterna o ciudad."
                 " No puede estar vacios los dos campos"
+            )
+
+        if (not contacto and (not email or not nombres_contacto or not apellidos_contacto or not nro_contacto)):
+            # Only do something if both fields are valid so far.
+            raise forms.ValidationError(
+                "Debe tener información de un contacto."
             )
 
     class Meta:
@@ -182,6 +204,8 @@ class CotizacionForm(ModelForm):
             'nro_contacto',
             'email',
             'observaciones',
+            'contacto',
+            'contacto_nuevo',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -213,6 +237,9 @@ class CotizacionForm(ModelForm):
                 Field('otra_ciudad')
             ),
             Div(
+                Field('contacto'),
+            ),
+            Div(
                 Field('nombres_contacto'),
                 Field('apellidos_contacto')
             ),
@@ -220,6 +247,9 @@ class CotizacionForm(ModelForm):
                 Field('nro_contacto'),
             ),
             PrependedText('email', '@', placeholder="Correo Electrónico"),
+            Div(
+                Field('contacto_nuevo'),
+            ),
             HTML('<hr/>'),
             Field('observaciones'),
             HTML('<hr/>')

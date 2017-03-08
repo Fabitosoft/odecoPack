@@ -52,13 +52,9 @@ class EnviarCotizacionMixin(object):
             colaboradores = SucursalBiable.objects.values('vendedor_real__colaborador_id').filter(
                 cliente_id=cotizacion.cliente_biable_id, vendedor_real__isnull=False
             ).distinct()
-            print("entro 2")
-            print(colaboradores)
             if colaboradores.exists():
                 if colaboradores.count() == 1:
                     colaborador = Colaborador.objects.get(pk=colaboradores.first()['vendedor_real__colaborador_id'])
-                    print(colaborador)
-                    print(colaborador.usuario.user)
                     cotizacion.usuario = colaborador.usuario.user
 
                     cotizacion.save()

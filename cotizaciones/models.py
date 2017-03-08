@@ -12,6 +12,7 @@ from productos.models import Producto, ArticuloCatalogo
 from listasprecios.models import FormaPago
 from biable.models import FacturasBiable, Cliente as ClienteBiable
 from geografia_colombia.models import Ciudad
+from contactos.models import ContactoEmpresa
 
 
 # Create your models here.
@@ -48,6 +49,8 @@ class Cotizacion(TimeStampedModel):
     otra_ciudad = models.BooleanField(default=False)
     sucursal_sub_empresa = models.CharField(max_length=120, blank=True, null=True, verbose_name='Empresa o Sucursal')
     actualmente_cotizador = models.BooleanField(default=False, editable=False)
+    contacto = models.ForeignKey(ContactoEmpresa, null=True, blank=True, related_name='mis_cotizaciones')
+    contacto_nuevo = models.BooleanField(default=False)
 
     estados = CotizacionesEstadosQuerySet.as_manager()
     objects = models.Manager()

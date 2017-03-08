@@ -26,6 +26,8 @@ from productos.models import (
 
 from ..models import Cotizacion
 
+from contactos.models import ContactoEmpresa
+
 
 class CotizadorView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -90,6 +92,29 @@ class CotizacionUpdateView(
             form.instance.version += 1
         form.instance.en_edicion = False
         form.instance.fecha_envio = timezone.now()
+
+        contacto = form.instance.contacto
+        if contacto and not form.instance.contacto_nuevo:
+            form.instance.nombres_contacto = contacto.nombres
+            form.instance.apellidos_contacto = contacto.apellidos
+            form.instance.nro_contacto = contacto.nro_telefonico
+            form.instance.email = contacto.correo_electronico
+        elif not form.instance.cliente_nuevo and form.instance.contacto_nuevo:
+            contacto = ContactoEmpresa()
+            contacto.nombres = form.instance.nombres_contacto
+            contacto.apellidos = form.instance.apellidos_contacto
+            contacto.nro_telefonico = form.instance.nro_contacto
+            contacto.correo_electronico = form.instance.email
+            contacto.cliente = form.instance.cliente_biable
+            contacto.subempresa = form.instance.sucursal_sub_empresa
+            contacto.creado_por = self.request.user
+            contacto.correo_electronico_alternativo = None
+            contacto.nro_telefonico_alternativo = None
+            contacto.nro_telefonico_alternativo_dos = None
+            contacto.save()
+            form.instance.contacto = contacto
+            form.instance.contacto_nuevo = False
+
         form.save()
         self.enviar_cotizacion(self.object, self.request.user)
 
@@ -109,6 +134,29 @@ class CotizacionCreateView(ListaPreciosMixin, CotizacionesActualesMixin, CreateV
         form.instance.actualmente_cotizador = True
         form.instance.estado = "INI"
         form.instance.en_edicion = False
+        contacto = form.instance.contacto
+        if contacto and not form.instance.contacto_nuevo:
+            form.instance.nombres_contacto = contacto.nombres
+            form.instance.apellidos_contacto = contacto.apellidos
+            form.instance.nro_contacto = contacto.nro_telefonico
+            form.instance.email = contacto.correo_electronico
+        elif not form.instance.cliente_nuevo and form.instance.contacto_nuevo:
+            contacto = ContactoEmpresa()
+            contacto.nombres = form.instance.nombres_contacto
+            contacto.apellidos = form.instance.apellidos_contacto
+            contacto.nro_telefonico = form.instance.nro_contacto
+            contacto.correo_electronico = form.instance.email
+            contacto.cliente = form.instance.cliente_biable
+            contacto.subempresa = form.instance.sucursal_sub_empresa
+            contacto.creado_por = self.request.user
+            contacto.correo_electronico_alternativo = None
+            contacto.nro_telefonico_alternativo = None
+            contacto.nro_telefonico_alternativo_dos = None
+            contacto.save()
+
+            form.instance.contacto = contacto
+            form.instance.contacto_nuevo = False
+
         cotizacion = form.save()
         cotizacion.nro_cotizacion = "%s - %s" % ('CB', cotizacion.id)
         cotizacion.save()

@@ -15,7 +15,7 @@ class ContactoEmpresa(TimeStampedModel):
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
     subempresa = models.CharField(max_length=100, null=True, blank=True)
-    correo_electronico = models.EmailField(null=True, blank=True)
+    correo_electronico = models.EmailField()
     correo_electronico_alternativo = models.EmailField(null=True, blank=True)
     nro_telefonico = models.CharField(max_length=120, null=True, blank=True)
     nro_telefonico_alternativo = models.CharField(max_length=120, null=True, blank=True)

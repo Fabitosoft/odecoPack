@@ -17,6 +17,9 @@
                 Empresa
             </th>
             <th>
+                Sucursal
+            </th>
+            <th>
                 Nit
             </th>
             <th>
@@ -59,10 +62,15 @@
                     <a href="{{ contacto.cliente.get_absolute_url }}">{{ contacto.cliente.nombre|title }}</a>
                 </td>
                 <td>
+                    {{ contacto.subempresa }}
+                </td>
+                <td>
                     {{ contacto.cliente.nit }}
                 </td>
                 <td>
-                    {{ contacto.cargo|title }}
+                    {% if contacto.cargo %}
+                        {{ contacto.cargo|title }}
+                    {% endif %}
                 </td>
                 <td>
                     {{ contacto.cliente.grupo.nombre|title }}
@@ -71,23 +79,29 @@
                     {{ contacto.correo_electronico }}
                 </td>
                 <td>
-                    {{ contacto.correo_electronico_alternativo }}
+                    {% if contacto.correo_electronico_alternativo %}
+                        {{ contacto.correo_electronico_alternativo }}
+                    {% endif %}
                 </td>
                 <td>
                     {{ contacto.nro_telefonico }}
                 </td>
                 <td>
-                    {{ contacto.nro_telefonico_alternativo }}
+                    {% if contacto.nro_telefonico_alternativo %}
+                        {{ contacto.nro_telefonico_alternativo }}
+                    {% endif %}
                 </td>
                 <td>
-                    {{ contacto.nro_telefonico_alternativo_dos }}
+                    {% if contacto.nro_telefonico_alternativo_dos %}
+                        {{ contacto.nro_telefonico_alternativo_dos }}
+                    {% endif %}
                 </td>
                 <td>
                     {{ contacto.creado_por }}
                 </td>
-{#                <td>#}
-{#                    <a href="{{ contacto.get_absolute_url_update }}">Editar</a>#}
-{#                </td>#}
+                {#                <td>#}
+                {#                    <a href="{{ contacto.get_absolute_url_update }}">Editar</a>#}
+                {#                </td>#}
             </tr>
         {% endfor %}
         </tbody>

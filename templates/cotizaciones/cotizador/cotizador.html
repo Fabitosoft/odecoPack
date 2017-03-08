@@ -60,11 +60,13 @@
                     </div>
                     <div class="col-md-3">
                         <h3>Cotización {{ cotizacion_actual.nro_cotizacion }}</h3>
+                        <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
                         {% crispy form %}
                     </div>
                 {% else %}
                     <div class="col-md-3 col-md-offset-3">
                         <h3>Crear Cotización</h3>
+                        <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
                         {% crispy form %}
                     </div>
                 {% endif %}
@@ -77,6 +79,10 @@
         </div>
 
     </div>
+{% endblock %}
+
+{% block jquery_version %}
+
 {% endblock %}
 
 <script>
@@ -111,6 +117,7 @@
                 dias: dias
             };
             $.get("{% url 'cotizaciones:cambiar_dias_item_cotizacion' %}", data, function (data) {
+                console.log(data)
                 if (data.error_cantidad) {
                     alert("Digitar correctamente los días de entrega para " + data.actual_item_error)
                 }
@@ -141,31 +148,54 @@
         }
 
         if (!$('#id_cliente_nuevo').is(':checked')) {
-            $("#div_id_razon_social").toggle(this.checked);
-            $("#div_id_cliente_biable").toggle(!this.checked);
+            cotizador_campos_cliente_toggle(this.checked)
         } else {
-            $("#div_id_razon_social").toggle(!this.checked);
-            $("#div_id_cliente_biable").toggle(this.checked);
+            cotizador_campos_cliente_toggle(!this.checked)
         }
+
         if (!$('#id_otra_ciudad').is(':checked')) {
-            $("#div_id_pais").toggle(this.checked);
-            $("#div_id_ciudad").toggle(this.checked);
-            $("#div_id_ciudad_despacho").toggle(!this.checked);
+            cotizador_campos_ciudad_toggle(this.checked);
         } else {
-            $("#div_id_pais").toggle(!this.checked);
-            $("#div_id_ciudad").toggle(!this.checked);
-            $("#div_id_ciudad_despacho").toggle(this.checked);
+            cotizador_campos_ciudad_toggle(!this.checked);
+        }
+
+
+        if (!$('#id_contacto_nuevo').is(':checked')) {
+            cotizador_campos_contacto_toggle(this.checked)
+        } else {
+            cotizador_campos_contacto_toggle(!this.checked)
         }
 
         $("#id_cliente_nuevo").change(function () {
-            $("#div_id_razon_social").toggle(this.checked);
-            $("#div_id_cliente_biable").toggle(!this.checked);
+            cotizador_campos_cliente_toggle(this.checked)
+        });
+
+        $("#id_contacto_nuevo").change(function () {
+            cotizador_campos_contacto_toggle(this.checked)
         });
 
         $("#id_otra_ciudad").change(function () {
-            $("#div_id_pais").toggle(this.checked);
-            $("#div_id_ciudad").toggle(this.checked);
-            $("#div_id_ciudad_despacho").toggle(!this.checked);
+            cotizador_campos_ciudad_toggle(this.checked);
         });
+
+        function cotizador_campos_contacto_toggle(bool) {
+            $("#div_id_contacto").toggle(!bool);
+            $("#div_id_nombres_contacto").toggle(bool);
+            $("#div_id_apellidos_contacto").toggle(bool);
+            $("#div_id_nro_contacto").toggle(bool);
+            $("#div_id_email").toggle(bool);
+        }
+
+        function cotizador_campos_ciudad_toggle(bool) {
+            $("#div_id_pais").toggle(bool);
+            $("#div_id_ciudad").toggle(bool);
+            $("#div_id_ciudad_despacho").toggle(!bool);
+        }
+
+        function cotizador_campos_cliente_toggle(bool) {
+            $("#div_id_razon_social").toggle(bool);
+            $("#div_id_cliente_biable").toggle(!bool);
+        }
+
     {% endblock %}
 </script>

@@ -1,9 +1,10 @@
+from dal import autocomplete
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 
-from braces.views import SelectRelatedMixin
+from braces.views import SelectRelatedMixin, LoginRequiredMixin
 
 from .models import ContactoEmpresa
 from .forms import ContactoEmpresaForm, ContactoEmpresaCreateForm, ContactoEmpresaBuscador
@@ -12,7 +13,7 @@ from biable.models import Cliente, SucursalBiable
 
 # Create your views here.
 
-class ContactosEmpresaCreateView(CreateView):
+class ContactosEmpresaCreateView(LoginRequiredMixin, CreateView):
     model = ContactoEmpresa
     template_name = 'biable/clientes/contacto_empresa_create.html'
     form_class = ContactoEmpresaCreateForm
@@ -61,7 +62,7 @@ class ContactosEmpresaUpdateView(SelectRelatedMixin, UpdateView):
         return redirect(self.object.cliente)
 
 
-class AgendaContactoListView(SelectRelatedMixin, ListView):
+class AgendaContactoListView(LoginRequiredMixin, SelectRelatedMixin, ListView):
     model = ContactoEmpresa
     context_object_name = 'contactos_list'
     template_name = 'contactos/contactos_list.html'
@@ -94,4 +95,27 @@ class AgendaContactoListView(SelectRelatedMixin, ListView):
             )
 
         qs = qs.distinct().order_by('nombres')
+        return qs
+
+
+class ContactoAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return Cliente.objects.none()
+
+        qs = ContactoEmpresa.objects.all()
+
+        cliente_id = self.forwarded.get('cliente_biable', None)
+
+        if cliente_id:
+            qs = qs.filter(cliente_id=cliente_id, retirado=False)
+            if self.q:
+                qs = qs.filter(
+                    Q(nombres__icontains=self.q) |
+                    Q(cliente__nombre__icontains=self.q) |
+                    Q(apellidos__icontains=self.q)
+                )
+        else:
+            qs = None
         return qs
