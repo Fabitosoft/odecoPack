@@ -92,7 +92,9 @@ class CotizacionAdmin(admin.ModelAdmin):
         'cliente_nuevo',
         'otra_ciudad',
         'sucursal_sub_empresa',
-        'contacto'
+        'contacto',
+        'nombres_contacto',
+        'apellidos_contacto'
     )
     readonly_fields = ('total',)
     list_editable = ('cliente_biable', 'contacto')
