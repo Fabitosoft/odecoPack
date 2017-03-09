@@ -197,5 +197,10 @@
             $("#div_id_cliente_biable").toggle(!bool);
         }
 
+        $(':input[name$=cliente_biable]').on('change', function () {
+            var prefix = $(this).getFormPrefix();
+            $(':input[name=' + prefix + 'contacto]').val(null).trigger('change');
+        });
+
     {% endblock %}
 </script>
