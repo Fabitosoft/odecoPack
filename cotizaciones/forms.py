@@ -13,8 +13,8 @@ from .models import (
     RemisionCotizacion,
     TareaCotizacion,
     ItemCotizacion,
-    ComentarioCotizacion
-)
+    ComentarioCotizacion,
+    ImagenCotizacion)
 
 from contactos.models import ContactoEmpresa
 from geografia_colombia.models import Ciudad
@@ -124,6 +124,15 @@ class ItemCotizacionOtrosForm(ModelForm):
             ),
             Submit('add_otro', 'Adicionar'),
         )
+
+class ImagenCotizacionForm(ModelForm):
+    class Meta:
+        model = ImagenCotizacion
+        fields = [
+            'cotizacion',
+            'imagen',
+            'nombre',
+        ]
 
 
 class CotizacionForm(ModelForm):

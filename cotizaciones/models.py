@@ -222,4 +222,10 @@ class ComentarioCotizacion(TimeStampedModel):
     usuario = models.ForeignKey(User, on_delete=models.PROTECT, related_name='comentarios_cotizaciones')
     cotizacion = models.ForeignKey(Cotizacion, null=True, blank=True, related_name="mis_comentarios")
 
+
+class ImagenCotizacion(TimeStampedModel):
+    cotizacion = models.ForeignKey(Cotizacion, related_name='mis_imagenes')
+    imagen = models.ImageField()
+    nombre = models.CharField(max_length=20)
+
 # endregion
