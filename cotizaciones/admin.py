@@ -117,7 +117,8 @@ class CotizacionAdmin(admin.ModelAdmin):
         'cliente_biable__nombre',
         'cliente_biable__nit',
         'contacto__nombres',
-        'contacto__apellidos'
+        'contacto__apellidos',
+        'cliente_biable__nombre'
     )
 
 

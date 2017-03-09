@@ -9,6 +9,7 @@ class ContactoEmpresaAdmin(admin.ModelAdmin):
     raw_id_fields = ('sucursal',)
     list_display = (
         'nombres',
+        'cliente',
         'subempresa',
         'apellidos',
         'correo_electronico',
@@ -17,6 +18,11 @@ class ContactoEmpresaAdmin(admin.ModelAdmin):
         'nro_telefonico_alternativo',
         'sucursal',
         'creado_por'
+    )
+    search_fields = (
+        'nombres',
+        'apellidos',
+        'cliente__nombre',
     )
 
 
