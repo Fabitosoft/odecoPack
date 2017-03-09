@@ -6,8 +6,6 @@ class CotizacionesEstadosQuerySet(models.QuerySet):
     def get_queryset(self, **kwarg):
         usuario = kwarg.get("usuario")
         qs = CotizacionesEstadosQuerySet(self.model, using=self._db)
-        if usuario:
-            qs = qs.filter(usuario=usuario)
         return qs
 
     def activo(self):

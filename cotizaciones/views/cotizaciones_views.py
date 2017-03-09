@@ -53,46 +53,36 @@ class TareaListView(SelectRelatedMixin, ListView):
     template_name = 'cotizaciones/tarea_list.html'
 
     def get_queryset(self):
-        query = self.request.GET.get("buscado")
         user = self.request.user
-
         qs = super().get_queryset()
+        qs = qs.filter(
+            esta_finalizada=False
+        ).distinct().order_by('fecha_final')
 
         full_permisos = user.has_perm('cotizaciones.full_cotizacion')
-        if full_permisos:
-            user = None
+        if not full_permisos:
+            qs = qs.filter(cotizacion__in=(Cotizacion.estados.activo().filter(usuario=user)))
 
-        if not query:
-            query = ""
-
-        qs = qs.filter(
-            Q(esta_finalizada=False) &
-            Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
-        ).distinct().order_by('fecha_final')
         return qs
 
 
 class RemisionListView(SelectRelatedMixin, ListView):
     model = RemisionCotizacion
-    select_related = ['cotizacion', 'cotizacion__usuario']
+    select_related = ['cotizacion', 'cotizacion__usuario','factura_biable']
     template_name = 'cotizaciones/remision_list.html'
 
     def get_queryset(self):
-        query = self.request.GET.get("buscado")
         user = self.request.user
         qs = super().get_queryset()
 
-        full_permisos = user.has_perm('cotizaciones.full_cotizacion')
-        if full_permisos:
-            user = None
-
-        if not query:
-            query = ""
-
         qs = qs.filter(
-            Q(entregado=False) &
-            Q(cotizacion__in=(Cotizacion.estados.activo(usuario=user)))
+            entregado=False
         ).distinct().order_by('fecha_prometida_entrega')
+
+        full_permisos = user.has_perm('cotizaciones.full_cotizacion')
+        if not full_permisos:
+            qs = qs.filter(cotizacion__in=(Cotizacion.estados.activo().filter(usuario=user)))
+
         return qs
 
 
@@ -150,8 +140,8 @@ class CotizacionesListView(UsuariosMixin, SelectRelatedMixin, ListView):
                 Q(items__banda__descripcion_comercial__icontains=query) |
                 Q(items__banda__referencia__icontains=query) |
                 Q(items__articulo_catalogo__referencia__icontains=query) |
-                Q(items__articulo_catalogo__nombre__icontains=query)|
-                Q(usuario__username__icontains=query)|
+                Q(items__articulo_catalogo__nombre__icontains=query) |
+                Q(usuario__username__icontains=query) |
                 Q(usuario__first_name=query)
             )
 
