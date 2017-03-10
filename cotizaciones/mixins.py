@@ -90,12 +90,12 @@ class EnviarCotizacionMixin(object):
                 try:
                     docfile = imagen.imagen.read()
                     if docfile:
-                        msg.attach("COSA.png", docfile)
+                        nombre_archivo = imagen.imagen.name.split("/")[-1]
+                        print(nombre_archivo)
+                        msg.attach(nombre_archivo, docfile)
                         docfile.close()
                     else:
                         pass
-                        # msg.attach_file(imagen.imagen.path)
-
                 except:
                     pass
 
