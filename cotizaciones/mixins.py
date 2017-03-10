@@ -1,3 +1,4 @@
+import os
 from io import BytesIO
 
 from django.db.models import Q
@@ -6,6 +7,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.template import Context
 from django.conf import settings
+from django.utils._os import safe_join
 from weasyprint import HTML
 
 from bandas.models import Banda
@@ -86,7 +88,11 @@ class EnviarCotizacionMixin(object):
 
         if cotizacion.mis_imagenes.exists():
             for imagen in cotizacion.mis_imagenes.all():
-                msg.attach_file(imagen.imagen.path)
+                try:
+                    msg.attach_file(imagen.imagen.path)
+                except NotImplementedError:
+                    path = safe_join(os.path.abspath(settings.MEDIA_ROOT), imagen.imagen)
+                    msg.attach_file(path=path)
 
         msg.send()
         output.close()
