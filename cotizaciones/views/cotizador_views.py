@@ -401,5 +401,4 @@ class EliminarImagenCotizacionView(SingleObjectMixin, View):
     def get(self, request, *args, **kwargs):
         imagen = self.get_object()
         imagen.delete()
-        print('entro aqui')
         return redirect('cotizaciones:cotizador')
