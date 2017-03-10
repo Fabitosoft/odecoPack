@@ -88,11 +88,8 @@ class EnviarCotizacionMixin(object):
 
         if cotizacion.mis_imagenes.exists():
             for imagen in cotizacion.mis_imagenes.all():
-                try:
-                    msg.attach_file(imagen.imagen.path)
-                except NotImplementedError:
-                    path = safe_join(os.path.abspath(settings.MEDIA_ROOT), imagen.imagen)
-                    msg.attach_file(path=path)
+                path = safe_join(os.path.abspath(settings.AWS_S3_CUSTOM_DOMAIN), imagen.imagen.url)
+                msg.attach_file(path)
 
         msg.send()
         output.close()
