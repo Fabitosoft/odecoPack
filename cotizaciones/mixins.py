@@ -88,11 +88,11 @@ class EnviarCotizacionMixin(object):
         if cotizacion.mis_imagenes:
             for imagen in cotizacion.mis_imagenes.all():
                 try:
-                    docfile = default_storage.open(imagen.path, 'r')
+                    docfile = default_storage.open(imagen.image.path, 'r')
                     if docfile:
                         msg.attach(docfile.name, docfile.read())
                     else:
-                       pass
+                        pass
                         # msg.attach_file(imagen.imagen.path)
                 except:
                     pass
