@@ -125,8 +125,7 @@ else:
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = '/static/'
-MEDIA_ROOT = '/media/'
+MEDIA_ROOT = 'media'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',

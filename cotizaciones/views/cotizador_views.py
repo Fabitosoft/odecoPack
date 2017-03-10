@@ -12,13 +12,13 @@ from django.views.generic.detail import SingleObjectMixin
 
 from braces.views import SelectRelatedMixin, LoginRequiredMixin
 
-from ..models import ItemCotizacion
+from ..models import ItemCotizacion, ImagenCotizacion
 from ..mixins import EnviarCotizacionMixin, CotizacionesActualesMixin, ListaPreciosMixin
 
 from ..forms import (
     CotizacionCrearForm,
-    CotizacionEnviarForm
-)
+    CotizacionEnviarForm,
+    ImagenCotizacionForm)
 
 from productos.models import (
     Producto
@@ -79,6 +79,11 @@ class CotizacionUpdateView(
     form_class = CotizacionEnviarForm
     context_object_name = 'cotizacion_actual'
     select_related = ['cliente_biable', ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['imagenes_form'] = ImagenCotizacionForm(initial={'cotizacion_id': self.object.id})
+        return context
 
     def form_valid(self, form):
         if not form.instance.items.exists():
@@ -374,4 +379,27 @@ class AddItemOtro(SingleObjectMixin, View):
         item.total = precio * item.cantidad
         item.save()
 
+        return redirect('cotizaciones:cotizador')
+
+
+class AddImagenCotizacionView(View):
+    def post(self, request, *args, **kwargs):
+        form = ImagenCotizacionForm(
+            self.request.POST,
+            self.request.FILES,
+            initial={'cotizacion_id': self.request.POST.get('cotizacion_id')}
+        )
+        if form.is_valid():
+            form.instance.cotizacion_id = form.cotizacion_id
+            form.save()
+        return redirect('cotizaciones:cotizador')
+
+
+class EliminarImagenCotizacionView(SingleObjectMixin, View):
+    model = ImagenCotizacion
+
+    def get(self, request, *args, **kwargs):
+        imagen = self.get_object()
+        imagen.delete()
+        print('entro aqui')
         return redirect('cotizaciones:cotizador')

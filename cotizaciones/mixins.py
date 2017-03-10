@@ -10,7 +10,7 @@ from weasyprint import HTML
 
 from bandas.models import Banda
 from seguimientos.models import SeguimientoComercialCliente
-from .models import FormaPago
+from .models import FormaPago, ImagenCotizacion
 from productos.models import (
     Producto,
     ArticuloCatalogo
@@ -83,6 +83,11 @@ class EnviarCotizacionMixin(object):
         msg.attach_alternative(html_content, "text/html")
 
         msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
+
+        if cotizacion.mis_imagenes.exists():
+            for imagen in cotizacion.mis_imagenes.all():
+                msg.attach_file(imagen.imagen.path)
+
         msg.send()
         output.close()
         cotizacion.save()

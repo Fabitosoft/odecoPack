@@ -125,14 +125,36 @@ class ItemCotizacionOtrosForm(ModelForm):
             Submit('add_otro', 'Adicionar'),
         )
 
+
 class ImagenCotizacionForm(ModelForm):
+    cotizacion_id = forms.IntegerField(widget=forms.HiddenInput)
+
     class Meta:
         model = ImagenCotizacion
         fields = [
-            'cotizacion',
             'imagen',
-            'nombre',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(ImagenCotizacionForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-otro-item'
+        self.helper.form_method = "POST"
+        self.helper.form_action = reverse('cotizaciones:add_imagen_cotizacion')
+        self.cotizacion_id = self.initial.get('cotizacion_id', None)
+
+        # self.helper.form_class = 'form-inline'
+        self.helper.layout = Layout(
+            HTML('<h3>Adjuntar Imagen</h3>'),
+            Field('cotizacion_id'),
+            Div(
+                Div(
+                    Field('imagen'),
+                    css_class='col-md-4'
+                ),
+            ),
+            Submit('add_otro', 'Adicionar'),
+        )
 
 
 class CotizacionForm(ModelForm):

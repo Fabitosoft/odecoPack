@@ -12,7 +12,9 @@ from .views import (
     CotizadorView,
     EditarCotizacion,
     CambiarPorcentajeDescuentoView,
-    CotizacionView
+    CotizacionView,
+    AddImagenCotizacionView,
+    EliminarImagenCotizacionView
 )
 
 urlpatterns = [
@@ -30,6 +32,8 @@ urlpatterns = [
     url(r'^buscar/$', CotizacionesListView.as_view(), name='buscar_cotizacion'),
     url(r'^editar_cotizacion/', EditarCotizacion.as_view(), name='editar_cotizacion'),
     url(r'^add_otro/', AddItemOtro.as_view(), name='add_item_otro_cotizacion'),
+    url(r'^add_imagen_cotizacion/', AddImagenCotizacionView.as_view(), name='add_imagen_cotizacion'),
+    url(r'^del_imagen_cotizacion/(?P<pk>[0-9]+)$', EliminarImagenCotizacionView.as_view(), name='del_imagen_cotizacion'),
     url(r'^cotizador/', CotizadorView.as_view(), name='cotizador'),
 
 ]

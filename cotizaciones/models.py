@@ -1,8 +1,11 @@
 import datetime
+import random
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
+from imagekit.models import ImageSpecField
+from pilkit.processors import ResizeToFill
 
 from bandas.models import Banda
 from model_utils.models import TimeStampedModel
@@ -223,9 +226,18 @@ class ComentarioCotizacion(TimeStampedModel):
     cotizacion = models.ForeignKey(Cotizacion, null=True, blank=True, related_name="mis_comentarios")
 
 
+def imagen_upload_to(instance, filename):
+    basename, file_extention = filename.split(".")
+    new_filename = '%s %s' % (basename, random.randint(100, 999))
+    return "img/coti/%s/%s.%s" % (instance.cotizacion.id, new_filename,file_extention)
+
+
 class ImagenCotizacion(TimeStampedModel):
     cotizacion = models.ForeignKey(Cotizacion, related_name='mis_imagenes')
-    imagen = models.ImageField()
-    nombre = models.CharField(max_length=20)
+    imagen = models.ImageField(upload_to=imagen_upload_to)
+    imagen_cotizador = ImageSpecField(source='imagen',
+                                      processors=[ResizeToFill(150, 150)],
+                                      format='JPEG',
+                                      options={'quality': 60})
 
 # endregion
