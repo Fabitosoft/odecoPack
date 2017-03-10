@@ -91,7 +91,6 @@ class EnviarCotizacionMixin(object):
                     docfile = imagen.imagen.read()
                     if docfile:
                         nombre_archivo = imagen.imagen.name.split("/")[-1]
-                        print(nombre_archivo)
                         msg.attach(nombre_archivo, docfile)
                         docfile.close()
                     else:

@@ -56,37 +56,7 @@
                                     {% crispy forma_item_otro %}
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <h3>Imagenes Adjuntas</h3>
-                                <hr>
-                                {% with imagenes=cotizacion_actual.mis_imagenes.all %}
-                                    {% if imagenes %}
-
-                                        <div>
-                                            <div class="row">
-                                                {% for imagen in imagenes %}
-                                                    <div class="col-sm-6 col-md-4">
-                                                        <div class="thumbnail"
-                                                             style="padding: 1rem; height: 210px; width: 190px">
-                                                            <img src="{{ imagen.imagen_cotizador.url }}"/>
-                                                            <div class="caption">
-                                                                <p>
-                                                                    <a href="{% url 'cotizaciones:del_imagen_cotizacion' pk=imagen.pk %}">
-                                                                        <i class="fa fa-trash fa-2x"
-                                                                           aria-hidden="true"></i>
-                                                                    </a>
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-
-                                    {% endif %}
-                                {% endwith %}
-                                {% crispy imagenes_form %}
-                            </div>
+                            {% include 'cotizaciones/cotizador/imagenes_cotizacion.html' %}
                         </div>
                     </div>
                     <div class="col-md-3">
