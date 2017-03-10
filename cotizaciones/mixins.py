@@ -90,7 +90,7 @@ class EnviarCotizacionMixin(object):
                 try:
                     docfile = default_storage.open(imagen.imagen.path, 'r')
                     if docfile:
-                        msg.attach(docfile.name, docfile.read())
+                        msg.attach("COSA.png", docfile.read())
                     else:
                         pass
                         # msg.attach_file(imagen.imagen.path)
