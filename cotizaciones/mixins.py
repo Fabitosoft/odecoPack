@@ -1,6 +1,5 @@
 from io import BytesIO
 
-from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.core.mail import get_connection
 from django.core.mail import EmailMultiAlternatives
