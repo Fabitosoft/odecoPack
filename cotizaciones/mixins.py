@@ -1,18 +1,17 @@
-import os
 from io import BytesIO
 
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.core.mail import get_connection
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.template import Context
 from django.conf import settings
-from django.utils._os import safe_join
 from weasyprint import HTML
 
 from bandas.models import Banda
 from seguimientos.models import SeguimientoComercialCliente
-from .models import FormaPago, ImagenCotizacion
+from .models import FormaPago
 from productos.models import (
     Producto,
     ArticuloCatalogo
@@ -86,9 +85,17 @@ class EnviarCotizacionMixin(object):
 
         msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')
 
-        if cotizacion.mis_imagenes.exists():
+        if cotizacion.mis_imagenes:
             for imagen in cotizacion.mis_imagenes.all():
-                msg.attach_file(imagen.imagen.url)
+                try:
+                    docfile = default_storage.open(imagen.path, 'r')
+                    if docfile:
+                        msg.attach(docfile.name, docfile.read())
+                    else:
+                       pass
+                        # msg.attach_file(imagen.imagen.path)
+                except:
+                    pass
 
         msg.send()
         output.close()
