@@ -1,0 +1,10 @@
+{% with imagenes=cotizacion.mis_imagenes.all %}
+    {% if imagenes %}
+        <h3>Imagenes Adjuntas</h3>
+        <div class="panel panel-default" style="padding: 1rem">
+            {% for imagen in imagenes %}
+                <img src="{{ imagen.imagen_cotizador.url }}"/>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
