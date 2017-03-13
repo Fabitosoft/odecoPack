@@ -3,7 +3,9 @@
         <h3>Imagenes Adjuntas</h3>
         <div class="panel panel-default" style="padding: 1rem">
             {% for imagen in imagenes %}
-                <img src="{{ imagen.imagen_cotizador.url }}"/>
+                <a href="{{ imagen.imagen.url }}" target="_blank">
+                    <img src="{{ imagen.imagen_cotizador.url }}"/>
+                </a>
             {% endfor %}
         </div>
     {% endif %}
