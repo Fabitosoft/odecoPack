@@ -91,7 +91,6 @@ class BandaAdmin(admin.ModelAdmin):
         'descripcion_estandar',
         'descripcion_comercial',
         'fabricante__nombre',
-        'tipo_por_categoria__tipo__nombre',
     ]
 
     list_select_related = (
