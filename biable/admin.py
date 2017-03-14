@@ -52,7 +52,7 @@ class ItemsBiableAdmin(ImportExportModelAdmin):
     )
     readonly_fields = (
         'id_item', 'id_referencia', 'descripcion', 'descripcion_dos', 'activo', 'nombre_tercero', 'desc_item_padre',
-        'unidad_medida_inventario', 'id_procedencia')
+        'unidad_medida_inventario', 'id_procedencia','ultimo_costo')
 
     search_fields = (
         'id_item',

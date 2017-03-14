@@ -13,6 +13,7 @@ from productos_caracteristicas.models import (
     UnidadMedida
 )
 from biable.models import ItemsBiable
+from .managers import ArticuloCatalogoActivosQuerySet
 
 
 # region Productos
@@ -220,8 +221,10 @@ class ArticuloCatalogo(models.Model):
     activo = models.BooleanField(default=True)
     origen = models.CharField(max_length=20, default='LP_INTRANET')
 
+    activos = ArticuloCatalogoActivosQuerySet.as_manager()
+
     class Meta:
-        unique_together = ('referencia', 'fabricante')
+        unique_together = ('referencia', 'fabricante', 'origen')
 
     def __str__(self):
         return self.nombre
