@@ -5,7 +5,12 @@ from django.db.models.functions import Upper
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView
 
-from braces.views import JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
+from braces.views import (
+    JSONResponseMixin,
+    AjaxResponseMixin,
+    LoginRequiredMixin,
+    PrefetchRelatedMixin
+)
 
 from biable.models import (
     MovimientoVentaBiable,
@@ -715,21 +720,24 @@ class VentasProductoAnoMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMi
         return qFinal
 
 
-class MargenesFacturaView(InformeVentasConAnoMixin,
+class MargenesFacturaView(PrefetchRelatedMixin,
+                          InformeVentasConAnoMixin,
                           InformeVentasConLineaMixin,
                           FechaActualizacionMovimientoVentasMixin,
+
                           ListView):
     queryset = FacturasBiable.activas.all()
     context_object_name = 'facturas_list'
     template_name = 'reportes/margenes/margenxfactura.html'
+    prefetch_related = ['vendedor', 'cliente']
 
     def get_queryset(self):
         linea = self.request.GET.getlist('linea')
         ano = self.request.GET.getlist('ano')
         mes = self.request.GET.getlist('mes')
         qs = super().get_queryset()
-        qs = FacturasBiable.objects.annotate(
-            margen=(F('rentabilidad') / F('venta_neto'))*100
+        qs = qs.annotate(
+            margen=(F('rentabilidad') / F('venta_neto')) * 100
         ).filter(
             fecha_documento__year__in=ano,
             fecha_documento__month__in=mes,
