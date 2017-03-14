@@ -1,4 +1,4 @@
-{% extends 'indicadores/base_indicadores_con_filtros.html' %}
+{% extends 'reportes/base_reportes_con_filtros.html' %}
 {% block title %}
     Consola Ventas
 {% endblock %}
@@ -11,10 +11,10 @@
     {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_2 %}
 
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_mes.html' with multiple=True %}
+            {% include 'reportes/components/lista_mes.html' with multiple=True %}
         </div>
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_ano.html' with anos_list=anos_list multiple=True %}
+            {% include 'reportes/components/lista_ano.html' with anos_list=anos_list multiple=True %}
         </div>
     {% else %}
         No tiene permisos suficientes para ver este informe

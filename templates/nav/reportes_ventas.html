@@ -1,0 +1,59 @@
+{% if perms.biable.reportes_ventas %}
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+           aria-expanded="false">Reportes Ventas<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            {% if perms.biable.reporte_ventas_8 %}
+                <li><a href="{% url 'reportes_ventas:ventasxmes' %}">Ventas x Mes</a></li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_1 %}
+                <li><a href="{% url 'reportes_ventas:ventasxvendedor' %}">Ventas x Vendedor</a></li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_9 %}
+                <li><a href="{% url 'reportes_ventas:ventasxvendedorxmes' %}">Ventas x Vendedor x
+                    Mes</a>
+                </li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_3 %}
+                <li><a href="{% url 'reportes_ventas:ventasxcliente' %}">Ventas x Cliente</a></li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_4 %}
+                <li><a href="{% url 'reportes_ventas:ventasxclientexano' %}">Ventas x Cliente x Año</a>
+                </li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_5 %}
+                <li><a href="{% url 'reportes_ventas:ventasxclientexmes' %}">Ventas x Cliente x Mes</a>
+                </li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_6 %}
+                <li><a href="{% url 'reportes_ventas:ventasxlineaxano' %}">Ventas x Linea x Año</a></li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_7 %}
+                <li><a href="{% url 'reportes_ventas:ventasxlineaxanoxmes' %}">Ventas x Linea x Año x
+                    Mes</a></li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_2 %}
+                <li><a href="{% url 'reportes_ventas:consolaventas' %}">Consola de Ventas</a></li>
+            {% endif %}
+
+            {% if perms.biable.reporte_ventas_10 %}
+                <li><a href="{% url 'reportes_ventas:ventasxproductoxanoxmes' %}">Ventas x Producto x
+                    Año x
+                    Mes</a></li>
+            {% endif %}
+
+            {% if perms.biable.ver_carteras_todos or perms.biable.ver_carteras %}
+                <li><a href="{% url 'reportes_ventas:cartera_vencimientos' %}">Cartera Vencimientos</a>
+                </li>
+                <li><a href="{% url 'reportes_ventas:margen_factura' %}">Margen x Factura</a>
+                </li>
+            {% endif %}
+            {% if perms.biable.reporte_ventas_todos_vendedores %}
+                <li><a href="{% url 'reportes_ventas:cotizacion_venta_vendedorxanoxmes' %}">Cotizaciones
+                    vs
+                    Ventas</a></li>
+            {% endif %}
+
+        </ul>
+    </li>
+{% endif %}

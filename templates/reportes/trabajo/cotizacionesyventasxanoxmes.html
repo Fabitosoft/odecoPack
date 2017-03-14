@@ -1,23 +1,20 @@
-{% extends 'indicadores/base_indicadores_con_filtros.html' %}
+{% extends 'reportes/base_reportes_con_filtros.html' %}
 
 {% block title %}
-    Vent x Cli
+    Vent x Vend
 {% endblock %}
 
 {% block titulo_indicador %}
-    Ventas por Cliente
+    Ventas por Vendedor
 {% endblock %}
 
 {% block filtros %}
     {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_3 %}
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_lineas.html' with lineas=lineas_list %}
+            {% include 'reportes/components/lista_mes.html' with multiple=True %}
         </div>
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_mes.html' with multiple=True %}
-        </div>
-        <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_ano.html' with anos_list=anos_list multiple=True %}
+            {% include 'reportes/components/lista_ano.html' with anos_list=anos_list multiple=True %}
         </div>
     {% else %}
         No tiene permisos suficientes para ver este informe
@@ -28,8 +25,6 @@
     <div id="tabla_pv"></div>
 {% endblock %}
 
-
-
 <script>
     {% block script %}
         $('#form_consulta').submit(function (e) {
@@ -37,7 +32,6 @@
             var target = e.target;
             var opciones_mes = target['mes'].selectedOptions;
             var opciones_ano = target['ano'].selectedOptions;
-            var opciones_linea = target['linea'].value;
 
             var meses = $.map(opciones_mes, function (val, i) {
                 return parseInt(val.value)
@@ -45,17 +39,16 @@
             var anos = $.map(opciones_ano, function (val, i) {
                 return parseInt(val.value)
             });
-            evento(anos, meses, opciones_linea)
+            evento(anos, meses)
         });
 
-        function evento(anos, meses, linea) {
+        function evento(anos, meses) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
                 'anos': anos,
-                'meses': meses,
-                'linea': linea
+                'meses': meses
             };
             $.post(".", data, function (data) {
                 $('#hora_actualizacion').text("(" + data.fecha_actualizacion + ")");
@@ -80,10 +73,14 @@
                         collapsed: true
                     },
                     fields: [
-                        {name: 'cliente__nombre', caption: 'Cliente'},
-                        {name: 'tipo', caption: 'Tipo'},
+                        {name: 'vendedor', caption: 'Vendedor'},
+                        {name: 'mes_consulta', caption: 'Mes'},
+                        {name: 'ano_consulta', caption: 'Año'},
+                        {name: 'dia_consulta', caption: 'Día'},
+                        {name: 'hora_consulta', caption: 'Hora'},
+                        {name: 'dia_semana_consulta', caption: 'Dia Semana'},
                         {
-                            name: 'v_bruta', caption: 'Valor Bruto',
+                            name: 'descuentos_cotizaciones', caption: 'Descuentos',
                             dataSettings: {
                                 aggregateFunc: 'sum',
                                 formatFunc: function (value) {
@@ -92,7 +89,7 @@
                             }
                         },
                         {
-                            name: 'Costo', caption: 'Costo',
+                            name: 'facturacion', caption: 'Total Facturacion',
                             dataSettings: {
                                 aggregateFunc: 'sum',
                                 formatFunc: function (value) {
@@ -101,7 +98,7 @@
                             }
                         },
                         {
-                            name: 'v_neto', caption: 'Valor Neto',
+                            name: 'total_cotizaciones', caption: 'Total Cotizaciones',
                             dataSettings: {
                                 aggregateFunc: 'sum',
                                 formatFunc: function (value) {
@@ -110,36 +107,27 @@
                             }
                         },
                         {
-                            name: 'renta', caption: 'Rentabilidad',
+                            name: 'nro_cotizaciones', caption: 'Nro Cotizaciones',
                             dataSettings: {
                                 aggregateFunc: 'sum',
                                 formatFunc: function (value) {
-                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                    return value;
                                 }
                             }
                         },
                         {
-                            name: 'Descuentos', caption: 'Descuentos',
+                            name: 'nro_ventas', caption: 'Nro Ventas',
                             dataSettings: {
                                 aggregateFunc: 'sum',
                                 formatFunc: function (value) {
-                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
-                                }
-                            }
-                        },
-                        {
-                            name: 'Margen', caption: 'Margen',
-                            dataSettings: {
-                                aggregateFunc: 'sum',
-                                formatFunc: function (value) {
-                                    return value ? Number(value).formatMoney(2, ',', '.') + '%' : '';
+                                    return value;
                                 }
                             }
                         }
                     ],
-                    rows: ['tipo', 'cliente__nombre'],
-                    columns: [],
-                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
+                    rows: ['vendedor', 'ano_consulta', 'dia_consulta'],
+                    columns: ['mes_consulta'],
+                    data: ['total_cotizaciones', 'nro_cotizaciones', 'facturacion', 'nro_ventas']
                 };
 
                 // instantiate and show the pivot grid

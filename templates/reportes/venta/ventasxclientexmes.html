@@ -1,20 +1,22 @@
-{% extends 'indicadores/base_indicadores_con_filtros.html' %}
+{% extends 'reportes/base_reportes_con_filtros.html' %}
 
 {% block title %}
-    Vent x Lin x Año x Mes
+    Vent x Cli x Mes
 {% endblock %}
 
 {% block titulo_indicador %}
-    Ventas por Linea por Año por Mes
+    Ventas por Cliente por Mes
 {% endblock %}
+
 
 {% block filtros %}
     {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_3 %}
+
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_lineas.html' with lineas=lineas_list %}
+            {% include 'reportes/components/lista_lineas.html' with lineas=lineas_list %}
         </div>
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_ano.html' with anos_list=anos_list multiple=True %}
+            {% include 'reportes/components/lista_ano.html' with anos_list=anos_list multiple=False %}
         </div>
     {% else %}
         No tiene permisos suficientes para ver este informe
@@ -30,21 +32,18 @@
         $('#form_consulta').submit(function (e) {
             e.preventDefault()
             var target = e.target;
-            var opciones_ano = target['ano'].selectedOptions
+            var opciones_ano = target['ano'].value
             var opciones_linea = target['linea'].value
 
-            var anos = $.map(opciones_ano, function (val, i) {
-                return parseInt(val.value)
-            });
-            evento(anos, opciones_linea)
+            evento(opciones_ano, opciones_linea)
         })
 
-        function evento(anos, linea) {
+        function evento(ano, linea) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
-                'anos': anos,
+                'ano': ano,
                 'linea': linea
             };
             $.post(".", data, function (data) {
@@ -69,12 +68,10 @@
                         visible: true,
                         collapsed: true
                     },
-                    rowSettings: {
-                        sort: {order: 'desc'}
-                    },
                     fields: [
-                        {name: 'year', caption: 'Año'},
+                        {name: 'tipo', caption: 'Tipo'},
                         {name: 'month', caption: 'Mes'},
+                        {name: 'cliente__nombre', caption: 'Cliente'},
                         {
                             name: 'v_bruta', caption: 'Valor Bruto',
                             dataSettings: {
@@ -130,7 +127,7 @@
                             }
                         }
                     ],
-                    rows: ['year'],
+                    rows: ['tipo','cliente__nombre'],
                     columns: ['month'],
                     data: ['v_neto']
                 };

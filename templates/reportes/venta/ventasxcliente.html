@@ -1,20 +1,23 @@
-{% extends 'indicadores/base_indicadores_con_filtros.html' %}
+{% extends 'reportes/base_reportes_con_filtros.html' %}
 
 {% block title %}
-    Vent x Prod x Año x Mes
+    Vent x Cli
 {% endblock %}
 
 {% block titulo_indicador %}
-    Ventas por Producto por Año por Mes
+    Ventas por Cliente
 {% endblock %}
 
 {% block filtros %}
     {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_3 %}
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_mes.html' with multiple=True %}
+            {% include 'reportes/components/lista_lineas.html' with lineas=lineas_list %}
         </div>
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_ano.html' with anos_list=anos_list multiple=True %}
+            {% include 'reportes/components/lista_mes.html' with multiple=True %}
+        </div>
+        <div class="col-sx-12 col-sm-4 col-md-3">
+            {% include 'reportes/components/lista_ano.html' with anos_list=anos_list multiple=True %}
         </div>
     {% else %}
         No tiene permisos suficientes para ver este informe
@@ -25,6 +28,8 @@
     <div id="tabla_pv"></div>
 {% endblock %}
 
+
+
 <script>
     {% block script %}
         $('#form_consulta').submit(function (e) {
@@ -32,6 +37,7 @@
             var target = e.target;
             var opciones_mes = target['mes'].selectedOptions;
             var opciones_ano = target['ano'].selectedOptions;
+            var opciones_linea = target['linea'].value;
 
             var meses = $.map(opciones_mes, function (val, i) {
                 return parseInt(val.value)
@@ -39,16 +45,17 @@
             var anos = $.map(opciones_ano, function (val, i) {
                 return parseInt(val.value)
             });
-            evento(anos, meses)
+            evento(anos, meses, opciones_linea)
         });
 
-        function evento(anos, meses) {
+        function evento(anos, meses, linea) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
                 'anos': anos,
-                'meses': meses
+                'meses': meses,
+                'linea': linea
             };
             $.post(".", data, function (data) {
                 $('#hora_actualizacion').text("(" + data.fecha_actualizacion + ")");
@@ -73,20 +80,10 @@
                         collapsed: true
                     },
                     fields: [
-                        {name: 'item_biable__descripcion', caption: 'Descripción'},
-                        {name: 'item_biable__descripcion_dos', caption: 'Descripción 2'},
-                        {name: 'item_biable__categoria_mercadeo', caption: 'Categoría'},
-                        {name: 'item_biable__categoria_mercadeo_tres', caption: 'Categoría 3'},
-                        {name: 'item_biable__categoria_mercadeo_dos', caption: 'Categoría 2'},
-                        {name: 'factura__vendedor__linea_ventas__nombre', caption: 'Línea'},
-                        {name: 'factura__cliente__nombre', caption: 'Cliente'},
-                        {name: 'item_biable__serie', caption: 'Serie'},
-                        {name: 'item_biable__id_item', caption: 'Item Id'},
-                        {name: 'year', caption: 'Año'},
-                        {name: 'month', caption: 'Mes'},
-                        {name: 'vendedor', caption: 'Vendedor'},
+                        {name: 'cliente__nombre', caption: 'Cliente'},
+                        {name: 'tipo', caption: 'Tipo'},
                         {
-                            name: 'venta_neta', caption: 'Facturación',
+                            name: 'v_bruta', caption: 'Valor Bruto',
                             dataSettings: {
                                 aggregateFunc: 'sum',
                                 formatFunc: function (value) {
@@ -95,18 +92,54 @@
                             }
                         },
                         {
-                            name: 'cantidad_neta', caption: 'Cantidad',
+                            name: 'Costo', caption: 'Costo',
                             dataSettings: {
                                 aggregateFunc: 'sum',
                                 formatFunc: function (value) {
-                                    return value;
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
                                 }
                             }
                         },
+                        {
+                            name: 'v_neto', caption: 'Valor Neto',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'renta', caption: 'Rentabilidad',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'Descuentos', caption: 'Descuentos',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? '$' + Number(value).formatMoney(0, ',', '.') : '';
+                                }
+                            }
+                        },
+                        {
+                            name: 'Margen', caption: 'Margen',
+                            dataSettings: {
+                                aggregateFunc: 'sum',
+                                formatFunc: function (value) {
+                                    return value ? Number(value).formatMoney(2, ',', '.') + '%' : '';
+                                }
+                            }
+                        }
                     ],
-                    rows: ['vendedor'],
+                    rows: ['tipo', 'cliente__nombre'],
                     columns: [],
-                    data: []
+                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
                 };
 
                 // instantiate and show the pivot grid

@@ -1,23 +1,20 @@
-{% extends 'indicadores/base_indicadores_con_filtros.html' %}
+{% extends 'reportes/base_reportes_con_filtros.html' %}
 
 {% block title %}
-    Vent x Cli x Año
+    Vent x Mes
 {% endblock %}
 
 {% block titulo_indicador %}
-    Ventas por Cliente por Año
+    Ventas por Mes
 {% endblock %}
 
 {% block filtros %}
     {% if perms.biable.reportes_ventas and perms.biable.reporte_ventas_3 %}
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_lineas.html' with lineas=lineas_list %}
+            {% include 'reportes/components/lista_lineas.html' with lineas=lineas_list %}
         </div>
         <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_mes.html' with multiple=True %}
-        </div>
-        <div class="col-sx-12 col-sm-4 col-md-3">
-            {% include 'indicadores/components/lista_ano.html' with anos_list=anos_list multiple=True %}
+            {% include 'reportes/components/lista_ano.html' with anos_list=anos_list %}
         </div>
     {% else %}
         No tiene permisos suficientes para ver este informe
@@ -31,59 +28,45 @@
 <script>
     {% block script %}
         $('#form_consulta').submit(function (e) {
-            e.preventDefault()
+            e.preventDefault();
             var target = e.target;
-            var opciones_mes = target['mes'].selectedOptions
-            var opciones_ano = target['ano'].selectedOptions
-            var opciones_linea = target['linea'].value
+            var opciones_ano = target['ano'].value;
+            var opciones_linea = target['linea'].value;
+            evento(opciones_ano, opciones_linea)
+        });
 
-            var meses = $.map(opciones_mes, function (val, i) {
-                return parseInt(val.value)
-            });
-            var anos = $.map(opciones_ano, function (val, i) {
-                return parseInt(val.value)
-            });
-            evento(anos, meses, opciones_linea)
-        })
-
-        function evento(anos, meses, linea) {
+        function evento(ano, linea) {
             $.ajaxSetup({
                 headers: {"X-CSRFToken": getCookie("csrftoken")}
             });
             var data = {
-                'anos': anos,
-                'meses': meses,
+                'ano': ano,
                 'linea': linea
             };
             $.post(".", data, function (data) {
-                $('#hora_actualizacion').text("("+data.fecha_actualizacion+")");
+               $('#hora_actualizacion').text("("+data.fecha_actualizacion+")");
 
                 // pivot grid options
-                $('#tabla_pv').empty()
-                $('#tabla_pv').append('<div id =\'pgrid\'></div>')
+                $('#tabla_pv').empty();
+                $('#tabla_pv').append('<div id =\'pgrid\'></div>');
                 var config = {
                     dataSource: data.lista,
-                    dataHeadersLocation: 'columns',
+                    dataHeadersLocation: 'rows',
                     canMoveFields: true,
                     theme: 'orange',
                     toolbar: {
                         visible: true
                     },
                     grandTotal: {
-                        rowsvisible: true,
+                        rowsvisible: false,
                         columnsvisible: true
                     },
                     subTotal: {
                         visible: true,
                         collapsed: true
                     },
-                    columnSettings: {
-                        sort: {order: 'asc'}
-                    },
                     fields: [
-                        {name: 'cliente__nombre', caption: 'Cliente'},
-                        {name: 'year', caption: 'Año'},
-                        {name: 'tipo', caption: 'Tipo'},
+                        {name: 'mes', caption: 'Mes'},
                         {
                             name: 'v_bruta', caption: 'Valor Bruto',
                             dataSettings: {
@@ -139,9 +122,9 @@
                             }
                         }
                     ],
-                    rows: ['tipo','cliente__nombre'],
-                    columns: ['year'],
-                    data: ['v_neto']
+                    rows: [],
+                    columns: ['mes'],
+                    data: ['v_bruta', 'Descuentos', 'v_neto', 'Costo', 'renta', 'Margen']
                 };
 
                 // instantiate and show the pivot grid
