@@ -15,7 +15,7 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
         'margen__categoria',
         'margen__proveedor__moneda',
         'fabricante',
-        'cg_uno'
+        'cg_uno',
     )
 
     list_filter = (

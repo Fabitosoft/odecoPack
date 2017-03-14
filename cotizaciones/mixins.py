@@ -158,12 +158,10 @@ class ListaPreciosMixin(object):
                 Q(descripcion_comercial__icontains=query)
             ).distinct().order_by('-modified')
 
-            qs_articulos_catalogo = ArticuloCatalogo.activos.filter(
-                (
-                    Q(referencia__icontains=query) |
-                    Q(nombre__icontains=query) |
-                    Q(categoria__icontains=query)
-                )
+            qs_articulos_catalogo = ArticuloCatalogo.activos.todos().filter(
+                Q(referencia__icontains=query) |
+                Q(nombre__icontains=query) |
+                Q(categoria__icontains=query)
             ).distinct()
 
             context['object_list_componentes'] = qs_componentes
