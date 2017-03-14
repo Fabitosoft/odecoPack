@@ -742,5 +742,37 @@ class MargenesFacturaView(PrefetchRelatedMixin,
             fecha_documento__year__in=ano,
             fecha_documento__month__in=mes,
             vendedor__linea_ventas_id__in=linea
-        ).order_by('-margen')
+        ).order_by('margen')
+        return qs
+
+
+class MargenesItemView(PrefetchRelatedMixin,
+                       InformeVentasConAnoMixin,
+                       InformeVentasConLineaMixin,
+                       FechaActualizacionMovimientoVentasMixin,
+
+                       ListView):
+    queryset = MovimientoVentaBiable.objects.all()
+    context_object_name = 'movimientos_list'
+    template_name = 'reportes/margenes/margenxitem.html'
+    prefetch_related = [
+        'factura',
+        'factura__vendedor',
+        'factura__cliente',
+        'item_biable'
+    ]
+
+    def get_queryset(self):
+        linea = self.request.GET.getlist('linea')
+        ano = self.request.GET.getlist('ano')
+        mes = self.request.GET.getlist('mes')
+        qs = super().get_queryset()
+        qs = qs.annotate(
+            margen=(F('rentabilidad') / F('venta_neto')) * 100
+        ).filter(
+            factura__fecha_documento__year__in=ano,
+            factura__fecha_documento__month__in=mes,
+            factura__vendedor__linea_ventas_id__in=linea,
+            factura__activa=True
+        ).order_by('margen')
         return qs

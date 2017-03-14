@@ -13,7 +13,8 @@ from .views import (
     CarteraVencimientos,
     TrabajoCotizacionVentaVendedorAnoMes,
     VentasProductoAnoMes,
-    MargenesFacturaView
+    MargenesFacturaView,
+    MargenesItemView
 )
 
 urlpatterns = [
@@ -29,6 +30,7 @@ urlpatterns = [
     url(r'^consola_ventas/', VentasVendedorConsola.as_view(), name='consolaventas'),
     url(r'^cartera_vencimientos/', CarteraVencimientos.as_view(), name='cartera_vencimientos'),
     url(r'^margen_factura/', MargenesFacturaView.as_view(), name='margen_factura'),
+    url(r'^margen_item/', MargenesItemView.as_view(), name='margen_item'),
     url(r'^cotizacion_venta_vendedorxanoxmes/', TrabajoCotizacionVentaVendedorAnoMes.as_view(),
         name='cotizacion_venta_vendedorxanoxmes'),
 ]

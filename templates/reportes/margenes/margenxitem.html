@@ -1,11 +1,11 @@
 {% extends 'reportes/base_reportes_con_filtros.html' %}
 
 {% block title %}
-    Mrg x Factura
+    Mrg x Item
 {% endblock %}
 
 {% block titulo_indicador %}
-    Margen x Factura
+    Margen x Item
 {% endblock %}
 
 {% block filtros %}
@@ -25,13 +25,16 @@
 {% endblock %}
 
 {% block resultado %}
-    {% with facturas=facturas_list.all %}
-        {% if facturas %}
+    {% with movimientos=movimientos_list.all %}
+        {% if movimientos %}
             <table class="table table-bordered table-striped">
                 <thead>
                 <tr>
                     <th>
                         Factura
+                    </th>
+                    <th>
+                        Item
                     </th>
                     <th>
                         Cliente
@@ -54,32 +57,35 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for factura in facturas %}
+                {% for movimiento in movimientos %}
                     <tr>
                         <td>
-                            <a href="{{ factura.get_absolute_url }}">
-                                {{ factura.tipo_documento }}-{{ factura.nro_documento }}
+                            <a href="{{ movimiento.factura.get_absolute_url }}">
+                                {{ movimiento.factura.tipo_documento }}-{{ movimiento.factura.nro_documento }}
                             </a>
                         </td>
                         <td>
-                            <a href="{{ factura.cliente.get_absolute_url }}">
-                                {{ factura.cliente.nombre }}
+                            {{ movimiento.item_biable.descripcion }}
+                        </td>
+                        <td>
+                            <a href="{{ movimiento.factura.cliente.get_absolute_url }}">
+                                {{ movimiento.factura.cliente.nombre }}
                             </a>
                         </td>
                         <td>
-                            {{ factura.vendedor.nombre }}
+                            {{ movimiento.factura.vendedor.nombre }}
                         </td>
                         <td>
-                            {{ factura.venta_neto|floatformat }}
+                            {{ movimiento.venta_neto|floatformat }}
                         </td>
                         <td>
-                            {{ factura.costo_total|floatformat }}
+                            {{ movimiento.costo_total|floatformat }}
                         </td>
                         <td>
-                            {{ factura.rentabilidad|floatformat }}
+                            {{ movimiento.rentabilidad|floatformat }}
                         </td>
                         <td>
-                            {{ factura.margen|floatformat }}%
+                            {{ movimiento.margen|floatformat }}%
                         </td>
                     </tr>
                 {% empty %}

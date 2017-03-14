@@ -14,6 +14,7 @@
                     Mes</a>
                 </li>
             {% endif %}
+            <li class="divider"></li>
             {% if perms.biable.reporte_ventas_3 %}
                 <li><a href="{% url 'reportes_ventas:ventasxcliente' %}">Ventas x Cliente</a></li>
             {% endif %}
@@ -25,6 +26,7 @@
                 <li><a href="{% url 'reportes_ventas:ventasxclientexmes' %}">Ventas x Cliente x Mes</a>
                 </li>
             {% endif %}
+            <li class="divider"></li>
             {% if perms.biable.reporte_ventas_6 %}
                 <li><a href="{% url 'reportes_ventas:ventasxlineaxano' %}">Ventas x Linea x Año</a></li>
             {% endif %}
@@ -32,6 +34,15 @@
                 <li><a href="{% url 'reportes_ventas:ventasxlineaxanoxmes' %}">Ventas x Linea x Año x
                     Mes</a></li>
             {% endif %}
+            <li class="divider"></li>
+
+            {% if perms.biable.ver_info_admon_ventas %}
+                <li><a href="{% url 'reportes_ventas:margen_factura' %}">Margen x Factura</a></li>
+                <li><a href="{% url 'reportes_ventas:margen_item' %}">Margen x Item</a></li>
+            {% endif %}
+
+            <li class="divider"></li>
+
             {% if perms.biable.reporte_ventas_2 %}
                 <li><a href="{% url 'reportes_ventas:consolaventas' %}">Consola de Ventas</a></li>
             {% endif %}
@@ -43,17 +54,13 @@
             {% endif %}
 
             {% if perms.biable.ver_carteras_todos or perms.biable.ver_carteras %}
-                <li><a href="{% url 'reportes_ventas:cartera_vencimientos' %}">Cartera Vencimientos</a>
-                </li>
-                <li><a href="{% url 'reportes_ventas:margen_factura' %}">Margen x Factura</a>
-                </li>
+                <li><a href="{% url 'reportes_ventas:cartera_vencimientos' %}">Cartera Vencimientos</a></li>
             {% endif %}
             {% if perms.biable.reporte_ventas_todos_vendedores %}
                 <li><a href="{% url 'reportes_ventas:cotizacion_venta_vendedorxanoxmes' %}">Cotizaciones
                     vs
                     Ventas</a></li>
             {% endif %}
-
         </ul>
     </li>
 {% endif %}
