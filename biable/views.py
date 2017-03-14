@@ -76,7 +76,6 @@ class ClienteDetailView(
     ]
 
     def get_context_data(self, **kwargs):
-        print('entro get context data')
         usuario = self.request.user
         context = super().get_context_data(**kwargs)
         qs = self.object.mis_contactos.filter(sucursal__isnull=True).all()
@@ -96,7 +95,6 @@ class ClienteDetailView(
         if query:
             self.buscar_historia_precios(context, query)
 
-
         qs_sc = SeguimientoComercialCliente.objects.select_related(
             'cliente',
             'creado_por',
@@ -114,7 +112,7 @@ class ClienteDetailView(
             'seguimiento_cotizacion__tarea__cotizacion',
             'contacto',
         ).filter(cliente=self.object).order_by('-created')[:150]
-        context['mi_gestion_comercial']=qs_sc
+        context['mi_gestion_comercial'] = qs_sc
 
         return context
 

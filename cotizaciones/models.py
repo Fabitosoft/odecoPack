@@ -166,8 +166,9 @@ class ItemCotizacion(TimeStampedModel):
 
     def get_margen_rentabilidad_actual(self):
         margen = 0
-        if self.total != 0:
-            round((self.get_rentabilidad_actual_total() * 100) / self.total, 2)
+        if not self.p_n_lista_descripcion:
+            if self.total != 0:
+                return round((self.get_rentabilidad_actual_total() * 100) / self.total, 2)
         return margen
 
     def get_tiempo_entrega_prometido(self):
