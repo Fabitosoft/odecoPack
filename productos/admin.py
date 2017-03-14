@@ -7,6 +7,7 @@ from productos.models import (
     ArticuloCatalogo
 )
 
+
 class ArticuloCatalogoAdmin(ImportExportModelAdmin):
     list_select_related = (
         'margen',
@@ -44,8 +45,8 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
         'activo',
     )
 
-    list_editable = ['activo','margen','costo','unidad_medida','cg_uno']
-    raw_id_fields = ('margen','cg_uno')
+    list_editable = ['activo', 'margen', 'costo', 'unidad_medida', 'cg_uno']
+    raw_id_fields = ('margen', 'cg_uno')
     readonly_fields = ("get_precio_base", "get_costo_cop", "get_rentabilidad")
 
     def get_margen(self, obj):
@@ -90,17 +91,29 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
 
     def get_costo_cop(self, obj):
         return obj.get_costo_cop()
+
     get_costo_cop.short_description = 'Costo Cop'
 
     def get_precio_base(self, obj):
         return obj.get_precio_base()
+
     get_precio_base.short_description = 'Precio Base'
 
     def get_rentabilidad(self, obj):
         return obj.get_rentabilidad()
+
     get_rentabilidad.short_description = 'Rentabilidad'
 
-admin.site.register(ArticuloCatalogo,ArticuloCatalogoAdmin)
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            qs = super().get_queryset(request)
+        else:
+            qs = ArticuloCatalogo.activos.lista_precios()
+        return qs
+
+
+admin.site.register(ArticuloCatalogo, ArticuloCatalogoAdmin)
+
 
 # region Productos
 
@@ -238,8 +251,8 @@ class ProductoAdmin(ImportExportModelAdmin):
         'activo_catalogo', 'serie')
 
     list_editable = ['activo', 'activo_ensamble', 'activo_proyectos', 'activo_componentes', 'activo_catalogo', 'margen',
-                     'costo','cg_uno']
-    raw_id_fields = ('margen','cg_uno')
+                     'costo', 'cg_uno']
+    raw_id_fields = ('margen', 'cg_uno')
     readonly_fields = ("precio_base", "costo_cop", "rentabilidad")
 
     def get_margen(self, obj):
@@ -276,14 +289,17 @@ class ProductoAdmin(ImportExportModelAdmin):
 
     def get_costo_cop(self, obj):
         return obj.get_costo_cop()
+
     get_costo_cop.short_description = 'Costo Cop'
 
     def get_precio_base(self, obj):
         return obj.get_precio_base()
+
     get_precio_base.short_description = 'Precio Base'
 
     def get_rentabilidad(self, obj):
         return obj.get_rentabilidad()
+
     get_rentabilidad.short_description = 'Rentabilidad'
 
     def save_model(self, request, obj, form, change):
