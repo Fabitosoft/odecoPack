@@ -5,7 +5,7 @@ from django.db.models import Q
 class ArticuloCatalogoActivosQuerySet(models.QuerySet):
     def get_queryset(self, **kwarg):
         qs = ArticuloCatalogoActivosQuerySet(self.model, using=self._db).filter(
-            Q(cg_uno__activo=True),
+            Q(cg_uno__activo=True) &
             Q(activo=True)
         )
         return qs
