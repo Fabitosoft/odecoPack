@@ -214,7 +214,7 @@ class ArticuloCatalogo(models.Model):
     categoria = models.CharField(max_length=100, null=True, blank=True)
     costo = models.DecimalField(max_digits=18, decimal_places=4, default=0)
     fabricante = models.ForeignKey(FabricanteProducto, verbose_name='fabricante', related_name='mis_articulos_catalogo',
-                                   on_delete=models.PROTECT)
+                                   on_delete=models.PROTECT, null=True, blank=True)
     margen = models.ForeignKey(MargenProvedor, null=True, blank=True, related_name="articulos_catalogo_con_margen",
                                verbose_name="Id MxC")
 
