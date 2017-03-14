@@ -105,10 +105,9 @@ class ArticuloCatalogoAdmin(ImportExportModelAdmin):
     get_rentabilidad.short_description = 'Rentabilidad'
 
     def get_queryset(self, request):
-        if request.user.is_superuser:
-            qs = super().get_queryset(request)
-        else:
-            qs = ArticuloCatalogo.activos.lista_precios()
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.filter(origen='LP_INTRANET')
         return qs
 
 
