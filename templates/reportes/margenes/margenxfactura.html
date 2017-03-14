@@ -37,6 +37,9 @@
                         Cliente
                     </th>
                     <th>
+                        Fecha
+                    </th>
+                    <th>
                         Vendedor
                     </th>
                     <th>
@@ -65,6 +68,9 @@
                             <a href="{{ factura.cliente.get_absolute_url }}">
                                 {{ factura.cliente.nombre }}
                             </a>
+                        </td>
+                        <td>
+                            {{ factura.fecha_documento }}
                         </td>
                         <td>
                             {{ factura.vendedor.nombre }}

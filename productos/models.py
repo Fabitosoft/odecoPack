@@ -60,7 +60,8 @@ class Producto(TimeStampedModel):
         if filesize > megabyte_limit * 1024 * 1024:
             raise ValidationError("Max file size is %sMB" % str(megabyte_limit))
 
-    cg_uno = models.ForeignKey(ItemsBiable, null=True, blank=True, related_name='mis_componentes_bandas', verbose_name='producto cguno')
+    cg_uno = models.ForeignKey(ItemsBiable, null=True, blank=True, related_name='mis_componentes_bandas',
+                               verbose_name='producto cguno')
     referencia = models.CharField(max_length=120, unique=True)
     descripcion_estandar = models.CharField(max_length=200, default='AUTOMATICO')
     descripcion_comercial = models.CharField(max_length=200, default='AUTOMATICO')
@@ -215,7 +216,9 @@ class ArticuloCatalogo(models.Model):
                                    on_delete=models.PROTECT)
     margen = models.ForeignKey(MargenProvedor, null=True, blank=True, related_name="articulos_catalogo_con_margen",
                                verbose_name="Id MxC")
+
     activo = models.BooleanField(default=True)
+    origen = models.CharField(max_length=20, default='LP_INTRANET')
 
     class Meta:
         unique_together = ('referencia', 'fabricante')

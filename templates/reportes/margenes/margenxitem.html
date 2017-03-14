@@ -40,6 +40,9 @@
                         Cliente
                     </th>
                     <th>
+                        Fecha
+                    </th>
+                    <th>
                         Vendedor
                     </th>
                     <th>
@@ -71,6 +74,9 @@
                             <a href="{{ movimiento.factura.cliente.get_absolute_url }}">
                                 {{ movimiento.factura.cliente.nombre }}
                             </a>
+                        </td>
+                        <td>
+                            {{ movimiento.factura.fecha_documento }}
                         </td>
                         <td>
                             {{ movimiento.factura.vendedor.nombre }}
