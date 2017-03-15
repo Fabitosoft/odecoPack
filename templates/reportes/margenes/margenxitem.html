@@ -37,6 +37,9 @@
                         Item
                     </th>
                     <th>
+                        Procedencia
+                    </th>
+                    <th>
                         Cliente
                     </th>
                     <th>
@@ -69,6 +72,9 @@
                         </td>
                         <td>
                             {{ movimiento.item_biable.descripcion }}
+                        </td>
+                        <td>
+                            {{ movimiento.item_biable.id_procedencia }}
                         </td>
                         <td>
                             <a href="{{ movimiento.factura.cliente.get_absolute_url }}">

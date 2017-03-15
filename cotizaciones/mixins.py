@@ -1,8 +1,7 @@
 from io import BytesIO
 
 from django.db.models import Q
-from django.core.mail import get_connection
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.template import Context
 from django.conf import settings
