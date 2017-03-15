@@ -41,6 +41,7 @@ class ItemsBiableAdmin(ImportExportModelAdmin):
         'categoria_mercadeo_dos',
         'categoria_mercadeo_tres',
         'serie',
+        'ultimo_costo',
     )
     resource_class = ItemResource
     list_editable = (
