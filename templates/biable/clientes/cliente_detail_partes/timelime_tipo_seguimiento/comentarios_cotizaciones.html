@@ -7,6 +7,8 @@
     <br>
     <small>{{ seguimiento.created }} | Hace {{ seguimiento.created|timesince }}</small>
     {{ seguimiento.observacion_adicional|safe }}
+    Valor: {{ seguimiento.comentario_cotizacion.cotizacion.total|floatformat }}
+    <br>
     Ver cotizacion: <a
         href="{{ seguimiento.comentario_cotizacion.cotizacion.get_absolute_url }}">{{ seguimiento.comentario_cotizacion.cotizacion.nro_cotizacion }}</a>
 </div>

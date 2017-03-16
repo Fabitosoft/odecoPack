@@ -16,8 +16,6 @@ def crear_seguimiento_comercial_comentario_cotizacion(sender, instance, created,
         seguimiento.comentario_cotizacion = instance
         seguimiento.creado_por = instance.usuario
         seguimiento.cliente = instance.cotizacion.cliente_biable
-        observacion_adicional = "<p>" + instance.comentario + "</p>"
-        seguimiento.observacion_adicional = observacion_adicional
         if created:
             seguimiento.tipo_accion = "Comentó"
         seguimiento.save()

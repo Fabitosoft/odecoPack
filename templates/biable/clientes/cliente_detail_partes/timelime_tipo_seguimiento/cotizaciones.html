@@ -8,7 +8,15 @@
     <small>{{ seguimiento.creado_por.get_full_name }}</small>
     <br>
     <small>{{ seguimiento.created }} | Hace {{ seguimiento.created|timesince }}</small>
-    {{ seguimiento.observacion_adicional|safe }}
+    <br>
+    Valor: {{ seguimiento.cotizacion.total|floatformat }}
+    <br>
+    {% with descuento=seguimiento.cotizacion.descuento %}
+        {% if descuento %}
+            Descuento: {{ seguimiento.cotizacion.descuento|floatformat }}
+            <br>
+        {% endif %}
+    {% endwith %}
     Ver cotizacion: <a
         href="{{ seguimiento.cotizacion.get_absolute_url }}">{{ seguimiento.cotizacion.nro_cotizacion }}</a>
 </div>

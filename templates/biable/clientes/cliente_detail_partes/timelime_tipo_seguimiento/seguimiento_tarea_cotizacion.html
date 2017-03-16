@@ -1,12 +1,15 @@
 <div style="padding: 0">
     <h3><i class="fa fa-shopping-cart" aria-hidden="true" style="color: black"></i>
-        Cotización {{ seguimiento.seguimiento_cotizacion.tarea.cotizacion.nro_cotizacion }}, {{ seguimiento.tipo_accion }}
+        Cotización {{ seguimiento.seguimiento_cotizacion.tarea.cotizacion.nro_cotizacion }},
+        , {{ seguimiento.tipo_accion }}
         Seguimiento para <a href="{{ seguimiento.cliente.get_absolute_url }}">{{ seguimiento.cliente.nombre|title }}</a>
     </h3>
     <small>{{ seguimiento.creado_por.get_full_name }}</small>
     <br>
     <small>{{ seguimiento.created }} | Hace {{ seguimiento.created|timesince }}</small>
     {{ seguimiento.observacion_adicional|safe }}
+    Valor: {{ seguimiento.seguimiento_cotizacion.tarea.cotizacion.total|floatformat }}
+    <br>
     Ver cotizacion: <a
         href="{{ seguimiento.seguimiento_cotizacion.tarea.cotizacion.get_absolute_url }}">{{ seguimiento.seguimiento_cotizacion.tarea.cotizacion.nro_cotizacion }}</a>
 </div>
