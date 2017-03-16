@@ -27,7 +27,7 @@
                         <td>{{ pro.cantidad_empaque }} </td>
                         <td>{{ pro.unidad_medida.nombre|title }} </td>
                         <td> {{ precio }} </td>
-                        <td> LISTA PRECIOS CB </td>
+                        <td> LISTA PRECIOS CB</td>
                         {% if cotizacion_actual %}
                             <td>
                                 <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=1 %}">
@@ -38,14 +38,19 @@
                     </tr>
                 {% endfor %}
                 {% for pro in object_list_articulos_catalogo %}
-                    {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
+                    {% if pro.origen == 'LP_INTRANET' %}
+                        {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
+                    {% else %}
+                        {% obtener_precio_lp pro.get_precio_base 0 as precio %}
+                    {% endif %}
                     <tr>
                         <td>{{ pro.referencia }} </td>
                         <td>{{ pro.nombre|title }} </td>
                         <td></td>
                         <td>{{ pro.unidad_medida|title }} </td>
                         <td> {{ precio }} </td>
-                        <td> {% if pro.origen == 'LP_INTRANET' %} LISTA PRECIOS CA {% else %} CGUNO {{ pro.origen }} {% endif %}</td>
+                        <td> {% if pro.origen == 'LP_INTRANET' %} LISTA PRECIOS CA {% else %} CGUNO
+                            {{ pro.origen }} {% endif %}</td>
                         {% if cotizacion_actual %}
                             <td>
                                 <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=2 %}">
@@ -63,7 +68,7 @@
                         <td> {{ banda.longitud }} </td>
                         <td>Metro</td>
                         <td> {{ precio }} </td>
-                        <td> LISTA PRECIOS BM </td>
+                        <td> LISTA PRECIOS BM</td>
                         {% if cotizacion_actual %}
                             <td>
                                 <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=3 %}">
