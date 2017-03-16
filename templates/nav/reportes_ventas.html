@@ -39,7 +39,6 @@
             {% if perms.biable.ver_info_admon_ventas %}
                 <li><a href="{% url 'reportes_ventas:margen_factura' %}">Margen x Factura</a></li>
                 <li><a href="{% url 'reportes_ventas:margen_item' %}">Margen x Item</a></li>
-                <li><a href="{% url 'reportes_ventas:revision_vendedores' %}">Revision Vendedores Facturacion</a></li>
             {% endif %}
 
             <li class="divider"></li>
@@ -62,6 +61,7 @@
                     vs
                     Ventas</a></li>
             {% endif %}
+            <li><a href="{% url 'reportes_ventas:revision_vendedores' %}">Revision Vendedores Facturacion</a></li>
         </ul>
     </li>
 {% endif %}

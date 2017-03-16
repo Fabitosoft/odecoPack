@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {{ fecha_actual }}
+    <h1>Revisión de Vendedores para {{ fecha_actual|date:"F Y" }}</h1>
     {% with lista_revision=vendedores_diferentes_list.all %}
         {% if  lista_revision %}
             <table class="table table-bordered table-striped">
@@ -24,9 +24,6 @@
                     </th>
                     <th>
                         Venta
-                    </th>
-                    <th>
-                        Costo
                     </th>
                 </tr>
                 </thead>
@@ -54,12 +51,6 @@
                         </td>
                         <td>
                             {{ factura.venta_neto|floatformat }}
-                        </td>
-                        <td>
-                            {{ factura.costo_total|floatformat }}
-                        </td>
-                        <td>
-                            {{ factura.rentabilidad|floatformat }}
                         </td>
                     </tr>
                 {% empty %}

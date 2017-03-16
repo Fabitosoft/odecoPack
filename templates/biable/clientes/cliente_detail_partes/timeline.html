@@ -5,12 +5,12 @@
         {% for ano in seguimiento_por_ano_list %}
             <li><h2>{{ ano.grouper }}</h2>
                 <ul style="list-style-type: none">
-                    {% regroup ano.list by created|date:"M" as seguimiento_por_mes_list %}
+                    {% regroup ano.list by created|date:"F" as seguimiento_por_mes_list %}
                     {% for mes in seguimiento_por_mes_list %}
                         <li><span class="badge" style="background-color: green">{{ mes.grouper }}</span>
                             <ul style="list-style-type: none">
                                 <hr>
-                                {% regroup mes.list by created|date:"d" as seguimiento_por_dia_list %}
+                                {% regroup mes.list by created|date:"l d F" as seguimiento_por_dia_list %}
                                 {% for dia in seguimiento_por_dia_list %}
                                     <li><span class="badge" style="background-color: red">{{ dia.grouper }}</span>
                                         {% for seguimiento in dia.list %}

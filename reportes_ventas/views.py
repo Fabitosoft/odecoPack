@@ -783,11 +783,13 @@ class MargenesItemView(LoginRequiredMixin,
 
 
 class RevisionVendedoresRealesVsCguno(LoginRequiredMixin, SelectRelatedMixin, ListView):
+    now = timezone.now()
     queryset = FacturasBiable.objects.filter(
-        Q(fecha_documento__month=3) &
-        Q(fecha_documento__year=2017) &
+        Q(fecha_documento__month=now.month) &
+        Q(fecha_documento__year=now.year) &
         ~Q(vendedor_id=1) &
-        ~Q(vendedor=F('sucursal__vendedor_real'))
+        ~Q(vendedor=F('sucursal__vendedor_real')) &
+        Q(activa=True)
     )
     context_object_name = 'vendedores_diferentes_list'
     template_name = 'reportes/venta/vendedores_diferentes_facturacion.html'
