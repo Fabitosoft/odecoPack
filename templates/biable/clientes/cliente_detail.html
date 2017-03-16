@@ -53,7 +53,7 @@
                                     role="tab"
                                     data-toggle="tab">Histórico Precios</a></li>
 
-                            <li role="presentation"><a
+                            <li role="presentation" {% if tab == "SCC" %} class="active" {% endif %}><a
                                     href="#seguimiento_cliente"
                                     aria-controls="seguimiento_cliente"
                                     role="tab"
@@ -150,11 +150,43 @@
                                 <div id="tabla_pv"></div>
                             </div>
 
-                            <div role="tabpanel" class="tab-pane" id="seguimiento_cliente">
+                            <div role="tabpanel" class="tab-pane {% if tab == "SCC" %} active {% endif %}"
+                                 id="seguimiento_cliente">
+
+                                <div style="padding: 1rem">
+                                    <form action="{% url 'biable:detalle_cliente' pk=object.pk %}"
+                                          method="get">
+                                        <button>TODO</button>
+                                        <button name="tipo_seguimiento_comercial" value="seguimiento_cotizacion">
+                                            Seguimiento
+                                            Cotizacion
+                                        </button>
+                                        <button name="tipo_seguimiento_comercial" value="seguimiento_cartera">
+                                            Seguimiento
+                                            Cartera
+                                        </button>
+                                        <button name="tipo_seguimiento_comercial" value="seguimiento_tcc">Seguimiento
+                                            TCC
+                                        </button>
+                                        <button name="tipo_seguimiento_comercial" value="contactos">Contactos</button>
+                                        <button name="tipo_seguimiento_comercial" value="seguimiento_cliente">
+                                            Seguimiento
+                                            Cliente
+                                        </button>
+                                        <button name="tipo_seguimiento_comercial" value="comentario_cotizacion">
+                                            Comentarios
+                                            Cotizacion
+                                        </button>
+                                        <button name="tipo_seguimiento_comercial" value="cotizacion">Cotizacion</button>
+                                    </form>
+                                </div>
+
                                 <a href="{% url 'biable:crear_seguimiento_cliente' nit=object.nit %}"><i
                                         class="fa fa-plus  fa-2x"
                                         aria-hidden="true">
                                     Nuevo</i></a>
+
+
                                 {% include 'biable/clientes/cliente_detail_partes/timeline.html' %}
                             </div>
                         </div>

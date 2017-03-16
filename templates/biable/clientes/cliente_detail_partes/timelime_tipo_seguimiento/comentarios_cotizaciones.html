@@ -1,7 +1,7 @@
 <div style="padding: 0">
     <h3><i class="fa fa-comments" style="color: black" aria-hidden="true"></i>
         {{ seguimiento.tipo_accion }} en cotizacion {{ seguimiento.comentario_cotizacion.cotizacion.nro_cotizacion }},
-        en {{ seguimiento.cliente.nombre|title }}
+        en <a href="{{ seguimiento.cliente.get_absolute_url }}">{{ seguimiento.cliente.nombre|title }}</a>
     </h3>
     <small>{{ seguimiento.creado_por.get_full_name }}</small>
     <br>

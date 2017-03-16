@@ -3,7 +3,7 @@
         Cartera factura {{ seguimiento.seguimiento_cartera.tarea.factura.tipo_documento }}
         - {{ seguimiento.seguimiento_cartera.tarea.factura.nro_documento }},
         {{ seguimiento.tipo_accion }}
-        Seguimiento para {{ seguimiento.cliente.nombre|title }}
+        Seguimiento para <a href="{{ seguimiento.cliente.get_absolute_url }}">{{ seguimiento.cliente.nombre|title }}</a>
     </h3>
     <small>{{ seguimiento.creado_por.get_full_name }}</small>
     <br>

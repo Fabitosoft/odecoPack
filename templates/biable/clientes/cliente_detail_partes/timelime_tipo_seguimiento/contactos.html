@@ -1,6 +1,6 @@
 <div style="padding: 0">
     <h3><i class="fa fa-address-book-o" style="color: black" aria-hidden="true"></i> {{ seguimiento.tipo_accion }}
-        Contacto en {{ seguimiento.cliente.nombre|title }}
+        Contacto en <a href="{{ seguimiento.cliente.get_absolute_url }}">{{ seguimiento.cliente.nombre|title }}</a>
     </h3>
     <small>{{ seguimiento.creado_por.get_full_name }}</small>
     <br>

@@ -20,6 +20,7 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 
 from cotizaciones.models import ItemCotizacion
+from seguimientos.mixins import SeguimientoGestionComercialMixin
 from .models import FacturasBiable, Cliente, MovimientoVentaBiable, SeguimientoCliente
 from .forms import (
     ContactoEmpresaBuscador,
@@ -54,6 +55,7 @@ class ClienteDetailView(
     PrefetchRelatedMixin,
     JSONResponseMixin,
     AjaxResponseMixin,
+    SeguimientoGestionComercialMixin,
     UpdateView):
     permission_required = "biable.ver_clientes"
     form_class = ClienteDetailEditForm
@@ -95,23 +97,10 @@ class ClienteDetailView(
         if query:
             self.buscar_historia_precios(context, query)
 
-        qs_sc = SeguimientoComercialCliente.objects.select_related(
-            'cliente',
-            'creado_por',
-            'cotizacion',
-            'cotizacion__cliente_biable',
-            'comentario_cotizacion',
-            'seguimiento_cliente',
-            'seguimiento_cartera__tarea',
-            'seguimiento_cartera__tarea__factura',
-            'seguimiento_envio_tcc',
-            'seguimiento_envio_tcc__tarea',
-            'seguimiento_envio_tcc__tarea__envio',
-            'seguimiento_cotizacion',
-            'seguimiento_cotizacion__tarea',
-            'seguimiento_cotizacion__tarea__cotizacion',
-            'contacto',
-        ).filter(cliente=self.object).order_by('-created')[:150]
+        tipo = self.request.GET.get('tipo_seguimiento_comercial')
+        if tipo:
+            context['tab'] = "SCC"
+        qs_sc = self.get_seguimiento_comercial(cliente_pk=self.object.pk, nro_registros=100, tipo=tipo)
         context['mi_gestion_comercial'] = qs_sc
 
         return context
