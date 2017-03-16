@@ -27,8 +27,9 @@
                 {% if perms.despachos_mercancias.ver_segui_envio_tcc %}
                     <li><a href="{% url 'despacho_mercancia:envio-reporte' %}">Envios TCC</a></li>
                 {% endif %}
-
-                <li><a href="{% url 'seguimientos:usuarios_gestion_comercial_list' %}">Gestion Comercial</a></li>
+                {% if perms.biable.reporte_ventas_todos_vendedores %}
+                    <li><a href="{% url 'seguimientos:usuarios_gestion_comercial_list' %}">Gestion Comercial</a></li>
+                {% endif %}
 
                 {% include 'nav/clientes.html' %}
             </ul>

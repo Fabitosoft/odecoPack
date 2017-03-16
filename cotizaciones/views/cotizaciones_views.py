@@ -68,7 +68,7 @@ class TareaListView(SelectRelatedMixin, ListView):
 
 class RemisionListView(SelectRelatedMixin, ListView):
     model = RemisionCotizacion
-    select_related = ['cotizacion', 'cotizacion__usuario','factura_biable']
+    select_related = ['cotizacion', 'cotizacion__usuario', 'factura_biable']
     template_name = 'cotizaciones/remision_list.html'
 
     def get_queryset(self):
@@ -86,7 +86,7 @@ class RemisionListView(SelectRelatedMixin, ListView):
         return qs
 
 
-class CotizacionesListView(UsuariosMixin, SelectRelatedMixin, ListView):
+class CotizacionesListView(LoginRequiredMixin, UsuariosMixin, SelectRelatedMixin, ListView):
     model = Cotizacion
     template_name = 'cotizaciones/cotizacion_list.html'
 
