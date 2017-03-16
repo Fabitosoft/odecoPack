@@ -4,11 +4,13 @@ from django.db.models.functions import Concat, Extract
 from django.db.models.functions import Upper
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView
+from django.utils import timezone
 
 from braces.views import (
     JSONResponseMixin,
     AjaxResponseMixin,
     LoginRequiredMixin,
+    SelectRelatedMixin,
     PrefetchRelatedMixin
 )
 
@@ -720,7 +722,8 @@ class VentasProductoAnoMes(LoginRequiredMixin, JSONResponseMixin, AjaxResponseMi
         return qFinal
 
 
-class MargenesFacturaView(PrefetchRelatedMixin,
+class MargenesFacturaView(LoginRequiredMixin,
+                          PrefetchRelatedMixin,
                           InformeVentasConAnoMixin,
                           InformeVentasConLineaMixin,
                           FechaActualizacionMovimientoVentasMixin,
@@ -746,7 +749,8 @@ class MargenesFacturaView(PrefetchRelatedMixin,
         return qs
 
 
-class MargenesItemView(PrefetchRelatedMixin,
+class MargenesItemView(LoginRequiredMixin,
+                       PrefetchRelatedMixin,
                        InformeVentasConAnoMixin,
                        InformeVentasConLineaMixin,
                        FechaActualizacionMovimientoVentasMixin,
@@ -776,3 +780,25 @@ class MargenesItemView(PrefetchRelatedMixin,
             factura__activa=True
         ).order_by('margen')
         return qs
+
+
+class RevisionVendedoresRealesVsCguno(LoginRequiredMixin, SelectRelatedMixin, ListView):
+    queryset = FacturasBiable.objects.filter(
+        Q(fecha_documento__month=3) &
+        Q(fecha_documento__year=2017) &
+        ~Q(vendedor_id=1) &
+        ~Q(vendedor=F('sucursal__vendedor_real'))
+    )
+    context_object_name = 'vendedores_diferentes_list'
+    template_name = 'reportes/venta/vendedores_diferentes_facturacion.html'
+    select_related = [
+        'vendedor',
+        'sucursal__vendedor_real',
+        'cliente'
+    ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now()
+        context['fecha_actual'] = now
+        return context

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ fecha_actual }}
+    {% with lista_revision=vendedores_diferentes_list.all %}
+        {% if  lista_revision %}
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>
+                        Factura
+                    </th>
+                    <th>
+                        Cliente
+                    </th>
+                    <th>
+                        Fecha
+                    </th>
+                    <th>
+                        Vend Actual
+                    </th>
+                    <th>
+                        Vend Real
+                    </th>
+                    <th>
+                        Venta
+                    </th>
+                    <th>
+                        Costo
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for factura in lista_revision %}
+                    <tr>
+                        <td>
+                            <a href="{{ factura.get_absolute_url }}">
+                                {{ factura.tipo_documento }}-{{ factura.nro_documento }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ factura.cliente.get_absolute_url }}">
+                                {{ factura.cliente.nombre }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ factura.fecha_documento }}
+                        </td>
+                        <td>
+                            {{ factura.vendedor.nombre }}
+                        </td>
+                        <td>
+                            {{ factura.sucursal.vendedor_real.nombre }}
+                        </td>
+                        <td>
+                            {{ factura.venta_neto|floatformat }}
+                        </td>
+                        <td>
+                            {{ factura.costo_total|floatformat }}
+                        </td>
+                        <td>
+                            {{ factura.rentabilidad|floatformat }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <li>Ningun Vendedor para Corregir.</li>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% endwith %}
+{% endblock %}
