@@ -197,10 +197,11 @@ class TareaUpdateView(PrefetchRelatedMixin, SelectRelatedMixin, UpdateView):
         estado = request.POST.get('estado')
         self.object = self.get_object()
 
+        self.object.trabajo_diario.set_actualizar_seguimiento_trabajo()
+
         observacion = request.POST.get('observacion')
         if observacion:
             seguimiento = self.crear_nuevo_seguimiento(observacion, self.object, self.request.user)
-            print('entro')
             seguimiento.save()
 
         if estado != self.object.estado:
