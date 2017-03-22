@@ -201,17 +201,12 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class ClienteBiableListView(
-    PermissionRequiredMixin,
-    LoginRequiredMixin,
-    SelectRelatedMixin,
-    ListView
-):
+class ClienteBiableListView(PermissionRequiredMixin, LoginRequiredMixin, SelectRelatedMixin, ListView):
     model = Cliente
     template_name = 'biable/clientes/cliente_list.html'
     context_object_name = 'clientes'
     paginate_by = 15
-    select_related = ['canal', 'grupo', 'industria', 'cliente_biable']
+    select_related = ['canal', 'grupo', 'industria']
     permission_required = "biable.ver_clientes"
     tipo = "todos"
 
