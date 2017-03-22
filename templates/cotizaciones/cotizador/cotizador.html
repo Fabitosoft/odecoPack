@@ -46,6 +46,25 @@
                     <div class="col-md-9">
                         <div class="row">
                             <div class="col-md-12">
+                                {% with sucursales=cotizacion_actual.cliente_biable.mis_sucursales.all %}
+                                    {% if sucursales %}
+                                        <h3>Vendedores que atienden a {{ cotizacion_actual.cliente_biable.nombre }}</h3>
+                                        {% for sucursal_cliente in sucursales %}
+                                            <li>
+                                                {% if sucursal_cliente.vendedor_real %}
+                                                    {{ sucursal_cliente.vendedor_real|title }} -
+                                                {% else %}
+                                                    <span style="color: red">SIN VENDEDOR ASIGNADO - </span>
+                                                {% endif %}
+                                                {% if sucursal_cliente.nombre_establecimiento_intranet %}
+                                                    {{ sucursal_cliente.nombre_establecimiento_intranet }}
+                                                {% else %}
+                                                    {{ sucursal_cliente.direccion }}
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
                                 <h3>Detalle Cotización {{ cotizacion_actual.nro_cotizacion }}</h3>
                                 {% include 'cotizaciones/cotizador/cotizacion_detalle.html' %}
                             </div>
