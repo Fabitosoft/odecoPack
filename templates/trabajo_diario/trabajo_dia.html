@@ -13,7 +13,7 @@
                         <i class="fa fa-trophy fa-2x segundo" aria-hidden="true"></i>
                     {% endif %}
                     <i class="fa fa-trophy fa-2x segundo" aria-hidden="true"></i>
-                    {{ fact_nro_2|floatformat:0 }}
+                    <small>{{ fact_nro_2|floatformat:0 }}</small>
                 </div>
                 <div class="col-xs-5 image-stage">
                     {% if vendedor_nro_1 %}
@@ -21,7 +21,7 @@
                              src="{{ vendedor_nro_1 }}"/>
                     {% endif %}
                     <i class="fa fa-trophy fa-3x primero" aria-hidden="true"></i>
-                    {{ fact_nro_1|floatformat:0 }}
+                    <small>{{ fact_nro_1|floatformat:0 }}</small>
                 </div>
                 <div class="col-xs-2 image-stage">
                     {% if vendedor_nro_3 %}
@@ -30,7 +30,7 @@
                         <i class="fa fa-trophy tercero" aria-hidden="true"></i>
                     {% endif %}
                     <i class="fa fa-trophy tercero" aria-hidden="true"></i>
-                    {{ fact_nro_3|floatformat:0 }}
+                    <small>{{ fact_nro_3|floatformat:0 }}</small>
                 </div>
                 <div class="col-xs-1">
 
