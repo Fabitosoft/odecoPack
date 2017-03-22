@@ -65,6 +65,9 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         facturacion_cotizaciones_dia = 0
         cantidad_cotizaciones_dia = 0
 
+        facturacion_linea_mes = 0
+        mi_participacion_facturacion = 0
+
         qsVentasMes = FacturasBiable.activas.select_related(
             'vendedor__colaborador__usuario__user'
         ).values(
@@ -133,9 +136,27 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         else:
             nombre = "Mi Indicador"
 
+        total_linea = FacturasBiable.activas.filter(
+            fecha_documento__year=year,
+            fecha_documento__month=month,
+        )
+
+        if vendedor_subalterno:
+            total_linea = total_linea.filter(vendedor__linea_ventas_id=vendedor_subalterno.linea_ventas_id)
+        else:
+            lineas = vendedores_usuario.values('linea_ventas_id').distinct()
+            total_linea = total_linea.filter(vendedor__linea_ventas_id__in=lineas).distinct()
+
+        total_linea = total_linea.aggregate(
+            fact_neta=Sum('venta_neto')
+        )
+        if total_linea['fact_neta']:
+            facturacion_linea_mes = total_linea['fact_neta']
+            mi_participacion_facturacion = (facturacion_ventas_mes / float(total_linea['fact_neta'])) * 100
+
         indicador = None
 
-        if facturacion_ventas_mes or cantidad_cotizaciones_mes:
+        if facturacion_ventas_mes > 0 or cantidad_cotizaciones_mes > 0:
             indicador = {
                 'nombre': nombre,
                 'facturacion_venta_mes': facturacion_ventas_mes,
@@ -147,6 +168,8 @@ class IndicadorMesMixin(JSONResponseMixin, object):
                 'cantidad_cotizaciones_mes': cantidad_cotizaciones_mes,
                 'cantidad_cotizaciones_dia': cantidad_cotizaciones_dia,
                 'tasa_conversion_ventas_mes': tasa_conversion_ventas_mes,
+                'facturacion_linea_mes': facturacion_linea_mes,
+                'mi_participacion_facturacion': mi_participacion_facturacion,
             }
 
         return indicador

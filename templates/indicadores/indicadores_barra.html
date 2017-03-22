@@ -1,5 +1,10 @@
 <h2>Indicadores {{ indicadores.nombre }}</h2>
-<table class="table table-bordered table-striped">
+<style>
+    table{
+        font-size: 10px;
+    }
+</style>
+<table class="table table-bordered table-striped texto-indicadores">
     <thead>
     <th>
         Tipo
@@ -35,6 +40,20 @@
     <tr>
         <td>Mi Tasa Conversion Ventas</td>
         <td>{{ indicadores.tasa_conversion_ventas_mes|floatformat }} %</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Ventas Totales</td>
+        <td>{{ indicadores.facturacion_linea_mes|floatformat:0 }} </td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Mi Participación Ventas</td>
+        <td>{{ indicadores.mi_participacion_facturacion|floatformat }} %</td>
         <td></td>
         <td></td>
         <td></td>
