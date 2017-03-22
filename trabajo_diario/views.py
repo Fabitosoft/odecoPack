@@ -55,12 +55,17 @@ class TrabajoDiaView(TaxasCambioMixin, IndicadorMesMixin, LoginRequiredMixin, Te
             if podio_vendedores_nro_posiciones > 0:
                 context['vendedor_nro_1'] = Colaborador.objects.get(
                     pk=podio_vendedores[0]['vendedor__colaborador_id']).foto_perfil.url
+                context['fact_nro_1']=podio_vendedores[0]['facturacion']
+
                 if podio_vendedores_nro_posiciones > 1:
                     context['vendedor_nro_2'] = Colaborador.objects.get(
                         pk=podio_vendedores[1]['vendedor__colaborador_id']).foto_perfil.url
-                if podio_vendedores_nro_posiciones > 2:
-                    context['vendedor_nro_3'] = Colaborador.objects.get(
-                        pk=podio_vendedores[2]['vendedor__colaborador_id']).foto_perfil.url
+                    context['fact_nro_2'] = podio_vendedores[1]['facturacion']
+
+                    if podio_vendedores_nro_posiciones > 2:
+                        context['vendedor_nro_3'] = Colaborador.objects.get(
+                            pk=podio_vendedores[2]['vendedor__colaborador_id']).foto_perfil.url
+                        context['fact_nro_3'] = podio_vendedores[2]['facturacion']
 
             try:
                 trabajo_diario = TrabajoDiario.objects.get(created__date=fecha_hoy, usuario=usuario)
