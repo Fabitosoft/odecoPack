@@ -1,7 +1,7 @@
 from braces.views import LoginRequiredMixin
 from braces.views import PrefetchRelatedMixin
 from braces.views import SelectRelatedMixin
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -12,7 +12,7 @@ from django.views.generic.detail import DetailView
 
 from cotizaciones.models import (
     Cotizacion)
-from biable.models import Cartera, VendedorBiable
+from biable.models import Cartera, VendedorBiable, FacturasBiable
 from importaciones.mixins import TaxasCambioMixin
 from .forms import SeguimientoTareaForm
 from usuarios.models import Colaborador
@@ -41,6 +41,27 @@ class TrabajoDiaView(TaxasCambioMixin, IndicadorMesMixin, LoginRequiredMixin, Te
         fecha_hoy = timezone.now().date()
 
         if usuario.has_perm('trabajo_diario.ver_trabajo_diario'):
+            podio_vendedores = FacturasBiable.activas.values('vendedor__colaborador_id').annotate(
+                facturacion=Sum('venta_neto')
+            ).filter(
+                fecha_documento__year=fecha_hoy.year,
+                fecha_documento__month=fecha_hoy.month
+            ).exclude(
+                vendedor__id=1
+            ).order_by('-facturacion')[0:3]
+
+            podio_vendedores_nro_posiciones = podio_vendedores.count()
+
+            if podio_vendedores_nro_posiciones > 0:
+                context['vendedor_nro_1'] = Colaborador.objects.get(
+                    pk=podio_vendedores[0]['vendedor__colaborador_id']).foto_perfil.url
+                if podio_vendedores_nro_posiciones > 1:
+                    context['vendedor_nro_2'] = Colaborador.objects.get(
+                        pk=podio_vendedores[1]['vendedor__colaborador_id']).foto_perfil.url
+                if podio_vendedores_nro_posiciones > 2:
+                    context['vendedor_nro_3'] = Colaborador.objects.get(
+                        pk=podio_vendedores[2]['vendedor__colaborador_id']).foto_perfil.url
+
             try:
                 trabajo_diario = TrabajoDiario.objects.get(created__date=fecha_hoy, usuario=usuario)
             except TrabajoDiario.DoesNotExist:

@@ -133,3 +133,21 @@ main {
   left: -13px;
   top: 11px;
 }
+.image-stage {
+  position: relative;
+  padding: 0;
+}
+.image-stage .fa {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+}
+.image-stage .primero {
+  color: #ffd700;
+}
+.image-stage .segundo {
+  color: #c0c0c0;
+}
+.image-stage .tercero {
+  color: #a52a2a;
+}

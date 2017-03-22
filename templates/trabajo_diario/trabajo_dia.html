@@ -1,7 +1,41 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% if monedas_lista and perms.importaciones.ver_tasas_actuales %}
-        <div class="row">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="row" style="text-align: center">
+                <h2>Podio de Ventas</h2>
+                <div class="col-xs-1">
+                </div>
+                <div class="col-xs-3 image-stage">
+                    {% if vendedor_nro_2 %}
+                        <img class="img-circle center-block" height="70%" width="70%"
+                             src="{{ vendedor_nro_2 }}"/>
+                        <i class="fa fa-trophy fa-2x segundo" aria-hidden="true"></i>
+                    {% endif %}
+                    <i class="fa fa-trophy fa-2x segundo" aria-hidden="true"></i>
+                </div>
+                <div class="col-xs-5 image-stage">
+                    {% if vendedor_nro_1 %}
+                        <img class="img-circle center-block" height="70%" width="70%"
+                             src="{{ vendedor_nro_1 }}"/>
+                    {% endif %}
+                    <i class="fa fa-trophy fa-3x primero" aria-hidden="true"></i>
+                </div>
+                <div class="col-xs-2 image-stage">
+                    {% if vendedor_nro_3 %}
+                        <img class="img-circle center-block" height="70%" width="70%"
+                             src="{{ vendedor_nro_3 }}"/>
+                        <i class="fa fa-trophy tercero" aria-hidden="true"></i>
+                    {% endif %}
+                    <i class="fa fa-trophy tercero" aria-hidden="true"></i>
+                </div>
+                <div class="col-xs-1">
+
+                </div>
+            </div>
+        </div>
+        {% if monedas_lista and perms.importaciones.ver_tasas_actuales %}
+
             <div class="col-md-2">
                 <div class="panel panel-default">
                     <div class="panel-heading">Tasas de Cambio Actuales</div>
@@ -16,8 +50,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    {% endif %}
+
+        {% endif %}
+
+    </div>
     {% if perms.trabajo_diario.ver_trabajo_diario %}
         <div class="col-md-12">
             {% include 'trabajo_diario/panel_inicio/tareas_trabajo_diario_lista.html' %}
