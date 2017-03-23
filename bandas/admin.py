@@ -11,8 +11,8 @@ class EnsambladoInline(admin.TabularInline):
     model = Ensamblado
     raw_id_fields = ("producto",)
     readonly_fields = (
-    "es_para_ensamblado", "get_costo_cop", "get_costo_producto", "get_costo_cop_linea", "get_precio_base_linea",
-    "get_rentabilidad_linea")
+        "es_para_ensamblado", "get_costo_cop", "get_costo_producto", "get_costo_cop_linea", "get_precio_base_linea",
+        "get_rentabilidad_linea")
     can_delete = False
     extra = 0
 
@@ -193,6 +193,11 @@ class BandaAdmin(admin.ModelAdmin):
                 "get_rentabilidad",
                 'get_costo_mano_obra',
                 "get_precio_total",
+            ),
+        }),
+        ('Imagen Ensamblado', {
+            'fields': (
+                "imagen",
             ),
         }),
     )

@@ -1,9 +1,13 @@
 from decimal import Decimal
+
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
 from model_utils.models import TimeStampedModel
+
+from .managers import BandaActivasQuerySet
 from productos.models import Producto
 
 from productos_caracteristicas.models import (
@@ -24,29 +28,13 @@ from productos_categorias.models import (
 # region Ensamblaje Bandas
 
 # region Banda
-class BandaQuerySet(models.QuerySet):
-    def para_catalogo(self):
-        return self.filter(activo_catalogo=True)
 
-    def para_componentes(self):
-        return self.filter(activo_componentes=True)
-
-    def para_proyectos(self):
-        return self.filter(activo_proyectos=True)
-
-
-class BandaActivosManager(models.Manager):
-    def get_queryset(self):
-        return BandaQuerySet(self.model, using=self._db).filter(activo=True)
-
-    def catalogo(self):
-        return self.get_queryset().para_catalogo()
-
-    def componentes(self):
-        return self.get_queryset().para_componentes()
-
-    def proyectos(self):
-        return self.get_queryset().para_proyectos()
+def imagen_ensamblado_banda_upload_to(instance, filename):
+    fecha_hoy = timezone.now().strftime('%Y%m%d%H%M%S')
+    print(fecha_hoy)
+    basename, file_extention = filename.split(".")
+    new_filename = "ensamblado_%s.%s" % (fecha_hoy, file_extention)
+    return "%s/%s/%s" % ("bandas", "ensamblado", new_filename)
 
 
 class Banda(TimeStampedModel):
@@ -58,6 +46,7 @@ class Banda(TimeStampedModel):
     """
     # region Caracteristicas Comunes
     id_cguno = models.PositiveIntegerField(default=0)
+    imagen = models.ImageField(upload_to=imagen_ensamblado_banda_upload_to, null=True, blank=True)
     descripcion_estandar = models.CharField(max_length=200, default='AUTOMÁTICO')
     descripcion_comercial = models.CharField(max_length=200, default='AUTOMÁTICO')
     referencia = models.CharField(max_length=120, unique=True, null=True, blank=True)
@@ -160,7 +149,7 @@ class Banda(TimeStampedModel):
         return self.get_precio_mano_obra() + self.get_precio_base()
 
     objects = models.Manager()
-    activos = BandaActivosManager()
+    activos = BandaActivasQuerySet.as_manager()
 
     ensamblaje = models.ManyToManyField(
         Producto,
