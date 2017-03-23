@@ -10,7 +10,9 @@ from .models import Banda, Ensamblado, CostoEnsambladoBlanda
 class EnsambladoInline(admin.TabularInline):
     model = Ensamblado
     raw_id_fields = ("producto",)
-    readonly_fields = ("es_para_ensamblado","get_costo_cop", "get_costo_producto", "get_costo_cop_linea", "get_precio_base_linea", "get_rentabilidad_linea")
+    readonly_fields = (
+    "es_para_ensamblado", "get_costo_cop", "get_costo_producto", "get_costo_cop_linea", "get_precio_base_linea",
+    "get_rentabilidad_linea")
     can_delete = False
     extra = 0
 
@@ -21,22 +23,27 @@ class EnsambladoInline(admin.TabularInline):
 
     def get_costo_producto(self, obj):
         return obj.producto.costo
+
     get_costo_producto.short_description = 'Costo'
 
     def get_costo_cop(self, obj):
         return obj.producto.get_costo_cop()
+
     get_costo_cop.short_description = 'Costo Cop'
 
     def get_costo_cop_linea(self, obj):
         return obj.get_costo_cop_linea()
+
     get_costo_cop_linea.short_description = 'Costo Cop Linea'
 
     def get_precio_base_linea(self, obj):
         return obj.get_precio_base_linea()
+
     get_precio_base_linea.short_description = 'Precio Cop Linea'
 
     def get_rentabilidad_linea(self, obj):
         return obj.get_rentabilidad_linea()
+
     get_rentabilidad_linea.short_description = 'Rentabilidad'
 
 
@@ -62,29 +69,36 @@ class BandaAdmin(admin.ModelAdmin):
         # "rentabilidad",
         'get_costo_mano_obra',
         "get_precio_total",
+        'created_by',
+        'updated_by',
     )
 
     def get_costo_cop(self, obj):
         self.costo_base = obj.get_costo_cop()
         return self.costo_base
+
     get_costo_cop.short_description = 'Costo Cop'
 
     def get_precio_base(self, obj):
         self.precio_base = obj.get_precio_base()
         return self.precio_base
+
     get_precio_base.short_description = 'Precio Base'
 
     def get_costo_mano_obra(self, obj):
-        self.costo_mano_obra =obj.get_precio_mano_obra()
+        self.costo_mano_obra = obj.get_precio_mano_obra()
         return self.costo_mano_obra
+
     get_costo_mano_obra.short_description = 'Costo Mano Obra'
 
     def get_precio_total(self, obj):
-        return self.precio_base+self.costo_mano_obra
+        return self.precio_base + self.costo_mano_obra
+
     get_precio_total.short_description = 'Precio Total'
 
     def get_rentabilidad(self, obj):
-        return self.precio_base-self.costo_base
+        return self.precio_base - self.costo_base
+
     get_rentabilidad.short_description = 'Rentabilidad'
 
     search_fields = [
@@ -92,6 +106,12 @@ class BandaAdmin(admin.ModelAdmin):
         'descripcion_estandar',
         'descripcion_comercial',
         'fabricante__nombre',
+        'created_by__username',
+        'updated_by__username',
+        'created_by__first_name',
+        'updated_by__first_name',
+        'created_by__last_name',
+        'updated_by__last_name',
     ]
 
     list_select_related = (
@@ -100,7 +120,7 @@ class BandaAdmin(admin.ModelAdmin):
 
     list_filter = (
         'activo', 'activo_proyectos', 'activo_componentes',
-        'activo_catalogo', 'serie__nombre','created_by',
+        'activo_catalogo', 'serie__nombre',
         ('created', DateFieldListFilter)
     )
 
