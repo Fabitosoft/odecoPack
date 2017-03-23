@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
+from django.contrib.admin import DateFieldListFilter
 
 from .models import Banda, Ensamblado, CostoEnsambladoBlanda
 
@@ -99,7 +100,9 @@ class BandaAdmin(admin.ModelAdmin):
 
     list_filter = (
         'activo', 'activo_proyectos', 'activo_componentes',
-        'activo_catalogo', 'serie__nombre')
+        'activo_catalogo', 'serie__nombre','created_by',
+        ('created', DateFieldListFilter)
+    )
 
     list_editable = (
         "activo",
