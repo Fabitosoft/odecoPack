@@ -13,7 +13,7 @@ from productos_caracteristicas.models import (
     UnidadMedida
 )
 from biable.models import ItemsBiable
-from .managers import ArticuloCatalogoActivosQuerySet
+from .managers import ArticuloCatalogoActivosQuerySet, ProductoQuerySet
 
 
 # region Productos
@@ -21,37 +21,6 @@ def productos_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
     new_filename = "produ_perfil_%s.%s" % (basename, file_extention)
     return "%s/%s/%s" % ("productos", "foto_perfil", new_filename)
-
-
-class ProductoQuerySet(models.QuerySet):
-    def para_ensamble(self):
-        return self.filter(activo_ensamble=True)
-
-    def para_catalogo(self):
-        return self.filter(activo_catalogo=True)
-
-    def para_componentes(self):
-        return self.filter(activo_componentes=True)
-
-    def para_proyectos(self):
-        return self.filter(activo_proyectos=True)
-
-
-class ProductoActivosManager(models.Manager):
-    def get_queryset(self):
-        return ProductoQuerySet(self.model, using=self._db).filter(activo=True)
-
-    def modulos(self):
-        return self.get_queryset().para_ensamble()
-
-    def catalogo(self):
-        return self.get_queryset().para_catalogo()
-
-    def componentes(self):
-        return self.get_queryset().para_componentes()
-
-    def proyectos(self):
-        return self.get_queryset().para_proyectos()
 
 
 class Producto(TimeStampedModel):
@@ -112,7 +81,7 @@ class Producto(TimeStampedModel):
     updated_by = models.ForeignKey(User, editable=False, null=True, blank=True, related_name="servicio_updated")
 
     objects = models.Manager()
-    activos = ProductoActivosManager()
+    activos = ProductoQuerySet.as_manager()
 
     class Meta:
         verbose_name_plural = "Componentes Bandas"

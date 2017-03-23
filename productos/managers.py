@@ -2,6 +2,20 @@ from django.db import models
 from django.db.models import Q
 
 
+class ProductoQuerySet(models.QuerySet):
+    def modulos(self):
+        return self.filter(activo_ensamble=True)
+
+    def catalogo(self):
+        return self.filter(activo_catalogo=True)
+
+    def componentes(self):
+        return self.filter(activo_componentes=True)
+
+    def proyectos(self):
+        return self.filter(activo_proyectos=True)
+
+
 class ArticuloCatalogoActivosQuerySet(models.QuerySet):
     def get_queryset(self, **kwarg):
         qs = ArticuloCatalogoActivosQuerySet(self.model, using=self._db).filter(
