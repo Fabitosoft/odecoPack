@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.db.models import Sum, Count
 from django.utils import timezone
 
-from biable.models import VendedorBiable, FacturasBiable
+from biable.models import VendedorBiable, FacturasBiable, SeguimientoCliente
 from cotizaciones.models import Cotizacion
 from usuarios.models import Colaborador
 
@@ -136,6 +136,7 @@ class IndicadorMesMixin(JSONResponseMixin, object):
         else:
             nombre = "Mi Indicador"
 
+        # obtenemos la facturacion total del mes
         total_linea = FacturasBiable.activas.filter(
             fecha_documento__year=year,
             fecha_documento__month=month,
@@ -154,6 +155,22 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             facturacion_linea_mes = total_linea['fact_neta']
             mi_participacion_facturacion = (facturacion_ventas_mes / float(total_linea['fact_neta'])) * 100
 
+        # obtenemos las visitas al cliente
+        qs_visitas = SeguimientoCliente.objects.filter(
+            tipo='Visita',
+            fecha_seguimiento__year=year,
+            fecha_seguimiento__month=month,
+        )
+
+        if vendedor_subalterno:
+            qs_visitas = qs_visitas.filter(
+                creado_por__user_extendido__colaborador__mi_vendedor_biable=vendedor_subalterno
+            )
+        elif usuario_sesion:
+            qs_visitas = qs_visitas.filter(
+                creado_por=usuario_sesion
+            )
+
         indicador = None
 
         if facturacion_ventas_mes > 0 or cantidad_cotizaciones_mes > 0:
@@ -170,6 +187,8 @@ class IndicadorMesMixin(JSONResponseMixin, object):
                 'tasa_conversion_ventas_mes': tasa_conversion_ventas_mes,
                 'facturacion_linea_mes': facturacion_linea_mes,
                 'mi_participacion_facturacion': mi_participacion_facturacion,
+                'visitas_cliente_mes': qs_visitas.count(),
+                'visitas_cliente_dia': qs_visitas.filter(fecha_seguimiento__day=day).count(),
             }
 
         return indicador

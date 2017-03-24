@@ -1,6 +1,6 @@
 <h2>Indicadores {{ indicadores.nombre }}</h2>
 <style>
-    table{
+    table {
         font-size: 10px;
     }
 </style>
@@ -24,39 +24,37 @@
     </thead>
     <tbody>
     <tr>
-        <td>Mis Ventas</td>
+        <td>Visitas</td>
+        <td></td>
+        <td></td>
+        <td>{{ indicadores.visitas_cliente_mes }}</td>
+        <td>{{ indicadores.visitas_cliente_dia }}</td>
+    </tr>
+    <tr>
+        <td>Ventas</td>
         <td>{{ indicadores.facturacion_venta_mes|floatformat }}</td>
         <td>{{ indicadores.facturacion_venta_dia|floatformat }}</td>
         <td>{{ indicadores.cantidad_venta_mes|floatformat }}</td>
         <td>{{ indicadores.cantidad_venta_dia|floatformat }}</td>
     </tr>
     <tr>
-        <td>Mis Cotizaciones</td>
+        <td>Cotizaciones</td>
         <td>{{ indicadores.valor_cotizacion_mes|floatformat }}</td>
         <td>{{ indicadores.valor_cotizacion_dia|floatformat }}</td>
         <td>{{ indicadores.cantidad_cotizaciones_mes|floatformat }}</td>
         <td>{{ indicadores.cantidad_cotizaciones_dia|floatformat }}</td>
     </tr>
     <tr>
-        <td>Mi Tasa Conversion Ventas</td>
-        <td>{{ indicadores.tasa_conversion_ventas_mes|floatformat }} %</td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>% Conv. Ventas</td>
+        <td colspan="4">{{ indicadores.tasa_conversion_ventas_mes|floatformat }} %</td>
     </tr>
     <tr>
-        <td>Ventas Totales</td>
-        <td>{{ indicadores.facturacion_linea_mes|floatformat:0 }} </td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>Tot. Ventas</td>
+        <td colspan="4">{{ indicadores.facturacion_linea_mes|floatformat:0 }} </td>
     </tr>
     <tr>
-        <td>Mi Participación Ventas</td>
-        <td>{{ indicadores.mi_participacion_facturacion|floatformat }} %</td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>Mis % Ventas</td>
+        <td colspan="4">{{ indicadores.mi_participacion_facturacion|floatformat }} %</td>
     </tr>
     </tbody>
     <tfoot>
