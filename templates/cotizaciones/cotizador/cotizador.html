@@ -126,6 +126,7 @@
                 else {
                     $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
                     $("#item-" + item).find('.descuento').html(numberWithCommas(data.descuento))
+                    $("#item-" + item).find('.cantidad_total').html(numberWithCommas(data.total_cantidad))
                 }
             });
         });
@@ -137,7 +138,6 @@
                 dias: dias
             };
             $.get("{% url 'cotizaciones:cambiar_dias_item_cotizacion' %}", data, function (data) {
-                console.log(data)
                 if (data.error_cantidad) {
                     alert("Digitar correctamente los días de entrega para " + data.actual_item_error)
                 }
@@ -154,6 +154,57 @@
                 if (data.error_porcentaje) {
                     alert(data.error_mensaje)
                 }
+                $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
+                $("#item-" + item).find('.descuento').html(numberWithCommas(data.descuento))
+                $("#coti_val_total").html(numberWithCommas(data.total_cotizacion));
+                $("#coti_val_descuento").html(numberWithCommas(data.descuento_total));
+            });
+        });
+
+        $(".item-qty-perdido").change(function () {
+            var item = $(this).prev("input[type='hidden']").val();
+            var cant_perdida = $(this).val();
+            var motivo_perdida = $(this).parent().parent().find('.tipo_perdida').find('.select-venta-perdida').val()
+            var data = {
+                item: item,
+                cant_perdida: cant_perdida,
+                motivo_perdida: motivo_perdida
+            };
+            $.get("{% url 'cotizaciones:cambiar_venta_perdida_item_cotizacion' %}", data, function (data) {
+                if (data.error_cantidad) {
+                    alert("Digitar correctamente las cantidades de la venta perdida para " + data.actual_item_error)
+                }
+                $("#item-" + item).find('.cantidad_total').html(numberWithCommas(data.total_cantidad))
+                $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
+                $("#item-" + item).find('.descuento').html(numberWithCommas(data.descuento))
+                $("#coti_val_total").html(numberWithCommas(data.total_cotizacion));
+                $("#coti_val_descuento").html(numberWithCommas(data.descuento_total));
+            });
+        });
+
+        $(".select-venta-perdida").change(function () {
+            var item = $(this).prev("input[type='hidden']").val();
+            var tipo_select = $(this).context.value
+            var motivo_perdida = $(this).parent().parent().find('.tipo_perdida').find('.select-venta-perdida').val()
+
+            if (tipo_select == "NA") {
+                $(this).parent().parent().find('.cantidad_perdida').hide()
+            } else {
+                if (tipo_select != "NA") {
+                    $(this).parent().parent().find('.cantidad_perdida').show()
+                }
+            }
+
+            $(this).parent().parent().find('.cantidad_perdida').find('.item-qty-perdido').get(0).value = 0
+
+            var data = {
+                item: item,
+                cant_perdida: 0,
+                motivo_perdida: motivo_perdida
+            };
+
+            $.get("{% url 'cotizaciones:cambiar_venta_perdida_item_cotizacion' %}", data, function (data) {
+                $("#item-" + item).find('.cantidad_total').html(numberWithCommas(data.total_cantidad))
                 $("#item-" + item).find('.total').html(numberWithCommas(data.total_line))
                 $("#item-" + item).find('.descuento').html(numberWithCommas(data.descuento))
                 $("#coti_val_total").html(numberWithCommas(data.total_cotizacion));
@@ -197,6 +248,7 @@
         $("#id_otra_ciudad").change(function () {
             cotizador_campos_ciudad_toggle(this.checked);
         });
+
 
         function cotizador_campos_contacto_toggle(bool) {
             $("#div_id_contacto").toggle(!bool);

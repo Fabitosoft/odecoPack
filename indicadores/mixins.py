@@ -30,9 +30,9 @@ class IndicadorMesMixin(JSONResponseMixin, object):
             ).distinct()
 
             fecha_hoy = timezone.localtime(timezone.now()).date()
-            day = fecha_hoy.day  # 5
-            year = fecha_hoy.year  # 2016
-            month = fecha_hoy.month  # 12
+            day = fecha_hoy.day
+            year = fecha_hoy.year
+            month = fecha_hoy.month
 
             indicadores_vendedores = []
             # Indicadores de Venta

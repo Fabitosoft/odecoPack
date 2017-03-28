@@ -133,6 +133,34 @@ class CotizacionesActualesMixin(object):
         return context
 
 
+class CotizacionesCambioCantidadesAjaxMixin(object):
+    def cambiar_cantidad(self, item, cantidad=None, cantidad_perdida=None, motivo_cantidad_perdida=None):
+        if cantidad_perdida is not None:
+            item.motivo_venta_perdida = motivo_cantidad_perdida
+            if cantidad_perdida <= 0 or motivo_cantidad_perdida == 'NA':
+                item.cantidad_venta_perdida = 0
+                item.motivo_venta_perdida = 'NA'
+            elif cantidad_perdida > item.cantidad:
+                item.cantidad_venta_perdida = item.cantidad
+            else:
+                item.cantidad_venta_perdida = cantidad_perdida
+
+        if cantidad:
+            item.cantidad = cantidad
+            if cantidad < item.cantidad_venta_perdida:
+                item.cantidad_venta_perdida = 0
+                item.motivo_venta_perdida = 'NA'
+
+        item.cantidad_total = item.cantidad - item.cantidad_venta_perdida
+        descuento = (item.precio * item.cantidad_total) * (item.porcentaje_descuento / 100)
+        item.descuento = descuento
+
+        item.valor_venta_perdida_total = item.cantidad_venta_perdida * item.precio
+
+        item.total = (item.precio * item.cantidad_total) - descuento
+        item.save()
+
+
 class ListaPreciosMixin(object):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

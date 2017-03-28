@@ -9,6 +9,41 @@ $color_h6_intranet = #000000
 $color_p_intranet = #000000
 $color_label_intranet = #df7755
 
+body
+  font-size 9px
+
+.form-control
+  font-size 0.9rem
+
+.btn
+  font-size 1rem
+
+input-tabla-cotizador()
+  padding 0 !important
+  margin 0 !important
+  vertical-align middle !important
+  height 100%
+  input, select
+    height 100%
+    width 100%
+    background-color beige
+
+.input-tabla-cotizador-cantidad
+  input-tabla-cotizador()
+  width 40px
+
+.input-tabla-cotizador-descuento
+  input-tabla-cotizador()
+  width 30px
+
+.input-tabla-cotizador-dias-entrega
+  input-tabla-cotizador()
+  width 30px
+
+.input-tabla-cotizador-venta-perdida
+  input-tabla-cotizador()
+  width 100px
+
 .form-signin
   max-width 330px;
   padding 15px;
@@ -116,41 +151,40 @@ main
   -webkit-box-shadow 0 8px 6px -6px black
   -moz-box-shadow 0 8px 6px -6px black
   box-shadow 0 8px 6px -6px black
-  font-size 20px
-
+  font-size 1.1rem
 
 .bubble
-    position relative
-    padding 0px
-    padding-left 1rem
-    margin-bottom 1rem
-    background #FFFFFF
-    -webkit-border-radius 10px
-    -moz-border-radius 10px
-    border-radius 10px
-    border #D77F7F solid 2px
-    &:after
-        content ''
-        position absolute
-        border-style solid
-        border-width 8px 10px 8px 0
-        border-color transparent #FFFFFF
-        display block
-        width 0
-        z-index 1
-        left -10px
-        top 12px
-    &:before
-        content ''
-        position absolute
-        border-style solid
-        border-width 9px 11px 9px 0
-        border-color transparent #D77F7F
-        display block
-        width 0
-        z-index 0
-        left -13px
-        top 11px
+  position relative
+  padding 0px
+  padding-left 1rem
+  margin-bottom 1rem
+  background #FFFFFF
+  -webkit-border-radius 10px
+  -moz-border-radius 10px
+  border-radius 10px
+  border #D77F7F solid 2px
+  &:after
+    content ''
+    position absolute
+    border-style solid
+    border-width 8px 10px 8px 0
+    border-color transparent #FFFFFF
+    display block
+    width 0
+    z-index 1
+    left -10px
+    top 12px
+  &:before
+    content ''
+    position absolute
+    border-style solid
+    border-width 9px 11px 9px 0
+    border-color transparent #D77F7F
+    display block
+    width 0
+    z-index 0
+    left -13px
+    top 11px
 
 .image-stage
   position relative

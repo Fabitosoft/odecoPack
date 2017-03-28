@@ -13,7 +13,12 @@ from django.views.generic.detail import SingleObjectMixin
 from braces.views import SelectRelatedMixin, LoginRequiredMixin
 
 from ..models import ItemCotizacion, ImagenCotizacion
-from ..mixins import EnviarCotizacionMixin, CotizacionesActualesMixin, ListaPreciosMixin
+from ..mixins import (
+    EnviarCotizacionMixin,
+    CotizacionesActualesMixin,
+    ListaPreciosMixin,
+    CotizacionesCambioCantidadesAjaxMixin
+)
 
 from ..forms import (
     CotizacionCrearForm,
@@ -191,12 +196,13 @@ class DescartarCotizacionActualView(View):
         return redirect('cotizaciones:cotizador')
 
 
-class AddItemCantidad(SingleObjectMixin, View):
+class AddItemCantidad(CotizacionesCambioCantidadesAjaxMixin, SingleObjectMixin, View):
     model = ItemCotizacion
 
     def get(self, request, *args, **kwargs):
         delete = False
         error_cantidad = False
+        total_cantidad = 0
         actual_item_error = ""
         item_id = request.GET.get("item")
         item = ItemCotizacion.objects.get(id=item_id)
@@ -206,13 +212,10 @@ class AddItemCantidad(SingleObjectMixin, View):
                 delete = True
                 item.delete()
             else:
-                item.cantidad = qty
-                descuento = (item.precio * qty) * (item.porcentaje_descuento / 100)
-                item.descuento = descuento
-                item.total = (item.precio * qty) - descuento
-                item.save()
+                self.cambiar_cantidad(item=item, cantidad=qty)
             total_linea = round(item.total, 2)
             total_cotizacion = round(item.cotizacion.total, 2)
+            total_cantidad = round(item.cantidad_total, 2)
         except InvalidOperation as e:
             error_cantidad = True
             actual_item_error = item.get_nombre_item()
@@ -224,6 +227,7 @@ class AddItemCantidad(SingleObjectMixin, View):
             "actual_item_error": actual_item_error,
             "deleted": delete,
             "total_line": total_linea,
+            "total_cantidad": total_cantidad,
             "descuento": round(item.descuento, 2),
             "descuento_total": round(item.cotizacion.descuento, 2),
             "total_cotizacion": total_cotizacion
@@ -232,27 +236,39 @@ class AddItemCantidad(SingleObjectMixin, View):
         return JsonResponse(data)
 
 
-class CambiarDiaEntregaView(SingleObjectMixin, View):
+class CambiarCantidadVentaPerdidaView(CotizacionesCambioCantidadesAjaxMixin, SingleObjectMixin, View):
     model = ItemCotizacion
 
     def get(self, request, *args, **kwargs):
         item_id = request.GET.get("item")
+        motivo_perdida = request.GET.get("motivo_perdida")
         item = ItemCotizacion.objects.get(id=item_id)
         error_cantidad = False
         actual_item_error = ""
+        total_cantidad = 0
+
         try:
-            dias = Decimal(request.GET.get("dias"))
-            item.dias_entrega = dias
-            item.save()
+            cantidad_perdida = Decimal(request.GET.get("cant_perdida"))
+            self.cambiar_cantidad(item=item, cantidad_perdida=cantidad_perdida, motivo_cantidad_perdida=motivo_perdida)
+            total_linea = round(item.total, 2)
+            total_cotizacion = round(item.cotizacion.total, 2)
+            total_cantidad = round(item.cantidad_total, 2)
         except InvalidOperation as e:
             error_cantidad = True
             actual_item_error = item.get_nombre_item()
+            total_linea = "ERROR CANTIDAD"
+            total_cotizacion = "ERROR CANTIDAD"
 
         data = {
-            "dias": item.dias_entrega,
             "error_cantidad": error_cantidad,
-            "actual_item_error": actual_item_error
+            "actual_item_error": actual_item_error,
+            "total_line": total_linea,
+            "descuento": round(item.descuento, 2),
+            "descuento_total": round(item.cotizacion.descuento, 2),
+            "total_cotizacion": total_cotizacion,
+            "total_cantidad": total_cantidad
         }
+
         return JsonResponse(data)
 
 
@@ -269,9 +285,9 @@ class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
             desc = Decimal(request.GET.get("desc"))
             if desc >= 0:
                 item.porcentaje_descuento = desc
-                descuento = (item.precio * item.cantidad) * (desc / 100)
+                descuento = (item.precio * item.cantidad_total) * (desc / 100)
                 item.descuento = descuento
-                item.total = (item.precio * item.cantidad) - descuento
+                item.total = (item.precio * item.cantidad_total) - descuento
                 item.save()
                 total_linea = round(item.total, 2)
                 descuento_linea = round(item.descuento, 2)
@@ -305,6 +321,30 @@ class CambiarPorcentajeDescuentoView(SingleObjectMixin, View):
         return JsonResponse(data)
 
 
+class CambiarDiaEntregaView(SingleObjectMixin, View):
+    model = ItemCotizacion
+
+    def get(self, request, *args, **kwargs):
+        item_id = request.GET.get("item")
+        item = ItemCotizacion.objects.get(id=item_id)
+        error_cantidad = False
+        actual_item_error = ""
+        try:
+            dias = Decimal(request.GET.get("dias"))
+            item.dias_entrega = dias
+            item.save()
+        except InvalidOperation as e:
+            error_cantidad = True
+            actual_item_error = item.get_nombre_item()
+
+        data = {
+            "dias": item.dias_entrega,
+            "error_cantidad": error_cantidad,
+            "actual_item_error": actual_item_error
+        }
+        return JsonResponse(data)
+
+
 class AddItem(SingleObjectMixin, View):
     model = ItemCotizacion
 
@@ -332,11 +372,8 @@ class AddItem(SingleObjectMixin, View):
 
         if not item:
             item = ItemCotizacion()
-            if tipo == 1:
-                producto = Producto.objects.get(id=item_id)
-                item.cantidad = producto.cantidad_empaque
-            else:
-                item.cantidad = 1
+            item.cantidad = 1
+            item.cantidad_total = 1
 
         item.cotizacion_id = coti_id
 

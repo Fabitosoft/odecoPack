@@ -1,3 +1,64 @@
+body {
+  font-size: 9px;
+}
+.form-control {
+  font-size: 0.9rem;
+}
+.btn {
+  font-size: 1rem;
+}
+.input-tabla-cotizador-cantidad {
+  padding: 0 !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+  height: 100%;
+  width: 40px;
+}
+.input-tabla-cotizador-cantidad input,
+.input-tabla-cotizador-cantidad select {
+  height: 100%;
+  width: 100%;
+  background-color: #f5f5dc;
+}
+.input-tabla-cotizador-descuento {
+  padding: 0 !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+  height: 100%;
+  width: 30px;
+}
+.input-tabla-cotizador-descuento input,
+.input-tabla-cotizador-descuento select {
+  height: 100%;
+  width: 100%;
+  background-color: #f5f5dc;
+}
+.input-tabla-cotizador-dias-entrega {
+  padding: 0 !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+  height: 100%;
+  width: 30px;
+}
+.input-tabla-cotizador-dias-entrega input,
+.input-tabla-cotizador-dias-entrega select {
+  height: 100%;
+  width: 100%;
+  background-color: #f5f5dc;
+}
+.input-tabla-cotizador-venta-perdida {
+  padding: 0 !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+  height: 100%;
+  width: 100px;
+}
+.input-tabla-cotizador-venta-perdida input,
+.input-tabla-cotizador-venta-perdida select {
+  height: 100%;
+  width: 100%;
+  background-color: #f5f5dc;
+}
 .form-signin {
   max-width: 330px;
   padding: 15px;
@@ -96,7 +157,7 @@ main {
   -webkit-box-shadow: 0 8px 6px -6px #000;
   -moz-box-shadow: 0 8px 6px -6px #000;
   box-shadow: 0 8px 6px -6px #000;
-  font-size: 20px;
+  font-size: 1.1rem;
 }
 .bubble {
   position: relative;

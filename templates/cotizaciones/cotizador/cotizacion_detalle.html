@@ -1,81 +1,112 @@
 {% load l10n %}
-<div class="col-md-9">
-    <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <td>Referencia</td>
-            <td>Nombre</td>
-            <td>Cantidad</td>
-            <td>Uni. Medida</td>
-            <td>Precio</td>
-            <td>Porcentaje Descuento %</td>
-            <td>Descuento $</td>
-            <td>Total</td>
-            <td>Días Ent.</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% with item_coti_list=cotizacion_actual.items.all %}
-            {% if item_coti_list %}
-                {% for item in item_coti_list %}
-                    <tr {% localize off %}id="item-{{ item.id }}"{% endlocalize %}>
-                        <td>
-                            {{ item.get_referencia_item }}
-                        </td>
-                        <td>
-                            {{ item.get_nombre_item|title }}
-                        </td>
-                        <td>
-                            {% localize off %}
-                                <input type='hidden' name='item' value='{{ item.id }}'/>
-                            {% endlocalize %}
-                            <input class="item-qty" style="width: 60px" step=any
-                                   value="{{ item.cantidad|floatformat:2 }}"/>
-                        </td>
-                        <td>
-                            {{ item.get_unidad_item }}
-                        </td>
-                        <td>{{ item.precio }}</td>
-                        <td>
-                            {% localize off %}
-                                <input type='hidden' name='item' value='{{ item.id }}'/>
-                            {% endlocalize %}
-                            <input class="item-desc" style="width: 60px" step=any
-                                   value="{{ item.porcentaje_descuento|floatformat:2 }}"/>
-                        </td>
-                        <td class="descuento">{{ item.descuento }}</td>
-                        <td class="total">{{ item.total }}</td>
-                        <td>
-                            {% localize off %}
-                                <input type='hidden' name='item' value='{{ item.id }}'/>
-                            {% endlocalize %}
-                            <input type="number" pattern="[0-9]" class="item-ent"
-                                   style="width: 60px"
-                                   min="0" step="1"
-                                   value="{{ item.dias_entrega }}"/>
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        </tbody>
-        <tfoot>
-        <tr>
-            <td>
-                Descuentos:
-            </td>
-            <td id="coti_val_descuento">
-                {{ cotizacion_actual.descuento }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Total:
-            </td>
-            <td id="coti_val_total">
-                {{ cotizacion_actual.total }}
-            </td>
-        </tr>
-        </tfoot>
-    </table>
-</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <td>Referencia</td>
+        <td>Nombre</td>
+        <td>Cant.</td>
+        <td>Uni. Medida</td>
+        <td>Venta Perdida</td>
+        <td>Precio</td>
+        <td>% Descu</td>
+        <td>$ Descu</td>
+        <td># Cant. Total</td>
+        <td>$ Val. Total</td>
+        <td>Días Ent.</td>
+    </tr>
+    </thead>
+    <tbody>
+    {% with item_coti_list=cotizacion_actual.items.all %}
+        {% if item_coti_list %}
+            {% for item in item_coti_list %}
+                <tr {% localize off %}id="item-{{ item.id }}"{% endlocalize %}>
+                    <td>
+                        {{ item.get_referencia_item }}
+                    </td>
+                    <td>
+                        {{ item.get_nombre_item|title }}
+                    </td>
+                    <td class="input-tabla-cotizador-cantidad">
+                        {% localize off %}
+                            <input type='hidden' name='item' value='{{ item.id }}'/>
+                        {% endlocalize %}
+                        <input
+                                class="item-qty"
+                                step=any
+                                value="{{ item.cantidad|floatformat }}"/>
+                    </td>
+                    <td>
+                        {{ item.get_unidad_item }}
+                    </td>
+                    <td class="input-tabla-cotizador-venta-perdida" style="width: 60px">
+                        <div class="row">
+                            <div class="col-xs-12 tipo_perdida">
+                                {% localize off %}
+                                    <input type='hidden' name='item' value='{{ item.id }}'/>
+                                {% endlocalize %}
+                                <select class="select-venta-perdida" name="{{ item.id }}" style="font-size: 0.9rem">
+                                    <option {% if item.motivo_venta_perdida == 'NA' %} selected {% endif %}>NA</option>
+                                    <option {% if item.motivo_venta_perdida == 'PRECIO' %} selected {% endif %}>PRECIO
+                                    </option>
+                                    <option {% if item.motivo_venta_perdida == 'INVENT' %} selected {% endif %}>INVENT
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-xs-12 cantidad_perdida" {% if item.motivo_venta_perdida == 'NA' %}
+                                 style="display: none" {% endif %}>
+                                {% localize off %}
+                                    <input type='hidden' name='item' value='{{ item.id }}'/>
+                                {% endlocalize %}
+                                <input
+                                        class="item-qty-perdido"
+                                        step=any
+                                        value="{{ item.cantidad_venta_perdida|floatformat }}"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ item.precio }}</td>
+                    <td class="input-tabla-cotizador-descuento">
+                        {% localize off %}
+                            <input type='hidden' name='item' value='{{ item.id }}'/>
+                        {% endlocalize %}
+                        <input
+                                class="item-desc"
+                                step=any
+                                value="{{ item.porcentaje_descuento|floatformat }}"/>
+                    </td>
+                    <td class="descuento">{{ item.descuento }}</td>
+                    <td class="cantidad_total">{{ item.cantidad_total|floatformat:2 }}</td>
+                    <td class="total">{{ item.total }}</td>
+                    <td class="input-tabla-cotizador-dias-entrega">
+                        {% localize off %}
+                            <input type='hidden' name='item' value='{{ item.id }}'/>
+                        {% endlocalize %}
+                        <input type="number" pattern="[0-9]" class="item-ent"
+                               min="0" step="1"
+                               value="{{ item.dias_entrega }}"/>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    </tbody>
+    <tfoot>
+    <tr>
+        <td>
+            Descuentos:
+        </td>
+        <td id="coti_val_descuento">
+            {{ cotizacion_actual.descuento }}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Total:
+        </td>
+        <td id="coti_val_total">
+            {{ cotizacion_actual.total }}
+        </td>
+    </tr>
+    </tfoot>
+</table>

@@ -40,6 +40,7 @@ class Cotizacion(TimeStampedModel):
     nro_cotizacion = models.CharField(max_length=120)
     fecha_envio = models.DateTimeField(null=True, blank=True)
     total = models.DecimalField(max_digits=18, decimal_places=0, default=0)
+    total_venta_perdida = models.DecimalField(max_digits=18, decimal_places=2, default=0)
     descuento = models.DecimalField(max_digits=18, decimal_places=2, default=0)
     usuario = models.ForeignKey(User, related_name='mis_cotizaciones')
     creado_por = models.ForeignKey(User, related_name='cotizaciones_creadas', editable=False)
@@ -72,11 +73,14 @@ class Cotizacion(TimeStampedModel):
         "updating..."
         total = 0
         descuento = 0
+        total_venta_perdida = 0
         items = self.items.all()
         for item in items:
             total += item.total
             descuento += item.descuento
+            total_venta_perdida += item.valor_venta_perdida_total
         self.total = total
+        self.total_venta_perdida = total_venta_perdida
         self.descuento = descuento
         self.save()
 
@@ -103,6 +107,12 @@ class ItemCotizacion(TimeStampedModel):
     banda = models.ForeignKey(Banda, related_name="cotizaciones", null=True)
     articulo_catalogo = models.ForeignKey(ArticuloCatalogo, related_name="cotizaciones", null=True)
     cantidad = models.DecimalField(max_digits=18, decimal_places=3, null=True)
+
+    cantidad_venta_perdida = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    motivo_venta_perdida = models.CharField(max_length=120, default="NA")
+    cantidad_total = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    valor_venta_perdida_total = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+
     precio = models.DecimalField(max_digits=18, decimal_places=2)
     forma_pago = models.ForeignKey(FormaPago, related_name="items_cotizaciones", null=True)
     p_n_lista_descripcion = models.CharField(max_length=120, null=True, verbose_name='Descripción Otro')
@@ -158,7 +168,7 @@ class ItemCotizacion(TimeStampedModel):
         return round(costo, 0)
 
     def get_costo_cop_actual_total(self):
-        return round(self.get_costo_cop_actual_unidad() * self.cantidad, 0)
+        return round(self.get_costo_cop_actual_unidad() * self.cantidad_total, 0)
 
     def get_rentabilidad_actual_total(self):
         costo = self.get_costo_cop_actual_total()
@@ -230,7 +240,7 @@ class ComentarioCotizacion(TimeStampedModel):
 def imagen_upload_to(instance, filename):
     basename, file_extention = filename.split(".")
     new_filename = '%s %s' % (basename, random.randint(100, 999))
-    return "img/coti/%s/%s.%s" % (instance.cotizacion.id, new_filename,file_extention)
+    return "img/coti/%s/%s.%s" % (instance.cotizacion.id, new_filename, file_extention)
 
 
 class ImagenCotizacion(TimeStampedModel):

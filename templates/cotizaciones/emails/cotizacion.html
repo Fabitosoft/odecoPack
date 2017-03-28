@@ -196,34 +196,36 @@
         </thead>
         <tbody>
         {% for item in object.items.all %}
-            <tr>
-                <td>
-                    {{ item.get_referencia_item }}
-                </td>
-                <td>
-                    {{ item.get_nombre_item|title }}
-                </td>
-                <td>
-                    {{ item.cantidad|floatformat }}
-                </td>
-                <td>
-                    {{ item.precio }}
-                </td>
-                <td>
-                    {{ item.get_unidad_item|title }}
-                </td>
-                {% if object.descuento > 0 %}
+            {% if item.cantidad_total > 0 %}
+                <tr>
                     <td>
-                        {{ item.descuento }}
+                        {{ item.get_referencia_item }}
                     </td>
-                {% endif %}
-                <td>
-                    {{ item.total }}
-                </td>
-                <td>
-                    {{ item.get_tiempo_entrega_prometido }}
-                </td>
-            </tr>
+                    <td>
+                        {{ item.get_nombre_item|title }}
+                    </td>
+                    <td>
+                        {{ item.cantidad_total|floatformat }}
+                    </td>
+                    <td>
+                        {{ item.precio }}
+                    </td>
+                    <td>
+                        {{ item.get_unidad_item|title }}
+                    </td>
+                    {% if object.descuento > 0 %}
+                        <td>
+                            {{ item.descuento }}
+                        </td>
+                    {% endif %}
+                    <td>
+                        {{ item.total }}
+                    </td>
+                    <td>
+                        {{ item.get_tiempo_entrega_prometido }}
+                    </td>
+                </tr>
+            {% endif %}
         {% endfor %}
         </tbody>
         <tfoot>
