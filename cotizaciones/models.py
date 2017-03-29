@@ -1,6 +1,7 @@
 import datetime
 import random
 
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
@@ -238,8 +239,11 @@ class ComentarioCotizacion(TimeStampedModel):
 
 
 def imagen_upload_to(instance, filename):
-    basename, file_extention = filename.split(".")
-    new_filename = '%s %s' % (basename, random.randint(100, 999))
+    fecha_hoy = timezone.now().strftime('%Y%m%d%H%M%S')
+    split_filename = filename.split(".")
+    file_extention = split_filename[-1]
+    basename = split_filename[0]
+    new_filename = '%s %s' % (basename, fecha_hoy)
     return "img/coti/%s/%s.%s" % (instance.cotizacion.id, new_filename, file_extention)
 
 

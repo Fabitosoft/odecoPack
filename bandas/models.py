@@ -31,8 +31,9 @@ from productos_categorias.models import (
 
 def imagen_ensamblado_banda_upload_to(instance, filename):
     fecha_hoy = timezone.now().strftime('%Y%m%d%H%M%S')
-    print(fecha_hoy)
-    basename, file_extention = filename.split(".")
+    split_filename = filename.split(".")
+    file_extention = split_filename[-1]
+    basename = split_filename[0]
     new_filename = "ensamblado_%s.%s" % (fecha_hoy, file_extention)
     return "%s/%s/%s" % ("bandas", "ensamblado", new_filename)
 

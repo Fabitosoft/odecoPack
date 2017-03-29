@@ -1,11 +1,11 @@
 body {
   font-size: 11px;
 }
-.form-control {
-  font-size: 0.9rem;
-}
 .btn {
   font-size: 1rem;
+}
+.form-control {
+  font-size: 0.9rem;
 }
 .input-tabla-cotizador-cantidad {
   padding: 0 !important;
