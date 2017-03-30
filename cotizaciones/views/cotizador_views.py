@@ -408,6 +408,7 @@ class AddItemOtro(SingleObjectMixin, View):
         if not item:
             item = ItemCotizacion()
             item.cantidad = 1
+            item.cantidad_total = 1
             item.cotizacion_id = coti_id
         item.p_n_lista_descripcion = nombre
         item.p_n_lista_referencia = referencia
