@@ -394,6 +394,7 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
             i["renta"] = int(i["renta"])
             i["Descuentos"] = int(i["Descuentos"])
         context["lista"] = lista
+
         return self.render_json_response(context)
 
     def consulta(self, ano):
@@ -412,7 +413,7 @@ class VentasVendedorMes(JSONResponseMixin, AjaxResponseMixin, InformeVentasConAn
             Margen=(Sum('rentabilidad') / Sum('venta_neto') * 100),
         ).filter(
             fecha_documento__year__in=list(map(lambda x: int(x), ano))
-        ).order_by('fecha_documento')
+        )
         return qs
 
 

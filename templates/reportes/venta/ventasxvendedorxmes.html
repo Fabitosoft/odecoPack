@@ -118,7 +118,7 @@
                             dataSettings: {
                                 aggregateFunc: 'sum',
                                 formatFunc: function (value) {
-                                    return value ? Number(value).formatMoney(2, ',', '.') + '%' : '';
+                                    return value ? Number(value).formatMoney(2, '.', ',') + '%' : '';
                                 }
                             }
                         }
