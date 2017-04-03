@@ -19,7 +19,7 @@ from .views import (
 )
 
 urlpatterns = [
-    url(r'^add/(?P<item_id>[0-9]+)/(?P<precio>[0-9]+)/(?P<forma_pago>[0-9]+)/(?P<cot_id>[0-9]+)/(?P<tipo>[0-9]+)$',
+    url(r'^add/(?P<item_id>[0-9]+)/(?P<precio>[0-9]+)/(?P<forma_pago>[0-9]+)/(?P<cot_id>[0-9]+)/(?P<tipo>[0-9]+)/(?P<tras_tipo>[\w\-]+)$',
         AddItem.as_view(), name='add_item_cotizacion'),
     url(r'^add_qty/$', AddItemCantidad.as_view(), name='add_qty_item_cotizacion'),
     url(r'^cambiar_dias/$', CambiarDiaEntregaView.as_view(), name='cambiar_dias_item_cotizacion'),

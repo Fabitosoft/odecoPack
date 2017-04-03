@@ -12,6 +12,7 @@ class Proveedor(TimeStampedModel):
     nombre = models.CharField(max_length=120, unique=True)
     moneda = models.ForeignKey(Moneda, on_delete=models.PROTECT, related_name="provedores_con_moneda")
     factor_importacion = models.DecimalField(max_digits=18, decimal_places=3, default=1)
+    factor_importacion_aereo = models.DecimalField(max_digits=18, decimal_places=3, default=0)
     margenes = models.ManyToManyField(
         CategoriaProducto,
         through='MargenProvedor',

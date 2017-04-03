@@ -111,6 +111,7 @@ class ItemCotizacion(TimeStampedModel):
 
     cantidad_venta_perdida = models.DecimalField(max_digits=18, decimal_places=2, default=0)
     motivo_venta_perdida = models.CharField(max_length=120, default="NA")
+    transporte_tipo = models.CharField(max_length=120)
     cantidad_total = models.DecimalField(max_digits=18, decimal_places=2, default=0)
     valor_venta_perdida_total = models.DecimalField(max_digits=18, decimal_places=2, default=0)
 

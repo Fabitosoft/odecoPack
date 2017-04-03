@@ -15,30 +15,47 @@
                     <td>Cant. Emp.</td>
                     <td>Uni. Med.</td>
                     <td>Precio</td>
+                    <td>Precio Aereo</td>
                     <td>Origen</td>
                 </tr>
                 </thead>
                 <tbody>
                 {% for pro in object_list_componentes %}
+                    {% obtener_precio_lp pro.get_precio_base_aereo formas_pago_porcentaje as precio_aereo %}
                     {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
                     <tr>
                         <td>{{ pro.referencia }} </td>
                         <td>{{ pro.descripcion_comercial|title }} </td>
                         <td>{{ pro.cantidad_empaque }} </td>
                         <td>{{ pro.unidad_medida.nombre|title }} </td>
-                        <td> {{ precio }} </td>
+                        <td style="text-align: right">
+                            {% if precio > 0 %}
+                                {% if cotizacion_actual %}
+                                    <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=1 tras_tipo='CONVENCIONAL' %}">
+                                        {{ precio }}
+                                    </a>
+                                {% else %}
+                                    {{ precio }}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right">
+                            {% if precio_aereo > 0 %}
+                                {% if cotizacion_actual %}
+                                    <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio_aereo forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=1 tras_tipo='AEREO' %}">
+                                        {{ precio_aereo }}
+                                    </a>
+                                {% else %}
+                                    {{ precio_aereo }}
+                                {% endif %}
+                            {% endif %}
+                        </td>
                         <td> LISTA PRECIOS CB</td>
-                        {% if cotizacion_actual %}
-                            <td>
-                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=1 %}">
-                                    +
-                                </a>
-                            </td>
-                        {% endif %}
                     </tr>
                 {% endfor %}
                 {% for pro in object_list_articulos_catalogo %}
                     {% if pro.origen == 'LP_INTRANET' %}
+                        {% obtener_precio_lp pro.get_precio_base_aereo formas_pago_porcentaje as precio_aereo %}
                         {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
                     {% else %}
                         {% obtener_precio_lp pro.get_precio_base 0 as precio %}
@@ -48,16 +65,30 @@
                         <td>{{ pro.nombre|title }} </td>
                         <td></td>
                         <td>{{ pro.unidad_medida|title }} </td>
-                        <td> {{ precio }} </td>
+                        <td style="text-align: right">
+                            {% if precio > 0 %}
+                                {% if cotizacion_actual %}
+                                    <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=2 tras_tipo='CONVENCIONAL' %}">
+                                        {{ precio }}
+                                    </a>
+                                {% else %}
+                                    {{ precio }}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right">
+                            {% if precio_aereo > 0 %}
+                                {% if cotizacion_actual %}
+                                    <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio_aereo forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=2 tras_tipo='AEREO' %}">
+                                        {{ precio_aereo }}
+                                    </a>
+                                {% else %}
+                                    {{ precio_aereo }}
+                                {% endif %}
+                            {% endif %}
+                        </td>
                         <td> {% if pro.origen == 'LP_INTRANET' %} LISTA PRECIOS CA {% else %} CGUNO
                             {{ pro.origen }} {% endif %}</td>
-                        {% if cotizacion_actual %}
-                            <td>
-                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=pro.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=2 %}">
-                                    +
-                                </a>
-                            </td>
-                        {% endif %}
                     </tr>
                 {% endfor %}
                 {% for banda in object_list_bandas %}
@@ -67,15 +98,20 @@
                         <td>{{ banda.descripcion_comercial|title }} </td>
                         <td> {{ banda.longitud }} </td>
                         <td>Metro</td>
-                        <td> {{ precio }} </td>
+                        <td style="text-align: right">
+                            {% if precio > 0 %}
+                                {% if cotizacion_actual %}
+                                    <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=3 tras_tipo='CONVENCIONAL' %}">
+                                        {{ precio }}
+                                    </a>
+                                {% else %}
+                                    {{ precio }}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right">
+                        </td>
                         <td> LISTA PRECIOS BM</td>
-                        {% if cotizacion_actual %}
-                            <td>
-                                <a href="{% url 'cotizaciones:add_item_cotizacion' item_id=banda.id precio=precio forma_pago=forma_de_pago cot_id=cotizacion_actual.id tipo=3 %}">
-                                    +
-                                </a>
-                            </td>
-                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>

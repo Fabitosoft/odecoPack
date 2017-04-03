@@ -12,8 +12,8 @@ class MargenProvedorInline(admin.TabularInline):
 
 
 class ProveedorAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'moneda','factor_importacion')
-    list_editable = ('factor_importacion',)
+    list_display = ('nombre', 'moneda','factor_importacion','factor_importacion_aereo')
+    list_editable = ('factor_importacion','factor_importacion_aereo')
 
     inlines = [
         MargenProvedorInline,

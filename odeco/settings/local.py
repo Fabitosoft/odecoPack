@@ -183,9 +183,6 @@ EMAIL_PORT_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_PORT")
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
 EMAIL_USE_TLS_ODECO = str_to_bool(get_secret("EMAIL_SERVER_ODECO","EMAIL_TLS"))
 
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-EMAIL_USE_TLS = str_to_bool(get_secret("EMAIL_SERVER_ODECO","EMAIL_TLS"))
-
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL_ODECO = EMAIL_HOST_USER_ODECO
 ########## END EMAIL CONFIGURATION

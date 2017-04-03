@@ -93,9 +93,22 @@ class Producto(TimeStampedModel):
             return round(self.margen.proveedor.moneda.cambio * self.margen.proveedor.factor_importacion * self.costo, 0)
         return 0
 
+    def get_costo_cop_aereo(self):
+        if self.margen:
+            if self.margen.proveedor.factor_importacion_aereo > self.margen.proveedor.factor_importacion:
+                return round(
+                    self.margen.proveedor.moneda.cambio * self.margen.proveedor.factor_importacion_aereo * self.costo,
+                    0)
+        return 0
+
     def get_precio_base(self):
         if self.margen:
             return round(self.get_costo_cop() / (1 - (self.margen.margen_deseado / 100)), 0)
+        return 0
+
+    def get_precio_base_aereo(self):
+        if self.margen:
+            return round(self.get_costo_cop_aereo() / (1 - (self.margen.margen_deseado / 100)), 0)
         return 0
 
     def get_rentabilidad(self):
@@ -203,9 +216,21 @@ class ArticuloCatalogo(models.Model):
             return round(self.margen.proveedor.moneda.cambio * self.margen.proveedor.factor_importacion * self.costo, 0)
         return 0
 
+    def get_costo_cop_aereo(self):
+        if self.margen:
+            return round(
+                self.margen.proveedor.moneda.cambio * self.margen.proveedor.factor_importacion_aereo * self.costo, 0)
+        return 0
+
     def get_precio_base(self):
         if self.margen:
             return round(self.get_costo_cop() / (1 - (self.margen.margen_deseado / 100)), 0)
+        return 0
+
+    def get_precio_base_aereo(self):
+        if self.margen:
+            if self.margen.proveedor.factor_importacion_aereo > self.margen.proveedor.factor_importacion:
+                return round(self.get_costo_cop_aereo() / (1 - (self.margen.margen_deseado / 100)), 0)
         return 0
 
     def get_rentabilidad(self):

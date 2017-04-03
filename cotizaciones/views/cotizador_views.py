@@ -352,6 +352,7 @@ class AddItem(SingleObjectMixin, View):
         coti_id = kwargs["cot_id"]
         item_id = kwargs["item_id"]
         precio = kwargs["precio"]
+        tran_tipo = kwargs["tras_tipo"]
         forma_pago_id = kwargs["forma_pago"]
         tipo = int(kwargs["tipo"])
         if tipo == 1:
@@ -384,6 +385,7 @@ class AddItem(SingleObjectMixin, View):
         else:
             item.banda_id = item_id
 
+        item.transporte_tipo = tran_tipo
         item.precio = precio
         item.forma_pago_id = forma_pago_id
         item.total = float(precio) * float(item.cantidad)
