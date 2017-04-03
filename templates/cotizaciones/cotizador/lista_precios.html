@@ -59,6 +59,7 @@
                         {% obtener_precio_lp pro.get_precio_base formas_pago_porcentaje as precio %}
                     {% else %}
                         {% obtener_precio_lp pro.get_precio_base 0 as precio %}
+                        {% obtener_precio_lp pro.get_precio_base_aereo 0 as precio_aereo %}
                     {% endif %}
                     <tr>
                         <td>{{ pro.referencia }} </td>
