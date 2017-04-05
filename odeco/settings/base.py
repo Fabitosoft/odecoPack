@@ -141,6 +141,7 @@ MY_APPS = (
     'contactos',
     'reportes_ventas',
     'seguimientos',
+    'configuraciones',
     # 'crm',
 )
 
@@ -149,6 +150,7 @@ THIRD_PART_APPS = (
     'crispy_forms',
     'imagekit',
     'mistune',
+    'solo',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

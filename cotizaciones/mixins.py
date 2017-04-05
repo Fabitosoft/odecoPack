@@ -1,7 +1,6 @@
 from io import BytesIO
 
 from django.db.models import Q
-from django.core.mail import get_connection
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.template import Context
@@ -9,6 +8,7 @@ from django.conf import settings
 from weasyprint import HTML
 
 from bandas.models import Banda
+from configuraciones.models import DominiosEmail, EmailConfiguration
 from seguimientos.models import SeguimientoComercialCliente
 from .models import FormaPago
 from productos.models import (
@@ -25,15 +25,26 @@ from biable.models import Colaborador, SucursalBiable
 
 class EnviarCotizacionMixin(object):
     def enviar_cotizacion(self, cotizacion, user):
-        connection = get_connection(host=settings.EMAIL_HOST_ODECO,
-                                    port=settings.EMAIL_PORT_ODECO,
-                                    username=settings.EMAIL_HOST_USER_ODECO,
-                                    password=settings.EMAIL_HOST_PASSWORD_ODECO,
-                                    use_tls=settings.EMAIL_USE_TLS_ODECO
-                                    )
-
         version_cotizacion = cotizacion.version
-        from_email = "ODECOPACK / COMPONENTES <%s>" % (settings.EMAIL_HOST_USER_ODECO)
+
+        from_ventas_email = EmailConfiguration.objects.first().email_ventas_from
+        if not from_ventas_email:
+            from_ventas_email = settings.DEFAULT_FROM_EMAIL
+
+        enviar_como = user.user_extendido.email_envio_como
+        if enviar_como:
+            enviar_como = '%s - %s' % (user.user_extendido.email_envio_como, user.get_full_name())
+        else:
+            enviar_como = 'ODECOPACK - %s' % (user.get_full_name())
+
+        if user.email:
+            email_split = user.email.split('@')
+            if email_split[-1] in list(DominiosEmail.objects.values_list('dominio', flat=True).all()):
+                from_email = "%s <%s>" % (enviar_como, user.email)
+            else:
+                from_email = "%s <%s>" % (enviar_como, from_ventas_email)
+        else:
+            from_email = "%s <%s>" % (enviar_como, from_ventas_email)
         to = cotizacion.email
         subject = "%s - %s" % ('Cotizacion', cotizacion.nro_cotizacion)
         if version_cotizacion > 1:
@@ -79,7 +90,7 @@ class EnviarCotizacionMixin(object):
         output = BytesIO()
         HTML(string=html_content).write_pdf(target=output)
         msg = EmailMultiAlternatives(subject, text_content, from_email, to=[to], bcc=[user.email],
-                                     connection=connection, reply_to=[user.email])
+                                     reply_to=[user.email])
         msg.attach_alternative(html_content, "text/html")
 
         msg.attach(nombre_archivo_cotizacion, output.getvalue(), 'application/pdf')

@@ -17,13 +17,16 @@ from django.core.exceptions import ImproperlyConfigured
 with open("secretsLocal.json") as f:
     secrets = json.loads(f.read())
 
-def get_secret(setting,variable, secrets=secrets):
+
+def get_secret(setting, variable, secrets=secrets):
     """ Get the environment setting or return exception """
     try:
         return secrets[setting][variable]
     except KeyError:
         error_msg = "Set the {0} environment variable".format(setting)
         raise ImproperlyConfigured(error_msg)
+
+
 ############### END SECRET FILE
 
 ########## MANAGER CONFIGURATION
@@ -72,10 +75,11 @@ CACHES = {
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 import sys
+
 if 'test' in sys.argv:
-    #To run a test:
-    #coverage run --include='./*' manage.py test
-    #coverage report
+    # To run a test:
+    # coverage run --include='./*' manage.py test
+    # coverage report
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -85,12 +89,12 @@ if 'test' in sys.argv:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': get_secret("DATABASE_LOCAL","ENGINE"),
-            'NAME': get_secret("DATABASE_LOCAL","NAME"),
-            'USER': get_secret("DATABASE_LOCAL","USER"),
-            'PASSWORD': get_secret("DATABASE_LOCAL","PASSWORD"),
-            'HOST': get_secret("DATABASE_LOCAL","HOST"),
-            'PORT': get_secret("DATABASE_LOCAL","PORT"),
+            'ENGINE': get_secret("DATABASE_LOCAL", "ENGINE"),
+            'NAME': get_secret("DATABASE_LOCAL", "NAME"),
+            'USER': get_secret("DATABASE_LOCAL", "USER"),
+            'PASSWORD': get_secret("DATABASE_LOCAL", "PASSWORD"),
+            'HOST': get_secret("DATABASE_LOCAL", "HOST"),
+            'PORT': get_secret("DATABASE_LOCAL", "PORT"),
             'OPTIONS': {
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             }
@@ -136,58 +140,38 @@ STATICFILES_FINDERS = (
 ########## EMAIL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 
-#'EMAIL_IS_LOCAL'
-if not str_to_bool(get_secret("EMAIL_SERVER","EMAIL_IS_LOCAL")):
+# 'EMAIL_IS_LOCAL'
+if not str_to_bool(get_secret("EMAIL_SERVER", "EMAIL_IS_LOCAL")):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-EMAIL_HOST = get_secret("EMAIL_SERVER","EMAIL_HOST")
+EMAIL_HOST = get_secret("EMAIL_SERVER", "EMAIL_HOST")
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-password
-EMAIL_HOST_PASSWORD = get_secret("EMAIL_SERVER","EMAIL_HOST_PASSWORD")
+EMAIL_HOST_PASSWORD = get_secret("EMAIL_SERVER", "EMAIL_HOST_PASSWORD")
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-user
-EMAIL_HOST_USER = get_secret("EMAIL_SERVER","EMAIL_HOST_USER")
+EMAIL_HOST_USER = get_secret("EMAIL_SERVER", "EMAIL_HOST_USER")
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-EMAIL_PORT = get_secret("EMAIL_SERVER","EMAIL_PORT")
+EMAIL_PORT = get_secret("EMAIL_SERVER", "EMAIL_PORT")
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
 EMAIL_SUBJECT_PREFIX = '[%s] ' % SITE_NAME
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-EMAIL_USE_TLS = str_to_bool(get_secret("EMAIL_SERVER","EMAIL_TLS"))
+EMAIL_USE_TLS = str_to_bool(get_secret("EMAIL_SERVER", "EMAIL_USE_TLS"))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-SERVER_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = get_secret("EMAIL_SERVER", "EMAIL_SERVER")
 
-########## END EMAIL CONFIGURATION
+EMAIL_USE_SSL = str_to_bool(get_secret("EMAIL_SERVER", "EMAIL_USE_SSL"))
 
+DEFAULT_FROM_EMAIL = get_secret("EMAIL_SERVER", "DEFAULT_FROM_EMAIL")
 
-########## EMAIL ODECO CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-
-#'EMAIL_IS_LOCAL'
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-EMAIL_HOST_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_HOST")
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-password
-EMAIL_HOST_PASSWORD_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_HOST_PASSWORD")
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-user
-EMAIL_HOST_USER_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_HOST_USER")
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-EMAIL_PORT_ODECO = get_secret("EMAIL_SERVER_ODECO","EMAIL_PORT")
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-EMAIL_USE_TLS_ODECO = str_to_bool(get_secret("EMAIL_SERVER_ODECO","EMAIL_TLS"))
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-SERVER_EMAIL_ODECO = EMAIL_HOST_USER_ODECO
 ########## END EMAIL CONFIGURATION
 
 
 ########## DEBUG TOOLBAR CONFIGURATION CONFIGURATION
-INTERNAL_IPS= '127.0.0.1'
+INTERNAL_IPS = '127.0.0.1'
 ########## END TOOLBAR CONFIGURATION CONFIGURATION

@@ -88,34 +88,14 @@ if not DEBUG:
     EMAIL_SUBJECT_PREFIX = '[%s] ' % SITE_NAME
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-    EMAIL_USE_TLS = str_to_bool(os.environ['EMAIL_TLS'])
+    EMAIL_USE_TLS = str_to_bool(os.environ['EMAIL_USE_TLS'])
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-    SERVER_EMAIL = EMAIL_HOST_USER
-    ########## END EMAIL CONFIGURATION
+    SERVER_EMAIL = os.environ["EMAIL_SERVER"]
 
+    EMAIL_USE_SSL = str_to_bool(os.environ["EMAIL_USE_SSL"])
 
-    ########## EMAIL ODECO VENTAS CONFIGURATION
-    # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-
-    # 'EMAIL_IS_LOCAL'
-    # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-    EMAIL_HOST_ODECO = os.environ['EMAIL_HOST_ODECO_VENTAS']
-
-    # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-password
-    EMAIL_HOST_PASSWORD_ODECO = os.environ['EMAIL_HOST_PASSWORD_ODECO_VENTAS']
-
-    # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-user
-    EMAIL_HOST_USER_ODECO = os.environ['EMAIL_HOST_USER_ODECO_VENTAS']
-
-    # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-    EMAIL_PORT_ODECO = os.environ['EMAIL_PORT_ODECO_VENTAS']
-
-    # See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-    EMAIL_USE_TLS_ODECO = str_to_bool(os.environ['EMAIL_TLS_ODECO_VENTAS'])
-
-    # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-    SERVER_EMAIL_ODECO = EMAIL_HOST_USER_ODECO
+    DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]
     ########## END EMAIL CONFIGURATION
 
 

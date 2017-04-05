@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 class UserExtended(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_extendido")
     tipo = models.CharField(max_length=1, choices=(('I', 'Colaborador'), ('E', 'Cliente')))
+    email_envio_como = models.CharField(max_length=120, null=True, blank=True)
 
     def __str__(self):
         return self.user.first_name
@@ -38,7 +39,6 @@ class Colaborador(models.Model):
     extencion = models.CharField(max_length=10)
     foto_perfil = models.ImageField(upload_to=colaborador_upload_to, validators=[validate_image], null=True, blank=True)
     jefe = models.ForeignKey('self', on_delete=models.CASCADE, related_name='subalternos', null=True, blank=True)
-
 
     class Meta:
         verbose_name_plural = "colaboradores"
