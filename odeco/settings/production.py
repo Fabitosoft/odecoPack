@@ -91,7 +91,7 @@ if not DEBUG:
     EMAIL_USE_TLS = str_to_bool(os.environ['EMAIL_USE_TLS'])
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-    SERVER_EMAIL = os.environ["EMAIL_SERVER"]
+    SERVER_EMAIL = os.environ["SERVER_EMAIL"]
 
     EMAIL_USE_SSL = str_to_bool(os.environ["EMAIL_USE_SSL"])
 
