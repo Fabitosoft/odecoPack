@@ -38,6 +38,7 @@ def imagen_ensamblado_banda_upload_to(instance, filename):
     return "%s/%s/%s" % ("bandas", "ensamblado", new_filename)
 
 
+
 class Banda(TimeStampedModel):
     """
     Genera un ensamblaje de banda
