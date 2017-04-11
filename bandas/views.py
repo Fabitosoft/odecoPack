@@ -24,6 +24,7 @@ class BandaDetailView(DetailView):
 
 class BandaListView(ListView):
     model = Banda
+    context_object_name = 'bandas_list'
 
     def get_queryset(self):
         return super().get_queryset()

@@ -68,12 +68,12 @@
                 <th>
                     Categoria
                 </th>
-                <th>
-                    Precio Unitario
-                </th>
-                <th>
-                    Total
-                </th>
+                {#                <th>#}
+                {#                    Precio Unitario#}
+                {#                </th>#}
+                {#                <th>#}
+                {#                    Total#}
+                {#                </th>#}
             </tr>
             </thead>
             <tbody>
@@ -97,21 +97,21 @@
                     <td>
                         {{ ensamblado.producto.margen.categoria }}
                     </td>
-                    <td>
-                        {{ ensamblado.producto.precio_base }}
-                    </td>
-                    <td>
-                        {{ ensamblado.precio_linea }}
-                    </td>
+                    {#                    <td>#}
+                    {#                        {{ ensamblado.producto.precio_base }}#}
+                    {#                    </td>#}
+                    {#                    <td>#}
+                    {#                        {{ ensamblado.precio_linea }}#}
+                    {#                    </td>#}
                 </tr>
             {% endfor %}
             </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="7"> Total:</td>
-                <td> {{ object.precio_total }} </td>
-            </tr>
-            </tfoot>
+{#            <tfoot>#}
+{#            <tr>#}
+{#                <td colspan="7"> Total:</td>#}
+{#                <td> {{ object.precio_total }} </td>#}
+{#            </tr>#}
+{#            </tfoot>#}
         </table>
     </div>
 
