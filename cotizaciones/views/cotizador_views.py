@@ -416,7 +416,7 @@ class AddItemOtro(SingleObjectMixin, View):
         item.p_n_lista_referencia = referencia
         item.p_n_lista_unidad_medida = p_n_lista_unidad_medida
         item.precio = precio
-        item.total = precio * item.cantidad
+        item.total = float(precio) * float(item.cantidad)
         item.save()
 
         return redirect('cotizaciones:cotizador')
