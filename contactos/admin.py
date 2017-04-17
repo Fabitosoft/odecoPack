@@ -6,7 +6,7 @@ from .models import ContactoEmpresa
 # Register your models here.
 class ContactoEmpresaAdmin(admin.ModelAdmin):
     list_select_related = ('sucursal', 'creado_por', 'creado_por')
-    raw_id_fields = ('sucursal',)
+    raw_id_fields = ('sucursal','cliente')
     list_display = (
         'nombres',
         'cliente',
