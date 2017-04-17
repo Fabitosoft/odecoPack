@@ -23,6 +23,8 @@ class ContactoEmpresaAdmin(admin.ModelAdmin):
         'nombres',
         'apellidos',
         'cliente__nombre',
+        'correo_electronico',
+        'correo_electronico_alternativo'
     )
 
 
